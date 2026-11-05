@@ -4,7 +4,20 @@ abstract class Store extends \BackendDiff {
 	
 	protected $_server_delimiter;
 	private static $_account=false;
-	
+
+	/**
+	 * Name of the Group-Office entity this store syncs.
+	 *
+	 * When set, the changes sink can use the cheap APCu state counter of this entity to detect changes before it
+	 * queries the database in getNotification(). Stores that are not backed by an entity (mail) return null and are
+	 * polled periodically.
+	 *
+	 * @return string|null
+	 */
+	public function getSinkEntityName(): ?string {
+		return null;
+	}
+
 	/**
 	 * Get the imap account of the current user
 	 * 

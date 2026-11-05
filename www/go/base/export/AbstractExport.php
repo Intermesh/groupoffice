@@ -3,6 +3,8 @@
 namespace GO\Base\Export;
 
 
+use go\core\orm\CustomFieldsModel;
+
 abstract class AbstractExport {
 	
 	/**
@@ -114,8 +116,9 @@ abstract class AbstractExport {
 	public function getLabels(){
 		$columns = $this->columnModel->getColumns();
 		$labels = array();
-		foreach($columns as $column)		
-			$labels[$column->getDataIndex()]=$column->getLabel();
+		foreach($columns as $column) {
+			$labels[$column->getDataIndex()] = $column->getLabel();
+		}
 		
 		return $labels;
 	}
@@ -126,11 +129,12 @@ abstract class AbstractExport {
 		
 		foreach($c as $key){
             if(is_array($record[$key])) {
-				$v = implode(', ',$record[$key]);
-                $frecord[$key] = html_entity_decode($v );
+	            $v = implode(', ', $record[$key]);
+	            $frecord[$key] = html_entity_decode($v);
             } else {
 				$v = $record[$key] ?? "";
-                $frecord[$key] = html_entity_decode($v);
+				// Custom fields should be exported as separate "customFields.<databaseName>" columns
+				$frecord[$key] = $v instanceof CustomFieldsModel ? "" : html_entity_decode($v);
             }
 		}
 

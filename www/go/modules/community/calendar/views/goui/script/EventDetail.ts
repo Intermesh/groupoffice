@@ -1,9 +1,9 @@
 import {
-	btn, Button, checkbox,
-	comp, Component, containerfield,
+	btn, Button,
+	comp, containerfield,
 	DataSourceForm,
 	datasourceform, DateInterval,
-	DateTime, DisplayField, displayfield, EntityID, fieldset, Format, hr, mapfield, MaterialIcon, menu, Notifier,
+	DateTime, DisplayField, displayfield, EntityID, fieldset, Format, hr, mapfield, menu, Notifier, select, SelectField,
 	tbar, Toolbar,
 	Window
 } from "@intermesh/goui";
@@ -13,21 +13,18 @@ import {
 	DetailPanel,
 	JmapDataSource,
 	jmapds,
-	linkbrowserbutton,
+	linkbrowsebutton, modules, Principal, PrincipalCombo, principalcombo,
 	RecurrenceField,
-	entities
 } from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
-import {calendarStore, statusIcons, t} from "./Index.js";
+import {calendarStore, getParticipantStatusIcon, t, writeableCalendarStore} from "./Index.js";
 import {EventWindow} from "./EventWindow.js";
+import {CommentsPanel} from "@intermesh/community-comments";
 
 
 export class EventDetail extends DetailPanel<CalendarEvent> {
 
-	// title = t('New Event')
-	// width = 800
-	// height = 650
 	form: DataSourceForm
 
 	item?: CalendarItem
@@ -36,6 +33,10 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	store: JmapDataSource
 	private statusTbar: Toolbar
 	private editBtn: Button;
+
+	private selectCalendar: SelectField
+	private showCalendar: DisplayField;
+	private changeOrganizerField: PrincipalCombo
 
 	constructor() {
 		super("CalendarEvent");
@@ -65,73 +66,102 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 				}
 			}
 		}});
-		// alertUseDefault = checkbox({
-		// 	hidden:true,
-		// 	name:'useDefaultAlerts',
-		// 	listeners: {
-		// 		'setvalue': (_, newV) => {
-		// 			if(newV) {alertField.useDefault = true;}
-		// 		}
-		// 	}})
 
 
 		this.items.add(this.statusTbar);
 
 
 		this.scroller.items.add(this.form = datasourceform({
-				flex:1,
-				dataSource: this.store,
-				listeners: {
-					'load': ( {data}) => {
-						const start = new DateTime(data.start);
-						data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime? -1 : 0).format('c');
-						this.title = data.title;
-						if(!data.recurrenceRule)
-							recurrenceField.hidden = true;
-						else
-							recurrenceField.dataSet.start = start;
+					flex: 1,
+					dataSource: this.store,
+					listeners: {
+						'beforeload': ({data}) => {
+							const start = new DateTime(data.start);
+							data.end = start.add(new DateInterval(data.duration)).addDays(data.showWithoutTime ? -1 : 0).format('c');
+							this.title = data.title;
+							if (!data.recurrenceRule)
+								recurrenceField.hidden = true;
+							else
+								recurrenceField.dataSet.start = start;
 
-						if(data.participants && this.item!.calendarPrincipal) {
-							this.statusTbar.show();
-							this.pressButton(this.item!.calendarPrincipal.participationStatus);
-						}
-						if(data.useDefaultAlerts) {
-							alertField.useDefault = true;
-							delete data.alerts;
-						}
-					},
-					'beforesave':( {data}) => {
-						if(alertField.isModified() || !this.item?.data.id) {
-							data.useDefaultAlerts = alertField.useDefault;
+							if (data.participants && this.item!.calendarPrincipal) {
+								this.statusTbar.show();
+								this.pressButton(this.item!.calendarPrincipal.participationStatus);
+							}
+							if (data.useDefaultAlerts) {
+								alertField.useDefault = true;
+								delete data.alerts;
+							}
+						},
+						'beforesave': ({data}) => {
+							if (alertField.isModified() || !this.item?.data.id) {
+								data.useDefaultAlerts = alertField.useDefault;
+							}
 						}
 					}
-				}
-			},
+				},
 				comp({cls: "card flow"},
 					fieldset({},
-						displayfield({name: 'title',flex:1, label:t('Title')}),
-						displayfield({name: 'calendarId', width:160, label:t('Calendar'), renderer: async (v) => {
-							const c = await calendarStore.dataSource.single(v);
-							return c ? c.name : t('Unknown');
-						},listeners: {
-							'setvalue': ({newValue}) => {
-								if(newValue)
-									calendarStore.dataSource.single(newValue).then(r => {
-										if(!r) return;
-										this.item!.cal = r;
-										const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-										alertField.setDefaultLabel(d)
-									});
+						displayfield({name: 'title', flex: 1, label: t('Title')}),
+						this.showCalendar = displayfield({name: 'calendarId', width:160, hideWhenEmpty:false, label:t('Calendar'), renderer: async (v) => {
+								const c = await calendarStore.dataSource.single(v);
+								return c ? c.name : t('Unknown');
+							},listeners: {
+								'setvalue': ({newValue}) => {
+									if(newValue) {
+										calendarStore.dataSource.single(newValue).then(r => {
+											if (!r) return;
+											this.item!.cal = r;
+											const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+											alertField.setDefaultLabel(d)
+										});
+									}
+								}
+							}  }),
+						this.selectCalendar = select({
+							name: 'calendarId', width: 160, label: t('Calendar'),
+							required:true,
+							hidden:true,
+							valueField: 'id',
+							store: writeableCalendarStore,
+							textRenderer: (r: any) => r.name,
+							listeners: {
+								'render': () => {
+									if(!writeableCalendarStore.loaded) {
+										void writeableCalendarStore.load();
+									}
+								},
+								'setvalue': ({newValue}) => {
+									if (newValue) {
+										if (this.item!.data.calendarId != newValue) {
+											this.item!.data.calendarId = newValue;
+											this.item!.patch({calendarId: newValue});
+										}
+										writeableCalendarStore.dataSource.single(newValue).then(r => {
+											if (!r) return;
+											this.item!.cal = r;
+											const d = this.item!.data.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
+											alertField.setDefaultLabel(d)
+										});
+									}
+								}
 							}
-						}  }),
-						comp({cls:'hbox'},
-							displayfield({label: t('Start'), name:'start',renderer:d=>Format.dateTime(d), flex:1}),
-							displayfield({label:t('End'), name: 'end',renderer:d=>Format.dateTime(d), flex:1})
+						}),
+						comp({cls: 'hbox'},
+							displayfield({label: t('Start'), name: 'start', renderer: d => Format.dateTime(d), flex: 1}),
+							displayfield({label: t('End'), name: 'end', renderer: d => Format.dateTime(d), flex: 1})
 						),
 						recurrenceField,
-						displayfield({name: 'location', label:t('Location')}),
-						displayfield({name:'description', tagName: "div", cls: "pad", escapeValue: false, renderer: (v, field) => Format.textToHtml(v)}),
-						mapfield({name: 'participants',
+						displayfield({name: 'location', label: t('Location')}),
+						displayfield({
+							name: 'description',
+							tagName: "div",
+							cls: "pad",
+							escapeValue: false,
+							renderer: (v) => Format.textToHtml(v)
+						}),
+						mapfield({
+							name: 'participants',
 
 							buildField: (v: any) => {
 								const userIcon = v.roles?.owner ?
@@ -139,45 +169,59 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 												'meeting_room' : (v.name ?
 													'person' : 'contact_mail')
 										),
-									statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
+									statusIcon = getParticipantStatusIcon(v);
 
 								let type = '';
-								if(v.email == this.item?.calendarPrincipal?.email) {
-									type = ' ('+(this.item!.calendarPrincipal?.email === client.user.email ? t('You') : t('This'))+')';
+								if (v.email == this.item?.calendarPrincipal?.email) {
+									type = ' (' + (this.item!.calendarPrincipal?.email === client.user.email ? t('You') : t('This')) + ')';
 								}
-								let name = v.name ? v.name + (v.email ? type+'<br>' + v.email :'') : v.email+type;
+								let name = v.name ? v.name + (v.email ? type + '<br>' + v.email : '') : v.email + type;
 
-								return containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
-									comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
+								return containerfield({cls: 'hbox', style: {alignItems: 'center', cursor: 'default'}},
+									comp({tagName: 'i', cls: 'icon', html: userIcon, style: {margin: '0 8px'}}),
 									comp({
 										flex: '1 0 60%',
 										html: name
 									}),
-									comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
+									comp({
+										tagName: 'i',
+										cls: 'icon ' + statusIcon[2],
+										html: statusIcon[0],
+										title: statusIcon[1],
+										style: {margin: '0 8px'}
+									}),
 								);
 							}
 
 						}),
 						hr(),
+						this.changeOrganizerField = principalcombo({
+							entity: "User",
+							label: t("Change organizer"),
+						}).on('select', ({target, record}) => {
+							this.changeOrganizer(record, target);
+						}),
 						alertField,
-						mapfield({name: 'links', cls:'goui-pit',
-							buildField: (v: any) => containerfield({flex:'1 0 100%',cls: 'flow'},
-								btn({icon: "description", text: v.title, flex:'1', style:{textAlign:'left'}, handler() {
-									client.downloadBlobId(v.blobId, v.title).catch((error) => {
-										Notifier.error(error);
-									})
-								}})
+						mapfield({
+							name: 'links', cls: 'goui-pit',
+							buildField: (v: any) => containerfield({flex: '1 0 100%', cls: 'flow'},
+								btn({
+									icon: "description", text: v.title, flex: '1', style: {textAlign: 'left'}, handler() {
+										client.downloadBlobId(v.blobId, v.title).catch((error) => {
+											Notifier.error(error);
+										})
+									}
+								})
 							)
 						})
 					)
 				)
 			)
-
 		);
 
 
 		this.addLinks();
-		this.addComments();
+		this.scroller.items.add(new CommentsPanel(this.entityName));
 		this.addCustomFields();
 
 
@@ -186,15 +230,15 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 			this.editBtn = btn({
 				icon: "edit",
 				title: t("Edit"),
-				handler: (button, ev) => {
-					void this.item!.open();
+				handler: () => {
+					void this.item!.open(()=>{},true);
 				},
 			}),
 
 
 			addbutton(),
 
-			linkbrowserbutton(),
+			linkbrowsebutton(),
 
 			btn({
 				icon: "more_vert",
@@ -213,7 +257,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 						icon: "delete",
 						text: t("Delete"),
 						handler: () => {
-							jmapds("CalendarEvent").confirmDestroy([this.entity!.id]);
+							this.item?.remove();
 						}
 					})
 				)
@@ -228,7 +272,25 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 		});
 	}
 
+	private changeOrganizer(p: Principal, fld: PrincipalCombo) {
+		const change:any = {};
 
+		for(const p in this.item!.participants) {
+			if (this.item!.participants[p].roles.owner) {
+				change['participants/'+p+'/roles'] = {attendee:true, owner: null};
+			}
+		}
+		change['participants/'+p.id] = {
+			email: p.email,
+			name: p.name,
+			roles: {attendee:true, owner:true},
+			kind: p.type,
+			participationStatus:"accepted",
+			expectReply:false
+		};
+
+		this.item!.patch(change, () => { this.reload();}, () => {fld.clear()}, true);
+	}
 
 	private updateStatus(v:'accepted'|'declined'|'tentative') {
 		this.item!.updateParticipation(v, () => {void this.loadEvent(this.item!)});
@@ -238,19 +300,25 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 	/**
 	 * Load's an event from the data source without recurrenceId
+	 * It's used for opening links, but we cannot link instances
 	 * @param id
 	 */
 	async load(id:EntityID): Promise<this> {
-		const r = await super.load(id);
+		// const r = await super.load(id);
+		if (!calendarStore.loaded) {
+			await calendarStore.load();
+		}
+
+		if (!this.entity) {
+			await super.load(id);
+		}
 
 		const item = (new CalendarItem({
 			key: id + "",
 			data:this.entity!
 		}))
+		return await this.loadEvent(item);
 
-		await this.loadEvent(item);
-
-		return r;
 	}
 
 	/**
@@ -274,23 +342,25 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 
 			this.statusTbar.items.replace(btn({
 				text: t("Add"),
-				handler: button => {
+				handler: () => {
 					const dlg = new EventWindow();
 					dlg.show();
 					dlg.loadEvent(this.item!);
-					console.log(dlg.form.value);
-					console.log(dlg.form.modified);
 				}
 			}))
 			this.statusTbar.show();
 
 		} else {
-			// await super.load(ev.data.id);
 
 			this.toolbar.show();
 
 			this.pressButton(ev.calendarPrincipal?.participationStatus);
 			this.form.findField('alerts')!.hidden = false;
+
+			// for custom fields panel
+			this.entity = ev.data;
+			this.legacyOnLoad(ev.data.id);
+
 			this.form.load(ev.data.id).then(() => {
 				if(ev.recurrenceId) {
 					const start = this.form.findField('start')!,
@@ -310,10 +380,18 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 					}
 				}
 				this.item = ev;
+				this.changeOrganizerField.hidden = !this.item?.participants || !this.item?.data.isOrigin || !modules.get("community", "calendar")!.userRights.mayChangeOrganizer;
+				this.editBtn.hidden = !this.item.mayChange;
+				this.showCalendar.hidden = this.item.mayMove
+				this.selectCalendar.hidden = !this.item.mayMove;
 			});
+
+			await super.load(ev.data.id)
 		}
 		this.scroller.hidden = false;
 		this.disabled = false;
+
+		return this;
 	}
 
 }
@@ -332,6 +410,6 @@ export class EventDetailWindow extends Window {
 	}
 
 	loadEvent(ev: CalendarItem) {
-		this.view.loadEvent(ev);
+		return this.view.loadEvent(ev);
 	}
 }

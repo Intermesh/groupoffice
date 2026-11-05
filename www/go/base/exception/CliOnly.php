@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class CliOnly extends \Exception
+use go\core\exception\UserSafeException;
+
+class CliOnly extends \Exception implements UserSafeException
 {
 
 	public function __construct($message='') {

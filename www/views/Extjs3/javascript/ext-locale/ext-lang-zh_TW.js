@@ -18,7 +18,7 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-﻿/*
+/*
  * Traditional Chinese translation
  * By hata1234
  * 09 April 2007

@@ -14,6 +14,7 @@ class Spreadsheet extends convert\Spreadsheet
 	public static $excludeHeaders = [ 'password', 'images'];
 
 	protected function init() {
+		parent::init();
 		$this->addColumn('notebook', go()->t('Notebook', 'community', 'notes'));
 	}
 	protected function exportNotebook(Note $note) {
@@ -22,7 +23,7 @@ class Spreadsheet extends convert\Spreadsheet
 	}
 
 	protected function importNotebook(Note $note, $value, array $values) {
-		$nb = TaskList::find(['id'])->where('name', '=', $value);
+		$nb = NoteBook::find(['id'])->where('name', '=', $value)->single();
 		if($nb) {
 			$note->noteBookId = $nb->id;
 		}

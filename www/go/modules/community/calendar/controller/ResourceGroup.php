@@ -7,6 +7,9 @@ use go\core\jmap\EntityController;
 use go\modules\community\calendar\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\calendar\model\ResourceGroup>
+ */
 class ResourceGroup extends EntityController {
 	
 	/**
@@ -36,8 +39,6 @@ class ResourceGroup extends EntityController {
 	 * @see https://jmap.io/spec-core.html#/get
 	 */
 	public function get($params) {
-		if(!$this->rights->mayChangeResources)
-			throw new Forbidden('Permission denied');
 		return $this->defaultGet($params);
 	}
 	

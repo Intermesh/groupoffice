@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class ViesDown extends \Exception
+use go\core\exception\UserSafeException;
+
+class ViesDown extends \Exception implements UserSafeException
 {
 
 	public function __construct($message='') {

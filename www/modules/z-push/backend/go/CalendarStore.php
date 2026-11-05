@@ -47,9 +47,20 @@ class CalendarStore extends Store {
 		return !$calendar->save() ? false : $this->StatFolder($calendar->id);
 	}
 
+	public function DeleteFolder($id, $parentid) {
+		$calendar = Calendar::findById($id);
+		if(empty($calendar)) {
+			return true; // already gone!
+		}
+		$calendar->syncToDevice = 0;
+		return $calendar->save();
+	}
+
 	public function GetFolderList()
 	{
-		return Calendar::find()->select('caluser.id, name as "mod", "0" as parent')
+		return Calendar::find()
+			->select('caluser.id, name as "mod", "0" as parent')
+			->filter(['permissionLevel' => Acl::LEVEL_READ])
 			->andWhere('isSubscribed', '=', 1)
 			->andWhere('syncToDevice', '=', 1)
 			->fetchMode(\PDO::FETCH_ASSOC)
@@ -58,16 +69,17 @@ class CalendarStore extends Store {
 
 	public function GetMessageList($folderid, $cutoffdate)
 	{
-		$query = CalendarEvent::find()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
+		$query = CalendarEvent::find()->distinct()->select(['cce.id', 'UNIX_TIMESTAMP(modifiedAt) as "mod"', '1 as flags']);
 		$filter = [
 			'inCalendars'=>$folderid,
-			'after' => date('Y-m-d H:i:s', $cutoffdate),
 			'hideSecret'=>1
 		];
 		if (!empty($cutoffdate)) {
 			$filter['after'] = date('Y-m-d H:i:s', $cutoffdate);
 		}
 		$query->filter($filter);
+
+		ZLog::Write(LOGLEVEL_DEBUG, (string) $query);
 		ZLog::Write(LOGLEVEL_INFO, "GetMessageList ".$folderid. ' '. $cutoffdate);
 		return $query->fetchMode(\PDO::FETCH_ASSOC)->all();
 	}
@@ -129,7 +141,18 @@ class CalendarStore extends Store {
 		$event->calendarId = $folderid;
 
 		try {
-			$event = CalendarConvertor::toCalendarEvent($message, $event);
+
+			// AS 16.1+ uses instanceid
+			if($message->instanceiddelete) {
+				$recurrenceId = (new \go\core\util\DateTime($message->instanceid))->setTimezone($event->timeZone())->format('Y-m-d\TH:i:s');
+				ZLog::Write(LOGLEVEL_DEBUG, "Deleting recurring event instance ".$id.' :: '. $recurrenceId);
+
+				$event->recurrenceOverrides[$recurrenceId] = (new RecurrenceOverride($event));
+				$event->recurrenceOverrides[$recurrenceId]->setValues(['excluded'=>true]);
+
+			} else {
+				$event = CalendarConvertor::toCalendarEvent($message, $event);
+			}
 
 			if(!$event->save()){
 				ZLog::Write(LOGLEVEL_WARN, "Failed to save event: " . var_export($event->getValidationErrors(), true));
@@ -165,6 +188,9 @@ class CalendarStore extends Store {
 		ZLog::Write(LOGLEVEL_DEBUG, "MeetingResponse($requestid, $folderid, $response, $instanceId)");
 
 		$event = CalendarEvent::findById($requestid);
+
+		// Send the reply to the organizer
+		CalendarEvent::$sendSchedulingMessages = true;
 
 		if($event->isRecurring() && isset($instanceId)) {
 
@@ -228,6 +254,10 @@ class CalendarStore extends Store {
 
 		$event->calendarId = $newfolderid;
 		return !$event->save() ? false : $event->id;
+	}
+
+	public function getSinkEntityName(): ?string {
+		return 'CalendarEvent';
 	}
 
 	public function getNotification($folder=null) {

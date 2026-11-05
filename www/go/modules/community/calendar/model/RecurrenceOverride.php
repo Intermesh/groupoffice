@@ -7,7 +7,6 @@ use go\core\data\Model;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use DateTime;
-use go\modules\community\addressbook\model\Date;
 use stdClass;
 
 /**
@@ -69,13 +68,14 @@ class RecurrenceOverride extends Property
 	}
 
 	/**
-	 * Adds (does not reset like setValues()) values for an occurrence and computes the difference with the series and saves them
+	 * Sets values for an occurrence and computes the difference with the series and saves them
 	 * to this object as a patch
 	 *
 	 * @param stdClass $props
+	 * @param bool $clear If true then all existing properties will be cleared. Set false if you only want to add the given properties
 	 * @return void
 	 */
-	public function patchProps(stdClass $props): void
+	public function patchProps(stdClass $props, bool $clear = true): void
 	{
 		$event = $this->owner;
 		$patch = [];
@@ -108,8 +108,10 @@ class RecurrenceOverride extends Property
 				$patch[$property] = $props->$property;
 			}
 		}
-		$this->props = new stdClass;
-		$this->setValues($patch);
+		if($clear) {
+			$this->props = new stdClass;
+		}
+		parent::setValues($patch);
 	}
 
 
@@ -172,9 +174,9 @@ class RecurrenceOverride extends Property
 		return $this->props->$name;
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
-		if(empty($this->props) || !isset($this->patch)) return null;
+		if(empty($this->props) || !isset($this->patch)) return [];
 		return json_decode($this->patch,true);
 	}
 

@@ -15,7 +15,7 @@
         font-size:14px;
         margin: 24px auto;
     }
-    .foot { margin-top: 32px; padding: 8px 0; border-top: 1px solid #e0e0e0; background-color: #fafafa; }
+    .foot { padding: 8px 0; border-top: 1px solid #e0e0e0; background-color: #fafafa; }
     a.bord {
         display:inline-block;
         min-width:123px;
@@ -50,7 +50,7 @@
         font-size: 10px;
         line-height: 18px;
     }
-    .center { margin-left: 112px; width: 456px;}
+    .center { margin-left: 112px; width: 456px; padding-bottom: 32px;}
     .accepted {color:green;}
     .declined {color: red;}
     .tentative {color: blue;}
@@ -120,16 +120,16 @@ $icon = [
         </div>
     </div>
     <?php if($method==='PAGE' && isset($_GET['reply'])): ?>
-    <div class="center <?=$_GET['reply']?>"><br>
+    <div class="center <?=htmlentities($_GET['reply'])?>"><br>
        <?php $msg = go()->t('replyPageMessage', 'community', 'calendar');
-       if(array_key_exists($_GET['reply'], $msg)) echo $msg[$_GET['reply']];
+       if(array_key_exists($_GET['reply'], $msg)) echo htmlentities($msg[$_GET['reply']]);
        ?>
     </div>
     <?php endif; ?>
-    <div class="foot"><?php if($method!=='CANCEL'): ?>
-        <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Accept')?></a>
-        <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Maybe')?></a>
-        <a class="bord <?=$status['declined']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=declined"><?=go()->t('Decline')?></a>
+    <div class="foot <?= $participant->kind === 'resource' ? "" : 'go-hidden' ?>"><?php if($method!=='CANCEL'): ?>
+        <a class="bord <?=$status['accepted']??''?>"  target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=accepted" style="margin-left:112px; margin-top:0;" ><?=go()->t('Accept', 'community', 'calendar')?></a>
+        <a class="bord <?=$status['tentative']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=tentative"><?=go()->t('Maybe', 'community', 'calendar')?></a>
+        <a class="bord <?=$status['declined']??''?>" target="<?=$method==='PAGE'?'':'_blank'?>" href="<?=$url?>?reply=declined"><?=go()->t('Decline', 'community', 'calendar')?></a>
 		<?php endif; ?>
     </div>
 

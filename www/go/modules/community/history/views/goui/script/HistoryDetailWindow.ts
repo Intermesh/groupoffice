@@ -17,12 +17,40 @@ export class HistoryDetailWindow extends Window {
 		this.resizable = true;
 
 		this.items.add(
-			comp({cls: "pad scroll"},
-				this.dateComp = comp(),
-				comp({tagName: "h4", text: t("Changes")}),
-				this.changesComp = comp()
+			comp({cls: "scroll", flex: 1},
+				comp({cls: "pad fit", flex: 1},
+					this.dateComp = comp(),
+					comp({tagName: "h4", text: t("Changes")}),
+					this.changesComp = comp()
+				)
 			)
 		);
+	}
+
+	private formatValue(v: any): string {
+
+		if (v === null || v === undefined) {
+			return '<i>null</i>';
+		}
+		switch (typeof v) {
+			case "string":
+				if (v.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/)) {
+					return Format.dateTime(v);
+				} else {
+					return v.htmlEncode();
+				}
+
+			case "object":
+				let str = "";
+				for (let key in v) {
+					str += `${key}: ${this.formatValue(v[key])} \n`;
+				}
+				return str;
+
+			default:
+				return JSON.stringify(v);
+
+		}
 	}
 
 	public async load(logEntryId: EntityID) {
@@ -46,7 +74,7 @@ export class HistoryDetailWindow extends Window {
 
 					this.changesComp.items.add(
 						comp({
-							html: `<b>${key}: </b> ${value!.toString()}`
+							html: `<b>${key}: </b> ${this.formatValue(value)}`
 						})
 					);
 				}
@@ -56,36 +84,18 @@ export class HistoryDetailWindow extends Window {
 				const tableData = [];
 
 				for (let i = 0; i < changes.length; i++) {
-					let change: [string, string] = changes[i];
-
-					let oldStr = change[1][0];
-					let newStr = change[1][1];
-
-					if (typeof oldStr === "object") {
-						oldStr = Object.entries(oldStr).map(([key], value) => {
-							return `${key}: ${value} \n`;
-						}).join("");
-					}
-
-					if (typeof newStr === "object") {
-						newStr = Object.entries(newStr).map(([key], value) => {
-							return `${key}: ${value} \n`;
-						}).join("");
-					}
-
-					newStr = !isNaN(new Date(newStr).getTime()) ? Format.dateTime(newStr) : newStr;
-					oldStr = !isNaN(new Date(oldStr).getTime()) ? Format.dateTime(oldStr) : oldStr;
+					const change: [string, string] = changes[i];
 
 					tableData.push({
 						name: change[0],
-						old: oldStr,
-						new: newStr
+						old: this.formatValue(change[1][1]),
+						new: this.formatValue(change[1][0])
 					});
 				}
 
 				this.changesComp.items.add(
 					table({
-						cls: "history-changes-table scroll",
+						cls: "history-changes-table",
 						columns: [
 							column({
 								id: "name",
@@ -101,11 +111,9 @@ export class HistoryDetailWindow extends Window {
 							})
 						],
 						store: store({data: tableData}),
-						fitParent: true,
 						rowSelectionConfig: {
 							multiSelect: false
-						},
-						flex: 1
+						}
 					})
 				);
 

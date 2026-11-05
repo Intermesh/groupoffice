@@ -11,9 +11,9 @@ abstract class State {
 	/**
 	 * Get the ID logged in user
 	 * 
-	 * @return int|null
+	 * @return string|null
 	 */
-	abstract function getUserId(): ?int;
+	abstract function getUserId(): ?string;
 
 	/**
 	 * Get the logged in user

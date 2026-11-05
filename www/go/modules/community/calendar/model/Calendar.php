@@ -5,8 +5,10 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
+use go\core\fs\File;
 use go\core\http;
 use go\core\model\Acl;
+use go\core\model\Group;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\CustomFieldsTrait;
@@ -62,7 +64,7 @@ class Calendar extends AclOwnerEntity {
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
 
-	public ?bool $syncToDevice = true;
+	public ?bool $syncToDevice = null;
 
 	protected ?string $defaultColor = null;
 
@@ -76,11 +78,22 @@ class Calendar extends AclOwnerEntity {
 	 * @var DefaultAlertWT[]
 	 */
 	public ?array $defaultAlertsWithoutTime;
+
+
+	/**
+	 * Calendar owner id
+	 *
+	 * Is null for shared calendars and resources. {@see getOwnerId()}
+	 * @var int|null
+	 */
 	protected ?int $ownerId = null;
 	public ?string $createdBy;
 	public ?string $webcalUri = null;
+	protected ?string $webcalHash = null;
 
 	public ?string $groupId;
+
+	public ?string $publishKey;
 	protected ?string $highestItemModSeq;
 
 	protected static function defineMapping(): Mapping
@@ -97,17 +110,40 @@ class Calendar extends AclOwnerEntity {
 		return ['name'];
 	}
 
+	protected function canCreate(): bool
+	{
+		return \go\modules\community\calendar\Module::get()->getModel()->getUserRights()->mayChangeCalendars;
+	}
+
+	private function generateSecret() {
+		$bits = openssl_random_pseudo_bytes(15); // 6bits per char, 120bits = 20 chars
+		return strtr(base64_encode($bits), '+/', '-_'); // translate to make url-safe
+	}
+
+	public function setPublish($val) {
+		$this->publishKey = $val ? $this->generateSecret() : null;
+	}
+
 	public function setOwnerId($v) {
 		$this->ownerId = $v;
 	}
 
+	/**
+	 * The calendar owner is a principal:
+	 *
+	 * 1. A user if it's a private calendar
+	 * 2. "Calendar::$id" if it's a resource
+	 * 3. null if it's a shared calendar where any user with permission can be the organizer.
+	 *
+	 * @return int|string|null
+	 */
 	public function getOwnerId() {
-		return !empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
+		return $this->ownerId; //!empty($this->groupId) ? ('Calendar:'.$this->id) : $this->ownerId;
 	}
 
-	/** @return int */
+
 	public static function fetchPersonal($userId) {
-		$user = User::findById($userId, ['id','displayName','calendarPreferences']);
+		$user = User::findById($userId, ['id','displayName','email', 'calendarPreferences']);
 		if(!empty($user)) {
 			/** @var Preferences $pref */
 			$pref = $user->calendarPreferences;
@@ -127,8 +163,12 @@ class Calendar extends AclOwnerEntity {
 		}
 
 		// create default
-		$cal = Calendar::createDefault($user);
-		return $cal->id;
+		if(!empty($user)) {
+			$cal = Calendar::createDefault($user);
+			if($cal)
+				return $cal->id;
+		}
+		return null;
 
 	}
 
@@ -140,13 +180,13 @@ class Calendar extends AclOwnerEntity {
 		$this->color = $value;
 	}
 
-	protected function getDefaultCreatedBy(): ?int
-	{
-		if(!empty($this->ownerId)) {
-			return $this->ownerId;
-		}
-		return parent::getDefaultCreatedBy();
-	}
+//	protected function getDefaultCreatedBy(): ?int
+//	{
+//		if(!empty($this->ownerId)) {
+//			return $this->ownerId;
+//		}
+//		return parent::getDefaultCreatedBy();
+//	}
 
 
 	protected static function defineFilters(): Filters
@@ -220,35 +260,50 @@ class Calendar extends AclOwnerEntity {
 		}
 		if($this->isNew()) {
 			$this->isSubscribed = true; // auto subscribe the creator.
+			$this->syncToDevice = true;
 			$this->isVisible = true;
 			$this->defaultColor = $this->color;
+
+			if(!empty($this->groupId)) {
+				// Make sure resource owner can manage resource calendars.
+				// This doesn't handle permissions when the resource calendar admin changes though.
+				$adminId = ResourceGroup::find()
+					->selectSingleValue('defaultOwnerId')
+					->where('id', '=', $this->groupId)
+					->single();
+				$groupId = Group::findPersonalGroupID($adminId);
+				if($groupId) {
+					$this->createAcl();
+					$this->findAcl()->addGroup($groupId, 35); // Write all
+				}
+			}
+
 		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {
 			$this->color = $this->defaultColor;
 		}
-		if(!empty($this->groupId) && empty($this->ownerId)) {
-			$this->ownerId = ResourceGroup::find()
-				->selectSingleValue('defaultOwnerId')
-				->where('id', '=', $this->groupId)
-				->single();
-		}
+
 		if($this->isModified('defaultAlertsWithTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithTime);
 		}
 		if($this->isModified('defaultAlertsWithoutTime')) {
 			$this->updateEventAlerts($this->defaultAlertsWithoutTime, false);
 		}
+		if(!$this->isNew() && $this->id === go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId) {
+			$this->isSubscribed = true; // do not let users unsubscribe there personal calendar
+		}
 		if(empty($this->includeInAvailability) && !$this->isPrincipal()) {
 			// set sane default
 			$this->includeInAvailability = $this->ownerId == go()->getUserId() ? 'all' :
 				(empty($this->ownerId) ? 'attending' : 'none');
 		}
+		$wasNew = $this->isNew();
 		$success = parent::internalSave();
 
-		if(!empty($this->webcalBlob)) {
-			CalendarEvent::import([$this->webcalBlob], $this->id, 'ignore');
+		if($wasNew && !empty($this->webcalBlob)) {
+			ICalendarHelper::import([$this->webcalBlob], $this->id, 'ignore');
 		}
 
 		return $success;
@@ -324,7 +379,9 @@ class Calendar extends AclOwnerEntity {
 			return false;
 		}
 		$httpClient = new http\Client();
-		$tmpFile = \go\core\fs\File::tempFile('ics');
+		$httpClient->globalRangeOnly = true;
+
+		$tmpFile = File::tempFile('ics');
 		$httpClient->download($this->webcalUri, $tmpFile);
 
 		if ($tmpFile->isFile()) {
@@ -337,6 +394,36 @@ class Calendar extends AclOwnerEntity {
 		return false;
 	}
 
+	private function webcalFingerprint($path){
+
+		$events = [];
+		foreach(ICalendarHelper::veventSplitter($path) as $uid => $block) {
+
+			preg_match('/RECURRENCE-ID[^:]*:(.+)/', $block, $rid);
+			preg_match('/LAST-MODIFIED:(.+)/', $block, $lm);
+			preg_match('/DTSTART[^:]*:(.+)/', $block, $dtstart);
+			preg_match('/DTEND[^:]*:(.+)/', $block, $dtend);
+			preg_match('/SUMMARY:(.+)/', $block, $summary);
+			preg_match('/SEQUENCE:(.+)/', $block, $seq);
+
+			$key = trim($uid);
+			if (!empty($rid[1])) {
+				$key .= '|' . trim($rid[1]);
+			}
+
+			$events[$key] =
+				($dtstart[1] ?? '') . '|' .
+				($dtend[1] ?? '') . '|' .
+				($summary[1] ?? ''). '|'.
+				($seq[1] ?? '').'|'.
+				($lm[1] ?? '');
+		}
+
+		ksort($events);
+
+		return hash('sha1', implode("\n", $events));
+	}
+
 	public function importWebcal() {
 
 		if(!$this->webcalUri) {
@@ -347,23 +434,61 @@ class Calendar extends AclOwnerEntity {
 				return false;
 			}
 		}
+		$path = Blob::buildPath($this->webcalBlob);
+		if(!file_exists($path)) {
+			go()->log("File not found: ".$path);
+			return false;
+		}
+
+		$hash = $this->webcalFingerprint($path);
+		if(($hash === $this->webcalHash)) {
+			go()->log("Webcal not imported, no changes.");
+			return false;
+		}
+		$this->webcalHash = $hash;
 		// truncate
 		CalendarEvent::delete((new Query)->where(['calendarId'=>$this->id]));
 		// then insert
-		return CalendarEvent::import([$this->webcalBlob], $this->id, 'ignore');
+		$response =  ICalendarHelper::import([$this->webcalBlob], $this->id, 'ignore');
+		$this->save();
+		return $response;
 	}
 
 	protected function isPrincipal() : bool
 	{
-		return isset($this->groupId) && isset($this->ownerId);
+		if(!isset($this->groupId)) {
+			return false;
+		}
+
+		$group = ResourceGroup::findById($this->groupId);
+		return !empty($group->defaultOwnerId);
 	}
 
 	protected static function queryMissingPrincipals(int $offset = 0): Query {
 		return self::traitMissingPrincipals($offset)->andWhere('groupId', 'IS NOT', NULL);
 	}
 
+	private bool $forcePrincipalUpdate = false;
+
+	/**
+	 * Rebuild the principal from the current resource group. Needed when the group's admin
+	 * (defaultOwnerId) changes as the principal's email and description are derived from it.
+	 */
+	public function refreshPrincipal(): void
+	{
+		$this->forcePrincipalUpdate = true;
+		try {
+			$this->savePrincipal();
+		} finally {
+			$this->forcePrincipalUpdate = false;
+		}
+	}
+
 	protected function isPrincipalModified() : bool
 	{
+		if($this->forcePrincipalUpdate) {
+			return true;
+		}
 		return $this->isModified(['name', 'description', 'timeZone', 'ownerId','groupId']);
 	}
 
@@ -373,22 +498,29 @@ class Calendar extends AclOwnerEntity {
 
 	public static function createDefault(User $user) : Calendar {
 
-		$calendar = Calendar::find()->where(['ownerId' => $user->id])->filter(['permissionLevel' => Acl::LEVEL_MANAGE])->single();
+		$calendar = Calendar::findFor($user->id)
+			->where(['ownerId' => $user->id])
+//			->filter(['permissionLevel' => Acl::LEVEL_MANAGE]) // can't be used when not logged in
+			->single();
 
 		if (empty($calendar)) {
 			$calendar = Calendar::createFor($user->id);
 			$calendar->forUserId();
+			$calendar->createdBy = $user->id;
 			$calendar->setValues([
 				'name' => $user->displayName,
 				'ownerId' => $user->id,
 				'color' => Calendar::randomColor($user->displayName),
-				'isSubscribed'=>true,
-				'includeInAvailability'=>'all'
+				'isSubscribed' => true,
+				'syncToDevice' => true,
+				'includeInAvailability' => 'all'
 			]);
+		} else {
+			$calendar->isSubscribed = true;
+		}
 
-			if(!$calendar->save()) {
-				throw new SaveException($calendar);
-			}
+		if(!$calendar->save()) {
+			throw new SaveException($calendar);
 		}
 
 		$user->calendarPreferences->personalCalendarId = $calendar->id;

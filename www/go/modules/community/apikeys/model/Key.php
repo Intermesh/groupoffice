@@ -36,21 +36,31 @@ class Key extends Entity {
 		
 		return parent::internalSave();
 	}
-	
+
+	public function historyLog(): bool|array
+	{
+		$log = parent::historyLog();
+		if (isset($log['accessToken'][0])) {
+			$log['accessToken'][0] = 'MASKED';
+		}
+		return $log;
+	}
+
 	protected static function internalDelete(Query $query): bool
 	{
 		$q = clone $query;
 		$q->select('accessToken');
+		$qq = $q->single();
 
-		if(!parent::internalDelete($query)) {
-		  return false;
-    }
+		if (!parent::internalDelete($query)) {
+			return false;
+		}
 
-    if(!Token::delete(['accessToken' => $q])) {
-      throw new \Exception("Could not delete access token");
-    }
+		if ($qq && !Token::delete(['accessToken' => $qq['accessToken']])) {
+			throw new \Exception("Could not delete access token");
+		}
 
-    return true;
+		return true;
 	}
 
 	private int $userId;

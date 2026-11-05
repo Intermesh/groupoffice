@@ -17,4 +17,8 @@ return array (
   'name' => 'Yhteenveto',
   'description' => 'Laita kuvaus tähän',
   'Start page' => 'Yhteenveto',
+  "welcomeTitle" => "Tervetuloa Group-Officeen!",
+  "welcomeContent" => "<p>Kiitos Group-Officen asentamisesta!</p>
+<p>Tässä on linkki, joka auttaa alkuun: {{link}}</p>
+<p>Toivomme, että nautit Group-Officesta!</p>"
 );

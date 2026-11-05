@@ -68,6 +68,25 @@ class Installer {
 	}
 
 	/**
+	 * Check if the web upgrade may run for the current request.
+	 *
+	 * When the database version differs from the code version, Group-Office can't be used until it's upgraded and
+	 * login may not work with the old schema, so anyone may start it. When the database is up to date, only an
+	 * administrator may run it again. Also used to protect install/license.php.
+	 *
+	 * @return bool
+	 */
+	public function isUpgradeAllowed(): bool
+	{
+		if (go()->getSettings()->databaseVersion != go()->getVersion()) {
+			return true;
+		}
+
+		$state = go()->getAuthState();
+		return $state !== null && $state->isAuthenticated() && $state->isAdmin();
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function enableGarbageCollection() {
@@ -97,6 +116,21 @@ class Installer {
 		}
 
 		return $cron;
+	}
+
+	private function createEmailReminderCron() {
+
+		$module = model\Module::findByName("core", "core");
+
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "EmailAlerts";
+		$cron->expression = "* * * * *";
+		$cron->description = "Email alerts";
+
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
 	}
 
 	/**
@@ -257,6 +291,7 @@ class Installer {
 
 
 		$this->createGarbageCollection();
+		$this->createEmailReminderCron();
 
 		if(!Password::register()) {
 			throw new Exception("Failed to register Password authenticator");
@@ -379,6 +414,11 @@ class Installer {
 
 	}
 
+	/**
+	 *
+	 * @param bool|null $enabled
+	 * @return array {name:string, package:string, version:int, enabled:bool}[]
+	 */
 	public function getUnavailableModules(bool|null $enabled = true): array
 	{
 		$this->removeObsoleteModules();
@@ -489,18 +529,12 @@ class Installer {
 
 		go()->disableEvents();
 
-
 		$this->isValidDb();
 		go()->getCache()->flush(true, false);
 		GO::clearCache(); //legacy framework
 		go()->setCache(new None());
+		\GO\Base\Db\Columns::$forceLoad = true;
 		
-//		$unavailable = go()->getInstaller()->getUnavailableModules();
-//		if(!empty($unavailable)) {
-//			throw new \Exception("There are unavailable modules: " . var_export($unavailable, true));
-//		}
-
-
 		$this->disableUnavailableModules();
 
 		$lock = new Lock("upgrade", false);
@@ -521,6 +555,9 @@ class Installer {
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
+		// for moving wopi module. remove later.
+		go()->getDbConnection()->exec("update core_module set package='community' where name='wopi'");
 
 		$database = go()->getDatabase();
 		$database->setUtf8();
@@ -588,26 +625,22 @@ class Installer {
 	}
 
     private function enableDiskUsage() {
+	    $job = model\CronJobSchedule::findByName("CalculateDiskUsage", "core", "core");
+	    if($job) {
+		    return;
+	    }
 
-        $cron = \GO\Base\Cron\CronJob::model()->findSingleByAttribute('job', 'GO\Base\Cron\CalculateDiskUsage');
-        if(!$cron) {
-            $cron = new \GO\Base\Cron\CronJob();
-            $cron->name = 'Calculate disk usage';
-            $cron->job = 'GO\Base\Cron\CalculateDiskUsage';
-        }
+	    $module = model\Module::findByName("core", "core");
 
-        $cron->active = true;
-        $cron->runonce = false;
-        $cron->minutes = '1';
-        $cron->hours = '1';
-        $cron->monthdays = '*';
-        $cron->months = '*';
-        $cron->weekdays = '*';
+	    $cron = new model\CronJobSchedule();
+	    $cron->moduleId = $module->id;
+	    $cron->name = "CalculateDiskUsage";
+	    $cron->expression = "1 1 * * *";
+	    $cron->description = "Calculate disk usage";
 
-        if(!$cron->save()) {
-            var_dump($cron->getValidationErrors());
-            throw new Exception("Could not save calculate disk usage cron");
-        }
+	    if(!$cron->save()) {
+		    throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+	    }
     }
 	
 	/**
@@ -771,7 +804,7 @@ class Installer {
 							require_once($updateScript);
 						});
 					} else {
-						echo $modStr . 'Excuting query: ' . $query . "\n";
+						echo $modStr . 'Executing query: ' . $query . "\n";
 						flush();
 						try {
 							if (!empty($query))

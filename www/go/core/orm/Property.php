@@ -133,7 +133,7 @@ abstract class Property extends Model {
 	/**
 	 * @var int|null When the entity has a user table this is the user we want to join or save that record for
 	 */
-	protected ?int $_forUserId = null;
+	private ?int $_forUserId = null;
 
 	/**
 	 * Constructor
@@ -352,12 +352,12 @@ abstract class Property extends Model {
 	/**
 	 * Check if a property was fetched in the {@see Entity::find()} method.
 	 *
-	 * @param string $propName
+	 * @param string[] $propName
 	 * @return bool
 	 */
-	public function isFetched(string $propName): bool
+	public function isFetched(string ...$propName): bool
 	{
-		return in_array($propName, $this->fetchProperties);
+		return count(array_diff($propName, $this->fetchProperties)) === 0;
 	}
 
 	/**
@@ -523,7 +523,11 @@ abstract class Property extends Model {
 			}
 
 			if (!empty($relation->orderBy)) {
-				$query->orderBy([$relation->orderBy => 'ASC']);
+				if(is_array($relation->orderBy)) {
+					$query->orderBy($relation->orderBy);
+				} else {
+					$query->orderBy([$relation->orderBy => 'ASC']);
+				}
 			}
 
 			$stmt = self::$cachedRelationStmts[$cacheKey] = $query->createStatement();
@@ -613,6 +617,25 @@ abstract class Property extends Model {
 			return $ret;
 		}
 
+		$p = $this->internalWatchProperties();
+
+		App::get()->getCache()->set($cacheKey, $p);
+
+		return $p;
+	}
+
+
+	/**
+	 * These properties are used to check if a model is modified.
+	 * override to exclude or include properties.
+	 *
+	 * By default, all non-static public and protected properties + dynamically mapped properties.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function internalWatchProperties(): array
+	{
 		$p = array_keys(static::getMapping()->getProperties());
 
 		$reflectionObject = new ReflectionClass(static::class);
@@ -634,11 +657,7 @@ abstract class Property extends Model {
 			'permissionLevel',
 			'readOnly'
 		];
-		$p = array_unique(array_diff($p, $exclude));
-
-		App::get()->getCache()->set($cacheKey, $p);
-
-		return $p;
+		return array_unique(array_diff($p, $exclude));
 	}
 
 	/**
@@ -662,7 +681,7 @@ abstract class Property extends Model {
 
 			if(is_object($v)) {
 				$this->oldProps[$propName] = clone $v;
-			} else if(is_array($v) && isset($v[0]) && $v[0] instanceof self) {
+			} else if(is_array($v) && (($firstKey = array_key_first($v)) && isset($v[$firstKey]) && $v[$firstKey] instanceof self)) {
 				$this->oldProps[$propName] = array_map(function($i) {return clone $i;}, $v);
 			} else {
 				$this->oldProps[$propName] = $v;
@@ -734,6 +753,8 @@ abstract class Property extends Model {
 
 		return $map;
 	}
+
+
 
 	/**
 	 * Get ID which is are the primary keys combined with a "-".
@@ -1170,7 +1191,7 @@ abstract class Property extends Model {
 			return true;
 		}
 
-		return $a->format('U') != $b->format('U');
+		return $a->format(Column::DATETIME_FORMAT) != $b->format(Column::DATETIME_FORMAT);
 	}
 
 	/**
@@ -1185,6 +1206,8 @@ abstract class Property extends Model {
 			return $forIsModified ? false : [];
 		}
 
+		$modified = [];
+
 		if(!is_array($properties)) {
 			$properties = [$properties];
 		}
@@ -1192,27 +1215,45 @@ abstract class Property extends Model {
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
 
-			if(method_exists($this, 'getCustomFields') && $this->getCustomFields()->isModified()) {
-				if ($forIsModified) {
-					return true;
-				}
-				$modified['customFields'] = $this->getCustomFields()->getModified();
+			if(method_exists($this, 'getCustomFields')) {
+				$properties[] = 'customFields';
 			}
 		}
 
-		$modified = [];
-
 		foreach($properties as $key) {
 
-			$oldValue = $this->oldProps[$key] ?? null;
-			$newValue = $this->{$key} ?? null;
+			if($key == 'customFields') {
+				/** @var CustomFieldsModel $cf */
+				$cf = $this->getCustomFields();
 
-			$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
-			if ($propModified) {
-				if ($forIsModified) {
-						return true;
+				if ($forIsModified && $cf->isModified()) {
+					return true;
 				}
-				$modified[$key] = [$newValue, $oldValue];
+
+				$cfModfications = $cf->getModified();
+
+				if(!empty($cfModfications)) {
+					$current = [];
+					$old = [];
+
+					foreach ($cfModfications as $key => $cfModfication) {
+						$current[$key] = $cfModfication[0];
+						$old[$key] = $cfModfication[1];
+					}
+					$modified['customFields'] = [$current, $old];
+				}
+
+			} else {
+				$oldValue = $this->oldProps[$key] ?? null;
+				$newValue = $this->{$key} ?? null;
+
+				$propModified = $this->internalIsModified($newValue, $oldValue, static::isScalarRelation($key));
+				if ($propModified) {
+					if ($forIsModified) {
+						return true;
+					}
+					$modified[$key] = [$newValue, $oldValue];
+				}
 			}
 		}
 
@@ -1394,6 +1435,14 @@ abstract class Property extends Model {
 	 * @var bool
 	 */
 	public bool $dontChangeModifiedAt = false;
+
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return [];
+	}
 
 	/**
 	 * Sets some default values such as modifiedAt and modifiedBy
@@ -1850,12 +1899,32 @@ abstract class Property extends Model {
 		$stmt->execute();
 	}
 
+	/**
+	 *
+	 * When the entity has a user table or per user relations this is the user we want to join or save that record for
+	 *
+	 * @param int|null $forUserId
+	 * @return int|null
+	 */
 	public function forUserId(int|null $forUserId = null): ?int
 	{
 		if(isset($forUserId)) {
 			$this->_forUserId = $forUserId;
 		}
 		return $this->_forUserId ?? go()->getUserId();
+	}
+
+	/**
+	 * Checks if modifiedBy, modifiedAt, createdBy or createdAt should be set automatically.
+	 */
+	private function shouldSetSaveProps(array $modified): bool
+	{
+		if(empty($modified)) {
+			return false;
+		}
+
+		$diff = array_diff(array_keys($modified), static::ignorePropertiesForModifiedAt(), ['modifiedAt', 'modifiedBy', 'createdAt', 'createdBy']);
+		return !empty($diff);
 	}
 
 	/**
@@ -1869,14 +1938,14 @@ abstract class Property extends Model {
 	private function saveTable(MappedTable $table, array &$modified): bool
 	{
 
-		if($table->isUserTable && (!go()->getAuthState() || !go()->getAuthState()->isAuthenticated())) {
+		if($table->isUserTable && empty($this->_forUserId) && (!go()->getAuthState() || !go()->getAuthState()->isAuthenticated())) {
 			//ignore user tables when not logged in.
 			return true;
 		}
 
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
 		$recordIsNew = $this->recordIsNew($table);
-		if(!empty($modified) || $recordIsNew) {
+		if($recordIsNew || $this->shouldSetSaveProps($modified)) {
 			$modifiedForTable = $this->setSaveProps($table, $modifiedForTable);
 		}
 
@@ -1945,7 +2014,6 @@ abstract class Property extends Model {
 				$this->updateTableRecord($table, $modifiedForTable, $query);
 			}
 		} catch (DbException $e) {
-			ErrorHandler::logException($e);
 			$uniqueKey = $e->isUniqueKeyException();
 
 			if ($uniqueKey) {
@@ -2107,6 +2175,8 @@ abstract class Property extends Model {
 	 */
 	public static $lastDeleteStmt;
 
+	protected static int $lastDeleteCount = 0;
+
 	/**
 	 * Delete this model
 	 *
@@ -2120,8 +2190,12 @@ abstract class Property extends Model {
 	{
 		$primaryTable = static::getMapping()->getPrimaryTable();
 
-		self::$lastDeleteStmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
-		return self::$lastDeleteStmt->execute();
+		static::$lastDeleteStmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
+		$success = self::$lastDeleteStmt->execute();
+		if($success) {
+			static::$lastDeleteCount = static::$lastDeleteStmt->rowCount();
+		}
+		return $success;
 	}
 
 	private function validateTable(MappedTable $table) {
@@ -2284,7 +2358,7 @@ abstract class Property extends Model {
 		}
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
 		if (empty($properties)) {
 			$properties = $this->fetchProperties;
@@ -2321,6 +2395,10 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_HAS_ONE:
 					if(isset($value) && isset($this->$propName)) {
+						// When JSON patching it might set the same object again via JSON::patch();
+						if(is_object($value) && $value === $this->$propName) {
+							return $this->$propName;
+						}
 						//if a has one relation exists then apply the new values to the existing property instead of creating a new one.
 						return $this->$propName->setValues($value);
 					} else {
@@ -2399,7 +2477,7 @@ abstract class Property extends Model {
 					$id = $i;
 				}
 
-				if (isset($mapped[$id])) {
+				if (isset($id) && isset($mapped[$id])) {
 					$mapped[$id]->setValues($patch);
 					$this->{$propName}[] = $mapped[$id];
 				} else {

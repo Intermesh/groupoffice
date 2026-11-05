@@ -2,7 +2,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 	autoHeight: true,
 	scrollLoader: false,
 	showMoreLoader: true,
-	loadMorePageSize: 20,
+	loadMorePageSize: 50,
 	cls: "go-tasks-task-list",
 
 	initColumns: function() {
@@ -14,17 +14,19 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 			id: 'group',
 			header: t('Group'),
 			sortable: false,
-			dataIndex: 'group',
-			// groupRenderer: function(v, un, r, rowIndex, colIndex, ds) {
-			// 	if(!v) {
-			// 		return "";
-			// 	}
-			// }
+			dataIndex: 'group'
 		})
 
 	},
 
 	initComponent: function () {
+		let canEditTaskLists = false;
+		if(this.support) {
+			const modRights = go.Modules.get("business", "support").userRights;
+			canEditTaskLists =  modRights.mayChangeTasklists;
+		} else {
+			canEditTaskLists =  go.Modules.get("community", 'tasks') && go.Modules.get("community", 'tasks').userRights.mayChangeTasklists;
+		}
 
 		this.view = new go.grid.GroupingView({
 			showGroupName: false,
@@ -50,7 +52,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				entityStore: this.support ? "SupportList" : "Tasklist",
 				filters: {role: {role: 'list'}, subscribed: {isSubscribed:true}},
 				sortInfo: {
-					field: 'sortOrder',
+					field: 'name',
 					direction: 'ASC'
 				}
 			}),
@@ -59,6 +61,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				{
 					itemId: "edit",
 					iconCls: 'ic-edit',
+					hidden: !canEditTaskLists,
 					text: t("Edit")+'…',
 					handler: function() {
 						var dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "TaskList"});
@@ -69,6 +72,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 					itemId: "delete",
 					iconCls: 'ic-delete',
 					text: t("Delete")+'…',
+					hidden: !canEditTaskLists,
 					handler: function() {
 						Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
 							if (btn != "yes") {
@@ -78,7 +82,9 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 						}, this);
 					},
 					scope: this
-				},'-',
+				}, new Ext.menu.Separator({
+					hidden: !canEditTaskLists,
+				}),
 				{
 					text: t('Unsubscribe'),
 					iconCls: 'ic-remove-circle',
@@ -100,7 +106,4 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 			menu.getComponent("delete").setDisabled(!go.Modules.get("community", 'tasks').userRights.mayChangeTasklists || record.get("permissionLevel") < go.permissionLevels.manage);
 		});
 	},
-
-	
-
 });

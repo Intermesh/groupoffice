@@ -7,7 +7,6 @@ use Exception;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
-use GO\Calendar\Model\Calendar;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\auth\Authenticate;
@@ -15,12 +14,10 @@ use go\core\auth\BaseAuthenticator;
 use go\core\auth\DomainProvider;
 use go\core\convert\UserSpreadsheet;
 use go\core\data\Model;
-use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\Environment;
 use go\core\exception\ConfigurationException;
 use go\core\exception\NotFound;
-use go\core\Installer;
 use go\core\jmap\Request;
 use go\core\mail\Address;
 use go\core\mail\Message;
@@ -31,8 +28,8 @@ use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
-use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\Relation;
 use go\core\util\ClassFinder;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -43,10 +40,8 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\UserSettings;
 use go\modules\community\notes\model\NoteBook;
 use go\modules\community\notes\model\UserSettings as NotesUserSettings;
-use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\TaskList;
 use go\modules\community\tasks\model\UserSettings as TasksUserSettings;
-use http\Exception\InvalidArgumentException;
 
 
 /**
@@ -61,6 +56,27 @@ class User extends AclItemEntity {
 	use PrincipalTrait;
 
 	const ID_SUPER_ADMIN = 1;
+
+	/**
+	 * The only properties somebody who registers themselves may set
+	 *
+	 * @see filterRegistrationValues()
+	 */
+	const REGISTRATION_PROPERTIES = ['username', 'displayName', 'email', 'password', 'recoveryEmail', 'language', 'timezone'];
+
+	/**
+	 * Strip everything that a user who registers themselves may not choose, like "groups" and "enabled".
+	 *
+	 * Saving an entity doesn't check permissions. That's done by the JMAP controller. Registration doesn't use that so
+	 * the input must be limited here.
+	 *
+	 * @param array $values Input as supplied by the client
+	 * @return array
+	 */
+	public static function filterRegistrationValues(array $values): array
+	{
+		return array_intersect_key($values, array_flip(self::REGISTRATION_PROPERTIES));
+	}
 
 	/**
 	 * Fires when the password is verified during login via the web only.
@@ -99,7 +115,11 @@ class User extends AclItemEntity {
 	 */
 	const EVENT_ARCHIVE = 'archive';
 
-	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
+	/**
+	 * The whole username must match. Without the anchors one valid character was enough to accept a name.
+	 * The D modifier makes "$" mean the end of the string, not also before a final new line.
+	 */
+	const USERNAME_REGEX = '/^[A-Za-z0-9_\-\.@]+$/D';
 	
 	private bool $validatePassword = true;
 
@@ -355,8 +375,11 @@ class User extends AclItemEntity {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
-			->addMap('clients', Client::class, ['id' => 'userId'])
-			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
+			->add('clients', Relation::array(Client::class)
+				->keys(['id' => 'userId'])
+				->orderBy(['createdAt' => 'DESC']))
+			->add('groups', Relation::scalar('core_user_group')
+				->keys(['id' => 'userId']));
 	}
 
 public function historyLog(): bool|array
@@ -438,8 +461,8 @@ public function historyLog(): bool|array
 	 */
 	public function setArchive($v)
 	{
-		if(!go()->getAuthState()->isAdmin()) {
-			throw new Forbidden("Only admins can archive");
+		if(!go()->getModel()->getUserRights()->mayChangeUsers) {
+			throw new Forbidden();
 		}
 		$this->archive = $v;
 	}
@@ -565,34 +588,31 @@ public function historyLog(): bool|array
 		return null;
 	}
 
-  /**
-   * Make sure to call this when changing the password with a recovery hash
-   * @param string $hash
-   * @return bool
-   * @depcreated Please remove after some time as the recovery hash check was refactored in the API auth script
-	public function checkRecoveryHash(string $hash): bool
-	{
-		if($hash === $this->recoveryHash) {
-			$this->passwordVerified = true;
-			$this->recoveryHash = null;
-			return true;
-		}
-		return false;
-	}
-  */
-
 	private function validatePasswordChange(): bool
 	{
 
-		if($this->passwordVerified || (go()->getAuthState() && go()->getAuthState()->isAdmin())) {
+		// user entered correct password, OK
+		if($this->passwordVerified) {
 			return true;
 		}
 
+		// User didn't have a password yet, ok
 		if(!$this->isModified(['password']) || $this->getOldValue('password') == null) {
 			return true;
 		}
 
+		// During install we don't verify
 		if(App::get()->getInstaller()->isInProgress()) {
+			return true;
+		}
+
+		// Current user is admin, always OK
+		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+			return true;
+		}
+
+		// current user mayChangeUsers and is not changing itself or an admin
+		if(go()->getAuthState() && go()->getModel()->getUserRights()->mayChangeUsers && $this->id != App::get()->getAuthState()->getUserId() && !$this->isAdmin()) {
 			return true;
 		}
 
@@ -620,7 +640,6 @@ public function historyLog(): bool|array
 
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->groups[] = Group::ID_EVERYONE;
-				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group everyone"));
 			}
 
 			if(!$this->isNew()) {
@@ -726,7 +745,13 @@ public function historyLog(): bool|array
 			return Acl::LEVEL_WRITE;
 		}
 
-		return parent::internalGetPermissionLevel();
+		$level = parent::internalGetPermissionLevel();
+		if(!$level) {
+			return false;
+		}
+
+		return go()->getModel()->getUserRights()->mayChangeUsers ? $level : Acl::LEVEL_READ;
+
 	}
 
 	protected static function textFilterColumns(): array
@@ -851,6 +876,10 @@ public function historyLog(): bool|array
 			$this->authenticators[] = $authenticator;
 		}
 
+		foreach ($auth->getExternalAuthenticatorsForUser($this->username) as $authenticator) {
+			$this->authenticators[] = $authenticator;
+		}
+
 		return $this->authenticators;
 	}
 
@@ -947,6 +976,15 @@ public function historyLog(): bool|array
 			Token::destroyOtherSessons($this->id);
 		}
 
+		if($this->isModified(['enabled']) && !$this->enabled) {
+			Token::destroyAllSessions($this->id);
+		}
+
+		// Applications that were authorized with this account (OAuth2 / OpenID Connect server) must authorize again
+		if($this->isModified(['password']) || ($this->isModified(['enabled']) && !$this->enabled)) {
+			OauthRefreshToken::revokeAllForUser($this->id);
+		}
+
 		return true;
 	}
 
@@ -1040,15 +1078,17 @@ public function historyLog(): bool|array
 	{
 		$contact = $this->getProfile();
 
-		if(!$contact) {
+		if (!$contact) {
 			return true;
 		}
 
-		if(!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
+		if (!$this->isModified(['displayName', 'email', 'avatarId']) && !$contact->isModified()) {
 			return true;
 		}
 
-		$contact->photoBlobId = $this->avatarId;
+		if (isset($this->avatarId)) {
+			$contact->photoBlobId = $this->avatarId;
+		}
 
 		$compare = $this->isModified('email') ? $this->getOldValue("email") : $this->email;
 		if($this->isModified("email")) {
@@ -1144,7 +1184,13 @@ public function historyLog(): bool|array
 			$model->getDefault($user);
 		}
 	}
-	
+
+	/**
+	 * Get the current client device / browser info
+	 *
+	 * @return Client|null
+	 * @throws Exception
+	 */
 	public function currentClient() : ?Client {
         if(Environment::get()->isCli()) {
             $where = [
@@ -1265,8 +1311,10 @@ public function historyLog(): bool|array
 			//delete all acl records
 			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-			foreach($defaultModels as $model){
-				$model->deleteByAttribute('user_id',$pk['id']);
+			foreach ($defaultModels as $model) {
+				if ($model->hasAttribute('user_id')) {
+					$model->deleteByAttribute('user_id', $pk['id']);
+				}
 			}
 
 			LegacyUser::model()->fireEvent("delete", [$user, true]);
@@ -1320,9 +1368,14 @@ public function historyLog(): bool|array
 		
 		$this->contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
 		if(!$this->contact) {
+
+			if(!$this->isFetched('email', 'displayName')) {
+				return null;
+			}
+
 			$this->contact = new Contact();
 			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
-			if($this->email) {
+			if(!empty($this->email)) {
 				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
 			}
 			$nameParts = explode(" ", $this->displayName);
@@ -1407,6 +1460,16 @@ public function historyLog(): bool|array
 		// used ArrayObject so it will be passed by reference to event listener
 		$aclIds = new \go\core\util\ArrayObject();
 
+		if(Module::isInstalled("legacy", "email")) {
+			$emailAclIds = go()->getDbConnection()
+				->selectSingleValue("acl_id")
+				->from("em_accounts")
+				->where("user_id", "=", $this->id)
+				->all();
+
+			$aclIds->push(...$emailAclIds);
+		}
+
 		if(Module::isInstalled("community", "addressbook")) {
 
 			$addressBooks = AddressBook::find()->where('createdBy','=', $this->id);
@@ -1479,6 +1542,91 @@ public function historyLog(): bool|array
 		return $this->getPersonalGroup()->findAclId();
 	}
 
+	/**
+	 * @param string $email
+	 * @return int[]
+	 * @throws Exception
+	 */
+	static function findIdsByEmailAliases(string $email) :array{
+		if(!go()->getModule("legacy", "email")) {
+			return [];
+		}
+		return go()->getDbConnection()
+			->selectSingleValue("user_id")
+			->from("em_accounts", "a")
+			->join("em_aliases", "al", "al.account_id = a.id")
+			->where("al.email", "LIKE", $email)
+			->all();
+	}
+
+
+	/**
+	 * Find all known e-mail aliases in lower case for a user ID
+	 *
+	 * @param int $userId
+	 * @return string[]
+	 * @throws Exception
+	 */
+	static function findEmailAliases(int $userId) : array {
+		$scheduleIds = [go()->getDbConnection()
+			->selectSingleValue('LOWER(email)')
+			->from("core_user")
+			->where("id", "=" , $userId)
+			->single()];
+
+		if(go()->getModule("legacy", "email")) {
+
+			$scheduleIds = array_values(array_unique(array_merge($scheduleIds, go()->getDbConnection()
+				->selectSingleValue("LOWER(al.email)")
+				->from("em_accounts", "a")
+				->join("em_aliases", "al", "al.account_id = a.id")
+				->where("a.user_id", "=", $userId)
+				->all())));
+		}
+		return $scheduleIds;
+	}
+
+	/**
+	 * All email aliases this user is known to use
+	 *
+	 * The users' email accounts are used for this too if the email module is installed.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getEmailAliases() : array {
+
+		$scheduleIds = [strtolower($this->email)];
+
+		if(go()->getModule("legacy", "email")) {
+
+			$scheduleIds = array_values(array_unique(array_merge($scheduleIds, go()->getDbConnection()
+				->selectSingleValue("LOWER(al.email)")
+				->from("em_accounts", "a")
+				->join("em_aliases", "al", "al.account_id = a.id")
+				->where("a.user_id", "=", $this->id)
+				->all())));
+		}
+
+		return $scheduleIds;
+	}
+
+	/**
+	 * Finds a user ID by email. Also uses e-mail aliases if evailable.
+	 *
+	 * @param string $email
+	 * @return int[]
+	 * @throws Exception
+	 */
+	static function findIdsByEmail(string $email) : array {
+
+		$stmt = self::find()->selectSingleValue('id')
+			->where('email','LIKE',$email);
+
+		$ids = $stmt->all();
+		return array_unique(array_merge($ids, self::findIdsByEmailAliases($email)));
+	}
+
 
 	public static function findOrCreateByUsername(string $username, string $email, string $displayName, array $values = [], array $properties = []) : User {
 
@@ -1489,7 +1637,7 @@ public function historyLog(): bool|array
 		if (!$user) {
 
 			if(!go()->getSettings()->allowRegistration) {
-				throw new NotFound("User not found and registration not allowed");
+				throw new NotFound("User $username not found and registration not allowed");
 			}
 
 			$user = new User();

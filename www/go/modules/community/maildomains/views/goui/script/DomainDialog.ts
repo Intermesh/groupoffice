@@ -1,5 +1,5 @@
 import {checkbox, fieldset, numberfield, t, textfield} from "@intermesh/goui";
-import {FormWindow, principalcombo} from "@intermesh/groupoffice-core";
+import {client, FormWindow, principalcombo} from "@intermesh/groupoffice-core";
 
 export class DomainDialog extends FormWindow {
 
@@ -23,7 +23,9 @@ export class DomainDialog extends FormWindow {
 					name: "userId",
 					id: "userId",
 					label: t("User"),
-					required: true
+					required: true,
+					entity: "User",
+					value: client.user.id
 				}),
 				textfield({
 					name: "domain",

@@ -12,3 +12,4 @@ DROP TABLE `addressbook_url`;
 DROP TABLE `addressbook_user_settings`;
 DROP TABLE `addressbook_contact` ;
 DROP TABLE `addressbook_addressbook`;
+DROP TABLE IF EXISTS `addressbook_addressbook_user`;

@@ -2,14 +2,9 @@
 
 namespace go\core;
 
-use GO\Base\Model\Module;
 use go\core\exception\JsonPointerException;
-use go\core\model\User;
 use go\core\orm\EntityTest;
-use go\core\util\ClassFinder;
 use go\core\util\JSON;
-use go\core\util\StringUtil;
-use go\modules\community\addressbook\model\ContactTest;
 use go\modules\community\test\model\AMap;
 
 class JSONTest extends \PHPUnit\Framework\TestCase {

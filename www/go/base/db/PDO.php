@@ -18,7 +18,12 @@ class PDO extends \PDO{
 			$passwd = \GO::config()->db_pass;
 		}
 				
-		$options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES " . GO::config()->db_charset . ", sql_mode='TRADITIONAL'";
+		$initCmd = "SET NAMES " . GO::config()->db_charset . ", sql_mode='TRADITIONAL'";
+		if(version_compare(PHP_VERSION, '8.5.0') >= 0) {
+			$options[\PDO\Mysql::ATTR_INIT_COMMAND] = $initCmd;
+		} else {
+			$options[PDO::MYSQL_ATTR_INIT_COMMAND] = $initCmd;
+		}
 		
 		parent::__construct($dsn, $username, $passwd, $options);
 		
@@ -27,7 +32,11 @@ class PDO extends \PDO{
 //		$this->setAttribute( PDO::ATTR_STATEMENT_CLASS, array( 'GO\Base\Db\ActiveStatement', array() ) );
 
 		//todo needed for foundRows
-		$this->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,true); 
+		if(version_compare(PHP_VERSION, '8.5.0') >= 0) {
+			$this->setAttribute(\PDO\Mysql::ATTR_USE_BUFFERED_QUERY, true);
+		} else {
+			$this->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+		}
 		
 	}
 }

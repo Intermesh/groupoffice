@@ -9,6 +9,9 @@ use go\core\model\Acl;
 use go\modules\community\calendar\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\calendar\model\Category>
+ */
 class Category extends EntityController {
 	
 

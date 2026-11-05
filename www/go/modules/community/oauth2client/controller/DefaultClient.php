@@ -5,8 +5,16 @@ namespace go\modules\community\oauth2client\controller;
 use go\core\jmap\EntityController;
 use go\modules\community\oauth2client\model;
 
+/**
+ * @extends EntityController<\go\modules\community\oauth2client\model\DefaultClient>
+ */
 final class DefaultClient extends EntityController
 {
+
+	protected function authenticate()
+	{
+		return true;
+	}
 
 	protected function entityClass(): string
 	{

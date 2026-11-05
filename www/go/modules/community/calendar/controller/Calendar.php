@@ -10,6 +10,9 @@ use go\core\model\Acl;
 use go\modules\community\calendar\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\calendar\model\Calendar>
+ */
 class Calendar extends EntityController {
 
 	protected function entityClass(): string {
@@ -51,15 +54,22 @@ class Calendar extends EntityController {
 
 		return [
 			'success'=> true,
-			'calendarId'=>$calendar->id
+			'calendarId'=>$calendar->id,
+			'calendar'=> $calendar->toArray()
 		];
 
 	}
 
 	public function reload($params) {
 		$cal = model\Calendar::findById($params['calendarId']);
-		if($cal)
+		if($cal) {
+
+			if(!$cal->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+				throw new Forbidden("You do not have permission to read this calendar");
+			}
+
 			return $cal->importWebcal();
+		}
 		return ['success' => false];
 	}
 

@@ -16,6 +16,7 @@ class Spreadsheet extends convert\Spreadsheet {
 	public static $excludeHeaders = ['recurrenceRule'];
 	
 	protected function init() {
+		parent::init();
 		$this->addColumn('recurrenceRule', go()->t('Recurrence', 'community', 'tasks'));
 		$this->addColumn('list', go()->t('List', 'community', 'tasks'));
 	}

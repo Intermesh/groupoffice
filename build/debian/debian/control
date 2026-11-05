@@ -9,34 +9,32 @@ Homepage: http://www.group-office.com
 Package: groupoffice
 Architecture: all
 Depends:
-    php-common (>= 8.1.0),
-    php-json (>= 8.1.0),
-	php-mysql (>= 8.1.0),
-	php-gd (>= 8.1.0),
-	php-cli (>= 8.1.0),
-	php-curl (>= 8.1.0),
-	php-xml (>= 8.1.0),
-	php-mbstring (>= 8.1.0),
-	php-intl (>= 8.1.0),
+   php-common,
+	php-mysql (>= 2:8.4),
+	php-gd (>= 2:8.4),
+	php-cli (>= 2:8.4),
+	php-curl (>= 2:8.4),
+	php-xml (>= 2:8.4),
+	php-mbstring (>= 2:8.4),
+	php-intl (>= 2:8.4),
 	unzip,
 	tar,
 	zip,
 	tnef,
 	${misc:Depends},
-	${perl:Depends},
 	dbconfig-common,
 	dbconfig-mysql,
 	ucf (>= 0.28)
-Recommends: apache2, libapache2-mod-php (>= 8.1.0), default-mysql-server
-Suggests: php-apcu
+Recommends: apache2, php-fpm (>= 2:8.4), default-mysql-server, php-apcu
+Suggests: php-imagick
 Conflicts: groupoffice-com,
 	groupoffice-pro,
 	groupoffice-billing,
 	groupoffice-documents
-Description: Group-Office groupware and CRM
- Group-Office is a web based groupware and CRM application
+Description: GroupOffice groupware and CRM
+ GroupOffice is a web based groupware and CRM application
  Take your office online. Share projects, calendars, files and e-mail online 
- with co-workers and clients. Easy to use and fully customizable, Group-Office 
+ with co-workers and clients. Easy to use and fully customizable, GroupOffice
  takes online collaboration to the next level.
 
 

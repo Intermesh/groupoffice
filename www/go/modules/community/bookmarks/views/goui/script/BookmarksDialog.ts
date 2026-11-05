@@ -1,15 +1,20 @@
-import {FormWindow, jmapds, client} from "@intermesh/groupoffice-core";
+import {FormWindow, jmapds, client, AclLevel} from "@intermesh/groupoffice-core";
 import {
 	browser,
-	btn, Button,
+	btn,
+	Button,
 	checkbox,
 	CheckboxField,
-	combobox, comp,
-	fieldset, HiddenField, hiddenfield,
+	combobox,
+	comp,
+	fieldset,
+	HiddenField,
+	hiddenfield,
 	t,
 	TextField,
 	textfield
 } from "@intermesh/goui";
+import {bookmarksCategoryDS} from "./Index.js";
 
 export class BookmarksDialog extends FormWindow {
 	private readonly newTabCheckbox: CheckboxField
@@ -34,7 +39,6 @@ export class BookmarksDialog extends FormWindow {
 
 		this.generalTab.items.add(
 			fieldset({},
-
 				this.urlTextField = textfield({
 					name: "content",
 					type: "url",
@@ -42,7 +46,7 @@ export class BookmarksDialog extends FormWindow {
 					placeholder: "https://example.com",
 					required: true,
 					listeners: {
-						change: async ( {newValue}) => {
+						change: async ({newValue}) => {
 							this.mask();
 
 							await client.jmap("community/bookmarks/Bookmark/description", {
@@ -78,10 +82,11 @@ export class BookmarksDialog extends FormWindow {
 				}),
 
 				combobox({
-					dataSource: jmapds("BookmarksCategory"),
+					dataSource: bookmarksCategoryDS,
 					storeConfig: {
 						sort: [{property: "name"}]
 					},
+					filter: {permissionLevel: AclLevel.WRITE},
 					label: t("Category"),
 					name: "categoryId",
 					required: true,
@@ -91,7 +96,7 @@ export class BookmarksDialog extends FormWindow {
 				this.logoHiddenField = hiddenfield({
 					name: "logo",
 					listeners: {
-						setvalue: async ( {newValue}) => {
+						setvalue: async ({newValue}) => {
 							const blobURL = await client.getBlobURL(newValue);
 
 							this.logoButton.style = {
@@ -122,16 +127,15 @@ export class BookmarksDialog extends FormWindow {
 				),
 				this.newTabCheckbox = checkbox({
 					value: true,
-					disabled: false,
 					name: "openExtern",
 					label: t("Open in new browser tab")
 				}),
 				checkbox({
 					name: "behaveAsModule",
-					label: t("Behave as a module (Browser reload required)"),
+					label: t("Behave as a module"),
 					listeners: {
-						change: ( {newValue}) => {
-							this.newTabCheckbox["disabled"] = newValue;
+						change: ({newValue}) => {
+							this.newTabCheckbox.disabled = newValue;
 
 							if (newValue) {
 								this.newTabCheckbox.value = false;

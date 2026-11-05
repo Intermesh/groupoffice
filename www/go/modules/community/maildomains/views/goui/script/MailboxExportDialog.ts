@@ -11,6 +11,7 @@ import {
 	Window
 } from "@intermesh/goui";
 import {client, jmapds} from "@intermesh/groupoffice-core";
+import {MailDomain} from "./MailDomain.js";
 
 export class MailboxExportDialog extends Window {
 	private domainEntity: DefaultEntity|undefined;
@@ -41,7 +42,6 @@ export class MailboxExportDialog extends Window {
 					columns: cols
 				};
 				client.jmap("MailBox/export", params).then(async (response) => {
-					debugger;
 					if(response.blobId) {
 						await client.downloadBlobId(response.blobId, response.blob.name);
 					} else {
@@ -74,7 +74,7 @@ export class MailboxExportDialog extends Window {
 		);
 	}
 
-	public load(domainEntity: DefaultEntity, ids: Array<EntityID>) {
+	public load(domainEntity: MailDomain, ids: Array<EntityID>) {
 		this.domainEntity = domainEntity;
 		this.title = t("Export domain:") + " " + this.domainEntity!.domain;
 		this.form!.value = {ids: ids};

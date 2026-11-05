@@ -275,14 +275,12 @@ class Folder extends Base {
 			$permissionsMode=octdec(\GO::config()->folder_create_mode);		
 		
 		if(is_dir($this->path)){
-			
-			//was trying to chmod /tmp. Best way is to leave existing folders alone.
-//			if(!chmod($this->path, $permissionsMode))
-//				\GO::debug("chmod failed on ".$this->path);
 			return true;
 		}		
 		try {
 			if (mkdir($this->path, $permissionsMode, true)) {
+				// mkdir() applies the system umask, so set the mode explicitly
+				chmod($this->path, $permissionsMode);
 				if (\GO::config()->file_change_group)
 					chgrp($this->path, \GO::config()->file_change_group);
 
@@ -367,25 +365,7 @@ class Folder extends Base {
 	 * @return int/false 
 	 */
 	public function calculateSize(){
-		$cmd = 'du -sbL "'.$this->path.'" 2>/dev/null';
 
-		$io = popen ($cmd, 'r' );
-
-		if($io){
-			$size = fgets ( $io, 4096);
-			if($size === false) {
-				pclose($io);
-				return false;
-			}
-
-			$size = preg_replace('/[\t\s]+/', ' ', trim($size));
-			$size = substr ( $size, 0, strpos ( $size, ' ' ) );
-			pclose($io);
-
-			return $size;
-		}else
-		{
-			return false;
-		}		
+		return (new \go\core\fs\Folder($this->path))->calculateSize();
 	}
 }

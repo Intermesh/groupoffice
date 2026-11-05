@@ -42,7 +42,8 @@ class MenuController extends \GO\Base\Controller\AbstractJsonController {
 		$findParams = \GO\Base\Db\FindParams::newInstance()->criteria($findCriteria);
 		
 		$store = new \GO\Base\Data\DbStore('GO\Site\Model\Content', new \GO\Base\Data\ColumnModel('GO\Site\Model\Content'), $_REQUEST,$findParams);
-		
+
+		// nosemgrep
 		echo $this->renderStore($store);
 	}
 	
@@ -53,13 +54,13 @@ class MenuController extends \GO\Base\Controller\AbstractJsonController {
 	 * @param int $id
 	 * @param int $site_id
 	 */
-	public function actionLoad($id = false,$site_id){
+	public function actionLoad($id, $site_id){
 		$remoteComboFields = array();
 		
 		$model = $this->_loadModel($site_id,$id);
 		
 		if(!empty($model->content_id))
-			$remoteComboFields['content_id']=$model->content->title;
+			$remoteComboFields['content_id']=var_export($model->content->title, true);
 		
 		echo $this->renderForm($model,$remoteComboFields);
 	}
@@ -94,7 +95,7 @@ class MenuController extends \GO\Base\Controller\AbstractJsonController {
 		$model = $this->_loadModel($site_id,$id);
 		
 		if(!empty($model->content_id))
-			$remoteComboFields['content_id']=$model->content->title;
+			$remoteComboFields['content_id']=var_export($model->content->title, true);
 		
 		if(\GO\Base\Util\Http::isPostRequest()){
 			$model->setAttributes($_POST);

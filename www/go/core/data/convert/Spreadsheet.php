@@ -2,8 +2,10 @@
 
 namespace go\core\data\convert;
 
+use DateTimeZone;
 use Exception;
-use go\core\db\Column;
+use go\core\data\Model;
+use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -13,37 +15,28 @@ use go\core\model\FieldSet;
 use go\core\model\ImportMapping;
 use go\core\orm\Entity;
 use go\core\orm\exception\SaveException;
-use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
-use go\core\util\ArrayObject;
-use go\core\util\DateTime as GoDateTime;
 use go\core\util\StringUtil;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
-use Sabre\VObject\Property\VCard\DateTime;
-use function go\core\util\sorter;
-
+use Throwable;
 
 /**
  * CSV converter.
- * 
+ *
  * Imports a CSV file to entities.
- * 
+ *
  * A mapping can be supplied to the JMAP controller or importFile() function. {@see importFile()}
- * 
- * The key is the CSV record index and value the 
+ *
+ * The key is the CSV record index and value the
  * 	property path. "propName" or "prop.name" if it's a relation.
  * 	If the relation is a has many values can be separated with " ::: ".
- * 
+ *
  * For example pass to the options:
- * 
+ *
  * [
  * 		"mapping" => [
  * 			"firstName",
@@ -56,16 +49,16 @@ class Spreadsheet extends AbstractConverter {
 	use EventEmitterTrait;
 
 	const EVENT_INIT = 0;
-	
+
 	/**
 	 *
 	 * @var array
 	 */
 	private $headers;
-	
+
 	/**
 	 * Delimits multiple values in single CSV field
-	 * 
+	 *
 	 * @var string
 	 */
 	public static $multipleDelimiter = '|';
@@ -73,7 +66,7 @@ class Spreadsheet extends AbstractConverter {
 	protected $delimiter = ',';
 
 	protected $enclosure = '"';
-	
+
 	/**
 	 * List headers to exclude
 	 * @var string[]
@@ -115,6 +108,7 @@ class Spreadsheet extends AbstractConverter {
 	 */
 	protected $spreadsheetRowIterator;
 	private array $highest;
+	private DateTimeZone $timezone;
 
 	/**
 	 * @inheritDoc
@@ -128,9 +122,10 @@ class Spreadsheet extends AbstractConverter {
 	{
 		parent::init();
 
-		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
+		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator', 'timezone']);
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
+		$this->timezone = new DateTimeZone($user->timezone);
 
 		//try to set high memory limit as phpoffice likes to eat RAM
 		go()->getEnvironment()->setMemoryLimit("2G");
@@ -212,6 +207,14 @@ th {
 		}
 	}
 
+	protected function writeExportError(Throwable $e) : void
+	{
+		$this->writeRecord([$e->getMessage()]);
+	}
+
+	/**
+	 * Exports a single entity
+	 */
 	protected function exportEntity(Entity $entity): void
 	{
 
@@ -224,7 +227,8 @@ th {
 		if(property_exists($entity, "returnAsText")) {
 			$entity->returnAsText = true;
 		}
-		$templateValues = $entity->toArray();
+		Model::$convertDatesToString = false;
+		$templateValues = $this->exportEntityToArray($entity);
 
 		$record = [];
 		foreach($headers as $header) {
@@ -234,39 +238,27 @@ th {
 		$this->writeRecord($record);
 	}
 
-	/**
-	 * @param \go\core\orm\Query $entities
-	 * @param array $params
-	 * @return \go\core\fs\Blob
-	 * @throws \go\core\orm\exception\SaveException
-	 */
-	public function exportToBlob(Query $entities, array $params = []): Blob
+	protected function exportEntityToArray(Entity $entity): array
 	{
-		$this->clientParams = $params;
-		$this->entitiesQuery = $entities;
-		$this->initExport();
-
-		$this->index = 0;
-		foreach($entities as $entity) {
-			$this->exportEntity($entity);
-			$this->index++;
-		}
-
-		$this->colorizeHeaders();
-
-		return $this->finishExport();
+		return $entity->toArray();
 	}
 
 	/**
-	 * @return void
+	 * @return \go\core\fs\Blob
+	 * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+	 * @throws \go\core\orm\exception\SaveException
 	 */
-	protected function colorizeHeaders(): void
+	protected function finishExport(): Blob
 	{
-		switch ($this->extension) {
+		switch($this->extension) {
 			case 'html':
+				fputs($this->fp, "</table></body></html>");
+				break;
 			case 'csv':
+
 				break;
 			default:
+
 				$headerStyle = [
 					'font' => [
 						'bold' => true,
@@ -285,25 +277,7 @@ th {
 					$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
 					$colDim->setAutoSize(true);
 				}
-				break;
-		}
-	}
 
-	/**
-	 * @return \go\core\fs\Blob
-	 * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
-	 * @throws \go\core\orm\exception\SaveException
-	 */
-	protected function finishExport(): Blob
-	{
-		switch($this->extension) {
-			case 'html':
-				fputs($this->fp, "</table></body></html>");
-				break;
-			case 'csv':
-
-				break;
-			default:
 				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
 				$writer->setPreCalculateFormulas(false);
 				$writer->save($this->tempFile->getPath());
@@ -320,19 +294,19 @@ th {
 
 		return $blob;
 	}
-	
+
 	private $customColumns = [];
-	
+
 	/**
 	 * Add a custom column to the export and import
-	 * 
+	 *
 	 * @example
-	 * 
+	 *
 	 *	//override init
 	 * 	protected function init() {
 	 *		$this->addColumn('status', go()->t("Status", 'sony', 'assets'));
 	 *	}
-	 * 
+	 *
 	 * @param string $name Column name
 	 * @param string $label Column label
 	 * @param Callable $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
@@ -345,30 +319,30 @@ th {
 		if(!isset($importFunction)) {
 			$importFunction = [$this, "import".ucfirst($name)];
 		}
-		
+
 		$this->customColumns[$name] = [
-				'name' => $name, 
+				'name' => $name,
 				'label' => $label,
 
-				'importFunction' => $importFunction, 
+				'importFunction' => $importFunction,
 				'exportFunction' => $exportFunction
 		];
 	}
-	
+
 	/**
 	 * Get a value for a header
-	 * 
+	 *
 	 * @param Entity $entity
 	 * @param array $templateValues
 	 * @param string $header Header name delimited with a . for sub properties. eg. "emailAddresses.email"
 	 * @return string
 	 */
 	protected function getValue(Entity $entity, $templateValues, $header) {
-		
+
 		if(isset($this->customColumns[$header])) {
 			return $this->getCustomColumnValue($entity, $templateValues, $header);
 		}
-				
+
 		$path = explode('.', $header);
 
 		while ($seg = array_shift($path)) {
@@ -405,6 +379,12 @@ th {
 		}
 
 		try {
+
+			if($templateValues instanceof \DateTimeInterface) {
+				// Dates have UTC timezone. We'll set the user timezone to the date.
+				$templateValues->setTimezone($this->timezone);
+			}
+
 			return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
 		} catch(\Exception $e) {
 			return "error: ". $e->getMessage();
@@ -432,20 +412,20 @@ th {
 
 		return $index;
 	}
-	
+
 	private function getCustomColumnValue(Entity $entity, $templateValues, $header) {
 		return call_user_func($this->customColumns[$header]['exportFunction'], $entity, $templateValues, $header);
 	}
-	
+
 	private function exportSubFields($record, $v) {
-		if(!is_array($v)) {			
+		if(!is_array($v)) {
 			$record[] = $v;
 			return $record;
 		}
 		foreach($v as $key => $subvalue) {
 			$record = $this->exportSubFields($record, $subvalue);
 		}
-		
+
 		return $record;
 	}
 
@@ -462,12 +442,12 @@ th {
    * @throws Exception
    */
 	public final function getHeaders() {
-		
+
 		if(!isset($this->headers)) {
 			$this->headers = $this->internalGetHeaders();
 		}
-		
-		return $this->headers;		
+
+		return $this->headers;
 	}
 
 	/**
@@ -560,7 +540,7 @@ th {
 				$headers["customFields"] = ['name' => 'customFields', 'label' => null, 'many' => false, 'grouped'=>true, 'properties' => $customFieldProps];
 			}
 		}
-		
+
 		if($forMapping) {
 			return array_merge($headers, $this->customColumns);
 		} else{
@@ -570,13 +550,13 @@ th {
 			}));
 		}
 	}
-	
+
 	private function addSubHeaders($headers, $header, $prop, $many = false, $forMapping = false) {
-		
+
 		if(in_array($header, static::$excludeHeaders)) {
 			return $headers;
 		}
-		
+
 		if(!($prop instanceof Relation)) {
 			if(!$prop->primary) {
 				//client will define labels if not given. Only custom fields provide label
@@ -626,7 +606,7 @@ th {
 				}
 			}
 		}
-		
+
 		return $headers;
 	}
 
@@ -634,34 +614,26 @@ th {
 	 * Returns the max count of a has many relation in the dataset to export
 	 *
 	 * @param Relation $relation
-	 * @return bool|int|mixed
+	 * @return int
 	 * @throws Exception
 	 */
-	private function countMaxRelated(Relation $relation) {
+	private function countMaxRelated(Relation $relation) : int {
     if($relation->type == Relation::TYPE_HAS_ONE){
       return 1;
     }
-
-    $key = key($relation->keys);
     $fk = current($relation->keys);
 
-    $entitiesSub = clone $this->getEntitiesQuery();
-    $entitiesSub->selectSingleValue($entitiesSub->getTableAlias() . '.' . $key);
-
-    return go()->getDbConnection()
+    return (int) go()->getDbConnection()
       ->selectSingleValue('coalesce(count(*), 0) AS count')
       ->from($relation->propertyName::getMapping()->getPrimaryTable()->getName(), 't')
-      ->where($fk, 'IN', $entitiesSub)
+      ->where($fk, 'IN', $this->exportEntityIds)
       ->groupBy(['t.' . $fk])
       ->orderBy(['count' => 'DESC'])
       ->single();
   }
 
-
-
-
-	
-	private function recordIsEmpty(array $record) {
+	private function recordIsEmpty(array $record): bool
+	{
 		foreach($record as $v) {
 			if(!empty($v)) {
 				return false;
@@ -670,13 +642,13 @@ th {
 		return true;
 	}
 
-
-
 	protected function initImport(File $file): void
 	{
 		if($this->extension == 'csv') {
 			$this->fp = $file->open('r');
 			$this->delimiter = static::sniffDelimiter($file);
+
+			$this->total = 0;
 		} else{
 			$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 			$this->spreadsheet = $reader->load($file->getPath());
@@ -684,6 +656,8 @@ th {
 
 			$this->highest = $this->spreadsheet->getActiveSheet()->getHighestRowAndColumn();
 			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
+
+			$this->total =  $this->spreadsheet->getActiveSheet()->getHighestRow();
 		}
 
 		if(isset($this->clientParams['updateBy'])) {
@@ -754,17 +728,30 @@ th {
 			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
 			$cells = [];
 			foreach ($cellIterator as $cell) {
-				if(\PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($cell)) {
-					$v = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cell->getValue());
-				} else{
-					$v = (string) $cell->getValue();
+				if (\PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($cell)) {
+					$v = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cell->getCalculatedValue());
+				} else {
+					try {
+						$value = $cell->getCalculatedValue();
+					} catch (\PhpOffice\PhpSpreadsheet\Calculation\Exception $e) {
+						$value = '#ERROR: ' . $e->getMessage();
+					}
+
+					if (is_string($value) && isset($value[0]) && $value[0] === '#') {
+						ErrorHandler::log(
+							"Formula error in cell " . $cell->getCoordinate() . ": " . $value,
+							E_WARNING
+						);
+					}
+
+					$v = (string)$value;
 				}
 
 				$cells[] = $v;
 			}
 			return $cells;
 		} else{
-			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure, "");
 		}
 	}
 
@@ -784,7 +771,7 @@ th {
 		if(!isset($this->clientParams['mapping'])) {
 			throw new Exception("Mapping is required");
 		}
-		
+
 		if($this->recordIsEmpty($this->record)) {
 			return null;
 		}
@@ -826,7 +813,7 @@ th {
 		}
 		return $entity;
 	}
-	
+
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
 			if(isset($values[$c['name']])) {
@@ -983,17 +970,17 @@ th {
 	private static function tryDelimiter(File $file, string $delimiter): bool
 	{
 		$fp = $file->open('r');
-		$headers = fgetcsv($fp, 0, $delimiter, '"');
+		$headers = fgetcsv($fp, 0, $delimiter, '"', "");
 
 		$success = $headers && count($headers) > 1;
 		fclose($fp);
 
 		return $success;
 	}
-	
+
 	/**
 	 * Get headers from CSV
-	 * 
+	 *
 	 * @param File $file
 	 * @return string[]
 	 * @throws Exception
@@ -1006,7 +993,7 @@ th {
 		if(!$headers) {
 			throw new Exception("Could not read CSV file");
 		}
-		
+
 		return $headers;
 	}
 

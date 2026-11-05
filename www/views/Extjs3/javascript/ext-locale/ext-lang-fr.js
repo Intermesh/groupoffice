@@ -18,7 +18,7 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-﻿/*
+/*
  * France (France) translation
  * By Thylia
  * 09-11-2007, 02:22 PM

@@ -6,8 +6,10 @@ use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use go\core\auth\BaseAuthenticator;
+use go\core\auth\ExternalAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\cron\GarbageCollection;
+use go\core\db\DbException;
 use go\core\Environment;
 use go\core\ErrorHandler;
 use go\core\jmap\State;
@@ -18,6 +20,7 @@ use go\core\http\Response;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use Throwable;
 
 class Token extends Entity {
 	
@@ -46,7 +49,7 @@ class Token extends Entity {
 
 	/**
 	 * 
-	 * @var int
+	 * @var ?string
 	 */							
 	public ?string $userId;
 
@@ -102,7 +105,15 @@ class Token extends Entity {
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
 	const LOGIN_LIFETIME = 'PT10M';
-	
+
+	/**
+	 * Seconds a token is cached for. Changes to the user (disabled, groups) and tokens that were removed from the
+	 * database without clearing the cache take effect at the latest after this time.
+	 *
+	 * @see State::getToken()
+	 */
+	const CACHE_TTL = 300;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -142,7 +153,7 @@ class Token extends Entity {
 			}
 			$this->internalSave();
 
-			go()->getCache()->set('token-' . $this->accessToken, $this);
+			go()->getCache()->set('token-' . $this->accessToken, $this, true, self::CACHE_TTL);
 
 			return true;
 		}
@@ -358,19 +369,7 @@ class Token extends Entity {
 		}		
 		
     if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
-      //without cookie_httponly the cookie can be accessed by malicious scripts 
-      //injected to the site and its value can be stolen. Any information stored in 
-      //session tokens may be stolen and used later for identity theft or
-      //user impersonation.
-      ini_set("session.cookie_httponly",1);
-
-      //Avoid session id in url's to prevent session hijacking.
-      ini_set('session.use_only_cookies',1);
-
-      ini_set('session.cookie_secure', Request::get()->isHttps());
-   
-			session_name('groupoffice');
-      session_start();
+			go()->sessionStart();
     }
 		
 		if(!isset($_SESSION['GO_SESSION'])) {
@@ -442,7 +441,7 @@ class Token extends Entity {
 		$finishedAuthMethods = $this->getPassedAuthenticators(); // array('password','googleauthenticator');
 		
 		foreach($authenticators as $authenticator){
-			if(!in_array($authenticator::id(), $finishedAuthMethods)){
+			if(!in_array($authenticator::id(), $finishedAuthMethods) && !($authenticator instanceof ExternalAuthenticator)){
 				$pending[] = $authenticator;
 			}	
 		}
@@ -480,16 +479,31 @@ class Token extends Entity {
 	/**
 	 * Called by GarbageCollection cron job
 	 *
-	 * @see GarbageCollection
 	 * @return bool
-	 * @throws Exception
+	 * @throws Throwable
+	 * @see GarbageCollection
 	 */
 	public static function collectGarbage(): bool
 	{
-		return static::delete(
-			(new Query)
-				->where('expiresAt', '!=', null)
-				->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC"))));
+
+		go()->debug("GC: Tokens");
+		try {
+			do {
+				// delete in batches to keep transaction small
+				static::delete(
+					(new Query)
+						->where('expiresAt', '!=', null)
+						->andWhere('expiresAt', '<', new DateTime("now", new DateTimeZone("UTC")))
+						->limit(1000)
+						->setData(['gc' => true])
+				);
+			} while (self::$lastDeleteStmt->rowCount() > 0);
+		} catch(DbException $e) {
+			// Just log exceptions here but continue
+			ErrorHandler::logException($e);
+		}
+
+		return true;
 	}
 
 	/**
@@ -497,11 +511,13 @@ class Token extends Entity {
 	 */
 	protected static function internalDelete(Query $query): bool
 	{
-		$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken') ;
+		if(empty($query->getData()['gc'])) {
+			$deleteQuery = self::find()->mergeWith($query)->selectSingleValue('accessToken');
 
-		foreach($deleteQuery as $accessToken) {
-			go()->debug("Delete token: " . $accessToken);
-			go()->getCache()->delete('token-' . $accessToken);
+			foreach ($deleteQuery as $accessToken) {
+				go()->debug("Delete token: " . $accessToken);
+				go()->getCache()->delete('token-' . $accessToken);
+			}
 		}
 
 		return parent::internalDelete($query);
@@ -541,6 +557,22 @@ class Token extends Entity {
 	}
 
 	/**
+	 * Destroy all sessions and remember me logins of a user. Used when a user is disabled.
+	 *
+	 * Tokens that never expire (API keys) are left alone. {@see State::getToken()} refuses them while the user is disabled.
+	 *
+	 * @throws Exception
+	 */
+	public static function destroyAllSessions(int|string $userId): bool
+	{
+		$q = (new Query)
+			->where('expiresAt', '!=', null)
+			->andWhere('userId', '=', $userId);
+
+		return RememberMe::delete($q) && self::delete($q);
+	}
+
+	/**
 	 * Destroy all sessions for the current user except the current.
 	 * Used on password change.
 	 * @throws Exception
@@ -567,26 +599,46 @@ class Token extends Entity {
 		return self::delete($q);
 	}
 
-	public function setCookie() {
-		Response::get()->setCookie('accessToken', $this->accessToken, [
-			'expires' => 0,
-			"path" => "/",
-			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
-			"secure" => Request::get()->isHttps(),
-			"domain" => Request::get()->getHost(),
-			"httpOnly" => true
-		]);
+	/**
+	 * Set the access token as httpOnly cookie
+	 *
+	 * The cookie is host-only (no domain attribute) so the browser only sends it to the host it was set for. A domain
+	 * attribute is rejected by browsers for "localhost" and may differ from the address bar behind a proxy. The
+	 * browser then keeps sending an old cookie, which results in a CSRF token mismatch.
+	 */
+	public function setCookie(): void
+	{
+		self::unsetLegacyDomainCookie();
+		Response::get()->setCookie('accessToken', $this->accessToken, self::cookieOptions(0));
 	}
 
-	public static function unsetCookie() {
-		Response::get()->setCookie('accessToken', "", [
-			'expires' => time() - 3600,
+	/**
+	 * Remove the access token cookie
+	 */
+	public static function unsetCookie(): void
+	{
+		self::unsetLegacyDomainCookie();
+		Response::get()->setCookie('accessToken', "", self::cookieOptions(time() - 3600));
+	}
+
+	/**
+	 * Older versions set the cookie with a domain attribute. The browser stores that as a separate cookie and sends
+	 * both, so it must be removed or it will be used instead of the new one.
+	 */
+	private static function unsetLegacyDomainCookie(): void
+	{
+		Response::get()->setCookie('accessToken', "", ['domain' => Request::get()->getHost()] + self::cookieOptions(time() - 3600));
+	}
+
+	private static function cookieOptions(int $expires): array
+	{
+		return [
+			'expires' => $expires,
 			"path" => "/",
 			"samesite" => "Lax", // strict not possible or oauth won't work as it will not send cookie on callback page
 			"secure" => Request::get()->isHttps(),
-			"domain" => Request::get()->getHost(),
 			"httpOnly" => true
-		]);
+		];
 	}
 	
 }

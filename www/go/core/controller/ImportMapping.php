@@ -5,6 +5,9 @@ namespace go\core\controller;
 use go\core\jmap\EntityController;
 use go\core\model;
 
+/**
+ * @extends EntityController<\go\core\model\ImportMapping>
+ */
 class ImportMapping extends EntityController {
 
 	protected function entityClass(): string {

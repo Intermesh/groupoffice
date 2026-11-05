@@ -301,7 +301,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						.save({actionAt: date.getValue().format("Y-m-d")}, this.data.id)
 						.catch((e) => GO.errorDialog.show(e))
 						.then(() => {
-							go.Notifier.flyout({title: t("Success"), description: t("Saved successfully")});
+							window.GOUI.Notifier.notice(t("Saved successfully"));
 						});
 				}
 			}

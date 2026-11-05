@@ -1,0 +1,22 @@
+<?php
+return array (
+  'DAV Accounts' => 'DAVアカウント',
+  'Calendar' => 'カレンダー',
+  'Host' => 'ホスト名',
+  'Path' => 'パス',
+  'Common name' => '顧問ネーム',
+  'Refresh calendars' => 'カレンダーの更新',
+  'Every quarter' => '15分ごと',
+  'Every hour' => '1時間ごと',
+  'Connect' => '接続',
+  'Server' => 'サーバー',
+  'Collections' => 'コレクション',
+  'Sync now' => '今すぐ同期',
+  'Remove from sync' => '同期設定から削除',
+  'Last Sync' => '最後の同期日時',
+  'Keep calendar data?' => 'カレンダーのデータを保持しますか?',
+  'Do you want to keep the synchronised calendars or delete those as well?' => 'Do you want to keep the synchronised calendars or delete those as well?',
+  'If only the account is deleted the calendars can still be deleted manually' => 'アカウントのみ削除した場合、カレンダーは手動で削除する必要があります',
+  'Keep calendar data' => 'カレンダーのデータを保持',
+  'Delete all' => 'すべて削除',
+);

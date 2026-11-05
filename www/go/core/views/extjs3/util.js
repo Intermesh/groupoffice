@@ -1,4 +1,14 @@
 
+go.lookupPrincipal = function(id) {
+	const parts = id.split(":");
+	if(parts.length == 1) {
+		go.modules.community.addressbook.lookUpUserContact(id);
+	} else {
+		go.Entities.get("Contact").goto(parts[1]);
+	}
+
+}
+
 go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
 
@@ -20,7 +30,7 @@ go.print = function(tmpl, data) {
 };
 
 go.reload = function() {
-	window.location.replace(window.location.pathname);
+	window.location.reload();
 };
 
 go.Colors = [
@@ -242,20 +252,30 @@ go.util =  (function () {
 		},
 
 		streetAddress: function (config) {
-
-			var adr = config.address;
-			if(config.zipCode) {
+			let adr = config.address;
+			if (config.zipCode) {
 				adr += ", " + config.zipCode.replace(/ /g, '');
 			}
-			if(config.country) {
+			if (Ext.isWindows && config.city) {
+				adr += ", " + config.city;
+			}
+			if (config.country) {
 				adr += ", " + config.country;
 			}
-
 			// https://en.wikipedia.org/wiki/Geo_URI_scheme
-			const uri = "geo:q=" + adr;
+			let proto = "geo:0,0?q=";
+			if(Ext.isWindows) {
+				proto = "https://www.openstreetmap.org/search?query=";
+			} else if (Ext.isMac) {
+				proto = "maps:q=";
+			}
+
+			const uri = proto + encodeURIComponent(adr).replace(/%20/g, "+")
 
 			const a = document.createElement("a");
-			a.setAttribute("target", "_blank");
+			if(Ext.isWindows) {
+				a.setAttribute("target", "_blank");
+			}
 			a.setAttribute("href", uri);
 			a.click();
 
@@ -455,56 +475,58 @@ go.util =  (function () {
 	 */
 	exportToFile: function (entity, queryParams, extension, params) {
 
-
-		function doExport(columns) {
-			Ext.getBody().mask(t("Exporting..."));
-			const promise = go.Jmap.request({
-				method: entity + "/query",
-				params: queryParams
-			});
-
-			let params = {
-				extension: extension,
-				"#ids": {
-					resultOf: promise.callId,
-					path: "/ids"
-				}
-			}
-
-			if(columns)
-			{
-				params.columns = columns;
-			}
-
-			//allow longer requests for export. TODO. move this to a background process
-			const oldTimeout = go.Jmap.requestTimeout;
-			go.Jmap.requestTimeout = 180000;
-
-			return go.Jmap.request({
-				method: entity + "/export",
-				params: params
-			}).then(function (response) {
-				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
-			}).catch(function(response) {
-				Ext.MessageBox.alert(t("Error"), response.message);
-			}).finally(function() {
-				Ext.getBody().unmask();
-
-				go.Jmap.requestTimeout = oldTimeout;
-			})
-		}
-
-		if(extension == 'csv' || extension == 'xlsx' || extension == 'html') {
-			const win = new go.import.ColumnSelectDialog({
-				entity: entity,
-				handler: doExport,
-				scope: this
-			});
-			win.show();
-		} else
-		{
-			doExport();
-		}
+		window.groupofficeCore.Export.toFile(...arguments);
+		//
+		//
+		// function doExport(columns) {
+		// 	Ext.getBody().mask(t("Exporting..."));
+		// 	const promise = go.Jmap.request({
+		// 		method: entity + "/query",
+		// 		params: queryParams
+		// 	});
+		//
+		// 	let params = {
+		// 		extension: extension,
+		// 		"#ids": {
+		// 			resultOf: promise.callId,
+		// 			path: "/ids"
+		// 		}
+		// 	}
+		//
+		// 	if(columns)
+		// 	{
+		// 		params.columns = columns;
+		// 	}
+		//
+		// 	//allow longer requests for export. TODO. move this to a background process
+		// 	const oldTimeout = go.Jmap.requestTimeout;
+		// 	go.Jmap.requestTimeout = 180000;
+		//
+		// 	return go.Jmap.request({
+		// 		method: entity + "/export",
+		// 		params: params
+		// 	}).then(function (response) {
+		// 		go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
+		// 	}).catch(function(response) {
+		// 		Ext.MessageBox.alert(t("Error"), response.message);
+		// 	}).finally(function() {
+		// 		Ext.getBody().unmask();
+		//
+		// 		go.Jmap.requestTimeout = oldTimeout;
+		// 	})
+		// }
+		//
+		// if(extension == 'csv' || extension == 'xlsx' || extension == 'html') {
+		// 	const win = new go.import.ColumnSelectDialog({
+		// 		entity: entity,
+		// 		handler: doExport,
+		// 		scope: this
+		// 	});
+		// 	win.show();
+		// } else
+		// {
+		// 	doExport();
+		// }
 
 	},
 
@@ -521,60 +543,63 @@ go.util =  (function () {
 	 * @return {void}
 	 */
 	importFile : function(entity, accept, values, options) {
-		go.util.openFileDialog({
-			multiple: true,
-			accept: accept,
-			directory: false,
-			autoUpload: true,
-			scope: this,
-			listeners: {
-				upload: function (response) {
-					Ext.getBody().mask(t("Importing..."));
 
-					if(response.name.toLowerCase().slice(-3) === 'csv' || response.name.toLowerCase().slice(-4) === 'xlsx') {
-						Ext.getBody().unmask();
-						const dlg = new go.import.CsvMappingDialog({
-							entity: entity,
-							fileName: response.name,
-							blobId: response.blobId,
-							values: values,
-							fields: options.fields || {},
-							aliases: options.aliases || {},
-							lookupFields: options.lookupFields || {id: "ID"}
-						});
-						dlg.show();
-					}else {
-						go.Jmap.request({
-							method: entity + "/import",
-							params: {
-								blobId: response.blobId,
-								values: values
-							},
-							callback: function (options, success, response) {
+		window.groupofficeCore.Import.fromFile(...arguments);
 
-								Ext.getBody().unmask();
-
-								if (!success) {
-									Ext.MessageBox.alert(t("Error"), response.message);
-								} else {
-									// var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
-									//
-									// if (response.errors && response.errors.length) {
-									// 	msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
-									// }
-
-									Ext.MessageBox.alert(t("Success"), t("Importing is in progress in the background. You will be kept informed about progress via notifications."));
-
-									go.Db.store(entity).getUpdates();
-								}
-							},
-							scope: this
-						});
-					}
-				},
-				scope: this
-			}
-		});
+		// go.util.openFileDialog({
+		// 	multiple: true,
+		// 	accept: accept,
+		// 	directory: false,
+		// 	autoUpload: true,
+		// 	scope: this,
+		// 	listeners: {
+		// 		upload: function (response) {
+		// 			Ext.getBody().mask(t("Importing..."));
+		//
+		// 			if(response.name.toLowerCase().slice(-3) === 'csv' || response.name.toLowerCase().slice(-4) === 'xlsx') {
+		// 				Ext.getBody().unmask();
+		// 				const dlg = new go.import.CsvMappingDialog({
+		// 					entity: entity,
+		// 					fileName: response.name,
+		// 					blobId: response.blobId,
+		// 					values: values,
+		// 					fields: options.fields || {},
+		// 					aliases: options.aliases || {},
+		// 					lookupFields: options.lookupFields || {id: "ID"}
+		// 				});
+		// 				dlg.show();
+		// 			}else {
+		// 				go.Jmap.request({
+		// 					method: entity + "/import",
+		// 					params: {
+		// 						blobId: response.blobId,
+		// 						values: values
+		// 					},
+		// 					callback: function (options, success, response) {
+		//
+		// 						Ext.getBody().unmask();
+		//
+		// 						if (!success) {
+		// 							Ext.MessageBox.alert(t("Error"), response.message);
+		// 						} else {
+		// 							// var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
+		// 							//
+		// 							// if (response.errors && response.errors.length) {
+		// 							// 	msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
+		// 							// }
+		//
+		// 							Ext.MessageBox.alert(t("Success"), t("Importing is in progress in the background. You will be kept informed about progress via notifications."));
+		//
+		// 							go.Db.store(entity).getUpdates();
+		// 						}
+		// 					},
+		// 					scope: this
+		// 				});
+		// 			}
+		// 		},
+		// 		scope: this
+		// 	}
+		// });
 	},
 
 	// turns {'customFields.col_x': 'Foo'} into	{customFields:{col_x:'Foo}}

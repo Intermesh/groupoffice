@@ -13,6 +13,9 @@ use go\modules\community\addressbook\model\Contact;
 use go\core\model\Module;
 use go\core\model;
 
+/**
+ * @extends EntityController<\go\core\model\Search>
+ */
 class Search extends EntityController {
 
 	const EVENT_SEARCH_EMAIL_CONTACTS = "searchemailcontacts";

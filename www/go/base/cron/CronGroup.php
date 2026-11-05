@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @deprecated - use JMAP cron job system
+ */
 namespace GO\Base\Cron;
 
 

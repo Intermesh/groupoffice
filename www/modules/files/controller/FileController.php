@@ -9,6 +9,7 @@ use go\core\exception\Forbidden;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\http\Response;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
 use GO\Files\Model\File;
@@ -192,11 +193,12 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 		$response['data']['path'] = htmlspecialchars($model->path);
 		$response['data']['size'] = $model->fsFile->size();
-		$response['data']['extension'] = strtolower($model->fsFile->extension());
+		$response['data']['extension'] = htmlspecialchars(strtolower($model->fsFile->extension()));
 		$response['data']['type'] = \GO::t($response['data']['extension'], 'base', 'filetypes');
-		
-		$response['data']['locked_user_name']=$model->lockedByUser ? $model->lockedByUser->name : '';
+
 		$response['data']['locked']=$model->isLocked();
+		$response['data']['locked_user_name'] = $response['data']['locked'] && $model->lockedByUser ? $model->lockedByUser->name : '';
+
 		$response['data']['unlock_allowed']=$model->unlockAllowed();
 		
 
@@ -257,9 +259,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function afterLoad(&$response, &$model, &$params) {
 
-		$response['data']['path'] = $model->path;
+		$response['data']['path'] = htmlspecialchars($model->path);
 		$response['data']['size'] = \GO\Base\Util\Number::formatSize($model->fsFile->size());
-		$response['data']['extension'] = strtolower($model->fsFile->extension());
+		$response['data']['extension'] = htmlspecialchars(strtolower($model->fsFile->extension()));
 		$response['data']['type'] = \GO::t($response['data']['extension'], 'base', 'filetypes');
 		
 		$response['data']['name']=$model->fsFile->nameWithoutExtension();
@@ -426,6 +428,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 		if(!$file){
 			throw new \Exception("File not found");
+		}
+
+		if($file->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new AccessDenied();
 		}
 		
 		$response = [
@@ -597,6 +603,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	
 	
 	public function actionRecent($params){
+
+		\GO::session()->closeWriting();
 		
 		$start = !empty($params['start']) ? $params['start'] : 0;
 		$limit = !empty($params['limit']) ? $params['limit'] : 20;

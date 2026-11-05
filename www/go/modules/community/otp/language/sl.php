@@ -17,7 +17,7 @@ return array (
   'Invalid code' => 'Napačna koda',
   'OTP Authenticator' => 'OTP Authenticator',
   'Enforce two factor authentication for users in a specific group' => 'Uveljaviti dve faktorski overjenost uporabnikov v določeni skupini',
-  'Block Group-Office usage until setup is done' => 'Blokiraj uporabo Group-Office, dokler nastavitev ni končana',
+  'Block GroupOffice usage until setup is done' => 'Blokiraj uporabo GroupOffice, dokler nastavitev ni končana',
   'Count down' => 'Odštevanje',
   'Count down this number of seconds until the user can cancel the setup' => 'Odštejte to število sekund, dokler uporabnik ne more preklicati nastavitve',
   'Provide your current password before you can enable OTP Authenticator.' => 'Preden lahko omogočite OTP Authenticator, navedite trenutno geslo.',

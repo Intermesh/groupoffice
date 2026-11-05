@@ -5,20 +5,33 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-use go\core\cache\None;
-use go\modules\business\license\model\License;
-use go\modules\business\studio\Module as StudioModule;
 use go\core\App;
+use go\core\cache\None;
+use go\core\http\Response;
+use go\core\jmap\State;
+use go\modules\business\license\model\License;
 
 App::get();
 
-go()->setCache(new None());
+$cache = go()->getCache();
 
+go()->setCache(new None());
 
 if(!go()->isInstalled()) {
 	header("Location: index.php");
 	exit();
 }
+
+// This doesn't work on a fresh install: If a license is valid and installed it can't be changed anyway
+// Only an administrator may change the license, unless an upgrade is pending and login may not work yet.
+// The installer logs in the new administrator before redirecting here.
+//go()->setAuthState(new State());
+//if(!go()->getInstaller()->isUpgradeAllowed()) {
+//	Response::get()->setStatus(403);
+//	echo "<h1>Forbidden</h1>";
+//	echo "<p>" . go()->t("Only an administrator can change the license. Please log in as an administrator first.") . "</p>";
+//	exit();
+//}
 
 if(!empty(go()->getSettings()->license) && License::isValid()) {
     \go\core\http\Response::get()->setStatus(403);
@@ -30,10 +43,6 @@ if(!empty(go()->getSettings()->license) && License::isValid()) {
 // needed for invalid studio modules when upgrading for 6.5. They need to be patched before auto loaded by the event
 // system.
 go()->disableEvents();
-
-if(go()->getDatabase()->hasTable("studio_studio")) {
-	$studioError = StudioModule::patch65to66();
-}
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
@@ -52,6 +61,8 @@ if (!empty($_POST)) {
 
             if( !go()->getSettings()->licenseDenied) {
                 License::installModules();
+
+                go()->setCache($cache);
                 go()->rebuildCache();
             }
 
@@ -104,7 +115,7 @@ function noThanks() {
                 ?>
 				<p>
 					<label>License key</label>
-					<textarea style="height: 100px" name="license" required><?= $_POST['license'] ?? go()->getSettings()->license; ?></textarea>
+					<textarea style="height: 100px" name="license" required><?= htmlspecialchars($_POST['license'] ?? go()->getSettings()->license ?? ""); ?></textarea>
 				</p>
 
                 <input type="hidden" name="licenseDenied" value="0" />

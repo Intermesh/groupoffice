@@ -1,31 +1,42 @@
 import {
 	browser,
-	btn, collapsebtn,
+	btn,
+	collapsebtn,
 	comp,
-	Component, ComponentEventMap, DefaultEntity,
+	ComponentEventMap,
+	section,
+	Component,
+	DefaultEntity,
 	EntityID,
-	form, section,
+	fieldset,
+	form,
 	t,
-	tbar, Toolbar, Window
+	tbar,
+	Window
 } from "@intermesh/goui";
-import {CommentList} from "./CommentList.js";
+import CommentList from "./CommentList.js";
 import {CommentEditor} from "./CommentEditor.js";
-import {client, DetailPanel, jmapds} from "@intermesh/groupoffice-core";
+import {client, DetailPanel} from "@intermesh/groupoffice-core";
 import {LabelDialog} from "./LabelDialog.js";
+import {commentDS} from "./Index.js";
 
 export class CommentsPanel extends Component {
-	private commentList!: CommentList;
-	private commentEditor!: CommentEditor;
-	private countBadge!: Component;
+	public focusEditorOnload = false;
+
+	private readonly commentList!: CommentList;
+	private readonly commentEditor!: CommentEditor;
+	private readonly countBadge!: Component;
 
 	private entityId: EntityID | undefined;
 
-	private _title!:string
-	private titleCmp: Component;
+	private _title!: string
+	private readonly titleCmp: Component;
+
 	set title(title: string) {
-		if(this.titleCmp) {
+		if (this.titleCmp) {
 			this.titleCmp.html = title;
 		}
+
 		this._title = title;
 	}
 
@@ -33,13 +44,14 @@ export class CommentsPanel extends Component {
 		return this._title;
 	}
 
-	set section(section: string|undefined) {
+	set section(section: string | undefined) {
 		this.commentList.store.setFilter("section", {section: section})
 	}
 
 	get section() {
 		return this.commentList.store.getFilter("section")?.section
 	}
+
 	constructor(public entityName: string) {
 		super();
 
@@ -60,6 +72,13 @@ export class CommentsPanel extends Component {
 			cls: "count-badge"
 		});
 
+		this.commentList.on("listready", () => {
+			if (this.focusEditorOnload) {
+				this.commentEditor.editor.focus();
+				this.commentEditor.editor.el.scrollIntoView(false);
+			}
+		});
+
 		this.items.add(comp({
 				cls: "vbox"
 			},
@@ -74,6 +93,7 @@ export class CommentsPanel extends Component {
 					this.countBadge,
 				),
 				"->",
+
 				btn({
 					hidden: !client.user.isAdmin,
 					icon: "settings",
@@ -89,89 +109,90 @@ export class CommentsPanel extends Component {
 				}),
 				collapsebtn({
 					stateId: "comments-collapser",
-					collapseEl: b => b.parent!.nextSibling()!
+					target: b => b.parent!.nextSibling()!
 				}),
 			),
 			comp({},
-				comp({}, this.commentList),
+				this.commentList,
 				form({
-					flex: 1,
-					handler: (form) => {
-						if (form.value.text.length > 0) {
-							const labelIds = form.value.labels.map((l: { id: number; }) => l.id);
+						flex: 1,
+						handler: (form) => {
+							if (form.value.text.length > 0) {
+								return commentDS.create(
+									Object.assign({
+										entity: this.entityName,
+										entityId: this.entityId!,
+										labels: form.value.labels,
+										text: form.value.text,
+										attachments: form.value.attachments,
+										section: this.section
+									})
+								).then((r) => {
+									form.reset();
+								}).catch((err) => {
+									void Window.error(err);
+								});
+							}
+						}
+					},
+					fieldset({},
+						this.commentEditor
+					),
+					tbar({},
+						btn({
+							icon: "attach_file",
+							text: t("Attach file"),
+							handler: async () => {
+								const files = await browser.pickLocalFiles(true);
+								this.mask();
+								const blobs = await client.uploadMultiple((files));
+								this.unmask();
 
-							jmapds("Comment").create(
-								Object.assign({
-									entity: this.entityName,
-									entityId: this.entityId!,
-									labels: labelIds,
-									text: form.value.text,
-									attachments: form.value.attachments,
-									section: this.section
+								const attachments = this.commentEditor.attachments.value;
+								blobs.forEach((blob: any) => {
+									attachments.push({
+										name: blob.name,
+										blobId: blob.id
+									})
 								})
-							).then((r) => {
-								form.reset();
-							}).catch((err) => {
-								void Window.error(err);
-							})
-						}
-					}
-				},
-					this.commentEditor
-				),
-				tbar({},
-					btn({
-						icon: "upload",
-						text: t("Attach file"),
-						handler: async () => {
-							const files = await browser.pickLocalFiles(true);
-							this.mask();
-							const blobs = await client.uploadMultiple((files));
-							this.unmask();
-
-							const attachments = this.commentEditor.attachments.value;
-							blobs.forEach((blob: any) => {
-								attachments.push({
-									name: blob.name,
-									blobId: blob.id
-								})
-							})
-							this.commentEditor.attachments.value = attachments;
-						}
-					}),
-					"->",
-					btn({
-						icon: "arrow_circle_up",
-						text: t("Scroll to top"),
-						handler: () => {
-							this.commentList.scroller.el.scrollTop = 0;
-						}
-					})
+								this.commentEditor.attachments.value = attachments;
+							}
+						}),
+						"->",
+						btn({
+							type: "submit",
+							text: t("Add comment"),
+							icon: "send"
+						})
+					)
 				)
 			)
 		));
 	}
 
-	public static addToDetail(detailPanel:DetailPanel) {
+	public static addToDetail(detailPanel: DetailPanel) {
 		const comments = new CommentsPanel(detailPanel.entityName);
-		detailPanel.on("load", ( {entity}) => {
+
+		detailPanel.on("load", ({entity}) => {
 			comments.load(entity.id);
-		})
+		});
+
 		detailPanel.scroller.items.add(comments);
 	}
 
-	public onLoad(entity:DefaultEntity) {
-		this.load(entity.id);
+	public onLoad(entity: DefaultEntity) {
+		void this.load(entity.id);
 	}
 
 	public async load(id: EntityID) {
 		this.entityId = id;
 
-		void this.commentEditor.store.load();
-
 		this.commentList.store.setFilter("entity", {
+			entity: this.entityName,
 			entityId: id
 		});
+
+		this.commentEditor.editor.clearInvalid();
 
 		await this.commentList.store.load();
 		this.countBadge.text = this.commentList.store.count().toString();

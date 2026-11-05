@@ -12,7 +12,7 @@ $primaryColor = go()->getSettings()->primaryColor ?? 'rgb(22, 82, 161)';
 
 $webclient->loadScripts();
 $themeUrl = $webclient->getThemeUrl();
-$authController = new \GO\Core\Controller\AuthController(); // for some reason the event listeners are in this class
+$authController = new \GO\Core\Controller\AuthController(false); // for some reason the event listeners are in this class
 $cssMtime = filemtime(GO::view()->getTheme()->getPath() . "style.css");
 $lang = go()->getLanguage()->getIsoCode();
 ?><!DOCTYPE html>
@@ -23,7 +23,7 @@ $lang = go()->getLanguage()->getIsoCode();
         $authController->fireEvent('headstart');
     }?>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="HandheldFriendly" content="true">
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
 	<meta name="apple-mobile-web-app-capable" content="no">
@@ -38,24 +38,26 @@ $lang = go()->getLanguage()->getIsoCode();
     <link rel="icon" type="image/png" sizes="32x32" href="<?=$themeUrl?>img/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="<?=$themeUrl?>img/favicon/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="<?=$themeUrl;?>img/favicon/apple-touch-icon.png">
-    <link rel="manifest" href="<?=$themeUrl?>img/favicon/site.webmanifest">
+    <link rel="manifest" href="views/site.webmanifest">
     <link rel="mask-icon" href="<?=$themeUrl?>img/favicon/safari-pinned-tab.svg" color="#888888">
 <?php endif; ?>
     <title><?= $goTitle; ?><?= isset($title) ? ' - ' . $title : "" ?></title>
 
     <link rel="preload" href="<?= $themeUrl;?>fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" media="print, screen"  href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>">
-    <link rel="stylesheet" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/<?= $webclient->gouiStyleSheet ?>">
+    <link rel="stylesheet" href="<?= $webclient->getBaseUrl();?>node_modules/@intermesh/groupoffice-core/dist/<?= $webclient->gouiStyleSheet ?>?v=<?= $cssMtime; ?>">
 
 <?php if($webclient->loadExt) {
 	$webclient->drawScripts();
 	go()->fireEvent(App::EVENT_SCRIPTS);
 	$authController->fireEvent('head');
 	go()->fireEvent(App::EVENT_HEAD);
-	if (!\go\core\Installer::isInstalling()):?>
-		<link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" />
-	<?php endif;
+
 }
+
+if (!\go\core\Installer::isInstalling()):?>
+    <link rel="stylesheet" href="<?= GO::view()->getUrl()?>css.php?theme=<?=$themeUrl; ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" />
+<?php endif;
 
 if(!empty(GO()->getConfig()['custom_css_url'])): ?>
     <link rel="stylesheet" href="<?=GO::config()->custom_css_url?>">

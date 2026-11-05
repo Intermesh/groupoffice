@@ -4,6 +4,8 @@ namespace go\modules\community\davclient\model;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\model\Module;
 use go\core\orm\exception\SaveException;
+use go\core\db\Criteria;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\Crypt;
@@ -31,12 +33,17 @@ class DavAccount extends AclOwnerEntity {
 	const Card = 'card';
 
 	public ?string $id;
+
+	/**
+	 * The user this account belongs to. Accounts are personal. Synchronised calendars get the same owner.
+	 */
+	public ?int $ownerId = null;
 	public $active;
 	public $host;
 	public $username;
 	protected $password;
 	public $basePath;
-	public $principalUri;
+	public $principalUri = '';
 	public $capabilities;
 	public $name;
 	public $refreshInterval;
@@ -44,6 +51,12 @@ class DavAccount extends AclOwnerEntity {
 	public $lastError;
 	/** @var Calendar[] the collections items with ctag and uri */
 	public $collections = [];
+
+	/**
+	 * Enables SSL host and peer verification
+	 * @var bool
+	 */
+	public bool $verifySSL = true;
 
 	public function setPassword($v) {
 		$this->password = Crypt::encrypt($v);
@@ -59,12 +72,33 @@ class DavAccount extends AclOwnerEntity {
 			->addMap('collections', Calendar::class, ['id' => 'davaccountId']);
 	}
 
+	protected static function defineFilters(): Filters
+	{
+		return parent::defineFilters()
+			->add('ownerId', function(Criteria $criteria, $value, Query $query) {
+				$criteria->where('ownerId', '=', $value);
+			});
+	}
+
+	protected function getDefaultCreatedBy(): ?int
+	{
+		// the ACL of a personal account is owned by the owner
+		return $this->ownerId ?? parent::getDefaultCreatedBy();
+	}
+
 	protected function internalSave(): bool
 	{
-		if($this->isModified(['active', 'password', 'host', 'username']) && $this->active === true) {
+		if(empty($this->ownerId)) {
+			$this->ownerId = parent::getDefaultCreatedBy();
+		}
+
+		if(!$this->active || $this->isModified(['active', 'password', 'host', 'username'])) {
 			// when account is new or reactivated. Trigger discovery and resync homeset.
-			if(!$this->sync()) {
-				$this->active = false;
+			if(!$this->isModified('lastSync')) {
+				$this->principalUri = '';
+				if(!$this->sync()) {
+					$this->active = false;
+				}
 			}
 		}
 		return parent::internalSave();// maybe again for lastError and lastSync
@@ -87,10 +121,15 @@ class DavAccount extends AclOwnerEntity {
 	public function http() {
 		if(empty($this->http)) {
 			$proto = substr($this->host, -2, 2) === '80' ? 'http://' : 'https://';
-			$this->http = new HttpClient($proto . $this->host, [
+			$this->http = new HttpClient($proto . preg_replace('#^https?://#i', '', $this->host), [
 				'Content-Type' => 'application/xml; charset=utf-8',
 				'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->decryptPassword()),
 			]);
+
+			if(!$this->verifySSL) {
+				$this->http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+				$this->http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+			}
 		}
 		return $this->http;
 	}
@@ -140,16 +179,16 @@ class DavAccount extends AclOwnerEntity {
 		// fetch SRV record
 		$s = 's'; // secure first
 		$target = null;
+		$altPath = '/';
 		while ($target === null) {
 			$result = dns_get_record("_{$this->service}$s._tcp.{$this->http()->baseUri}", DNS_SRV | DNS_TXT);
 			foreach ($result as $record) {
-				if ($record['type'] === 'SRV' && ($target === null || $target['pri'] < $record['pri'])) {
-					$host = $record['target'];
-					$port = $record['port'];
+				if ($record['type'] === 'SRV' && ($target === null || $target['pri'] > $record['pri'])) {
+					$host = $record['target'] . (!empty($record['port']) ? ':'.$record['port'] : '');
 					// $record['weight'] for picking chance when 'pri' is equal
 					$target = $record;
 				} else if ($record['type'] === 'TXT' && strpos($record['txt'], 'path=') === 0) {
-					$path = substr($record['txt'], 5);
+					$altPath = substr($record['txt'], 5);
 				}
 			}
 			if ($s === '') {
@@ -157,24 +196,35 @@ class DavAccount extends AclOwnerEntity {
 			}
 			$s = '';
 		}
-
-		if (!isset($host)) {
-			// Thunderbird will do HEAD /, GET /, PROPFIND .well-known
-			$data = $this->http()->get("/.well-known/$this->service");
-			if(isset($data['headers']['location'])) {
-				$this->basePath = parse_url(rtrim($data['headers']['location'], '/'), PHP_URL_PATH) . '/';
-				$this->principalUri = $this->principalUri();
-			} else {
-				$responses = $this->propfind(['d:current-user-principal'], "/.well-known/$this->service");
-				foreach ($responses as $href => $response) {
-					if (isset($response->{'current-user-principal'})) {
-						$this->principalUri = $href;
-						return;
-					}
-				}
-				throw new \Exception("Could not find principalUri");
-			}
+		if (isset($host)) {
+			$this->http()->baseUri = $host;
 		}
+
+		// Thunderbird will do HEAD /, GET /, PROPFIND .well-known
+		$path = "/.well-known/$this->service";
+		try {
+			$data = $this->http()->get($path);
+		} catch(\Exception $e) {
+			// well-known not found, try path from SRV record or "/"
+		}
+		if(!isset($data) || $data['status'] === 404 || $data['status'] === 502) { //.well-known not found
+			$path = $altPath;
+			$data = $this->http()->get($path);
+		}
+		if(isset($data['headers']['location'])) {
+			$this->basePath = parse_url(rtrim($data['headers']['location'], '/'), PHP_URL_PATH) . '/';
+			$this->principalUri = $this->principalUri();
+		} else {
+			$responses = $this->propfind(['d:current-user-principal'], $path);
+			foreach ($responses as $href => $response) {
+				if (isset($response->{'current-user-principal'})) {
+					$this->principalUri = $href;
+					return;
+				}
+			}
+			throw new \Exception("Could not find principalUri");
+		}
+
 	}
 
 	// rfc6764
@@ -198,7 +248,14 @@ class DavAccount extends AclOwnerEntity {
 				parent::internalSave();
 			}
 //		if(!$this->isSetup()) {
-			$this->serviceDiscovery();
+			if(empty($this->principalUri))
+				$this->serviceDiscovery();
+			if($this->principalUri[0] === '/') {
+				$uri = $this->http()->baseUri;
+				$withoutPath = rtrim(parse_url($uri, PHP_URL_SCHEME) . '://' . parse_url($uri, PHP_URL_HOST) . (parse_url($uri, PHP_URL_PORT) ? ':' . parse_url($uri, PHP_URL_PORT) : ''), '/');
+				$this->http()->baseUri = $withoutPath;
+				$this->host = $withoutPath;
+			}
 //		}
 			$homesetUri = $this->homeSetUri($this->principalUri);
 			$responses = $this->syncCollections($homesetUri);
@@ -339,6 +396,9 @@ class DavAccount extends AclOwnerEntity {
 			$model->sortOrder = is_numeric($order) ? (int)$order : 1;
 			$model->color = !empty($color) ? $color : \go\modules\community\calendar\model\Calendar::randomColor($model->name);
 			$model->timeZone = $tz;
+			$model->syncToDevice = false;
+			$model->setOwnerId($this->ownerId);
+
 			if ($model->save()) {
 				$cal = new Calendar($this);
 				$cal->id = $model->id;

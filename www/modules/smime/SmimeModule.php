@@ -23,6 +23,11 @@ class SmimeModule extends \GO\Base\Module{
 		\GO\Base\Model\User::model()->addListener('delete', "GO\Smime\SmimeModule", "deleteUser");
 		
 	}
+
+	public function getCategory(): string
+	{
+		return go()->t("E-mail", $this->getPackage(), $this->getName());
+	}
 	
 	public static function deleteUser($user) {		
 		Model\PublicCertificate::model()->deleteByAttribute('user_id', $user->id);
@@ -34,7 +39,7 @@ class SmimeModule extends \GO\Base\Module{
 	 *
 	 * @param string $data
 	 * @param string $passphrase
-	 * @return string[]
+	 * @return array
 	 * @throws Exception
 	 */
 	public static function readPKCS12(string $data, string $passphrase): array

@@ -21,6 +21,9 @@ if($result !== 0) {
 	exit(1);
 }
 
+// for studio to create modules
+system("chown www-data:www-data ../www/go/modules", $result);
+
 $rsyncCmd = "rsync -av --delete --exclude=.git ../ " . $target;
 echo "Running: " . $rsyncCmd . "\n";
 system($rsyncCmd, $result);
@@ -31,7 +34,7 @@ if($result !== 0) {
 }
 
 //CHANGE TO DIR WHERE MANAGER IS ON
-chdir("/usr/local/share/groupoffice-25.0/www/");
+chdir("/usr/local/share/groupoffice-26.0/www/");
 $upgradeCmd = "sudo -u www-data php cli.php core/System/upgrade -c=".$manageConfig;
 echo "Running: " . $upgradeCmd . "\n";
 system($upgradeCmd, $result);

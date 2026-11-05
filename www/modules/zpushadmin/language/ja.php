@@ -25,4 +25,6 @@ return array (
   'Last synchronisation attempt' => '最後の同期試行',
   'ActiveSync management' => 'アクティブシンク管理',
   'Devices can connect by default.' => 'デバイスはデフォルトで接続できます。',
+  'ActiveSync' => 'ActiveSync',
+  'Resync' => 'Resync',
 );

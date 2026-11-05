@@ -14,11 +14,16 @@ use go\modules\community\pwned\model\Pwned;
 final class Module extends core\Module
 {
 	public function getStatus() : string{
-		return self::STATUS_BETA;
+		return self::STATUS_STABLE;
 	}
 	public function getAuthor(): string
 	{
 		return "Intermesh BV";
+	}
+
+	public static function getCategory(): string
+	{
+		return go()->t("E-mail", static::getPackage(), static::getName());
 	}
 
 	public function defineListeners()

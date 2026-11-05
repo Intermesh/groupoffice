@@ -1,0 +1,25 @@
+{
+  "type": "module",
+  "name": "otp",
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6",
+    "concurrently": "latest",
+    "esbuild": "^0.28.2",
+    "sass": "latest",
+    "typescript": "5.9.*"
+  },
+  "scripts": {
+    "start otp": "concurrently --kill-others \"npm run start:ts\" ",
+    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
+    "build": "npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

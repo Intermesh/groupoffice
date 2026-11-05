@@ -2,6 +2,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use go\core\db\Criteria;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 
@@ -23,10 +24,12 @@ class Preferences extends Property
 	public bool $showTooltips = true;
 
 	/** @var bool If true, show events that you have RSVPed "no" to */
-	public bool $showDeclined = true;
+	public bool $showDeclined = false;
 
 	/** @var bool Show birthdays on the calendar */
 	public bool $birthdaysAreVisible = false;
+
+	public bool $multiLine = false;
 	/** @var bool Show birthdays on the calendar */
 	public bool $tasksAreVisible = false;
 	/** @var bool Show birthdays on the calendar */
@@ -78,7 +81,7 @@ class Preferences extends Property
 	public int $weekViewGridSnap = 15;
 
 	/** @var int a percentage of view height a single hour should be */
-	public int $weekViewGridSize = 8; //vh
+	public int $weekViewGridSize = 7; //vh
 
 	/** @var ?string Which view to show first when the user opens the calendar. */
 	public ?string $startView = null;
@@ -88,6 +91,69 @@ class Preferences extends Property
 
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()->addTable("calendar_preferences", "ccs");
+	}
+
+	public function getSyncCalendarIds() {
+		return Calendar::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->selectSingleValue('calendar_calendar.id')
+			->all();
+	}
+
+	public function setSyncCalendarIds(array $calendarIds) {
+
+		$calendars = Calendar::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->andWhere('calendar_calendar.id', '!=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->syncToDevice = false;
+			$calendar->save();
+		}
+
+		$calendars = Calendar::findFor($this->userId)
+			->where(
+				(new Criteria())
+					->where('syncToDevice', '=', false)
+					->orWhere('syncToDevice', '=', null)
+			)
+			->andWhere('calendar_calendar.id', '=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->syncToDevice = true;
+			$calendar->save();
+		}
+
+	}
+
+
+	public function getSubscribedCalendarIds() {
+		return Calendar::findFor($this->userId)
+			->where('isSubscribed', '=', true)
+			->selectSingleValue('CAST(calendar_calendar.id as CHAR)')
+			->all();
+	}
+
+	public function setSubscribedCalendarIds(array $calendarIds) {
+
+		$calendars = Calendar::findFor($this->userId)
+			->where('isSubscribed', '=', true)
+			->andWhere('calendar_calendar.id', '!=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->isSubscribed = false;
+			$calendar->save();
+		}
+
+		$calendars = Calendar::findFor($this->userId)
+			->where(
+				(new Criteria())
+					->where('isSubscribed', '=', false)
+					->orWhere('isSubscribed', '=', null)
+			)
+			->andWhere('calendar_calendar.id', '=', $calendarIds);
+		foreach($calendars as $calendar) {
+			$calendar->isSubscribed = true;
+			$calendar->save();
+		}
+
 	}
 
 }

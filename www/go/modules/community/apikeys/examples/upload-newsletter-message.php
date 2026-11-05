@@ -11,7 +11,7 @@ ini_set('display_errors', 'on');
 error_reporting(E_ALL);
 
 
-$apiKey = "63e601fab29f86187a7af84898b3e0d93bae150b209a2";
+$apiKey = "your-api-key";
 function fetch($data) {
     global $apiKey;
 	//Adjust these variables for your installation
@@ -137,7 +137,7 @@ if(isset($_POST['blobId'])) {
         <form class="needs-validation" method="POST">
             <div class="mb-3">
                 <label for="subject">Subject</label>
-                <input type="text" class="form-control" id="subject"  name="subject" value="<?=$template['subject']?>">
+                <input type="text" class="form-control" id="subject"  name="subject" value="<?=htmlentities($template['subject'])?>">
             </div>
 
             <div id="email_body"></div>
@@ -146,7 +146,7 @@ if(isset($_POST['blobId'])) {
         </form>
         <script>
             const div = document.getElementById('email_body');
-				div.attachShadow({ mode: "closed" }).innerHTML = <?=json_encode($template['body'])?>;
+				div.attachShadow({ mode: "closed" }).innerHTML = <?=json_encode(htmlentities($template['body']))?>;
         </script>
         <?php endif; ?>
 	</div>

@@ -18,6 +18,8 @@
 namespace GO\Summary\Model;
 
 
+use go\core\http\Client;
+
 class RssFeed extends \GO\Base\Db\ActiveRecord {
 	
 	public static function model($className=__CLASS__)
@@ -38,25 +40,11 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 
 	public function validate(): bool
 	{
-		$parsed = parse_url($this->url, PHP_URL_HOST);
-		$address = gethostbyname($parsed);
+		$client = new Client();
+		$client->globalRangeOnly = true;
+		$response = $client->get($this->url);
 
-		if(!filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-			$this->setValidationError('url', go()->t("Private URL's are not allowed"));
-			return parent::validate();
-		}
-
-		if (function_exists('curl_init')) {
-			$httpclient = new \GO\Base\Util\HttpClient();
-			$xml = $httpclient->request($this->url);
-		} else {
-			if (!\GO\Base\Fs\File::checkPathInput($this->url))
-				throw new \Exception("Invalid request");
-
-			$xml = @file_get_contents($this->url);
-		}
-
-		if (!$xml || !self::isRSS($xml)){
+		if (!$response['body'] || !self::isRSS($response['body'])) {
 
 			$this->setValidationError('url', go()->t('The supplied URL is not an RSS feed'));
 		}

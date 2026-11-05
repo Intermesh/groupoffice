@@ -21,4 +21,5 @@ return array (
   'Download site config' => 'Stáhnout konfigurační soubor stránky',
   'Trial' => 'Zkouška',
   'Version' => 'Verze',
+  'Is trial' => 'Testovací',
 );

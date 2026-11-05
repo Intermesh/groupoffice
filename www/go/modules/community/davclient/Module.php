@@ -20,6 +20,11 @@ class Module extends core\Module
 		return "Intermesh BV <mdhart@intermesh.nl>";
 	}
 
+	public static function getCategory(): string
+	{
+		return go()->t("Calendar", static::getPackage(), static::getName());
+	}
+
 	public function defineListeners()
 	{
 		CalendarEvent::on(CalendarEvent::EVENT_BEFORE_SAVE, self::class, 'onBeforeEventSave');

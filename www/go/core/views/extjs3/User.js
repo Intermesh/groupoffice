@@ -48,9 +48,11 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			this.legacySettings(user);
 
 			this.checkForNewDevices(user);
+
 			document.body.classList.add(user.themeColorScheme);
 			changeTheme(prefersColorQuery);
-			if(document.body.classList.contains("dark")) {
+			// TODO: GOUI version has no meta theme-color declaration?
+			if(document.body.classList.contains("dark") && document.getElementsByTagName("meta")["theme-color"]) {
 				document.getElementsByTagName("meta")["theme-color"].content = "#202020";
 			}
 
@@ -139,8 +141,30 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 				GO.settings.modules[m.name].write_permission = m.permissionLevel >= go.permissionLevels.write;
 			}
 
+
 	},
-  
+	loadLegacyModuleScripts : function() {
+
+		return new Promise(function(resolve, reject) {
+			//legacy scripts loaded from scripts.inc.php
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php?mtime=" + go.User.modifiedAt + "-" + go.User.apiVersion);
+			script.charset = 'utf-8';
+			script.id = 'testing';
+			script.defer = true;
+			script.async = true;
+			script.onload = function () {
+				resolve();
+			};
+			script.onerror = function () {
+				reject();
+			};
+
+			document.body.appendChild(script);
+		});
+
+	},
 	isLoggedIn: function() {
 		return !Ext.isEmpty(this.username);
 	}

@@ -90,9 +90,9 @@ class Relation {
 
 
 	/**
-	 * Only used by array relations. Used for ordering the relation on save and when fetching.
+	 * Only used by array and map relations. Used for ordering the relation on save and when fetching.
 	 *
-	 * @var string
+	 * @var string|array
 	 */
 	public $orderBy;
 
@@ -132,6 +132,22 @@ class Relation {
 		return $this;
 	}
 
+
+	/**
+	 * Set sort order
+	 *
+	 * Only makes sense on array or scalar relations. Map key order is not preserved in Javascript.
+	 *
+	 * @param array $orderBy eg. ['field1'=>'ASC','field2'=>'DESC', new go\core\db\Expression('ISNULL(column) ASC')] for multiple values
+	 *
+	 * @return $this
+	 */
+	public function orderBy(array $orderBy): static
+	{
+		$this->orderBy = $orderBy;
+		return $this;
+	}
+
 	/**
 	 * Create a scalar relation. For example an array of ID's.
 	 *
@@ -163,7 +179,7 @@ class Relation {
 	/**
 	 * Create a mapped relation. Index is the ID of the {@see Property}.
 	 *
-	 * - Map objects are unsorted!
+	 * - Map objects are unsorted! Because JSON.parse() in javascript orders keys by numerical values.
 	 * - If the map is empty the value is null and not an empty object
 	 * - When updating a map the client must send the full property value. Everything that is not included will be removed.
 	 * - Setting a value to null or false will remove it from the map.

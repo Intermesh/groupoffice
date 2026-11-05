@@ -11,6 +11,7 @@ CREATE TABLE `notes_note` (
   `modifiedBy` int(11) NULL,
   `name` varchar(100) NOT NULL,
   `content` MEDIUMTEXT,
+  `type` enum('html','markdown') NOT NULL DEFAULT 'html',
   `filesFolderId` int(11) DEFAULT NULL,
   `password` varchar(255) DEFAULT '',
   `createdAt` datetime DEFAULT NULL,
@@ -106,7 +107,8 @@ CREATE TABLE `notes_user_settings` (
    `userId` int(11) NOT NULL,
    `defaultNoteBookId` int(11) DEFAULT NULL,
    `rememberLastItems` tinyint(1) DEFAULT 0,
-   `lastNoteBookIds` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT ''
+   `lastNoteBookIds` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+   `defaultType` enum('html','markdown') NOT NULL DEFAULT 'html'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -138,3 +140,20 @@ ALTER TABLE `notes_note_image`
 ALTER TABLE `notes_note_book` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 ALTER TABLE `notes_note` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 ALTER TABLE `notes_note` ADD FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+CREATE TABLE IF NOT EXISTS `notes_note_book_user`
+(
+    `noteBookId`   INT(11) NOT NULL,
+    `userId`       INT(11) NOT NULL,
+    `syncToDevice` TINYINT(1)       DEFAULT 0 NOT NULL,
+    `modSeq`       INT     NOT NULL DEFAULT 0,
+    PRIMARY KEY (`noteBookId`, `userId`),
+    CONSTRAINT `fk_notes_note_book_user_notes_note_book1` FOREIGN KEY (`noteBookId`)
+        REFERENCES `notes_note_book` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+    CONSTRAINT `fk_notes_note_book_user_core_user` FOREIGN KEY (`userId`)
+        REFERENCES `core_user` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
+);

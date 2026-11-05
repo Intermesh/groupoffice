@@ -26,7 +26,7 @@
 							cb.call(scope);
 						}
 						success ? resolve(me) : reject(me);
-					}				
+					}
 				}, me);
 
 				go.Db.store("FieldSet").all(function (success, fieldSets) {

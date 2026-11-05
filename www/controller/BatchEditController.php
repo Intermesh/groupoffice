@@ -24,7 +24,7 @@ namespace GO\Core\Controller;
 
 
 class BatchEditController extends \GO\Base\Controller\AbstractController {
-	
+
 	/**
 	 * Update the given id's with the given data
 	 * The params array must contain at least:
@@ -43,10 +43,12 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 		$data = json_decode($params['data'], true);
 		
 		$keys = json_decode($params['keys'], true);
-		
+
+		$modelClass = $this->getRequestedModel($params['model_name']);
+
 		if(is_array($keys)) {
 			foreach($keys as $key) {
-				$model = \GO::getModel($params['model_name'])->findByPk($key);
+				$model = $modelClass->findByPk($key);
 				if(!empty($model)) {
 					foreach ($data as &$item) {
 						if($item['mergeable'] && !$item['replace']) {
@@ -162,6 +164,7 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 		
 		$mergeableTypes = array('textfield', 'textarea');
 		
+		$this->getRequestedModel($params['model_name']);
 		$tmpModel = new $params['model_name']();
 		$columns = $tmpModel->getColumns();
 		

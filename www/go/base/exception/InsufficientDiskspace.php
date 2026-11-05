@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class InsufficientDiskspace extends \Exception
+use go\core\exception\UserSafeException;
+
+class InsufficientDiskspace extends \Exception implements UserSafeException
 {
 	private $_total_file_storage;
 	
@@ -65,9 +67,11 @@ class InsufficientDiskspace extends \Exception
 	 * Query the file_storage_usage once;
 	 * @return integer total file storage usage in bytes
 	 */
-	protected function getTotalUsage() {
-		if(!isset($this->_total_file_storage))
-			$this->_total_file_storage=\GO::config()->get_setting('file_storage_usage');
+	protected function getTotalUsage(): int
+	{
+		if (!isset($this->_total_file_storage)) {
+			$this->_total_file_storage = go()->getSettings()->fileStorageUsage;
+		}
 		return $this->_total_file_storage;
 	}
 }

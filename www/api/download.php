@@ -19,6 +19,16 @@ use go\core\jmap\Response;
 use go\core\jmap\State;
 use go\core\http\Request;
 
+const INSECURE_MIME_TYPES = [
+	'text/html',
+	'image/svg+xml',
+	'application/xhtml+xml',
+	'text/xml',
+	'application/xml',
+	'text/xsl',
+	'application/xslt+xml'
+];
+
 App::get();
 if(Request::get()->getMethod() == 'OPTIONS') {
 	Response::get()->output();
@@ -51,9 +61,15 @@ try {
 		$inline = !empty($_GET['inline']);
 
 		// prevent html to render on same domain having access to all global JS stuff
-		if($blob->type == 'text/html') {
+		// compare the bare media type: "TEXT/HTML; charset=utf-8" is html too
+		$mediaType = strtolower(trim(explode(';', (string) $blob->type)[0]));
+		if(in_array($mediaType, INSECURE_MIME_TYPES)) {
 			$inline = false;
+			$blob->type = 'text/plain';
 		}
+
+		// don't let the browser guess a more dangerous type than we send
+		Response::get()->setHeader('X-Content-Type-Options', 'nosniff');
 
 		try {
 			$ua_info = \donatj\UserAgent\parse_user_agent();
@@ -66,13 +82,6 @@ try {
 			//ignore
 		}
 
-		$inline = !empty($_GET['inline']);
-
-		// prevent html to render on same domain having access to all global JS stuff
-		if($blob->type == 'text/html') {
-			$inline = false;
-		}
-
 		$blob->output($inline);
 		exit();
 	}
@@ -83,11 +92,19 @@ try {
 
 	$package = array_shift($parts);
 	if ($package == "core") {
-		$c = GO();
+		$c = go();
 		$method = "download" . array_shift($parts);
+		$ctrlCls = App::class;
 	} else {
 		$module = array_shift($parts);
 		$method = "download" . array_shift($parts);
+
+		// package and module end up in a class name: allow identifiers only (no namespace separators)
+		if (!preg_match('/^\w+$/', (string) $package) || !preg_match('/^\w+$/', (string) $module)) {
+			Response::get()->setStatus(400);
+			Response::get()->output("Bad request.");
+			exit();
+		}
 		//left over are params
 
 		$ctrlCls = "go\\modules\\" . $package . "\\" . $module . "\\Module";
@@ -108,6 +125,7 @@ try {
 		Response::get()->sendHeaders();
 	}
 
+	// nosemgrep: tainted-callable
 	call_user_func_array([$c, $method], $parts);
 } catch(Exception $e) {
 	//require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');

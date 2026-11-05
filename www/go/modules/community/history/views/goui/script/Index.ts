@@ -1,31 +1,44 @@
-import {client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {JmapDataSource, modules} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {t} from "@intermesh/goui";
-import {SystemSettings} from "./SystemSettings.js";
+import {Settings} from "./Settings.js";
+
+export * from "./HistoryDetailPanel.js";
 
 modules.register({
 	package: "community",
 	name: "history",
-	async init() {
-		client.on("authenticated", ( {session}) => {
-			if (!session.capabilities["go:community:history"]) {
-				return;
+	panels: {
+		history: {
+			title: t("History"),
+			cmp: Main
+
+		}
+	},
+	systemSettingsPanels: [Settings],
+	entities: [{
+		name:'LogEntry',
+		relations: {
+			creator: {store: 'Principal', fk:'createdBy'}
+		},
+		filters: {
+			text: {
+				wildcards: false,
+				type: "string",
+				multiple: false,
+				title: t("Query")
+			},
+			entityId: {
+				title: t("Entity ID"),
+
+				multiple: true,
+				type: 'number'
 			}
-
-			router.add(/^history\/(\d+)$/, () => {
-				modules.openMainPanel("history");
-			});
-
-			modules.addMainPanel("community", "history", "history", "History", () => {
-				return new Main();
-			});
-
-			modules.addSystemSettingsPanel("community", "history", "history", t("History"), "history", () => {
-				return new SystemSettings();
-			});
-		});
-	}
+		}
+	}],
 });
 
 export const logEntryDS = new JmapDataSource("LogEntry");
 export const moduleDS = new JmapDataSource("Module");
+
+export {HistoryDetailPanel} from "./HistoryDetailPanel.js";

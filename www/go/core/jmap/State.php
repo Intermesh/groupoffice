@@ -72,6 +72,17 @@ class State extends AbstractState {
 	public static $CSRFcheck = true;
 
 	/**
+	 * A disabled user can't use a token. Checked when the token is loaded from the database, so it's cached for
+	 * {@see Token::CACHE_TTL} at most.
+	 */
+	private static function isUserEnabled(Token $token): bool
+	{
+		$user = User::find(['id', 'enabled'], true)->where(['id' => $token->userId])->single();
+
+		return $user && $user->enabled;
+	}
+
+	/**
 	 * @throws Forbidden
 	 */
 	private static function checkCSRF(Token $token) : bool {
@@ -81,7 +92,7 @@ class State extends AbstractState {
 		}
 
 		// if cookie is used then we must also check the CSRF token
-		$csrfToken = Request::get()->getHeader('X-CSRF-Token') ?: $_REQUEST['CSRFToken'] ?? null;
+		$csrfToken = self::getRequestCSRFToken();
 		if(!$csrfToken) {
 			go()->debug("'X-CSRF-Token' header or 'CSRFToken' request parameter missing");
 			return false;
@@ -94,10 +105,32 @@ class State extends AbstractState {
 
 		return true;
 	}
-	
-	/**	
+
+	private static function getRequestCSRFToken(): ?string
+	{
+		return Request::get()->getHeader('X-CSRF-Token') ?: $_REQUEST['CSRFToken'] ?? null;
+	}
+
+	/**
+	 * Check if the request carries the CSRF token of the access token as 'X-CSRF-Token' header or 'CSRFToken'
+	 * parameter. Also for GET requests.
 	 *
-	 * @var Token 
+	 * Used by the legacy controllers, which the GOUI client calls without the old session security token.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function hasValidCSRFToken(): bool
+	{
+		$token = $this->getToken();
+		$csrfToken = self::getRequestCSRFToken();
+
+		return $token && isset($token->CSRFToken) && is_string($csrfToken) && hash_equals($token->CSRFToken, $csrfToken);
+	}
+
+	/**
+	 *
+	 * @var Token
 	 */
 	private $token;
 
@@ -124,13 +157,20 @@ class State extends AbstractState {
 
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
 			if($this->token) {
-				if(!self::checkCSRF($this->token)) {
-					return false;
+				if($this->token->isExpired()) {
+					// The cache can outlive the database record (eg. removed by garbage collection). Never use or extend it.
+					go()->getCache()->delete('token-' . $tokenStr);
+					$this->token = null;
+				} else {
+					if(!self::checkCSRF($this->token)) {
+						$this->token = null;
+						return false;
+					}
+					$this->token->activity();
+					return $this->token;
 				}
-				$this->token->activity();
-				return $this->token;
 			}
-		
+
 			$this->token = Token::find()->where(['accessToken' => $tokenStr])->single();
 			
 			if(!$this->token) {
@@ -145,12 +185,15 @@ class State extends AbstractState {
 					ErrorHandler::logException($e);
 				}
 				$this->token = false;
+			} else if(!self::isUserEnabled($this->token)) {
+				// Not deleted: tokens that never expire (API keys) must work again when the user is enabled again.
+				$this->token = false;
 			} else{
 				if(!self::checkCSRF($this->token)) {
 					$this->token = null;
 					return false;
 				}
-				go()->getCache()->set('token-' . $tokenStr, $this->token);
+				go()->getCache()->set('token-' . $tokenStr, $this->token, true, Token::CACHE_TTL);
 			}
 		}
 		
@@ -223,7 +266,7 @@ class State extends AbstractState {
 	 */
 	public function getSession(): array
 	{
-		$response = [
+		return [
 			'version' => go()->getVersion(),
 			'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
 			// 'username' => $user->username,
@@ -234,42 +277,34 @@ class State extends AbstractState {
 				'hasDataFor' => []
 			]],
 			"auth" => [
-						"domains" => User::getAuthenticationDomains()
+				"domains" => User::getAuthenticationDomains()
 			],
-			'capabilities' => Capabilities::get(),
+			'capabilities' => $this->fetchCapabilities(),
+			'baseUrl' => $this->getBaseUrl(),
 			'apiUrl' => $this->getApiUrl(),
 			'downloadUrl' => $this->getDownloadUrl("{blobId}"),
 			'pageUrl' => $this->getPageUrl(),
 			'uploadUrl' => $this->getUploadUrl(),
 			'eventSourceUrl' => $this->getEventSourceUrl(),
 			'userId' => $this->getUserId(),
+			'isAdmin' => $this->isAdmin(),
+			'state' => OldState::model()->getFullClientState($this->getUserId()), //todo optimize
+			'CSRFToken' => $this->getToken()->CSRFToken,
 		];
-		$this->addModuleCapabilities($response);
-
-		//todo optimize
-		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
-
-		$response['CSRFToken'] = $this->getToken()->CSRFToken;
-
-		return $response;
 	}
 
-	private function addModuleCapabilities(array $response) {
-		$modules = Module::getInstalled();
-		foreach ($modules as $module) {
-			$p = $module->getUserRights();
-
-			if($p->mayRead) {
-				$response['capabilities']->{'go:' . ($module->package ?? 'legacy') . ':' . $module->name} = $p;
-			}
-		}
+	private function fetchCapabilities() {
+		return array_merge(...array_map(
+			fn($mod) => $mod->getCapabilities(),
+			Module::getInstalled()
+		));
 	}
 
 	/**
 	 * Get the user ID
-	 * @return int|null
+	 * @return string|null
 	 */
-	public function getUserId(): ?int
+	public function getUserId(): ?string
 	{
 		return $this->getToken() ? $this->getToken()->userId : null;
 	}

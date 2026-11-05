@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @deprecated but not sure what to do with this Replace with the alert system? Anything else?
+ */
 namespace GO\Base\Cron;
 
 

@@ -96,6 +96,11 @@ $updates['202402221543'][] = function(){ // insert event overrides
 			$patch->participants = (object) $participants;
 		}
 
+		// in some rare cases the recurrence_id is null.
+		if(empty($row['recurrence_id'])) {
+			continue;
+		}
+
 		// add patch to calendar_recurrence_override
 		$recurrenceId = tz_convert($row['recurrence_id'],$event['timezone'])->format('Y-m-d H:i:s');
 		$insertPatchStmt->execute([$event['id'],$recurrenceId, json_encode($patch)]);
@@ -253,7 +258,7 @@ $updates['202404071212'][] = function() {
 // after timezone conversion make all full day event floating-time
 $updates['202404071212'][] = "UPDATE calendar_event SET timeZone = NULL WHERE showWithoutTime = 1;";
 // remove orphan categories
-$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE c.id IS NOT NULL;";
+$updates['202502261353'][] = "DELETE cat FROM calendar_category cat LEFT JOIN calendar_calendar c on c.id = cat.calendarId WHERE cat.calendarId IS NOT NULL AND c.id IS NULL;";
 // fix: set duration at 1 hour if duration is negative
 $updates['202503101510'][] = "UPDATE calendar_event SET duration = 'PT1H' WHERE duration LIKE 'PT-%';";
 $updates['202503111342'][] = function(){
@@ -316,7 +321,7 @@ $updates["202507221653"][] = "alter table `calendar_preferences` add column week
 
 $updates["202508111058"][] = "update calendar_event set uri = REPLACE(REPLACE(REPLACE(uri, '/', '_'), '+', '-'), '=', '.');";
 
-$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 1 not null after `timeZone`";
+$updates["202508191124"][] = "alter table calendar_calendar_user add column syncToDevice tinyint default 0 not null after `timeZone`";
 
 $updates["202508211118"][] = "update ignore calendar_participant p inner join core_user u on u.email = p.email set p.id = u.id;";
 $updates["202508211118"][] = "update calendar_preferences set defaultCalendarId=null where defaultCalendarId not in (select id from calendar_calendar);";
@@ -434,3 +439,85 @@ $updates["202509151158"][] = function() {
 };
 
 $updates["202509161101"][] = "ALTER TABLE `calendar_preferences` CHANGE COLUMN `startView` `startView` VARCHAR(20) NULL DEFAULT 'month';";
+
+$updates['202510071214'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `publishKey` CHAR(20) NULL AFTER `highestItemModSeq`;";
+
+
+$updates['202510091209'][] = 'update calendar_recurrence_override set patch = replace(patch, \'"status":"cancelled"\', \'"excluded":true\')
+where patch like \'%"status":"cancelled"%\'';
+
+$updates['202511241214'][] = 'alter table calendar_calendar_user
+    alter column syncToDevice set default 0;';
+
+$updates['202511280942'][] = function() {
+	// move jitsi settings into own module
+	go()->getDbConnection()->exec("update core_module set package='community', enabled=1 where name='jitsimeet'");
+
+	$modId = go()->getDbConnection()->selectSingleValue("id")->from("core_module")->where(['name' => 'jitsimeet'])->single();
+
+	if(!$modId) {
+		$mod = \go\modules\community\jitsimeet\Module::get()->install();
+		$modId = $mod->id;
+	}
+
+	if(!$modId) {
+		throw new Exception("Failed to install jitsimeet");
+	}
+
+	$calendarModId = go()->getDbConnection()->selectSingleValue("id")->from("core_module")->where(['package'=>'community', 'name' => 'calendar'])->single();
+
+	if(!$calendarModId) {
+		throw new Exception("Failed to get calendar module ID");
+	}
+
+	go()->getDbConnection()->updateIgnore("core_setting", ['moduleId' => $modId], ['moduleId' => $calendarModId])->execute();
+
+
+};
+
+$updates['202512030900'][] = 'create index calendar_event_status_index
+    on calendar_event (status);';
+
+$updates['202602160945'][] = function() {
+	\go\modules\community\calendar\cron\ImportWebcalIcs::install("*/15 * * * *");
+};
+
+$updates['202602160945'][] = "ALTER TABLE `calendar_resource_group` ADD COLUMN `autoAccept` TINYINT(1) NOT NULL DEFAULT 1 AFTER `description`;";
+
+$updates['202604211050'][] = "ALTER TABLE `calendar_calendar` ADD COLUMN `webcalHash` CHAR(40) COLLATE ascii_bin NULL DEFAULT NULL AFTER `webcalUri`;";
+
+$updates['202605281632'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN multiLine TINYINT(1) DEFAULT 0 NOT NULL AFTER `showDeclined`;";
+
+
+$updates['202610051128'][] = "update calendar_calendar set ownerId = null where groupId is not null;";
+
+$updates['202610051128'][] = "update calendar_event set replyTo = replace(lower(replyTo), 'mailto:', '')";
+
+$updates['202610061549'][] = "alter table calendar_view
+    drop foreign key calendar_View_ownerId;";
+
+$updates['202610061549'][] = "alter table calendar_view
+    add constraint calendar_View_ownerId
+        foreign key (ownerId) references core_user (id)
+            on delete cascade;";
+
+$updates['202610090902'][] = "update calendar_event set createdBy = null where createdBy not in (select id from core_user);";
+
+$updates['202610090902'][] = "update calendar_event set modifiedBy = createdBy where modifiedBy='0';";
+
+//ALTER TABLE calendar_event
+//    ADD INDEX calendar_event_range_idx (firstOccurrence, lastOccurrence, status, privacy);
+
+$updates['202610091000'][] = "ALTER TABLE `calendar_calendar_event`
+    ADD INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
+    DROP INDEX `fk_calendar_calendar_event_calendar_calendar1_idx`,
+    DROP INDEX `fk_calendar_calendar_event_calendar_event1_idx`;";
+
+// Resource principals were not updated when the admin of the resource group changed.
+$updates['202610121000'][] = "UPDATE core_principal p
+	JOIN core_entity et ON et.id = p.entityTypeId AND et.name = 'Calendar'
+	JOIN calendar_calendar c ON c.id = p.entityId
+	JOIN calendar_resource_group rg ON rg.id = c.groupId
+	JOIN core_user u ON u.id = rg.defaultOwnerId
+	SET p.email = u.email, p.description = IFNULL(c.description, u.displayName)
+	WHERE c.groupId IS NOT NULL;";

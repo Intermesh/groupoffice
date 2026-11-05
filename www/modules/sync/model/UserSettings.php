@@ -29,29 +29,16 @@ use go\core\model\User;
 class UserSettings extends Property
 {
 
-	public $user_id;
+	public ?int $user_id;
 	/**
 	 * Email account
 	 * @var int
 	 */
 	public $account_id;
 
-	public $noteBooks = [];
-
-	public $addressBooks = [];
-
-
-	/**
-	 * Allow deletion of items
-	 *
-	 * @var bool
-	 */
-	public $allowDeletes = true;
-
-
 	private $doSetup = false;
 
-	protected function init()
+	protected function init(): void
 	{
 		if($this->isNew()) {
 			$this->doSetup = true;
@@ -65,64 +52,32 @@ class UserSettings extends Property
 		$this->doSetup = false;
 	}
 
-	public $tasklists = [];
+
 
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
-			->addTable("sync_settings", "syncs")
-			->addArray('noteBooks', UserNoteBook::class, ['user_id' => 'userId'])
-			->addArray('addressBooks', UserAddressBook::class, ['user_id' => 'userId'])
-			->addArray('tasklists', UserTasklist::class, ['user_id' => 'userId']);
+			->addTable("sync_settings", "syncs");
 	}
 
 
-	protected function setup() {
-
-	  if(empty($this->account_id)) {
-      if (Module::isInstalled('legacy', 'email')) {
-        $account = \GO\Email\Model\Account::model()->findSingleByAttribute('user_id', $this->user_id);
-        if ($account) {
-          $this->account_id = $account->id;
-        }
-      }
-	  }
-
-		if (empty($this->addressBooks) || empty($this->noteBooks)  || empty($this->tasklists)) {
-			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings', 'syncSettings', 'tasksSettings']);
-
-			if (empty($this->addressBooks)) {
-				if (isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
-					$this->addressBooks[] = (new UserAddressBook($this))->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
+	protected function setup()
+	{
+		if (empty($this->account_id)) {
+			if (Module::isInstalled('legacy', 'email')) {
+				$account = \GO\Email\Model\Account::model()->findSingleByAttribute('user_id', $this->user_id);
+				if ($account) {
+					$this->account_id = $account->id;
 				}
 			}
-
-			if (empty($this->noteBooks)) {
-				if (isset($user->notesSettings) && ($noteBookId = $user->notesSettings->getDefaultNoteBookId())) {
-					$this->noteBooks[] = (new UserNoteBook($this))->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
-				}
-			}
-
-			if (empty($this->tasklists)) {
-				if (isset($user->tasksSettings) && ($tasklistId = $user->tasksSettings->getDefaultTasklistId())) {
-					$this->tasklists[] = (new UserTasklist($this))->setValues(['tasklistId' => $tasklistId, 'isDefault' => true]);
-				}
-			}
-
-			if ($this->isModified()) {
-				if(!$this->internalSave()) {
-					throw new \Exception("Could not update user with sync settings:  " . $this->getValidationErrorsAsString());
-				}
-			}
-
-			$this->doSetup = false;
 		}
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
-		if($this->doSetup)
+		if($this->doSetup) {
 			$this->setup();
+		}
 
 		return parent::toArray($properties);
 	}

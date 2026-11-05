@@ -54,6 +54,8 @@ export class Main extends MainThreeColumnPanel {
 	constructor() {
 		super("tasks");
 
+		this.setup(this.createCenter(), this.createWest(), this.createEast());
+
 		this.on("render", () => {
 			void this.taskListGrid.store.load();
 			void this.taskCategoryGrid.store.load();
@@ -65,7 +67,7 @@ export class Main extends MainThreeColumnPanel {
 				cls: "vbox scroll fit",
 				width: 300
 			},
-			this.showCenterButton(),
+			// this.showCenterButton(),
 			schedulefilter({
 				columns: [
 					column({
@@ -82,8 +84,8 @@ export class Main extends MainThreeColumnPanel {
 				rowSelectionConfig: {
 					multiSelect: false,
 					listeners: {
-						selectionchange: (rowSelect) => {
-							const value = rowSelect.selected.map((row) => row.record.value)[0];
+						selectionchange: ({target}) => {
+							const value = target.getSelected().map((row) => row.record.value)[0];
 
 							const filters: Record<string, Filter> = {
 								today: {start: "<=now"},
@@ -134,7 +136,7 @@ export class Main extends MainThreeColumnPanel {
 				})
 			),
 			tbar({
-					cls: "border-bottom"
+					cls: "border-bottom table-aligned"
 				},
 				checkbox({
 					listeners: {
@@ -151,7 +153,7 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: ({text}) => {
-							(this.taskListGrid.store.queryParams.filter as Filter).text = text;
+							this.taskListGrid.store.setFilter("text", {text: text});
 							void this.taskListGrid.store.load();
 						}
 					}
@@ -182,20 +184,18 @@ export class Main extends MainThreeColumnPanel {
 					cls: "scroll"
 				},
 				this.taskListGrid = tasklistgrid({
-					headers: false,
-					fitParent: true,
 					cls: "no-row-lines",
 					dropOn: true,
 					sortableGroup: "TaskToList",
 					rowSelectionConfig: {
 						multiSelect: true,
 						listeners: {
-							selectionchange: (tableRowSelect) => {
-								const taskListIds = tableRowSelect.selected.map((row) => row.record.id);
+							selectionchange: ({target}) => {
+								const taskListIds = target.getSelected().map((row) => row.record.id);
 
-								this.taskGrid.store.queryParams.filter = {
+								this.taskGrid.store.setFilter("tasklist", {
 									taskListId: taskListIds
-								}
+								});
 
 								void this.taskGrid.store.load();
 							}
@@ -258,7 +258,7 @@ export class Main extends MainThreeColumnPanel {
 			),
 
 			tbar({
-					cls: "border-bottom"
+					cls: "border-bottom table-aligned"
 				},
 				checkbox({
 					listeners: {
@@ -286,12 +286,11 @@ export class Main extends MainThreeColumnPanel {
 				this.taskCategoryGrid = taskcategorygrid({
 					cls: "no-row-lines",
 					headers: false,
-					fitParent: true,
 					rowSelectionConfig: {
 						multiSelect: true,
 						listeners: {
-							selectionchange: (tableRowSelect) => {
-								const categoryIds = tableRowSelect.selected.map((row) => row.record.id);
+							selectionchange: ({target}) => {
+								const categoryIds = target.getSelected().map((row) => row.record.id);
 
 								this.taskGrid.store.queryParams.filter = {
 									categories: categoryIds
@@ -345,7 +344,7 @@ export class Main extends MainThreeColumnPanel {
 			})
 		);
 
-		this.taskListGrid.on("drop", async ({target, toIndex, fromIndex, source}) => {
+		this.taskListGrid.on("drop", async ({toIndex, fromIndex, source, target}) => {
 			const fromTable = source as Table;
 
 			const tasklist = target.store.get(toIndex);
@@ -362,16 +361,15 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createCenter() {
 		this.taskGrid = new TaskGrid();
-		this.taskGrid.fitParent = true;
-		this.taskGrid.draggable = true;
+		this.taskGrid.draggableRows = true;
 		this.taskGrid.sortableGroup = "TaskToList";
 		void this.taskGrid.store.load();
 
 		this.taskGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
-				selectionchange: (tableRowSelect) => {
-					const taskIds = tableRowSelect.selected.map((row) => row.record.id);
+				selectionchange: ({target}) => {
+					const taskIds = target.getSelected().map((row) => row.record.id);
 
 					if (taskIds[0]) {
 						router.goto("tasks/" + taskIds[0]);
@@ -387,7 +385,7 @@ export class Main extends MainThreeColumnPanel {
 				flex: 1
 			},
 			this.taskGridToolbar = tbar({
-					cls: "bg-mid border-bottom"
+					cls: "bg-mid border-bottom table-aligned"
 				},
 				this.showWestButton(),
 				"->",

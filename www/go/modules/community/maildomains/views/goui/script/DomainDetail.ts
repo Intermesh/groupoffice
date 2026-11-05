@@ -317,16 +317,6 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						await this.openAliasDlg();
 					}
 				}),
-				// btn({
-				// 	icon: "delete",
-				// 	title: t("Delete"),
-				// 	handler: async (_btn) => {
-				// 		const ids = aliasTable!.rowSelection!.selected.map(index => aliasTable!.store.get(index)!.id);
-				// 		await jmapds("MailAlias")
-				// 			.confirmDestroy(ids);
-				//
-				// 	}
-				// }),
 
 				mstbar({table: aliasTable},
 					"->",
@@ -371,7 +361,7 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 	private async openExportDlg(): Promise<void> {
 		const ids = Array.from(this.mailboxTable.store.data, (m: DefaultEntity) => m.id);
 		const w = new MailboxExportDialog();
-		w.load(this.form.value, ids);
+		w.load(this.form.value as MailDomain, ids);
 		w.show();
 	}
 

@@ -13,4 +13,5 @@ return array (
   'You have an unsaved comment. Are you sure you want to discard the comment?' => 'U heeft een niet opgeslagen bericht. Weet u zeker dat u die wilt verwijderen?',
   'Message' => 'Bericht',
   'Attach file' => 'Bestand bijvoegen',
+	'Imported from mail' => 'Geïmporteed uit email',
 );

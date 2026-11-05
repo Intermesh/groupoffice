@@ -44,7 +44,7 @@ GO.email.MessagesGrid = function(config){
 		},{
 			header: t("From", "email"),
 			dataIndex: 'from',
-			renderer:{ 
+			renderer:{
 				fn: this.renderMessage,
 				scope: this
 			},
@@ -106,7 +106,7 @@ GO.email.MessagesGrid = function(config){
 		totalDisplay: true,
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
-		}		
+		}
 	});
 
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -239,8 +239,6 @@ GO.email.MessagesGrid = function(config){
 						}
 					}
 				}
-
-
 			]
 		})
 	});
@@ -262,24 +260,34 @@ GO.email.MessagesGrid = function(config){
 		pressed:false,
 		text: t("Show flagged", "email")
 	});
-	
+
 	this.searchDialog = new GO.email.SearchDialog({
 		store:config.store,
 		grid: this
 	});
 
-	
-	
+
 	this.settingsMenu = new Ext.menu.Menu({
-		items:[{
-			iconCls: 'ic-account-box',
-			text: t("Accounts", "email"),
-			handler: function(){
-				this.emailClient.showAccountsDialog();
+		items: [
+			{
+				iconCls: 'ic-account-box',
+				text: t("Accounts", "email"),
+				handler: function () {
+					this.emailClient.showAccountsDialog();
+				},
+				scope: this
 			},
-			scope: this
-		},
-		this.showFlaggedButton
+			{
+				iconCls: 'ic-contact-mail',
+				text: t("Templates", "email"),
+				handler: function () {
+					var dlg = new GO.email.TemplatesSettingsDialog();
+
+					dlg.show();
+				},
+				scope: this
+			},
+			this.showFlaggedButton
 		]
 	});
 
@@ -336,13 +344,12 @@ GO.email.MessagesGrid = function(config){
 			'->',
 			this.showUnreadButton,
 			this.searchField = new go.toolbar.SearchButton({
-				//store: config.store,
 				paramName: 'search',
 				hidden: config.hideSearch,
 				tools: [
 					this.moveAllButton = new Ext.Button({
 						iconCls: 'ic-move-to-inbox',
-						tooltip: t('Move all'),
+						tooltip: t('Move all', 'email'),
 						disabled: true,
 						handler: function (b) {
 
@@ -358,7 +365,7 @@ GO.email.MessagesGrid = function(config){
 					}),
 					this.deleteAllButton = new Ext.Button({
 						iconCls: 'ic-delete-sweep',
-						tooltip: t('Delete all'),
+						tooltip: t('Delete all', 'email'),
 						disabled: true,
 						handler: function (b) {
 
@@ -384,6 +391,7 @@ GO.email.MessagesGrid = function(config){
 				],
 				listeners: {
 					search: function (me, v) {
+						v = v.replace(/[\"\']/g, '');
 						config.store.baseParams['search'] = v;
 						config.store.load();
 
@@ -485,11 +493,11 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 
 	createQtipTemplate: function(record){
 		var qtipTemplate = '';
-		
+
 		if(this.getStore().baseParams.query){
 			qtipTemplate = 'ext:qtitle="'+t('folder','email')+'" ext:qtip="' + record.data['mailbox'] + '"';
 		}
-		
+
 		return qtipTemplate;
 	},
 
@@ -543,11 +551,32 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		if(record.data['flagged'] == 1){
 			icons.push('flag');
 		}
+        let numTasks = 0, numFinishedTasks = 0;
+        if (go.Modules.isAvailable("legacy","savemailas")) {
+            if(record.json['numTasks'] !== undefined) {
+                icons.push('assignment');
+                numTasks = record.json['numTasks'];
+                numFinishedTasks = record.json['numFinishedTasks'];
+            }
+        }
 
-		return unseen + icons.map(function(i) {
-			return '<i class="icon '+(i!=='flag'?'c-primary':'red')+'">' + i + '</i>';
+
+        return unseen + icons.map(function(i) {
+            let secondaryCls, title= "";
+            switch(i) {
+                case 'flag':
+                    secondaryCls = 'red';
+                    break
+                case 'assignment':
+                    secondaryCls = numFinishedTasks === numTasks ? 'green' : 'bluegrey';
+                    title = ` title = "${numFinishedTasks} / ${numTasks} ${t("Completed tasks", "tasks")}"`;
+                    break;
+                default:
+                    secondaryCls = 'c-primary';
+            }
+			return `<i class="icon ${secondaryCls}"${title}>${i}</i>`;
 		}).join("");
-		
+
 	},
 
 	showMoveMailToDialog : function() {

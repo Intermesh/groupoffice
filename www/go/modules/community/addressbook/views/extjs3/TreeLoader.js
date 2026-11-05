@@ -38,27 +38,6 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		return Ext.apply({limit: this.pageSize, position: this.position, calculateHasMore: true, sort: [{property: "name", isAscending: true }]}, this.baseParams);
 	},
 
-
-
-	// handleResponse : function(r) {
-	//
-	// 	if(this.position == 0 && !this.getFilter("tbsearch")) {
-	// 		r.responseData.unshift({
-	// 			leaf: true,
-	// 			iconCls: "ic-select-all blue",
-	// 			text: t("All contacts", "addressbook", "community"),
-	// 			id: "all"
-	// 		},{
-	// 			leaf: true,
-	// 			iconCls: "ic-star orange",
-	// 			text: t("Starred", "addressbook", "community"),
-	// 			id: "starred"
-	// 		});
-	// 	}
-	// 	go.modules.community.addressbook.TreeLoader.superclass.handleResponse.call(this, r);
-	//
-	// },
-	
 	convertEntityToNode : function(entity) {
 		
 		var attr = go.modules.community.addressbook.TreeLoader.superclass.convertEntityToNode.call(this, entity);
@@ -68,9 +47,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 			attr.children = [];
 			attr.expanded = true;
 		}
-		// if(entity.id === go.User.addressBookSettings.defaultAddressBookId) {
-		// 	attr.iconCls = 'ic-home bluegrey';
-		// }
+
 		return attr;
 	}
 

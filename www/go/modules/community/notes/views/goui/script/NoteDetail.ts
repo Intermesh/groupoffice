@@ -1,36 +1,53 @@
-import {br, btn, Button, comp, Component, h3, hr, menu, t} from "@intermesh/goui";
+import {br, btn, Button, comp, Component, datasourceform, DataSourceForm, h3, hr, menu, t} from "@intermesh/goui";
 import {
 	AclLevel,
 	addbutton,
+	customFields,
+	CustomFieldDetailFieldset,
 	DetailPanel,
 	filesbutton,
 	Image,
-	linkbrowserbutton,
+	linkbrowsebutton, LinkDetail,
+	Markdown,
 	modules
 } from "@intermesh/groupoffice-core";
 import {NoteDialog} from "./NoteDialog";
-import {CommentsPanel} from "@intermesh/community/comments";
+import {CommentsPanel} from "@intermesh/community-comments";
 import {Note, noteDS} from "./Index";
+import {HistoryDetailPanel} from "@intermesh/community-history";
+import {Encrypt} from "./Encrypt";
 
 export class NoteDetail extends DetailPanel<Note> {
 	private content: Component;
 	private editBtn: Button;
 	private deleteBtn: Button;
+	private form: DataSourceForm;
 
 	constructor() {
 		super("Note");
 
 		this.scroller.items.add(
 			this.content = comp({
-				cls: "normalize card pad"
+				cls: "normalize code-blocks card pad"
 			})
 		);
-		this.scroller.items.add(new CommentsPanel(this.entityName));
-		this.addCustomFields();
+
+		this.scroller.items.add(this.form = datasourceform({dataSource: noteDS}, ...customFields.getFieldSets("Note").map(fs => new CustomFieldDetailFieldset(fs))))
+		// Enlarge images when clicked in window
+		Image.enableZoom(this.content.el);
+
+		if(modules.isAvailable("community", "comments")) {
+			this.scroller.items.add(new CommentsPanel(this.entityName));
+		}
 
 		this.addFiles();
-		this.addLinks();
-		this.addHistory();
+		// this.addLinks();
+
+		this.scroller.items.add(...LinkDetail.getAll());
+
+		if(modules.isAvailable("community", "history")) {
+			this.scroller.items.add(new HistoryDetailPanel(this.entityName));
+		}
 
 		this.toolbar.items.add(
 			this.editBtn = btn({
@@ -43,7 +60,7 @@ export class NoteDetail extends DetailPanel<Note> {
 				}
 			}),
 			addbutton(),
-			linkbrowserbutton(),
+			linkbrowsebutton(),
 			btn({
 				icon: "more_vert",
 				menu: menu({},
@@ -70,7 +87,7 @@ export class NoteDetail extends DetailPanel<Note> {
 			this.toolbar.items.insert(-1, filesbutton());
 		}
 
-		this.on("load", ( {entity}) => {
+		this.on("load", ({entity}) => {
 			this.title = entity.name;
 
 			this.deleteBtn.disabled = entity.permissionLevel < AclLevel.DELETE;
@@ -81,7 +98,17 @@ export class NoteDetail extends DetailPanel<Note> {
 				text: entity.name
 			}));
 			this.content.items.add(br());
-			this.content.items.add(Image.replace(entity.content));
+
+			if(Encrypt.isEncrypted(entity.content)) {
+				Encrypt.prompt(entity.content).then(decryptedText => {
+					this.content.items.add(Image.replace(Markdown.contentToHtml(decryptedText, entity.type)));
+				})
+			} else{
+				this.content.items.add(Image.replace(Markdown.contentToHtml(entity.content, entity.type)));
+			}
+
+			void this.form.load(entity.id);
+
 		});
 	}
 }

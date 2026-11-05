@@ -42,7 +42,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"isOrganization",
 				"emailAddresses",
 				"phoneNumbers",
-
+				{
+					name: "address",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("address").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},{
+					name: "zipCode",
+					convert: function(v, data) {
+						return data.addresses ? data.addresses.column("zipCode").filter(i => !go.util.empty(i)).unique().join(", ") : "";
+					}
+				},
 				{
 					name: "city",
 					convert: function(v, data) {
@@ -174,13 +184,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Name'),
 					width: dp(220),
 					sortable: true,
-					dataIndex: 'name',
+					dataIndex: go.User.addressBookSettings.sortBy === 'lastName' ? 'lastName' : 'name',
 					hidden: this.enabledColumns.indexOf('name') == -1,
 					renderer: function (v, meta, record) {
 						if(record.get("color")) {
-							meta.attr = 'style="color: #' + record.get("color") + ';"';
+							meta.attr = 'style="color: #' + Ext.util.Format.htmlEncode(record.get("color")) + ';"';
 						}
-						return v;
+						return Ext.util.Format.htmlEncode(record.get('name'));
 					}
 				},
 				{
@@ -190,12 +200,19 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'gender',
 					renderer: function (v) {
-						if(v === 'M') {
-							return t("Male", 'addressbook');
-						} else if (v === 'F') {
-							return t("Female", 'addressbook');
+						switch(v) {
+							case'M':
+								return t("Male", 'addressbook');
+							case 'F':
+								return t("Female", 'addressbook');
+							case 'N':
+								return t("Non-binary", 'addressbook');
+							case 'P':
+								return t("Won't say", 'addressbook');
+
+							default:
+								return "";
 						}
-						return "";
 					}
 				},
 				{
@@ -287,7 +304,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'registrationNumber'
 				},{
 					hidden: this.enabledColumns.indexOf('debtorNumber') == -1,
-					header: t('Debtor number'),
+					header: t('Customer number'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'debtorNumber'
@@ -314,6 +331,22 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (phoneNumbers, meta, record) {
 						return Ext.util.Format.htmlEncode(phoneNumbers.column("number").join(", "));
 					}
+				},
+				{
+					id: 'address',
+					header: t('Address'),
+					sortable: true,
+					dataIndex: "address",
+					width: dp(300),
+					hidden: true
+				},
+				{
+					id: 'zipCode',
+					header: t('ZIP code'),
+					sortable: true,
+					dataIndex: "zipCode",
+					width: dp(300),
+					hidden: true
 				},
 				{
 					id: 'city',

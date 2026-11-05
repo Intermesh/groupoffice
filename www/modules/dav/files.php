@@ -21,7 +21,7 @@ use Sabre\DAV\Auth\Plugin as AuthPlugin;
 use Sabre\DAV\Browser\Plugin;
 use Sabre\DAV\Exception\NotAuthenticated;
 use Sabre\DAV\Exception\NotFound;
-use Sabre\DAV\Locks\Plugin as LockPlugin;
+use \GO\Dav\Locks\Plugin as LockPlugin;
 
 define("GO_NO_SESSION", true);
 
@@ -58,13 +58,16 @@ $server->on('exception', function($e){
 $baseUri = strpos($_SERVER['REQUEST_URI'],'files.php') ? \GO::config()->host . 'modules/dav/files.php/' : '/webdav/';
 $server->setBaseUri($baseUri);
 
+
+// Show locks: select id,name,lock_id, locked_user_id, from_unixtime(lock_expires_at), from_unixtime(unix_timestamp()) from fs_files where lock_id != "" and lock_id is not null;
+
 // Support for LOCK and UNLOCK
-if(empty(go()->getConfig()['webdavEnableLocks'])) {
-	$lockBackend = new Sabre\DAV\Locks\Backend\PDO(\GO::getDbConnection());
-	$lockBackend->tableName = 'dav_locks';
-} else {
+//if(empty(go()->getConfig()['webdavEnableLocks'])) {
+//	$lockBackend = new Sabre\DAV\Locks\Backend\PDO(\GO::getDbConnection());
+//	$lockBackend->tableName = 'dav_locks';
+//} else {
 	$lockBackend = new LocksBackend($server);
-}
+//}
 
 $lockPlugin = new LockPlugin($lockBackend);
 $server->addPlugin($lockPlugin);

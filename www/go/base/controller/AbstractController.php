@@ -40,6 +40,7 @@ namespace GO\Base\Controller;
 use Exception;
 use GO;
 use GO\Base\Data\JsonResponse;
+use GO\Base\Db\ActiveRecord;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\CliOnly;
 use GO\Base\Exception\MissingParameter;
@@ -101,7 +102,7 @@ abstract class AbstractController extends Observable {
 	 */
 	protected $view = 'file';
 
-	public function __construct() {
+	public function __construct($checkEnabled = true) {
 		
 		
 		$this->init();
@@ -111,7 +112,7 @@ abstract class AbstractController extends Observable {
 			$this->view = new $name();
 		}
 		
-		if (!GO::config()->enabled) {
+		if ($checkEnabled && !GO::config()->enabled) {
 			$this->render('Disabled');
 			exit();
 		}	
@@ -182,6 +183,8 @@ abstract class AbstractController extends Observable {
 	 *  1. Not in debug mode
 	 *  2. There's a logged in user.
 	 *  3. A route to a controller has been given. Because we don't want to block the default page when entered manually.
+	 *
+	 * The CSRF token of the JMAP access token is accepted too. The GOUI client doesn't have the session token.
      *
 	 * @throws SecurityTokenMismatch
 	 */
@@ -195,7 +198,8 @@ abstract class AbstractController extends Observable {
 			!GO::config()->debug &&
 			!GO::config()->disable_security_token_check &&
 			!empty($_REQUEST['r']) &&
-			(!isset($_REQUEST['security_token']) || $_REQUEST['security_token'] != GO::session()->values['security_token'])
+			(!isset($_REQUEST['security_token']) || $_REQUEST['security_token'] != GO::session()->values['security_token']) &&
+			!($state instanceof State && $state->hasValidCSRFToken())
 		) {
 			throw new SecurityTokenMismatch();
 		} else {
@@ -215,7 +219,7 @@ abstract class AbstractController extends Observable {
 			
 			$moduleId = strtolower($classParts[1]);
 			
-			$this->_module = $moduleId=='core' ? false : Module::model()->findByName($moduleId, false, true);			
+			$this->_module = Module::model()->findByName($moduleId, false, true);
 		}
 		
 		return $this->_module;
@@ -267,8 +271,37 @@ abstract class AbstractController extends Observable {
 	}
 	
 	
-	
-	
+
+	/**
+	 * Get the model for a class name given by the client.
+	 *
+	 * Only models protected by an ACL may be used. Models without an ACL pass every permission check in
+	 * ActiveRecord, so only admins may use them.
+	 *
+	 * @param string $modelName Class name or entity name
+	 * @return ActiveRecord
+	 * @throws AccessDenied
+	 */
+	protected function getRequestedModel(string $modelName): ActiveRecord {
+		if(!class_exists($modelName)) {
+			$entityType = \go\core\orm\EntityType::findByName($modelName);
+			if($entityType) {
+				$modelName = $entityType->getClassName();
+			}
+		}
+
+		if(!class_exists($modelName) || !is_subclass_of($modelName, ActiveRecord::class)) {
+			throw new AccessDenied();
+		}
+
+		$model = $modelName::model();
+		if(!$model->aclField() && !GO::user()->isAdmin()) {
+			throw new AccessDenied();
+		}
+
+		return $model;
+	}
+
 	/**
 	 * Checks if a user is logged in, if the user has permission to the module and if the user has access to a specific action.
 	 * 
@@ -276,7 +309,7 @@ abstract class AbstractController extends Observable {
 	 * @return boolean boolean
 	 */
 	protected function _checkPermission($action){
-		
+
 		$allowGuests = $this->allowGuests();
 		
 		if(!in_array($action, $allowGuests) && !in_array('*', $allowGuests)){			
@@ -286,6 +319,10 @@ abstract class AbstractController extends Observable {
 			}
 			
 			$this->checkSecurityToken();
+
+			if(GO::user()->isAdmin()) {
+				return true;
+			}
 			
 			//check module permission
 			$allowWithoutModuleAccess = $this->allowWithoutModuleAccess();
@@ -293,7 +330,7 @@ abstract class AbstractController extends Observable {
 			{
 				// return !!go()->getAuthState()->getClassPermissionLevel(static::class);
 				$module = $this->getModule();		
-				if($module && !$module->permissionLevel)
+				if(!$module || !$module->permissionLevel)
 					return false;
 			}
 		}
@@ -436,11 +473,13 @@ abstract class AbstractController extends Observable {
 			$response['success'] = false;
 			
 			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
-			$response['feedback'] .= go()->getDebugger()->enabled ? $msg : get_class($e);
+			$response['feedback'] .= \go\core\ErrorHandler::clientMessage($e);
 			
 			$response['exceptionCode'] = $e->getCode();
 					
-			$response['exceptionClass'] = get_class($e);
+			if(go()->getDebugger()->enabled) {
+				$response['exceptionClass'] = get_class($e);
+			}
 
 			if ($e instanceof SecurityTokenMismatch) {
 				$response['redirectToLogin'] = true;

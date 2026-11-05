@@ -1,17 +1,16 @@
 import {
 	btn,
-	colorfield,
+	checkbox,
 	column,
 	combobox,
 	comp,
 	DataSourceStore,
 	datasourcestore,
 	h3,
-	hiddenfield,
 	hr,
 	menu,
+	menucolumn,
 	searchbtn,
-	select,
 	splitter,
 	Table,
 	table,
@@ -20,8 +19,9 @@ import {
 	textfield,
 	Window
 } from "@intermesh/goui";
-import {FormWindow, jmapds, principalDS} from "@intermesh/groupoffice-core";
+import {AclLevel, FormWindow, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
+import {ResourceWindow} from "./ResourceWindow.js";
 
 class ResourceGroupWindow extends FormWindow {
 
@@ -33,6 +33,7 @@ class ResourceGroupWindow extends FormWindow {
 		this.generalTab.items.add(
 			textfield({name:'name', label: t('Name')}),
 			textarea({name:'description', label: t('Description')}),
+			checkbox({name:'autoAccept', label: t('Auto-accept available resources')}),
 			combobox({
 				dataSource: principalDS, displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Default admin"), name: "defaultOwnerId", filterName: "text", flex:'1 0', required:true
@@ -42,46 +43,19 @@ class ResourceGroupWindow extends FormWindow {
 }
 const resourceStore = datasourcestore({
 	dataSource:jmapds('Calendar'),
-	filters:{isResource:{isResource:true}},
+	filters:{isResource:{isResource:true}, permission:{permissionLevel: AclLevel.MANAGE}},
 	//properties: ['id', 'name', 'description'],
 	sort: [{property:'sortOrder'}]
 })
 
-const resourceGroupStore = datasourcestore({
+export const resourceGroupStore = datasourcestore({
 	dataSource: jmapds("ResourceGroup"),
-	sort: [{property:'name'}]
+	sort: [{property:'name'}],
+	filters: {
+		def: {permissionLevel: AclLevel.MANAGE}
+	}
 });
 
-export class ResourceWindow extends FormWindow {
-	constructor() {
-		super('Calendar');
-		this.title = t('Resource');
-		this.maximizable = false;
-
-		this.generalTab.cls = 'flow pad';
-		this.generalTab.items.add(
-			select({name:'groupId', required:true,label:t('Group'), 	store: resourceGroupStore, valueField: 'id', textRenderer: (r: any) => r.name}),
-			textfield({name:'name', flex:1,label: t('Name')}),
-			colorfield({name:'color',width:100, value: '69554f'}),
-			textarea({name:'description', label: t('Description')}),
-			hiddenfield({name:'includeInAvailability', value: 'all'})
-			//checkbox({disabled:true, name:'needsApproval', label: t('Needs approval')})
-		);
-
-		this.addCustomFields();
-
-		this.addSharePanel([
-			{value: "",name: ""},
-			{value: 5, name: t("Read free/busy")},
-			{value: 10,name: t("Read items")},
-			//{value: 20,name: t("Update private")},
-			{value: 25,name: t("Approve / Disapprove")}, // RSVP
-			//{value: 30,name: t("Write own")},
-			//{value: 35,name: t("Write all")},
-			{value: 50,name: t("Manage")}
-		]);
-	}
-}
 export class ResourcesWindow extends Window {
 
 	resourceTable: Table<DataSourceStore>
@@ -95,21 +69,30 @@ export class ResourcesWindow extends Window {
 		this.resizable = true;
 
 		this.on('render', async () => {
-			resourceStore.load();
+
 			await resourceGroupStore.load();
-			const first = resourceStore.first();
+			const first = resourceGroupStore.first();
 			if(first) {
 				this.resourceGroupTable.rowSelection!.add(first);
 			}
 		})
 
+		const rights = modules.get("community", "calendar")!.userRights;
+
 		const aside = comp({tagName:'aside', cls:'vbox', width: 300},
 			tbar({},
 				h3({html:t('Group')}),'->',
-				btn({icon: 'add', cls: 'filled', handler: _ => (new ResourceGroupWindow()).show()})
+				btn({
+					icon: 'add',
+					cls: 'filled',
+					hidden: !rights.mayChangeResources,
+					handler: _ => (new ResourceGroupWindow()).show()
+				})
 			),
 			comp({cls: "scroll",flex:1},
-				this.resourceGroupTable =table({cls: "no-row-lines", headers: false, fitParent: true,
+				this.resourceGroupTable = table({
+					cls: "no-row-lines",
+					headers: false,
 					store: resourceGroupStore,
 					rowSelectionConfig: {
 						multiSelect: false,
@@ -123,41 +106,40 @@ export class ResourcesWindow extends Window {
 					},
 					columns:[
 						column({id:'name', header:t('Name') }),
-						column({id: "btn", width: 48,renderer: (columnValue: any, record, td, table, rowIndex) =>
+
+						menucolumn({
+							hidden: !rights.mayChangeResources,
+							menu: menu({},
 								btn({
-									icon: "more_vert",
-									menu: menu({},
-										btn({
-											icon: "edit",
-											text: t("Edit"),
-											handler: async (_btn) => {
-												const g = table.store.get(rowIndex)!;
-												const d = new ResourceGroupWindow();
-												await d.load(g.id);
-												d.show();
-											}
-										}),
-										hr(),
-										btn({
-											icon: "delete",
-											text: t("Delete"),
-											handler: async (_btn) => {
+									icon: "edit",
+									text: t("Edit"),
+									handler: async (b) => {
+										const tbl = b.parent!.dataSet.table;
+										const group = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+										const d = new ResourceGroupWindow();
+										d.show();
+										void d.load(group.id);
+									}
+								}),
+								hr(),
+								btn({
+									icon: "delete",
+									text: t("Delete"),
+									handler: async (b) => {
+										const tbl = b.parent!.dataSet.table;
+										const group = tbl.store.get(b.parent!.dataSet.rowIndex)!;
 
-												await jmapds("ResourceGroup").confirmDestroy([table.store.get(rowIndex)!.id]).catch((e:any) => {
-													console.log(e);
-													if(e.type=='dbException') {
-														Window.error(t('Could not delete non-empty resource group'));
-													} else
-														Window.error(e);
-												});
-
-
-											}
-										})
-
-									)
+										await jmapds("ResourceGroup").confirmDestroy([group.id]).catch((e:any) => {
+											console.log(e);
+											if(e.type=='dbException') {
+												Window.error(t('Could not delete non-empty resource group'));
+											} else
+												Window.error(e);
+										});
+									}
 								})
 
+							)
 						})
 					]
 				})
@@ -175,7 +157,7 @@ export class ResourcesWindow extends Window {
 						searchbtn({
 							listeners: {
 								input: ( {text}) => {
-									this.resourceTable!.store.setFilter("search", {text: text})
+									this.resourceTable!.store.setFilter("search", {text: text}).load()
 								}
 							}
 						}),
@@ -184,6 +166,7 @@ export class ResourcesWindow extends Window {
 							//text: t("Add"),
 							cls: "filled primary",
 							icon: "add",
+							hidden: !rights.mayChangeResources,
 							handler: () => {
 								const d = new ResourceWindow();
 								d.form.value = {
@@ -193,40 +176,43 @@ export class ResourcesWindow extends Window {
 							}
 						}),
 					),
-					comp({cls: "scroll",flex:1},
+					comp({cls: "scroll bg-lowest", flex:1},
 					this.resourceTable = table({
-						fitParent: true,
+						rowSelectionConfig: {multiSelect: false},
+						fit: true,
 						store: resourceStore,
-						columns: [column({header: t("ID"), id:"id", sortable: true, hidden:true, width: 60}),
-							column({header: t("Color"), id:"color", width: 40, renderer: v => comp({text:'-',style:{backgroundColor:'#'+v}}) }),
-							column({header: t("Name"), id:"name", resizable: true, sortable: true, width: 180}),
-							column({id: "btn", width: 48,renderer: (columnValue: any, record, td, table, rowIndex) =>
+						columns: [
+							column({header: t("ID"), id:"id", sortable: true, hidden:true, width: 60}),
+							column({header: t("Color"), id:"color", width: 60, renderer: v => comp({html: '&nbsp;',style:{backgroundColor:'#'+v}}) }),
+							column({header: t("Name"), id:"name", resizable: true, sortable: true}),
+							menucolumn({
+								menu: menu({},
 									btn({
-										icon: "more_vert",
-										menu: menu({},
-											btn({
-												icon: "edit",
-												text: t("Edit"),
-												handler: async (_btn) => {
-													const g = table.store.get(rowIndex)!;
-													const d = new ResourceWindow();
-													d.show();
-													void d.load(g.id);
-												}
-											}),
-											hr(),
-											btn({
-												icon: "delete",
-												text: t("Delete"),
-												handler: async (_btn) => {
-													const resource = table.store.get(rowIndex)!;
-													jmapds("Calendar").confirmDestroy([resource.id]);
-												}
-											})
-
-										)
+										icon: "edit",
+										text: t("Edit"),
+										handler: async (b) => {
+											const tbl = b.parent!.dataSet.table;
+											const cal = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+											const d = new ResourceWindow();
+											d.show();
+											void d.load(cal.id);
+										}
+									}),
+									hr(),
+									btn({
+										disabled: !rights.mayChangeResources,
+										icon: "delete",
+										text: t("Delete"),
+										handler: async (b) => {
+											const tbl = b.parent!.dataSet.table;
+											const cal = tbl.store.get(b.parent!.dataSet.rowIndex)!;
+											jmapds("Calendar").confirmDestroy([cal.id]).catch(e => Window.error(e))
+										}
 									})
+
+								)
 							})
+
 						],
 						listeners: {
 							rowdblclick:( {target, storeIndex}) => {
@@ -236,9 +222,12 @@ export class ResourcesWindow extends Window {
 							},
 
 							delete: async (_tbl) => {
+								if(!rights.mayChangeResources) {
+									return;
+								}
 								const ids = this.resourceTable!.rowSelection!.getSelected().map(row => row.record.id);
 								await jmapds("Calendar")
-									.confirmDestroy(ids);
+									.confirmDestroy(ids).catch(e => Window.error(e))
 							}
 						}
 					})

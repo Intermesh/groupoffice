@@ -30,7 +30,8 @@ try {
 	ini_set('max_execution_time', 300);
 
 	$filename = Request::get()->getHeader('X-File-Name');
-	$filename = Request::headerDecode($filename);
+	// The header is user input: never allow path separators in the name.
+	$filename = \go\core\fs\File::stripInvalidChars((string) Request::headerDecode($filename));
 	$tmpFile = \go\core\fs\File::tempFile($filename);
 
 	$input = fopen('php://input', "r");

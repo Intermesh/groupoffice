@@ -1,18 +1,26 @@
-import {client, FormWindow} from "@intermesh/groupoffice-core";
+import {client, FormWindow, jmapds} from "@intermesh/groupoffice-core";
 import {
 	btn,
 	CheckboxField, checkboxselectcolumn, column,
-	comp,
+	comp, datasourcestore,
 	List, menu,
 	select, table,
-	textfield
+	textfield,
+	SelectOption
 } from "@intermesh/goui";
-import {allCalendarStore, t} from "./Index.js";
+import {t} from "./Index.js";
+
+const allCalendarStore = datasourcestore({
+	dataSource:jmapds('Calendar'),
+	sort: [{property:'sortOrder'},{property:'name'}]
+});
 
 export class ViewWindow extends FormWindow {
 	//groupIdsFld: MapField
 	calendarIdList: List
 	calandarIds: {[key:number]: boolean} = {}
+
+	static customViews: SelectOption[] = []
 	constructor() {
 		super('CalendarView');
 		this.title = 'view';
@@ -43,7 +51,7 @@ export class ViewWindow extends FormWindow {
 		this.generalTab.items.add(
 			comp({cls: 'flow pad'},
 				textfield({name: 'name', label: t('Name'), required: true, flex: 1}),
-				select({name: 'defaultView', label: t('Display as'), options:[
+				select({name: 'defaultView', label: t('Display as'), options:[...[
 					{value:null, name: t('Current ')},
 					{value:'day', name: t('Day')},
 					{value:'days-5', name: t('Workweek')},
@@ -52,7 +60,7 @@ export class ViewWindow extends FormWindow {
 					{value:'weeks-3',name:  '3 ' + t('Weeks')},
 					{value:'month',name:  t('Month')},
 					{value:'split-5',name:  t('Split')},
-				]}),
+				],...ViewWindow.customViews]}),
 				this.calendarIdList = table({
 					tagName: 'div',
 					headers: false,
@@ -69,7 +77,7 @@ export class ViewWindow extends FormWindow {
 						checkboxselectcolumn({id:'checkbox', listeners: {
 							'change': ({checked, record}) => {this.calandarIds[record.id] = checked},
 							'render': ({td,result,record,storeIndex}) => {
-								(result as CheckboxField).color = '#'+record.color;
+								(result as CheckboxField).color = record.color ? '#' + record.color : record.color;
 									td.addEventListener("mousedown", (ev) => {
 										ev.stopPropagation(); // stop lists row selector event
 									});
@@ -96,12 +104,7 @@ export class ViewWindow extends FormWindow {
 			)
 		);
 
-		this.addSharePanel([
-			{value: "",name: ""},
-			{value: 10,name: t("Read")},
-			{value: 30,name: t("Write")},
-			{value: 50,name: t("Manage")}
-		]);
+		this.addSharePanel();
 
 	}
 }

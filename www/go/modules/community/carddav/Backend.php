@@ -5,10 +5,10 @@
 namespace go\modules\community\carddav;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\http\Request;
 use go\core\model\Acl;
-use go\core\ErrorHandler;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\util\DateTime;
@@ -25,10 +25,12 @@ use Sabre\VObject\Component\VCard as VCardComp;
 use Sabre\VObject\Reader;
 use function GO;
 
-class Backend extends AbstractBackend {
-	
-	public function createAddressBook($principalUri, $url, array $properties): void {
-		
+class Backend extends AbstractBackend
+{
+
+	public function createAddressBook($principalUri, $url, array $properties): void
+	{
+
 	}
 
 	/**
@@ -41,10 +43,7 @@ class Backend extends AbstractBackend {
 	{
 
 		$addressbook = AddressBook::find()
-			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
-			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
-			->where('su.userId', '=', go()->getAuthState()->getUserId())
-			->orderBy(['su.isDefault' => 'DESC'])
+			->where('a.id', '=', go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId())
 			->single();
 
 		if (!$addressbook)
@@ -60,7 +59,7 @@ class Backend extends AbstractBackend {
 	 */
 	public function createCard($addressBookId, $cardUri, $cardData): string
 	{
-		if($addressBookId == "all") {
+		if ($addressBookId == "all") {
 			$addressbook = $this->getDefaultAddressBook();
 			$addressBookId = $addressbook->id;
 		} else {
@@ -77,21 +76,22 @@ class Backend extends AbstractBackend {
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		/** @var VCardComp $vcardComp */
 		$contact = new Contact();
-		$contact->addressBookId = (int) $addressBookId;
-		$contact->setUid((string) $vcardComp->uid);
+		$contact->addressBookId = (int)$addressBookId;
+		$contact->setUid((string)$vcardComp->uid);
 		$contact->setUri($cardUri);
-		
+
 		$this->createBlob($contact, $cardData);
-		
+
 		$c = new VCard();
 		$c->import($vcardComp, $contact);
-		
+
 		//blob id can serve as ETag
 		return '"' . $contact->vcardBlobId . '"';
 	}
 
-	public function deleteAddressBook($addressBookId) {
-		
+	public function deleteAddressBook($addressBookId)
+	{
+
 	}
 
 	/**
@@ -101,7 +101,7 @@ class Backend extends AbstractBackend {
 	{
 
 		$blob = Blob::fromString($cardData);
-		if(!$blob->isNew() && $contact->vcardBlobId == $blob->id) {
+		if (!$blob->isNew() && $contact->vcardBlobId == $blob->id) {
 			// no changes needed
 			return $blob;
 		}
@@ -112,16 +112,16 @@ class Backend extends AbstractBackend {
 
 		$blob->type = 'text/vcard';
 		$blob->name = $contact->getUri();
-		if(empty($blob->name)) {
+		if (empty($blob->name)) {
 			$blob->name = 'nouid.vcf';
 		}
 		$blob->modifiedAt = $contact->modifiedAt;
-		if(!$blob->save()) {
+		if (!$blob->save()) {
 			throw new Exception("could not save vcard blob for contact '" . $contact->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
 		}
-		
+
 		$contact->vcardBlobId = $blob->id;
-		
+
 		return $blob;
 	}
 
@@ -130,25 +130,18 @@ class Backend extends AbstractBackend {
 	 * @throws Forbidden
 	 * @throws Exception
 	 */
-	public function deleteCard($addressBookId, $cardUri): bool {
-
-		/** @phpstan-ignore-next-line */
-		if(!go()->getAuthState()->getUser(['syncSettings'])->syncSettings->allowDeletes) {
-			go()->debug("Deleting is disabled by user sync settings");
-			throw new Forbidden("Deleting is disabled by user sync settings");
-		}
-
-
+	public function deleteCard($addressBookId, $cardUri): bool
+	{
 		$contact = Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
-		if(!$contact) {
+		if (!$contact) {
 			throw new NotFound();
 		}
-		if($contact->getPermissionLevel() < Acl::LEVEL_DELETE) {
+		if ($contact->getPermissionLevel() < Acl::LEVEL_DELETE) {
 			throw new Forbidden();
 		}
 		return Contact::delete($contact->primaryKeyValues());
 	}
-	
+
 	private function addressBookToDAV(AddressBook $addressBook, $principalUri): array
 	{
 		return array(
@@ -162,18 +155,20 @@ class Backend extends AbstractBackend {
 		);
 	}
 
-	private function isMacOs() {
+	private function isMacOs()
+	{
 		//// [user-agent] => macOS/12.1 (21C52) AddressBookCore/2498.2.1
-		$ua =  Request::get()->getHeader('user-agent');
+		$ua = Request::get()->getHeader('user-agent');
 		return stripos($ua, 'macos') !== false && stripos($ua, "AddressBookCore") !== false;
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	public function getAddressBooksForUser($principalUri): array {
+	public function getAddressBooksForUser($principalUri): array
+	{
 
-		if($this->isMacOs()) {
+		if ($this->isMacOs()) {
 			return [
 				[
 					'id' => "all",
@@ -190,22 +185,24 @@ class Backend extends AbstractBackend {
 		$r = [];
 
 		$addressBooks = $this->findAddressBooks();
-						
-		foreach($addressBooks as $a) {
+
+		foreach ($addressBooks as $a) {
 			$r[] = $this->addressBookToDAV($a, $principalUri);
 		}
-		
-		return $r;						
+
+		return $r;
 	}
 
 
 	/**
 	 * @throws Exception
 	 */
-	private function findAddressBooks(): Query {
+	private function findAddressBooks(): Query
+	{
 		return AddressBook::find()
-			->join("sync_addressbook_user", "u", "u.addressBookId = a.id")
+			->join("addressbook_addressbook_user", "u", "u.addressBookId = a.id")
 			->filter(['permissionLevel' => Acl::LEVEL_READ])
+			->where('u.syncToDevice', '=', true)
 			->andWhere('u.userId', '=', go()->getAuthState()->getUserId());
 	}
 
@@ -215,67 +212,69 @@ class Backend extends AbstractBackend {
 	 * @throws Forbidden
 	 * @throws Exception
 	 */
-	public function getCard($addressBookId, $cardUri): array {
+	public function getCard($addressBookId, $cardUri): array
+	{
 
-		if($addressBookId == "all") {
+		if ($addressBookId == "all") {
 			$addressBookId = $this->findAddressBooks()->selectSingleValue('addressBookId');
 		}
 
 		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => rawurldecode($cardUri)])->single();
 		/** @var Contact $contact */
-		if(!$contact) {
+		if (!$contact) {
 			throw new NotFound();
 		}
 
-		if(!$contact->hasPermissionLevel(Acl::LEVEL_READ)) {
+		if (!$contact->hasPermissionLevel(Acl::LEVEL_READ)) {
 			throw new Forbidden();
 		}
-		
+
 		$blob = isset($contact->vcardBlobId) ? Blob::findById($contact->vcardBlobId) : false;
-		
-		if(!$blob || $blob->modifiedAt < $contact->modifiedAt) {
+
+		if (!$blob || $blob->modifiedAt < $contact->modifiedAt) {
 			//blob won't be deleted if still used
 			$c = new VCard();
-			$cardData = $c->export($contact);			
+			$cardData = $c->export($contact);
 			$blob = $this->createBlob($contact, $cardData);
 			$contact->save();
 		}
 
 		$cardData = $blob->getFile()->getContents();
 		go()->debug($cardData);
-		
+
 		return [
-					'carddata' => $cardData,
-					'uri' => $contact->getUri(),
-					'lastmodified' => $contact->modifiedAt->format("U"),
-					'etag' => '"' . $contact->vcardBlobId . '"',
-					'size' => $blob->size
-			];
+			'carddata' => $cardData,
+			'uri' => $contact->getUri(),
+			'lastmodified' => $contact->modifiedAt->format("U"),
+			'etag' => '"' . $contact->vcardBlobId . '"',
+			'size' => $blob->size
+		];
 	}
 
 	/**
 	 * @throws SaveException
 	 * @throws Exception
 	 */
-	private function generateCards($addressBookId) {
+	private function generateCards($addressBookId)
+	{
 		$contacts = Contact::find()
-						->join('core_blob', 'b', 'b.id = c.vcardBlobId', 'LEFT')
-						->where(['addressBookId' => $addressBookId])
-						->andWhere('(c.vcardBlobId IS NULL OR b.modifiedAt < c.modifiedAt)')
-						->execute();
-		
-		if(!$contacts->rowCount()) {
+			->join('core_blob', 'b', 'b.id = c.vcardBlobId', 'LEFT')
+			->where(['addressBookId' => $addressBookId])
+			->andWhere('(c.vcardBlobId IS NULL OR b.modifiedAt < c.modifiedAt)')
+			->execute();
+
+		if (!$contacts->rowCount()) {
 			return;
 		}
-		
+
 		$c = new VCard();
-		
-		foreach($contacts as $contact) {
+
+		foreach ($contacts as $contact) {
 			$cardData = $c->export($contact);
-			
+
 			$this->createBlob($contact, $cardData);
-			
-			if(!$contact->save()) {
+
+			if (!$contact->save()) {
 				throw new Exception("Could not save contact");
 			}
 		}
@@ -291,7 +290,7 @@ class Backend extends AbstractBackend {
 		if ($addressBookId == "all") {
 			$addressBookId = $this->findAddressBooks()->selectSingleValue('addressBookId');
 			$op = 'IN';
-		}else {
+		} else {
 			$op = '=';
 			$addressbook = AddressBook::findById($addressBookId);
 			if (!$addressbook) {
@@ -302,18 +301,19 @@ class Backend extends AbstractBackend {
 				throw new Forbidden();
 			}
 		}
-		$this->generateCards($addressBookId);		
-		
-		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
-						->from('addressbook_contact', 'c')
-						->join('core_blob', 'b', 'c.vcardBlobId = b.id')
-						->where('c.addressBookId', $op, $addressBookId)
-						->all();
-	}
-	
+		$this->generateCards($addressBookId);
 
-	public function updateAddressBook($addressBookId, PropPatch $propPatch): void {
-		
+		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
+			->from('addressbook_contact', 'c')
+			->join('core_blob', 'b', 'c.vcardBlobId = b.id')
+			->where('c.addressBookId', $op, $addressBookId)
+			->all();
+	}
+
+
+	public function updateAddressBook($addressBookId, PropPatch $propPatch): void
+	{
+
 	}
 
 	/**
@@ -333,25 +333,25 @@ class Backend extends AbstractBackend {
 		}
 
 		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => rawurldecode($cardUri)])->single();
-		if(!$contact) {
+		if (!$contact) {
 			throw new NotFound();
 		}
-		if($contact->getPermissionLevel() < Acl::LEVEL_DELETE) {
+		if ($contact->getPermissionLevel() < Acl::LEVEL_DELETE) {
 			throw new Forbidden();
 		}
-		
+
 		$this->createBlob($contact, $cardData);
-		
+
 		try {
 			go()->debug($cardData);
-			$c = new VCard();			
+			$c = new VCard();
 			$vcardComponent = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 			/** @var $vcardComponent VCardComp */
 			$c->import($vcardComponent, $contact);
-			
-		} catch(Exception $e) {
+
+		} catch (Exception $e) {
 			ErrorHandler::logException($e);
-			
+
 			return null;
 		}
 		//vcardBlobId can serve as etag

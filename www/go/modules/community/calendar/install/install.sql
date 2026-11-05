@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS calendar_resource_group (
 	id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	name           VARCHAR(200) NULL,
 	description    MEDIUMTEXT NULL,
+	autoAccept	TINYINT(1) NOT NULL DEFAULT 1,
 	defaultOwnerId INT NOT NULL,
 	`createdBy` INT NULL,
 	CONSTRAINT calendar_resource_group_core_user_id_fk FOREIGN KEY (defaultOwnerId)
@@ -18,11 +19,13 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar` (
     `defaultColor` VARCHAR(21) NOT NULL, # lightgoldenrodyellow
     `timeZone` VARCHAR(45) NULL,
 	  `webcalUri` VARCHAR(512) NULL DEFAULT NULL,
+		`webcalHash` CHAR(40) COLLATE ascii_bin NULL DEFAULT NULL,
 	  `groupId` INT UNSIGNED NULL,
     `aclId` INT NOT NULL,
     `createdBy` INT NULL,
     `ownerId` INT NULL,
     `highestItemModSeq` VARCHAR(32) NULL DEFAULT 0,
+	  `publishKey` CHAR(20) NULL,
     PRIMARY KEY (`id`),
 	  INDEX `fk_calendar_calendar_calendar_resource_group_idx` (`groupId` ASC),
 	 CONSTRAINT `fk_calendar_calendar_calendar_resource_group`
@@ -53,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `color` VARCHAR(21) NOT NULL,
     `sortOrder` INT NOT NULL DEFAULT 0,
     `timeZone` VARCHAR(45) NULL,
-    `syncToDevice` TINYINT(1) NOT NULL DEFAULT 1,
+    `syncToDevice` TINYINT(1) NOT NULL DEFAULT 0,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'none',
 	`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
@@ -159,8 +162,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
      `eventId` INT UNSIGNED NOT NULL,
      `calendarId` INT UNSIGNED NOT NULL,
      PRIMARY KEY (`id`),
-    INDEX `fk_calendar_calendar_event_calendar_event1_idx` (`eventId` ASC),
-    INDEX `fk_calendar_calendar_event_calendar_calendar1_idx` (`calendarId` ASC),
+    INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
 		 UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC),
     CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
     FOREIGN KEY (`eventId`)
@@ -379,6 +381,7 @@ CREATE TABLE calendar_preferences (
 	lastProcessed					VARCHAR(11) DEFAULT '' NOT NULL,
 	lastProcessedUid		  BIGINT DEFAULT 1 NOT NULL,
 	showDeclined          TINYINT(1) DEFAULT 1 NOT NULL,
+	multiLine          TINYINT(1) DEFAULT 0 NOT NULL,
 	showWeekNumbers				TINYINT(1) DEFAULT 1 NOT NULL,
 	birthdaysAreVisible   TINYINT(1) DEFAULT 0 NOT NULL,
 	tasksAreVisible       TINYINT(1) DEFAULT 0 NOT NULL,
@@ -440,7 +443,10 @@ CREATE TABLE  IF NOT EXISTS `calendar_view` (
 	CONSTRAINT `calendar_View_ownerId`
 		FOREIGN KEY (`ownerId`)
 		REFERENCES `core_user` (`id`)
-		ON DELETE RESTRICT
+		ON DELETE CASCADE
 		ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create index calendar_event_status_index
+    on calendar_event (status);
 

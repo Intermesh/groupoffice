@@ -23,4 +23,8 @@ return array (
   'name' => 'Översikt',
   'description' => 'Visar en översikt från utvalda moduler.',
   'Start page' => 'Översikt',
+  "welcomeTitle" => "Välkommen till Group-Office!",
+  "welcomeContent" => "<p>Tack för att du installerar Group-Office!</p>
+<p>Här är en länk för att hjälpa dig komma igång: {{link}}</p>
+<p>Vi hoppas att du kommer att trivas med Group-Office!</p>"
 );

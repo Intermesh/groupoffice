@@ -18,7 +18,11 @@
 		pad: true,
 		itemCfg: {
 			labelWidth: dp(140),
-			items: [{
+			items: [
+				{
+					xtype: "hidden",
+					name: "id" //for keeping records
+				},{
 				anchor: "100%",
 				fieldLabel: t("Type"),
 				xtype: 'combo',

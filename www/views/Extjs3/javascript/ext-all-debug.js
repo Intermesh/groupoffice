@@ -5087,7 +5087,7 @@ Ext.EventManager = function(){
     function initDocReady(){
         docReadyEvent || (docReadyEvent = new Ext.util.Event());
 //        if (DETECT_NATIVE) {
-            DOC.addEventListener(DOMCONTENTLOADED, fireDocReady, false);
+            //DOC.addEventListener(DOMCONTENTLOADED, fireDocReady, false);
 //        }
         
 //        if (Ext.isIE9m){
@@ -5409,6 +5409,10 @@ Ext.EventManager = function(){
     pub.un = pub.removeListener;
 
     pub.stoppedMouseDownEvent = new Ext.util.Event();
+
+	// for GOUI this is called in the legacy boot stuff in Modules.ts
+	Ext.fireDocReady = fireDocReady;
+
     return pub;
 }();
 
@@ -44343,8 +44347,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
     
     getDocMarkup : function(){
         var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-        var theme = go.User ? go.User.theme : "Paper";
-        return String.format('<html><head><link rel="stylesheet" href="' + BaseHref + 'views/Extjs3/themes/' + theme + '/htmleditor.css"> <style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}</style></head><body></body></html>', this.iframePad, h);
+        return String.format('<html><head><link rel="stylesheet" href="' + BaseHref + 'views/Extjs3/themes/Paper/htmleditor.css"> <style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}</style></head><body></body></html>', this.iframePad, h);
     },
 
     
@@ -44550,14 +44553,14 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     createLink : function() {
-				this.focus();
+				// this.focus();
 				this.updateToolbar();
-				setTimeout(() => {
+				// setTimeout(() => {
 					var url = prompt(this.createLinkText, this.defaultLinkValue);
 					if(url && url != 'http:/'+'/'){
 							this.relayCmd('createlink', url);
 					}
-				}, 10)
+				// }, 10)
     },
 
     
@@ -44859,11 +44862,11 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     relayCmd : function(cmd, value){
-        (function(){
+        // (function(){
             this.focus();
             this.execCmd(cmd, value);
             this.updateToolbar();
-        }).defer(10, this);
+        // }).defer(10, this);
     },
 
     
@@ -47190,7 +47193,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 v = Ext.util.Format.htmlEncode(v);
             } else if(col.type.isRelation) {
                                         
-                v = go.util.Format.htmlEncode(v);                                    
+                v = go.util.Format.htmlEncode(structuredClone(v));
             }
         }
 

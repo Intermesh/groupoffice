@@ -2,14 +2,20 @@
 
 GO.files.openDetailViewFileBrowser = function () {
 
-	var dv;
-	if(this.detailView){
+	let dv;
+	if (this.detailView){
 		dv = this.detailView;
 	} else {
 		dv = this.findParentByType("detailview");
 		if (!dv) {
 			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
 		}
+	}
+	// Old modules may give the full class name. This will distill the entity name from class name
+	let entityName = dv.entity || dv.model_name || dv.entityStore.entity.name;
+	if (entityName.indexOf("\\") > -1) {
+		const ar = entityName.split("\\");
+		entityName = ar.pop();
 	}
 
 	GO.request({
@@ -18,12 +24,12 @@ GO.files.openDetailViewFileBrowser = function () {
 		jsonData: {},
 		params: {
 			mustExist: true,
-			model: dv.model_name || dv.entity || dv.entityStore.entity.name,
+			model: entityName,
 			id: dv.data.id
 		},
 		success: function (response, options, result) {
 			var fb = GO.files.openFolder(result.files_folder_id);
-			fb.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
+			fb.model_name = entityName;
 			fb.model_id = dv.data.id;
 			fb.contact_id = dv.data.contact_id || dv.data.contactId || null; // if you want to email or sign files later
 

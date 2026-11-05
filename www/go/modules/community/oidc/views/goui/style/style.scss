@@ -1,0 +1,6 @@
+@use '@intermesh/goui/style/util'  as *;
+@use '@intermesh/goui/style/config' as *;
+
+.go-auth-method-oidc {
+	background-image:url('../resources/openid.png');
+}

@@ -2,7 +2,7 @@ import {CalendarView} from "./CalendarView.js";
 import {DateInterval, DateTime, E, Format} from "@intermesh/goui";
 import {CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
-import {calendarStore, t} from "./Index.js";
+import {t} from "./Index.js";
 
 class CalendarDayItem extends CalendarItem {
 	pos!: number
@@ -27,6 +27,7 @@ export class WeekView extends CalendarView {
 		}, 60000);
 
 		this.makeDraggable();
+		this.makeDraggableDay(this.el, true); // full-day item in top bar
 		this.el.tabIndex = 0;
 
 		this.el.on('keydown', (e: KeyboardEvent) => {
@@ -51,7 +52,14 @@ export class WeekView extends CalendarView {
 					pxPerSnap = liRect.height / (1440 / SNAP), // 96 quarter-hours in a day
 					minute = Math.round((e.clientY - liRect.top) / pxPerSnap) * SNAP;
 
+				this.contextMenuEmpty.dataSet.viewSupportsTime = true;
 				this.contextMenuEmpty.dataSet.date = (new DateTime(e.target.dataset.day!)).setHours(0, minute).format('c');
+				this.contextMenuEmpty.showAt(e);
+			} else if(e.target.isA('li') && e.target.dataset.date) {
+				// all day event
+
+				this.contextMenuEmpty.dataSet.date = e.target.dataset.date;
+				this.contextMenuEmpty.dataSet.viewSupportsTime = true;
 				this.contextMenuEmpty.showAt(e);
 			}
 		});
@@ -113,8 +121,8 @@ export class WeekView extends CalendarView {
 				Object.values(ev.divs).forEach(d => d.remove());
 				ev.divs = {};
 				changed = true;
-				this.updateItems(ev.start.clone());
-				this.updateItems(prevDay);
+				this.updateDayItems(ev.start.clone());
+				this.updateDayItems(prevDay);
 			}
 			if(minute !== last) { // move to along same day
 				last = minute;
@@ -125,31 +133,18 @@ export class WeekView extends CalendarView {
 				ev.end.setHours(0, till);
 				const firstDiv = Object.values(ev.divs)[0];
 				if(firstDiv)
-					firstDiv.lastElementChild!.textContent = ev.start.format(Format.timeFormat) + ' - ' + ev.end.format(Format.timeFormat);
+					firstDiv.firstElementChild!.lastElementChild!.textContent = ev.start.format(Format.timeFormat) + ' - ' + ev.end.format(Format.timeFormat);
 				changed = true;
-				this.updateItems(ev.start.clone());
+				this.updateDayItems(ev.start.clone());
 			}
 
-		},
-		mouseAllDayMove = (e: MouseEvent & {target: HTMLElement}) => {
-			const day = e.target.up('li[data-day]');
-			if(day && day !== lastDay) {
-				changed = true;
-				lastDay = day;
-				moveday(day)
-				Object.values(ev.divs).forEach(d => d.remove());
-				ev.divs = {};
-				this.updateFullDayItems();
-			}
 		},
 		mouseUp = (_e:MouseEvent) => {
 			this.el.cls('-resizing');
 			this.el.un('mousemove', mouseMove);
-			this.el.un('mousemove', mouseAllDayMove);
 			changed && ev.save(() => {
 				this.currentCreation = undefined;
 				this.populateViewModel();
-				//this.updateItems();
 			});
 		};
 
@@ -167,23 +162,14 @@ export class WeekView extends CalendarView {
 			if (event) { // MOVE
 				offset += e.offsetY;
 				ev = this.dayItems.find(m => m.key == event.dataset.key)!;
-				if(!ev) {
-					// find full day
-					ev = this.viewModel.find(m => m.key == event.dataset.key)!;
-					if(ev && ev.mayChange) {
-						this.el.on('mousemove', mouseAllDayMove);
-						this.el.cls('+resizing');
-						window.addEventListener('mouseup', mouseUp,{once:true});
-						return;
-					}
-				}
+
 				if(!ev || !ev.mayChange) return;
 				action = resize;
 				this.el.cls('+resizing');
 				// 4 pixels for the resize handle on top and bottom of event
-				if (e.offsetY <= 4) {
+				if (e.offsetY < 4) {
 					anchor = ev.end.getMinuteOfDay();
-				} else if (e.offsetY >= event.offsetHeight - 4) {
+				} else if (e.offsetY > event.offsetHeight - 4) {
 					anchor = ev.start.getMinuteOfDay();
 					offset -= event.offsetHeight;
 				} else {
@@ -206,7 +192,7 @@ export class WeekView extends CalendarView {
 
 				this.currentCreation = ev = new CalendarDayItem({start,end,data,key:''});
 				this.dayItems.unshift(ev as CalendarDayItem);
-				this.updateItems(start.clone().setHours(0,0,0,0));
+				this.updateDayItems(start.clone().setHours(0,0,0,0));
 				action = resize;
 				changed = true;
 				this.el.on('mousemove', mouseMove);
@@ -239,10 +225,10 @@ export class WeekView extends CalendarView {
 			}
 		}
 
-		this.viewModel = allDay.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+		this.viewModel = this.mergeDuplicates(allDay).sort((a,b) => Math.sign(+a.start.date - +b.start.date));
 		this.dayItems = withTime;
-		this.updateFullDayItems();
 		this.updateItems();
+		this.updateDayItems();
 	}
 
 	updateNowBar() {
@@ -282,7 +268,7 @@ export class WeekView extends CalendarView {
 			);
 			const dayContainer = E('dd').cls('weekend',day.getDay()%6==0).attr('data-day', day.format('Y-m-d'));
 			this.dayCols[day.format('Ymd')] = dayContainer;
-			fullDays.push(E('li').cls('weekend',day.getDay()%6==0).attr('data-day', day.format('Y-m-d')))
+			fullDays.push(E('li').cls('weekend',day.getDay()%6==0).attr('data-date', day.format('Y-m-d')))
 			days.push(dayContainer);
 			if(now.format('Ymd') === day.format('Ymd')) {
 				showNowBar = true;
@@ -311,7 +297,7 @@ export class WeekView extends CalendarView {
 		setTimeout(() => ol.scrollTop = oldScrollTop || (ol.scrollHeight / 4)); // = scroll 6hours down (1/4 of day)
 	}
 
-	private updateFullDayItems() {
+	protected updateItems() {
 
 		this.slots = Array.from({length: this.days}, _ => ({}) );
 
@@ -325,7 +311,7 @@ export class WeekView extends CalendarView {
 		this.alldayCtr.parentElement!.style.height = (Math.max(...lengths,1) * this.ROWHEIGHT)+'rem';
 	}
 
-	private updateItems(day?: DateTime) {
+	private updateDayItems(day?: DateTime) {
 
 		this.dayItems = this.dayItems.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
 		this.continues = [];
@@ -427,24 +413,6 @@ export class WeekView extends CalendarView {
 			height: 'calc('+(100 / 1440 * (e.endM - e.startM))+'% - 1px)',
 			backgroundImage, paddingLeft, borderLeft:'0'
 		});
-	}
-
-	private stackedCalendars(e: CalendarDayItem) {
-		let backgroundImage = 'linear-gradient(to right, ',
-			padding = 0;
-
-		for(const key in e.calendarIds) {
-			if(key !== e.data.calendarId) {
-				const cal = calendarStore.findById(key);
-				if(cal) {
-					backgroundImage += '#'+cal.color+' '+(padding/10)+'rem '+((padding+=6)/10)+'rem, ';
-				}
-			}
-		}
-
-		padding += 6;
-		backgroundImage += 'currentColor '+((padding-6)/10)+'rem '+(padding/10)+'rem, transparent '+(padding/10)+'rem 100%)';
-		return [backgroundImage, ((padding+6)/10)+'rem'];
 	}
 
 }

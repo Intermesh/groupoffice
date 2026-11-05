@@ -1,0 +1,27 @@
+{
+  "name": "groupoffice",
+  "private": true,
+  "workspaces": [
+    "views/goui",
+    "modules/*/views/goui",
+    "go/modules/community/*/views/goui",
+    "go/modules/business/*/views/goui"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "dependencies": {
+    "@intermesh/goui": "latest",
+    "@intermesh/groupoffice-core": "^2.0.10",
+    "pdfjs-dist": "latest"
+  },
+  "allowScripts": {
+    "esbuild@*": true,
+    "@parcel/watcher@*": true,
+    "fsevents@*": true,
+    "file:../../../links/goui": true,
+    "file:../../../goui": true,
+    "file:../../../links/groupoffice-core": true
+  }
+}

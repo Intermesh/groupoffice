@@ -1,10 +1,20 @@
-import {avatar, btn, column, comp, datasourcestore, DataSourceStore, datecolumn, t, Table} from "@intermesh/goui";
+import {
+	avatar,
+	btn,
+	column,
+	comp,
+	datasourcestore,
+	DataSourceStore,
+	datetimecolumn,
+	t,
+	Table
+} from "@intermesh/goui";
 import {client, principalDS} from "@intermesh/groupoffice-core";
 import {HistoryDetailWindow} from "./HistoryDetailWindow.js";
 import {logEntryDS} from "./Index.js";
 
 export class LogEntryGrid extends Table<DataSourceStore> {
-	constructor() {
+	constructor(forDetail = false) {
 		super(
 			datasourcestore({
 				dataSource: logEntryDS,
@@ -18,14 +28,10 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 						path: "createdBy"
 					}
 				},
-				queryParams: {
-					filter: {
-						actions: {}
-					}
-				}
 			}),
 			[
-				column({
+
+				...(forDetail ? [] : [column({
 					id: "entityId",
 					header: t("ID"),
 					hidden: true,
@@ -35,18 +41,23 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 				}),
 				column({
 					id: "description",
-					header: t("Name"),
-					resizable: true
+					header: t("Description"),
+					resizable: true,
+					minWidth: 60
 				}),
 				column({
 					id: "entity",
 					header: t("Entity"),
-					resizable: true
-				}),
+					resizable: true,
+					width: 120
+				})
+				]),
 				column({
+					width: forDetail ? undefined : 200,
 					id: "creator",
 					header: t("User"),
 					resizable: true,
+					minWidth: 60,
 					renderer: (v) => {
 						return comp({
 								cls: "hbox"
@@ -54,11 +65,11 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 
 							avatar({
 								cls: "inline",
-								displayName: v.name,
-								backgroundImage: v.avatarId ? client.downloadUrl(v.avatarId) : undefined
+								displayName: v ? v.name : t("Unknown user"),
+								backgroundImage: v?.avatarId ? client.downloadUrl(v.avatarId) : undefined
 							}),
 
-							comp({text: v.name, cls: "history-created-by"})
+							comp({text: v ? v.name : t("Unknown user"), cls: "history-created-by"})
 						)
 					}
 				}),
@@ -68,7 +79,7 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					resizable: true,
 					width: 80,
 					align: "center",
-					renderer: (columnValue, record, td, table, storeIndex, column) => {
+					renderer: (columnValue, record) => {
 						if (columnValue) {
 							return btn({
 								cls: "history-changes-button",
@@ -89,20 +100,22 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 					id: "action",
 					header: t("Action"),
 					resizable: true,
+					width: 100,
 					renderer: (v) => {
 						return t(v.charAt(0).toUpperCase() + v.slice(1));
 					}
 				}),
-				datecolumn({
+				datetimecolumn({
 					id: "createdAt",
 					header: t("Date"),
 					sortable: true,
 					resizable: true
 				}),
 				column({
-					id: "remoteIP",
+					id: "remoteIp",
 					header: "IP",
-					resizable: true
+					resizable: true,
+					width: 120
 				}),
 				column({
 					id: "requestId",
@@ -113,6 +126,8 @@ export class LogEntryGrid extends Table<DataSourceStore> {
 			]
 		);
 
-		this.fitParent = true;
+
+
+		this.scrollLoad = true;
 	}
 }

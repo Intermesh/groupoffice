@@ -3,39 +3,34 @@ require('../vendor/autoload.php');
 
 use go\core\App;
 use go\core\ErrorHandler;
-use go\core\fs\File as FileAlias;
+use go\core\fs\File;
 use go\core\http\Router;
 use go\core\jmap\State;
-use go\core\model\OauthUser as UserAlias;
-use go\core\oauth\server\AuthorizationServer;
-use go\core\oauth\server\grant\AuthCodeGrant;
+use go\core\model\OauthUser;
+use go\core\oauth\server\EncryptionKey;
 use go\core\oauth\server\repositories;
-use go\core\oauth\server\responsetypes\IdTokenResponse;
-use GuzzleHttp\Psr7\MessageTrait as MessageTraitAlias;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
-use GuzzleHttp\Psr7\Stream as StreamAlias;
+use GuzzleHttp\Psr7\Stream;
+use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use OpenIDConnectServer\ClaimExtractor;
-use Psr\Http\Message\ResponseInterface as ResponseInterfaceAlias;
-use function GuzzleHttp\json_encode;
+use OpenIDConnectServer\IdTokenResponse;
+use Psr\Http\Message\ResponseInterface;
 
 App::get();
-App::get()->setAuthState(new State());
+go()->setAuthState(new State());
 
 //for serializing authRequest
-session_name('groupoffice_oauth');
-session_start();
+go()->sessionStart();
 
 class OAuthController {
 
-	/**
-	 * @var  AuthorizationServer
-	 */
-	private $server;
+	private ?AuthorizationServer $server;
 
 	/**
 	 * @return AuthorizationServer
@@ -55,21 +50,22 @@ class OAuthController {
 			$privateKeyPath = 'file://' . $this->getPrivateKeyFile()->getPath();
 
 			// OpenID Connect Response Type
-			$responseType = new IdTokenResponse(new repositories\UserRepository(), new ClaimExtractor());
-			$responseType->setKid($this->getKid());
+			$responseType = new IdTokenResponse(new repositories\UserRepository(), new ClaimExtractor(), $this->getKid());
 
 			$this->server = new AuthorizationServer(
 				$clientRepository,
 				$accessTokenRepository,
 				$scopeRepository,
 				$privateKeyPath,
-				'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen',
+				// Encrypts the authorization codes and refresh tokens. Random for each installation. Never put a fixed
+				// key in the source: everybody could then create codes and tokens that this server accepts.
+				EncryptionKey::get(),
 				$responseType
 			);
 
 			// Enable the authentication code grant on the server with a token TTL of 1 hour
 			$this->server->enableGrantType(
-				new AuthCodeGrant(
+				new  AuthCodeGrant(
 					$authCodeRepository,
 					$refreshTokenRepository,
 					new DateInterval('PT10M')
@@ -90,11 +86,7 @@ class OAuthController {
 		return $this->server;
 	}
 
-	/**
-	 * @return MessageTraitAlias|Response|ResponseInterfaceAlias
-	 * @throws Exception
-	 */
-	public function authorize() {
+	public function authorize() : ResponseInterface {
 		$server = $this->getServer();
 
 		$request = ServerRequest::fromGlobals();
@@ -111,19 +103,13 @@ class OAuthController {
 
 			if(!go()->getAuthState()->isAuthenticated()) {
 				$_SESSION['authRequest'] = $authRequest;
-				$authRedirectUrl = $_SERVER['PHP_SELF'] . '/authorize';
 
 				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthAuthorize=1';
 				return $response->withStatus(302)->withHeader('Location', $loginUrl);
 			}
 
 			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
-			$authRequest->setUser(new UserAlias($user));
-
-
-//			$userRepository = new repositories\UserRepository();
-//			$userEntity = $userRepository->getUserEntityByIdentifier(2);
-//			$authRequest->setUser($userEntity);
+			$authRequest->setUser(new OauthUser($user));
 
 			// Once the user has approved or denied the client update the status
 			// (true = approved, false = denied)
@@ -138,37 +124,18 @@ class OAuthController {
 			
 			ErrorHandler::logException($exception);
 
-			$body = new StreamAlias(fopen('php://temp', 'rb+'));
+			$body = new Stream(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);
 		}
 	}
 
-//	private function validateResourceRequest(\Psr\Http\Message\RequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
-//
-//
-//		// Init our repositories
-//		$accessTokenRepository = new repositories\AccessTokenRepository(); // instance of AccessTokenRepositoryInterface
-//
-//// Path to authorization server's public key
-//		$publicKeyPath = 'file://' . go()->getEnvironment()->getInstallPath() . '/public.key';
-//
-//// Setup the authorization server
-//		$server = new \League\OAuth2\Server\ResourceServer(
-//			$accessTokenRepository,
-//			$publicKeyPath
-//		);
-//
-//		return $server->validateAuthenticatedRequest($request);
-//
-//	}
-
 	/**
-	 * @return FileAlias
+	 * @return File
 	 * @throws Exception
 	 */
-	private function getPrivateKeyFile(): FileAlias
+	private function getPrivateKeyFile(): File
 	{
 		$file = go()->getDataFolder()->getFile('oauth2/private.key');
 		if(!$file->exists()) {
@@ -190,17 +157,14 @@ class OAuthController {
 			}
 			$pubKeyFile->chmod(0600);
 		}
-
-
-
 		return $file;
 	}
 
 	/**
-	 * @return FileAlias
+	 * @return File
 	 * @throws Exception
 	 */
-	private function getPublicKeyFile(): FileAlias
+	private function getPublicKeyFile(): File
 	{
 		$file = go()->getDataFolder()->getFile('oauth2/public.key');
 		if(!$file->exists()) {
@@ -211,10 +175,10 @@ class OAuthController {
 
 
 	/**
-	 * @return Response
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function userinfo(): ResponseInterfaceAlias
+	public function userinfo(): ResponseInterface
 	{
 		$request = ServerRequest::fromGlobals();
 		$response = new Response();
@@ -256,10 +220,10 @@ class OAuthController {
 	}
 
 	/**
-	 * @return MessageTraitAlias|Response|ResponseInterfaceAlias
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function token()
+	public function token(): ResponseInterface
 	{
 		$server = $this->getServer();
 
@@ -273,7 +237,7 @@ class OAuthController {
 			return $exception->generateHttpResponse($response);
 		} catch (Exception $exception) {
 			ErrorHandler::logException($exception);
-			$body = new StreamAlias(fopen('php://temp', 'rb+'));
+			$body = new Stream(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);
@@ -292,7 +256,7 @@ class OAuthController {
 		$signing_alg_values_supported = array('HS256', 'RS256');
 
 		$discovery = array(
-			'issuer' => AuthorizationServer::getIssuer(),
+			'issuer' => 'https://' . $_SERVER['HTTP_HOST'],
 			'authorization_endpoint' => $endpointBase . '/authorize',
 			'token_endpoint' => $endpointBase . '/token',
 			'userinfo_endpoint' => $endpointBase . '/userinfo',
@@ -343,7 +307,7 @@ class OAuthController {
 	}
 
 	/**
-	 * @return MessageTraitAlias|Response
+	 * @return ResponseInterface
 	 */
 	public function certs()
 	{
@@ -378,7 +342,7 @@ class OAuthController {
 		} catch (Exception $exception) {
 
 			ErrorHandler::logException($exception);
-			$body = new StreamAlias(fopen('php://temp', 'rb+'));
+			$body = new Stream(fopen('php://temp', 'rb+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);

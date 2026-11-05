@@ -345,9 +345,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	nextMapId : function () {
 		return "_NEW_" + (go.form.FormGroup._nextMapId++);
 	},
-	
-	addPanel : function(auto, index) {
-		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
+
+	createDeleteButton : function(index) {
+		var me = this;
+		return new Ext.Button({
 			//disabled: formField.disabled,
 			itemId: 'del-btn',
 			xtype: "button",
@@ -363,7 +364,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 				me.fireEvent("change", me, me.getValue());
 			}
-		}),
+		})
+	},
+	
+	addPanel : function(auto, index) {
+		var formField = this.createNewItem(auto),  items = [formField], delBtn = this.createDeleteButton(index !== undefined ? index : this.items ? this.items.getCount() : 0),
 			rowId  = Ext.id();
 
 		if(this.startWithItem) {
@@ -382,6 +387,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 			const editTB = new Ext.Container({
 				itemId: 'edit-tb',
+				width: dp(40),
 				cls: 'go-form-group-edit-tb',
 				layout: {
 					type: "hbox",
@@ -401,7 +407,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		var wrap = new go.form.FormGroupItemContainer({
 			id: rowId,
-			rowIndex: this.items ? this.items.getCount() : 0,
+			rowIndex: index !== undefined ? index : this.items ? this.items.getCount() : 0,
 
 			formField: formField,
 			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",
@@ -483,6 +489,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	 */
 	setNotDirty : function() {
 
+		this.dirty = false
+
 		var fn = function (i) {
 			i.originalValue = i.getValue();
 			i.dirty = false;
@@ -528,7 +536,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(!records) {
 			records = this.mapKey ? {} : [];
 		}
-		// this.dirty = true;
+		this.dirty = true;
 		this.removeAll();
 		if(records === null) return;
 		this.markDeleted = [];

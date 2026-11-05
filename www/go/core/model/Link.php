@@ -458,20 +458,6 @@ class Link extends AclItemEntity
 		return true;
 	}
 
-//	private function updateDataFromSearch() {
-//		//make sure the aclId, description and name are set so they are returned to the client
-//		if(!isset($this->toSearchId) || !isset($this->aclId)) {
-//			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
-//			if(!$search) {
-//				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
-//			}
-//			$this->toDescription = $search->description;
-//			$this->toName = $search->name;
-//			$this->toSearchId = $search->id;
-//			$this->aclId = $search->findAclId();
-//		}
-//	}
-//
 	protected static function internalDelete(Query $query): bool
 	{
 
@@ -517,17 +503,7 @@ class Link extends AclItemEntity
 		//Readable items may be linked!
 		return $this->permissionLevel ?  Acl::LEVEL_DELETE : false;
 	}
-	
-//	
-//	/**
-//	 * The to properties
-//	 * 	
-//	 * @return array ['name' => string, 'description' => 'description']
-//	 */
-//	public function getTo() {
-//		return ['name' => $this->toName, 'description' => $this->toDescription];
-//	}
-	
+
 	protected static function defineFilters(): Filters
 	{
 		return parent::defineFilters()

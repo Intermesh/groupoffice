@@ -10,7 +10,11 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 		var items = [{
 				xtype: 'fieldset',
-				items: [
+				items: [{
+					xtype:"hidden",
+					value: this.role,
+					name: "role"
+				},
 					{
 						xtype: 'textfield',
 						name: 'name',

@@ -7,6 +7,7 @@ use Faker\Generator;
 use GO\Base\Model\Module as LegacyModuleModel;
 use GO\Base\Module as LegacyModule;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\data\ArrayableInterface;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
@@ -35,7 +36,7 @@ use function GO;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-abstract class Module extends Singleton {
+abstract class Module extends Singleton implements ArrayableInterface {
 
 	const STATUS_STABLE = "stable";
 	const STATUS_BETA = "beta";
@@ -152,7 +153,6 @@ abstract class Module extends Singleton {
 			$model->package = static::getPackage();
 			$model->version = $this->getUpdateCount();
 			$model->checkDepencencies = false;
-			$model->sort_order = static::getDefaultSortOrder();
 
 			if(!$this->beforeInstall($model)) {
 				go()->warn(static::class .'::beforeInstall returned false');
@@ -504,6 +504,15 @@ abstract class Module extends Singleton {
 	 */
 	abstract function getAuthor(): string;
 
+
+	/**
+	 * Get URL to the documentation page
+	 * @return string|null
+	 */
+	public function getDocumentationURL(): ?string {
+		return null;
+	}
+
 	/**
 	 * The names of the properties that can be set as permission. The value will be a label (to be translated by client)
 	 * When this is not overriden there are no extra permissions. Groups van still be added
@@ -539,6 +548,16 @@ abstract class Module extends Singleton {
 	public function getDependencies(): array
 	{
 		return [];
+	}
+
+	/**
+	 * Override this to add specific URNs with capabilities other then user rights
+	 *
+	 * @param model\Module $module
+	 * @return array
+	 */
+	public function getCapabilities(\go\core\model\Module $module): array {
+		return ['go:'.$module->package.':'.$module->name => $module->getUserRights()];
 	}
 
 	/**
@@ -602,7 +621,7 @@ abstract class Module extends Singleton {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				} else{
-					if (!LegacyModuleModel::install($dependency->getName(), true, $dependency::getDefaultSortOrder())) {
+					if (!LegacyModuleModel::install($dependency->getName(), true)) {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				}
@@ -702,17 +721,6 @@ abstract class Module extends Singleton {
 
 
 	/**
-	 * Default sort order when installing. If null it will be auto generated.
-	 * Modules wit a sort under below 100 will be shown by default. Otherwise they can be opened from the menu.
-	 *
-	 * @return int|null
-	 */
-	public static function getDefaultSortOrder() : ?int{
-		return null;
-	}
-
-	
-	/**
 	 * // backwards compatible 6.2
 	 * 
 	 * @deprecated since version number
@@ -762,6 +770,11 @@ abstract class Module extends Singleton {
 		
 		return go()->t("name", $pkg, $name);
 	
+	}
+
+	public static function getCategory(): string
+	{
+		return go()->t("Main", static::getPackage(), static::getName());
 	}
 	
 	
@@ -955,5 +968,28 @@ abstract class Module extends Singleton {
 	 */
 	public function demo(Generator $faker) {
 
+	}
+
+	public function toArray(?array $properties = null): array
+	{
+		$model = $this->getModel();
+		return array(
+			'id' => $this->getPackage() . "/" . $this->getName(),
+			'name'=>$this->getName(),
+			'package'=>$this->getPackage(),
+			'title' => $this->getTitle(),
+			'author'=>$this->getAuthor(),
+			'description'=>$this->getDescription(),
+			'rights'=>array_keys($this->getRights()),
+			"status" => $this->getStatus(),
+			'packageTitle'=> $this->getLocalizedPackage(),
+
+			'enabled'=>$model && $model->enabled,
+			'installed' => $this->isInstalled(false),
+			'model' => $model,
+			'available'=> $this->isInstallable(),
+			'documentationUrl' => $this->getDocumentationURL(),
+			'category' => $this->getCategory(),
+		);
 	}
 }

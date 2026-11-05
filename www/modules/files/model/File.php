@@ -18,6 +18,7 @@ namespace GO\Files\Model;
 use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\mail\Attachment;
 use go\core\model\Module;
@@ -57,6 +58,7 @@ use setasign\Fpdi\PdfParser\Type\PdfBoolean;
  * @property \GO\Base\Model\User $lockedByUser
  *
  * @property boolean $delete_when_expired
+ * @property int $lock_expires_at
  */
 class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableInterface {
 
@@ -109,20 +111,25 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		return true;
 	}
 
-	protected function getCacheAttributes() {
-
+	protected function getCacheAttributes()
+	{
 		$path = $this->path;
 
 		//Don't cache tickets files because there are permissions issues. Everyone has read access to the types but may not see other peoples files.
-		if(strpos($path, 'tickets/')===0){
+		if (str_starts_with($path, 'tickets/')) {
 			return false;
 		}
 
-		if(!$this->folder) {
+		// Trashed items should not be cached either. You should NOT be able to use global search for Trash items.
+		if (str_starts_with($path, 'trash/')) {
 			return false;
 		}
 
-		return array('name'=>$this->name, 'description'=>$path, 'filter' => $this->folder->getIdPath() . "/");
+		if (!$this->folder) {
+			return false;
+		}
+
+		return array('name' => $this->name, 'description' => $path, 'filter' => $this->folder->getIdPath() . "/");
 	}
 
 	public function getLogMessage($action){
@@ -188,13 +195,22 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		parent::init();
 	}
 
+
+	public function lock(string $id, int|null $userId = null) {
+		$this->lock_id = $id;
+		$this->locked_user_id = $userId ?? \GO::user()->id;
+
+		// locks expire in 30 minutes. WOPI requires it: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/concepts#lock-length
+		$this->lock_expires_at = time() + 1800;
+
+	}
 	/**
 	 * Check if a file is locked by another user.
 	 *
 	 * @return boolean
 	 */
-	public function isLocked(){
-		return !empty($this->locked_user_id) && (!\GO::user() || $this->locked_user_id!=\GO::user()->id);
+	public function isLocked($forYouToo = false){
+		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && time() < $this->lock_expires_at;
 	}
 
 	public function unlockAllowed(){
@@ -275,7 +291,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			$enoughQuota = \GO::user()->disk_usage + $newBytes <= $userQuota;
 		}
 		if ($enoughQuota && \GO::config()->quota > 0) {
-			$currentQuota = (int) \GO::config()->get_setting('file_storage_usage', 0 ,0);
+			$currentQuota = (int) go()->getSettings()->fileStorageUsage;
 			$enoughQuota = $currentQuota + $newBytes <= (\GO::config()->quota * 1024);
 		}
 		
@@ -417,26 +433,27 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		return new \GO\Base\Fs\File(\GO::config()->file_storage_path . $this->path);
 	}
 
-	private function _addQuota(){
+	private function _addQuota(): void
+	{
+		if ($this->isModified('size') || $this->isNew) {
+			$sizeDiff = (int)$this->fsFile->size() - (int)$this->getOldAttributeValue('size');
 
-		if($this->isModified('size') || $this->isNew) {
-			$sizeDiff = (int) $this->fsFile->size() - (int) $this->getOldAttributeValue('size');
-
-//			GO::debug("Adding quota: $sizeDiff for ".$this->folder->quotaUser->getName());
-			if($this->folder->quotaUser){
+			if ($this->folder->quotaUser) {
 				$this->folder->quotaUser->calculatedDiskUsage($sizeDiff)->save(true); //user quota
 			}
-			if(GO::config()->quota>0) {
-				GO::config()->save_setting("file_storage_usage", (int) GO::config()->get_setting('file_storage_usage', 0 ,0) + $sizeDiff); //system quota
+			if (GO::config()->quota > 0) {
+				go()->getSettings()->fileStorageUsage += $sizeDiff;
+				go()->getSettings()->save();
 			}
 		}
-
 	}
 	
-	private function _removeQuota(){
-		if(\GO::config()->quota>0){
+	private function _removeQuota(): void
+	{
+		if ((int) go()->getConfig()['quota'] > 0) {
 			\GO::debug("Removing quota: $this->size");
-			\GO::config()->save_setting("file_storage_usage", (int) GO::config()->get_setting('file_storage_usage', 0 ,0) - $this->size);
+			go()->getSettings()->fileStorageUsage -= $this->size;
+			go()->getSettings()->save();
 		}
 
 		if($this->folder->quotaUser){
@@ -671,9 +688,24 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		for safety allow replace action
 		if(!$this->isNew)
 			$this->log("update");
-		$this->saveVersion();
 
-		if(!$fsFile->move($this->folder->fsFolder,$this->name, $isUploadedFile)){		
+		$oldPath = $this->saveVersion();
+
+		if(!$this->folder->fsFolder->exists()) {
+			// weird thing happened with pdf editor occasionally that it failed to save and the file seems to be gone !?
+			ErrorHandler::log("ERROR: " . $this->folder->fsFolder->path(). " does not exist.");
+			$this->folder->fsFolder->create();
+		}
+
+		if(!$fsFile->move($this->folder->fsFolder,$this->name, $isUploadedFile) || !file_exists($this->fsFile->path())){
+
+			ErrorHandler::log("Move of file: ".$fsFile->path()." to ".$this->folder->fsFolder->path()." failed.");
+
+			// restore old file
+			if($oldPath != $this->fsFile->path()) {
+				$restore = new GO\Base\Fs\File($oldPath);
+				$restore->move($this->folder->fsFolder, $this->name);
+			}
 			return false;
 		}
 		$fsFile->setDefaultPermissions();
@@ -692,6 +724,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		if(!File::checkQuota(strlen($data)))
 //			throw new \GO\Base\Exception\InsufficientDiskSpace();
 
+		// Check before writing. save() below checks it too but then the file on disk was already replaced.
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
+
 		$this->fsFile->putContents($data);
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
@@ -708,10 +745,20 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$this->fireEvent('saveversion', array($this));
 		
 		if(\GO::config()->max_file_versions > -1){
-			$version = new Version();
-			$version->file_id = $this->id;
-			$version->size_bytes = $this->size;
-			$version->save();
+			try {
+				$version = new Version();
+				$version->file_id = $this->id;
+				$version->size_bytes = $this->size;
+				$version->save();
+			} catch(\Throwable $e) {
+				$this->version--;
+				ErrorHandler::logException($e, "Failed to save version for file ID: ". $this->id);
+				return $this->fsFile->path();
+			}
+
+			return $version->path;
+		} else {
+			return $this->fsFile->path();
 		}
 	}
 
@@ -735,20 +782,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 * @return boolean
 	 */
 	public function isImage(){
-		switch(strtolower($this->extension)){
-			case 'ico':
-			case 'jpg':
-			case 'jpeg':
-			case 'png':
-			case 'gif':
-			case 'bmp':
-			case 'xmind':
-			case 'svg':
-
-				return true;
-			default:
-				return false;
-		}
+		return $this->fsFile->isImage();
 	}
 
 

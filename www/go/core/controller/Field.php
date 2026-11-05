@@ -9,6 +9,9 @@ use go\core\orm\Query;
 use go\core\util\ArrayObject;
 
 
+/**
+ * @extends EntityController<\go\core\model\Field>
+ */
 class Field extends EntityController {
 
 	protected function canUpdate(Entity $entity): bool

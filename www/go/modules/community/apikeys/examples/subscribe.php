@@ -3,7 +3,7 @@
 //an email to notify the system admin.
 
 //Adjust these variables for your installation
-$apiKey = "61bb0ed6515d2da17c95e073a0458bdb4421273784cc3";
+$apiKey = "your-api-key";
 $apiUrl = 'http://localhost/api/jmap.php';
 
 // make sure this list exists in Group-Office
@@ -72,8 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         ],
 		["core/Notify/mail", [
 			"subject" => "New contact created from website",
-			"body" =>  "Name: " .$_POST['firstName']. " ". $_POST['lastName'],
-			//"to" => ["admin@intermesh.localhost" => "Admin"] //Optional. If empty it will be sent to the system settings email.
+			"body" =>  "Name: " .$_POST['firstName']. " ". $_POST['lastName']
 		],
 			"clientCallId-1"]
 	];

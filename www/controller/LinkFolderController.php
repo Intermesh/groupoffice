@@ -74,9 +74,9 @@ class LinkFolderController extends \GO\Base\Controller\AbstractModelController {
 
 			} else {
 				
-				$moveModel = \GO::getModel($modelName)->findByPk($modelId);
-				
-				$targetModel = \GO::getModel($target->model_name)->findByPk($target->model_id);
+				$moveModel = $this->getRequestedModel($modelName)->findByPk($modelId);
+
+				$targetModel = $this->getRequestedModel($target->model_name)->findByPk($target->model_id);
 				$targetModel->updateLink($moveModel, array('folder_id'=>intval($target->folder_id)));
 			}
 		}

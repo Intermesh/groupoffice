@@ -9,6 +9,7 @@ import {
 	column,
 	comp,
 	containerfield,
+	DataSourceStore,
 	datasourcestore,
 	DateInterval,
 	DateTime,
@@ -29,15 +30,24 @@ import {
 	win,
 	Window,
 } from "@intermesh/goui";
-import {client, FormWindow, JmapDataSource, principalDS, recurrencefield} from "@intermesh/groupoffice-core";
-import {categoryStore, t, writeableCalendarStore} from "./Index.js";
+import {
+	client,
+	FormWindow,
+	JmapDataSource,
+	jmapds,
+	modules,
+	principalDS,
+	recurrencefield
+} from "@intermesh/groupoffice-core";
+import {OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {AvailabilityWindow} from "./AvailabilityWindow.js";
+import {locationfield, LocationField} from "./LocationField";
 
 
-export class EventWindow extends FormWindow {
+export class EventWindow extends FormWindow<CalendarEvent> {
 
 	private item?: CalendarItem
 
@@ -49,24 +59,25 @@ export class EventWindow extends FormWindow {
 
 	private attachments:MapField
 	private btnFreeBusy: Button
-	private locationField: TextField
+	private locationField: LocationField
 	public readonly participantFld: ParticipantField
 
 	private titleField: TextField
 	private alertField: AlertField
 	private confirmedScheduleMessage: boolean = false;
+	private categoryStore: DataSourceStore;
 
 	constructor() {
 		super("CalendarEvent");
 
-		const m = go.Modules.get('community','calendar');
+		const m = modules.get('community','calendar');
 		this.title = t('Event');
 		this.width = 620;
 		this.stateId = "calendar-event-window";
 		this.height = 840;
 		this.resizable = true;
 		this.hasLinks = true;
-		this.store = this.form.dataSource as JmapDataSource; //jmapds("CalendarEvent");
+		this.store = this.form.dataSource as JmapDataSource<CalendarEvent>; //jmapds("CalendarEvent");
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
@@ -81,7 +92,7 @@ export class EventWindow extends FormWindow {
 		this.form.on('beforesave', ({data}) => {
 			this.parseSavedData(data);
 		});
-		this.form.on('load', ({data}) => {
+		this.form.on('beforeload', ({data}) => {
 			const start = new DateTime(data.start);
 			data.end = start.add(new DateInterval(data.duration))
 				.addDays(data.showWithoutTime? -1 : 0)
@@ -97,8 +108,16 @@ export class EventWindow extends FormWindow {
 		this.form.on("beforesubmit", this.onBeforeSubmit, {bind:this});
 
 		this.generalTab.cls = 'flow fit scroll pad';
-		this.startDate = datetimefield({label: t('Start'), name:'start',flex:1, defaultTime: now.format('H')+':00',
-			listeners:{'change': ({target, oldValue}) => {
+
+		this.startDate = datetimefield({
+			label: t('Start'),
+			withTimeZone: false,
+			required: true,
+			name: 'start',
+			flex: 1,
+			defaultTime: now.format('H')+':00',
+			listeners:{
+				change: ({target, oldValue}) => {
 
 					const newStartDate = target.getValueAsDateTime(),
 						endDate = this.endDate.getValueAsDateTime(),
@@ -115,16 +134,21 @@ export class EventWindow extends FormWindow {
 							.add(di)
 							.format(format);
 					}
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				},
-			'setvalue': ({target}) => {
-				const d = target.getValueAsDateTime();
-				if(d){
-					recurrenceField.setStartDate(d);
+				setvalue: ({target}) => {
+					const d = target.getValueAsDateTime();
+					if(d){
+						recurrenceField.setStartDate(d);
+					}
 				}
-			}}
+			}
 		});
+
 		this.endDate = datetimefield({
 			label: t('End'),
+			withTimeZone: false,
+			required: true,
 			name: 'end',
 			flex:1,
 			defaultTime: (now.getHours()+1 )+':00',
@@ -141,6 +165,11 @@ export class EventWindow extends FormWindow {
 							.add(di)
 							.format(format);
 					}
+
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
+				},
+				setvalue: ev => {
+					const newEndDate = ev.target.getValueAsDateTime()
 					if(newEndDate && this.item) {
 						this.item.end = newEndDate; // for isInPast
 					}
@@ -169,7 +198,10 @@ export class EventWindow extends FormWindow {
 				'focus':()=> { this.titleField.input!.select();}
 			}}),
 			select({
-				label: t('Calendar'), name: 'calendarId', required: true, flex: '1 30%',
+				label: t('Calendar'),
+				name: 'calendarId',
+				required: true,
+				flex: '1 30%',
 				store: writeableCalendarStore,
 				valueField: 'id',
 				textRenderer: (r: any) => r.name,
@@ -180,34 +212,52 @@ export class EventWindow extends FormWindow {
 						}
 					},
 					'setvalue': ({newValue}) => {
-						if(newValue)
-							writeableCalendarStore.dataSource.single(newValue).then(r => {
-							if(!r) return;
-							this.item!.cal = r;
+						if(newValue) {
+							const r = writeableCalendarStore.findById(newValue);
+							if (!r) return;
+							if(this.item)
+								this.item.cal = r;
+
+							this.categoryStore.setFilter("calendar",  {
+								operator: "OR",
+								conditions: [
+									{mine: true},
+									{inCalendars: newValue}
+								]
+						});
 
 							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-							this.alertField.setDefaultLabel(d)
-							if(!this.item?.key && !this.participantFld.list.isEmpty()) {
+							this.alertField.setDefaultLabel(d);
+
+							const hasParticipants = Object.keys(this.item?.participants || {}).length > 0;
+							if (!this.item?.key && hasParticipants) {
 								// calendar changed and event is new, check if organizer needs to change as well
-								principalDS.single(this.item!.ownerId).then(p=> {
+								principalDS.single(this.item!.ownerId).then(p => {
 									this.participantFld.addOrganiser(p);
-									// this.participantFld.list.trackReset();
 								}).catch(e => {
 									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
 								})
 							}
-						});
+
+
+
+							if(!this.form.currentId && r.groupId != null) {
+								// Direct resource booking. We'll add the resource as participant.
+
+								principalDS.single("Calendar:" + r.id).then(p => {
+									this.participantFld.addParticipant(p);
+								}).catch(e => {
+									void Window.error(t("Could not add organizer because the calendar principal could not be read from the server. Do you have permissions?"));
+								})
+
+
+							}
+						}
 
 					}
 				}
 			}),
-			this.locationField = textfield({name: 'location',flex:1, label:t('Location'), style:{minWidth:'80%'},
-				listeners: {'setvalue': ({target, newValue}) => { target.buttons![0].hidden = !/^https?:\/\//.test(newValue); }},
-				buttons:[btn({hidden:true,icon: 'open_in_browser', handler:(_b)=>{window.open(this.locationField.value as string)}})]
-			}),
-			btn({icon:'video_call', hidden: !m?.settings?.videoUri, cls:'filled', width:50, handler: async (btn) => {
-					(btn.previousSibling() as TextField)!.value = await this.createVideoLink(m?.settings);
-			}}),
+
 			this.withoutTimeToggle = checkbox({type:'switch',value:undefined, name: 'showWithoutTime', label: t('All day'), style:{width:'auto'},
 				listeners: {'setvalue':({newValue}) => {
 					this.alertField.fullDay = newValue;
@@ -224,20 +274,30 @@ export class EventWindow extends FormWindow {
 				}}
 			}),
 			comp({}),
-			this.startDate,this.endDate,
+			this.startDate,
+			this.endDate,
 			comp({cls:'hbox'},
 				recurrenceField,
 				exceptionsBtn,
 			),
+
+			this.locationField = locationfield({flex:1, style:{minWidth:'80%'}}),
+			new OnlineMeetingButton(this.locationField, this.form),
+
 			this.participantFld = participantfield({
+				style:{minWidth:'80%'},
 				listeners: {
-					'change': ({newValue}) => {
+					'setvalue': ({newValue}) => {
+						const count = (newValue && Object.keys(newValue).length);
+						this.btnFreeBusy.hidden = !count;
+					},
+					'change' :({newValue}) => {
 						const count = (newValue && Object.keys(newValue).length);
 						this.submitBtn.text = t(count && (this.endDate.getValueAsDateTime()!.date > new Date()) ? 'Send' : 'Save');
-						this.btnFreeBusy.hidden = !count;
 
+						this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 					},
-					'beforeadd': ({target}) => {
+					'beforeadd': ({target, principal}) => {
 						if(target.list.isEmpty()) {
 							principalDS.single(this.item!.ownerId).then(p=>{
 								target.addOrganiser(p);
@@ -248,38 +308,55 @@ export class EventWindow extends FormWindow {
 					}
 				}
 			}),
+
+
+
 			this.btnFreeBusy = btn({hidden: true,text:t('Check availability'), handler: () => {
 				const dlg = new AvailabilityWindow();
 				dlg.on('changetime', ({start, end}) => {
 					this.startDate.value = start.format('Y-m-dTH:i');
 					this.endDate.value = end.format('Y-m-dTH:i');
+					this.participantFld.checkAvailability(this.startDate.getValueAsDateTime()!, this.endDate.getValueAsDateTime()!, !!this.withoutTimeToggle.value);
 				});
 				dlg.show(this.item, this.form.modified);
 			} }),
-			this.alertField,
-
 			textarea({
 				name:'description',
 				label: t('Description'),
 				autoHeight: true
 			}),
 
+			this.alertField,
+
 			autocompletechips({
-				list: table({fitParent: true, headers: false, store: datasourcestore({dataSource:categoryStore.dataSource}),
+				list: table({
+					headers: false,
+					store: this.categoryStore = datasourcestore({
+						dataSource:jmapds('CalendarCategory'),
+						sort: [{property:'name'}]
+					}),
 					rowSelectionConfig: {multiSelect: true},
 					columns: [
-						checkboxselectcolumn(),
+						checkboxselectcolumn().on('render', e => {
+							console.log(e.record);
+							(e.result as CheckboxField).color = '#'+e.record.color;
+						}),
 						column({id: "name"})
 					]
+
 				}),
 				label: t("Categories",'core','core'),
 				name: "categoryIds",
 				chipRenderer: async (chip, id) => {
-					categoryStore.dataSource.single(id).then(v => { chip.text = v?.name ?? '???'});
+					jmapds('CalendarCategory').single(id).then(v => {
+						chip.text = v?.name ?? '???';
+						if(v.color)
+							chip.el.style.color = '#'+v.color;
+					});
 				},
 				listeners: {
 					autocomplete: ( {target, input}) => {
-						target.list.store.queryParams = {filter: {name: input}};
+						target.list.store.setFilter("name", {name: input});
 						target.list.store.load();
 					}
 				}
@@ -316,30 +393,18 @@ export class EventWindow extends FormWindow {
 		);
 
 		this.addCustomFields();
+
 	}
 
-	private b64UrlEncode(data:string) {
-		const base64 = btoa(data);
-		return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-	}
 
-	private async createVideoLink(s: any) {
-		const room = this.b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
 
-		if(!s.videoJwtEnabled) {
-			return s.videoUri+room;
-		}
-
-		const response = await client.jmap("CalendarEvent/generateJWT", {room}, 'pJwt');
-
-		return  s.videoUri+room+'?jwt='+response.jwt;
-		// const id = s.videoJwtAppId,
-		// 	head= this.b64UrlEncode(JSON.stringify({alg: 'HS256', typ: 'JWT'})),
-		// 	load = this.b64UrlEncode(JSON.stringify({aud: id, iss: id, room})),
-		// 	key = await crypto.subtle.importKey('raw', (new TextEncoder()).encode(s.videoJwtSecret),
-		// 		{ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
-		// 	sign = await window.crypto.subtle.sign("HMAC", key, (new TextEncoder()).encode(`${head}.${load}`));
-		// return  s.videoUri+room+'?jwt='+`${head}.${load}.${this.b64UrlEncode(String.fromCharCode(...new Uint8Array(sign)))}`;
+	public addLinkOnSave(entityName:string, entityId:string) {
+		// Add name from linked entity to the title field when creating event with AddButton
+		jmapds(entityName)?.single(entityId).then(e => {
+			if(e.name)
+				this.titleField.value = e.name;
+		});
+		super.addLinkOnSave(entityName, entityId);
 	}
 
 	private openExceptionsWindow() {
@@ -353,7 +418,6 @@ export class EventWindow extends FormWindow {
 				title: t('Exceptions'),
 				height:400,
 			}, table({
-				fitParent:true,
 				store: exceptionStore,
 				columns: [
 					column({id: "recurrenceId",htmlEncode:false, header:t('Start'), renderer(v,record) {
@@ -391,7 +455,14 @@ export class EventWindow extends FormWindow {
 		return data;
 	}
 
-	loadEvent(ev: CalendarItem) {
+	/**
+	 * Loads a calendar item into the event window.
+	 *
+	 * This can be a new or existing item.
+	 *
+	 * @param ev
+	 */
+	async loadEvent(ev: CalendarItem) {
 
 		//this.title = t(!ev.key ? 'New event' : 'Edit event');
 		if(ev.data.calendarId) {
@@ -401,7 +472,7 @@ export class EventWindow extends FormWindow {
 			this.item = ev;
 			this.form.create(ev.data);
 		} else {
-			this.form.load(ev.data.id!).then(() => {
+			await this.form.load(ev.data.id!).then(() => {
 				if(ev.recurrenceId) {
 					this.startDate.value = ev.start.format(ev.data.showWithoutTime ? 'Y-m-d' : 'Y-m-d\TH:i');
 					this.startDate.trackReset();
@@ -426,6 +497,7 @@ export class EventWindow extends FormWindow {
 	}
 
 	private onBeforeSubmit() {
+
 		if(this.confirmedScheduleMessage) {
 			return;
 		}
@@ -433,8 +505,10 @@ export class EventWindow extends FormWindow {
 			this.close();
 			return false;
 		}
-		if(this.item!.isRecurring) {
 
+		if(this.form.currentId && this.item!.isRecurring) {
+
+			// patching only works on existing events
 			this.item!.patch(this.parseSavedData(this.form.modified), () => {
 				this.close();
 			});
@@ -445,13 +519,7 @@ export class EventWindow extends FormWindow {
 				this.confirmedScheduleMessage = true;
 
 				// allow long timeout for sending invitations
-				const oldTimeout = client.requestTimeout;
-				client.requestTimeout = 180000;
-				this.form.on("submit", () => {
-					// reset after submit
-					client.requestTimeout = oldTimeout;
-				}, {once: true});
-
+				client.raiseNextRequestTimeout(180000);
 				this.form.submit();
 				this.confirmedScheduleMessage = false;
 			});
@@ -464,15 +532,15 @@ export class EventWindow extends FormWindow {
 
 
 	private attachFile() {
-		 browser.pickLocalFiles(true).then(files => {
-			 this.attachments.mask();
-			 client.uploadMultiple(files).then(blobs => {
-				 for(const r of blobs)
-					 this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
-			 }).finally(() => {
-				 this.attachments.unmask();
-			 });
-		 });
+		browser.pickLocalFiles(true).then(files => {
+			this.attachments.mask();
+			client.uploadMultiple(files).then(blobs => {
+				for(const r of blobs)
+					this.attachments.add({blobId:r.id, title:r.name, size:r.size, contentType:r.type}, );
+			}).finally(() => {
+				this.attachments.unmask();
+			});
+		});
 	}
 
 }

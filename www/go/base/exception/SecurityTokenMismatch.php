@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class SecurityTokenMismatch extends \Exception
+use go\core\exception\UserSafeException;
+
+class SecurityTokenMismatch extends \Exception implements UserSafeException
 {
 
 	public function __construct() {

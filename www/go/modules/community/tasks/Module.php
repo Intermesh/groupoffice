@@ -33,6 +33,11 @@ class Module extends core\Module {
 		return self::STATUS_STABLE;
 	}
 
+	public static function getCategory(): string
+	{
+		return go()->t("Calendar", "community", "calendar");
+	}
+
 	public function getAuthor(): string
 	{
 		return "Intermesh BV <info@intermesh.nl>";
@@ -95,7 +100,7 @@ class Module extends core\Module {
 	 */
 	public static function onBeforeProjectDelete(Project $project): bool
 	{
-		$query = (new core\orm\Query())->where(['role' => Tasklist::Project, 'projectId' => $project->id]);
+		$query = (new core\orm\Query())->where(['role' => TaskList::Project, 'projectId' => $project->id]);
 		$success = TaskList::delete($query);
 		return $success;
 	}
@@ -108,7 +113,10 @@ class Module extends core\Module {
 			$tasklist = TaskList::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
 			if ($tasklist) {
 				$tasklist->name = $user->displayName;
-				$tasklist->save();
+				$tasklist->showInCalendar = true;
+				if(!$tasklist->save()) {
+					throw new SaveException($tasklist);
+				}
 			}
 		}
 	}

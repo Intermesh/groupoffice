@@ -1,8 +1,8 @@
 {
   "name": "intermesh/groupoffice",
-  "description": "Group-Office",
+  "description": "GroupOffice",
   "require": {
-    "php": ">=8.1",
+    "php": ">=8.4 < 8.6",
     "ext-pcre": "*",
     "ext-mbstring": "*",
     "ext-ctype": "*",
@@ -20,8 +20,9 @@
     "sabre/dav": "@stable",
     "ext-json": "*",
     "ext-openssl": "*",
+    "ext-imagick": "*",
     "michelf/php-markdown": "@stable",
-    "tecnickcom/tcpdf": "@stable",
+    "tecnickcom/tcpdf": "6.11.3",
     "dragonmantank/cron-expression": "@stable",
     "setasign/fpdi": "@stable",
     "matthiasmullie/minify": "@stable",
@@ -32,20 +33,18 @@
     "league/oauth2-server": "@stable",
     "guzzlehttp/psr7": "@stable",
     "guzzlehttp/guzzle": "@stable",
-    "steverhoades/oauth2-openid-connect-server": "^2.3.0",
+    "steverhoades/oauth2-openid-connect-server": "@stable",
     "phpoffice/phpspreadsheet": "@stable",
-    "lcobucci/jwt": "*",
-    "firebase/php-jwt": "@stable",
+    "firebase/php-jwt": "6.*",
     "donatj/phpuseragentparser": "@stable",
-    "league/oauth2-client": "2.7.0",
+    "league/oauth2-client": "@stable",
     "league/oauth2-google": "@stable",
     "fakerphp/faker": "@stable",
     "ext-fileinfo": "*",
     "thenetworg/oauth2-azure": "@stable",
     "erusev/parsedown": "@stable",
     "phpmailer/phpmailer": "@stable",
-    "jasny/phpdoc-parser": "^1.0",
-    "stevenmaguire/oauth2-keycloak": "^5.1"
+    "jasny/phpdoc-parser": "^1.0"
   },
   "license": "AGPL",
   "authors": [
@@ -78,7 +77,13 @@
   "config": {
     "optimize-autoloader": true,
     "platform": {
-      "php": "8.3"
+      "php": "8.4"
+    },
+    "audit": {
+      "ignore": [
+        "PKSA-y2cr-5h3j-g3ys"
+      ]
     }
   }
+
 }

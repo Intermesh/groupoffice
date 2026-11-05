@@ -79,28 +79,8 @@ class AbstractModelController extends AbstractController {
 					//where 1 is the id of the model
 
 					$linkProps = explode(':', $params['link']);			
-					$linkModel = \GO::getModel($linkProps[0])->findByPk($linkProps[1]);
+					$linkModel = $this->getRequestedModel($linkProps[0])->findByPk($linkProps[1]);
 					$model->link($linkModel);			
-				}
-
-				if(!empty($_FILES['importFiles'])){
-
-					$attachments = $_FILES['importFiles'];
-					$count = count($attachments['name']);
-
-					$params['enclosure'] = $params['importEnclosure'];
-					$params['delimiter'] = $params['importDelimiter'];
-
-					for($i=0;$i<$count;$i++){
-						if(is_uploaded_file($attachments['tmp_name'][$i])) {
-							$params['file']= $attachments['tmp_name'][$i];
-							//$params['model'] = $params['importModel'];
-
-							$controller = new $params['importController'];
-
-							$controller->run("import",$params,false);
-						}
-					}
 				}
 
 
@@ -330,12 +310,7 @@ class AbstractModelController extends AbstractController {
 	}
   
   /**
-   * The default grid action for the current model. This action also handles:
-	 * 
-	 * 1. Advanced queries. See _handleAdvancedQuery, the contacts advanced search
-	 * use case in Group-Office, and
-	 * \GO\Addressbook\Controller\Contact::beforeIntegrateRegularSql.
-	 * 2. Deleting models
+   * The default grid action for the current model. This action also handles deleting models.
    */
   protected function actionStore($params){	
     $modelName = $this->model;  
@@ -360,9 +335,7 @@ class AbstractModelController extends AbstractController {
 		$this->prepareStore($store);
 		
 		$storeParams = $store->getDefaultParams($params)->mergeWith($this->getStoreParams($params));
-		
-		if (!empty($params['advancedQueryData']))
-			$this->_handleAdvancedQuery($params['advancedQueryData'],$storeParams);
+
 		
 		$this->beforeStoreStatement($response, $params, $store, $storeParams);
 			
@@ -675,22 +648,23 @@ class AbstractModelController extends AbstractController {
 	protected function actionExport($params) {	
 		
 		\GO::setMaxExecutionTime(0);
-		
-		$orientation = false;
-		
+
+
 		$showHeader = false;
-  	$humanHeaders = true;
+  	    $humanHeaders = true;
 		$includeHidden = false;
 		
-		if(!empty($params['includeHeaders']))
+		if (!empty($params['includeHeaders'])) {
 			$showHeader = true;
+		}
 		
-		if(!empty($params['humanHeaders']))
+		if (!empty($params['humanHeaders'])) {
 			$humanHeaders = false;
+		}
 		
-		if(!empty($params['includeHidden']))
-			$includeHidden = true;		
-		
+		if (!empty($params['includeHidden'])) {
+			$includeHidden = true;
+		}
 		$checkboxSettings = array(
 			'export_include_headers'=>$showHeader,
 			'export_human_headers'=>!$humanHeaders,
@@ -703,16 +677,16 @@ class AbstractModelController extends AbstractController {
 		//define('EXPORTING', true);
 		//used by custom fields to format diffently
 
-		if(!empty($params['exportOrientation']) && ($params['exportOrientation']=="H"))
+		$orientation = 'P';
+		if(!empty($params['exportOrientation']) && ($params['exportOrientation']=="H")) {
 			$orientation = 'L'; // Set the orientation to Landscape
-		else
-			$orientation = 'P'; // Set the orientation to Portrait
+		}
 
-		if(!empty($params['documentTitle']))
+		if(!empty($params['documentTitle'])) {
 			$title = $params['documentTitle'];
-		else
+		} else {
 			$title = \GO::session()->values[$params['name']]['name'];
-			
+		}
 		$findParams = \GO::session()->values[$params['name']]['findParams'];
 		$findParams->limit(0); // Let the export handle all found records without a limit
 		$findParams->getCriteria()->recreateTemporaryTables();
@@ -733,37 +707,58 @@ class AbstractModelController extends AbstractController {
 		$this->afterStore($response, $params, $store, $storeParams);
 		
 		$columnModel = $store->getColumnModel();
-		$this->formatColumns($columnModel);		
-		
-		
+		$this->formatColumns($columnModel);
+
+		$fields = \go\core\model\Field::findByEntity($model->customFieldsEntityType()->getId())
+			->orderBy(['fs.sortOrder' => 'ASC', 'f.sortOrder' => 'ASC']);
+
 		if(!$includeHidden && !empty($params['columns'])) {
 			$includeColumns = explode(',',$params['columns']);
 			
 			foreach($includeColumns as $incColumn){
-				if(!$columnModel->getColumn($incColumn))
-					$columnModel->addColumn (new \GO\Base\Data\Column($incColumn,$incColumn));
+				if(str_starts_with($incColumn, 'customFields.')) {
+					foreach($fields as $field) {
+						if('customFields.'.$field->databaseName === $incColumn) {
+							$column = new \GO\Base\Data\Column($incColumn, $field->name);
+							$databaseName = $field->databaseName;
+							$column->setFormat(function($model) use ($databaseName) {
+								return $model->getCustomFields(true)[$databaseName] ?? "";
+							});
+							$columnModel->addColumn($column);
+							break;
+						}
+					}
+				} else if(!$columnModel->getColumn($incColumn)) {
+					$columnModel->addColumn(new \GO\Base\Data\Column($incColumn, $incColumn));
+				}
 			}
 			
 			$columnModel->sort($includeColumns);
 			
 			foreach($columnModel->getColumns() as $c){
-				if(!in_array($c->getDataIndex(), $includeColumns))
+				if(!in_array($c->getDataIndex(), $includeColumns)) {
 					$columnModel->removeColumn($c->getDataIndex());
+				}
 			}
 		} elseif ($includeHidden) {
 			
-			$columnOrder = array();
-			$colNames = $model->getColumns();
-			if (\GO::modules()->customfields) {
-				$cfRecord = $model->getCustomfieldsRecord(false);
-				if ($cfRecord) {
-					$cfColNames = $cfRecord->getColumns();
-					unset($cfColNames['model_id']);
-					$colNames = array_merge($colNames,$cfColNames);
+			$columnOrder = array_keys($model->getColumns());
+
+			if($model->hasCustomFields()) {
+				// Replace the single "customFields" object column with one column per custom field
+				$columnModel->removeColumn('customFields');
+
+				foreach($fields as $field) {
+					$dataIndex = 'customFields.' . $field->databaseName;
+					$column = new \GO\Base\Data\Column($dataIndex, $field->name);
+					$databaseName = $field->databaseName;
+					$column->setFormat(function($model) use ($databaseName) {
+						return $model->getCustomFields(true)[$databaseName] ?? "";
+					});
+					$columnModel->addColumn($column);
+					$columnOrder[] = $dataIndex;
 				}
 			}
-			foreach ($colNames as $colName=>$record)
-				$columnOrder[] = $colName;
 			$columnModel->sort($columnOrder);
 		}
 		$extraParams = empty($params['params']) ? array() : json_decode($params['params'], true);
@@ -776,12 +771,8 @@ class AbstractModelController extends AbstractController {
 			if (!empty($select) && substr($select,0,1)!=',')
 				$select = ','.$select;
 						
-			if (\GO::modules()->customfields && $cfRecord)
-				$select = 't.*,cf.*'.$select;
-			else
-				$select = 't.*'.$select;
-
-			$findParams->select($select);
+			// Custom field columns are added by joinCustomFields() in ActiveRecord::find()
+			$findParams->select('t.*'.$select);
 		}
 		
 		if(!empty($params['type']))
@@ -794,6 +785,15 @@ class AbstractModelController extends AbstractController {
 	
 	protected function beforeExport(&$store, &$columnModel,&$model, &$findParams, &$showHeader, &$humanHeaders, &$title, &$orientation, &$extraParams){
 		
+	}
+
+	/**
+	 * Only the command line may import a file that is on the server, otherwise it must be uploaded
+	 *
+	 * @return bool
+	 */
+	protected function mayImportServerFile(): bool {
+		return \GO::environment()->isCli();
 	}
 	
 	/**
@@ -821,15 +821,24 @@ class AbstractModelController extends AbstractController {
 		$attributeIndexMap = isset($params['attributeIndexMap'])
 			? $attributeIndexMap = json_decode($params['attributeIndexMap'],true)
 			: array();
-		
+
+		// The file is converted and its records are imported, so over the web it must be a file the user uploaded
+		if(!$this->mayImportServerFile() && !is_uploaded_file($params['file'] ?? '')) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		if (!isset($params['importType']))
+			$params['importType'] = 'Csv';
+
+		if(!in_array($params['importType'], ['Csv', 'Xls'], true)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		if(is_file($params['file'])){
-						
-			if (!isset($params['importType']))
-				$params['importType'] = 'Csv';
-			
+
 			$fileClassName = 'GO\\Base\\Fs\\'.$params['importType'].'File';
 			if ($params['importType']=='Xls' && !empty($params['maxColumnNr']))
-				$importFile = new $fileClassName($params['file'],$params['maxColumnNr']);
+				$importFile = new \GO\Base\Fs\XlsFile($params['file'],$params['maxColumnNr']);
 			else
 				$importFile = new $fileClassName($params['file']);
 		
@@ -1062,127 +1071,9 @@ class AbstractModelController extends AbstractController {
 	//$attributes['companies.name']=\GO::t("Company", "addressbook");
 	//return parent::afterAttributes($attributes, $response, $params, $model);
 	}
-	
-	/**
-	 * Adds advanced query request parameters to a findCriteria object. 
-	 * The advanced query panel view can be found in GO.query.QueryPanel
-	 * 
-	 * @param String-or-array $advancedQueryData 
-	 * @param \GO\Base\Db\FindParams $storeParams
-	 */
-	private function _handleAdvancedQuery($advancedQueryData, &$storeParams){
-		$advancedQueryData = is_string($advancedQueryData) ? json_decode($advancedQueryData, true) : $advancedQueryData;
-		$findCriteria = $storeParams->getCriteria();
-		
-		$criteriaGroup = \GO\Base\Db\FindCriteria::newInstance();
-		$criteriaGroupAnd=true;
-		for($i=0,$count=count($advancedQueryData);$i<$count;$i++){
-			
-			$advQueryRecord=$advancedQueryData[$i];
-			
-			//change * into % wildcard
-			$advQueryRecord['value']=isset($advQueryRecord['value']) ? str_replace('*','%', $advQueryRecord['value']) : '';
-			
-			if($i==0 || $advQueryRecord['start_group']){
-				$findCriteria->mergeWith($criteriaGroup,$criteriaGroupAnd);
-				$criteriaGroupAnd=$advQueryRecord['andor']=='AND';
-				$criteriaGroup = \GO\Base\Db\FindCriteria::newInstance();
-			}
-			
-			if(!empty($advQueryRecord['field'])){	
-				// Give the record a unique id, to enable the programmers to
-				// discriminate between advanced search query records of the same field
-				// type.
-				$advQueryRecord['id'] = $i;
-				// Check if current adv. search record should be handled in the standard
-				// manner.
-				if($this->beforeHandleAdvancedQuery($advQueryRecord, $criteriaGroup ,$storeParams)){
-					
-					$fieldParts = explode('.',$advQueryRecord['field']);
-				
-					if(count($fieldParts)==2){
-						$field = $fieldParts[1];
-						$tableAlias=$fieldParts[0];
-					}else
-					{
-						$field = $fieldParts[0];
-						$tableAlias=false;
-					}
 
-					if($tableAlias=='t')
-						$advQueryRecord['value']=\GO::getModel($this->model)->formatInput($field, $advQueryRecord['value']);						
-					elseif($tableAlias=='cf'){
-						$advQueryRecord['value']=\GO::getModel(\GO::getModel($this->model)->customfieldsModel())->formatInput ($field, $advQueryRecord['value']);
-					}
-					
-					$cfRec = \GO::getModel($this->model)->getCustomfieldsRecord();
-					if($cfRec){
-						$cfColRecord = $cfRec->getColumn($field);
-					}
-					if (!empty($cfColRecord['customfield']->attributes['multiselect']))
-						$advQueryRecord['value']='%'.$advQueryRecord['value'].'%';
-					
-					$criteriaGroup->addCondition($field, $advQueryRecord['value'], $advQueryRecord['comparator'],$tableAlias,$advQueryRecord['andor']=='AND');
-				}
-			}
-		}
-			
-		$findCriteria->mergeWith($criteriaGroup,$criteriaGroupAnd);
-	}
 	
-	/**
-	 * If this function is not overridden in your controller, advanced search will
-	 * be only possible for model fields that correspond directly to fields in the
-	 * model's database table.
-	 * You can catch advanced search query records that have to be handled
-	 * differently by overriding this function. For example, if the purpose is to
-	 * search through fields of models related to the current model, such as
-	 * 'company name' for 'contacts', you can handle it here and return false. The
-	 * resulting overridden function should be a switch.
-	 * In your controller, this should be used in conjunction with
-	 * afterAttributes(). See for an example: the advanced search use case in
-	 * Group-Office, \GO\Addressbook\Controller\Contact::afterAttributes and
-	 * \GO\Addressbook\Controller\Contact::beforeIntegrateRegularSql().
-	 * @param Array $advQueryRecord
-	 * @param \GO\Base\Db\FindCriteria $findCriteria
-	 * @param \GO\Base\Db\FindParams $storeParams
-	 * @return boolean Return true if the current $advQueryRecord must be handled
-	 * in the regular way, return false after it has been handled differently.
-	 */
-	protected function beforeHandleAdvancedQuery($advQueryRecord, \GO\Base\Db\FindCriteria &$findCriteria, \GO\Base\Db\FindParams &$storeParams){
-		return true;
-	}
-	
-	/**
-	 * Checks if query data $advancedQueryData contains a field with name $fieldName,
-	 * and returns the record with that name, if any.
-	 * @param String $fieldName
-	 * @param Array $advancedQueryData
-	 * @return Array The advanced query record, or false if not found. 
-	 */
-//	protected function getAdvancedQueryRecord($fieldName, $advancedQueryData) {
-//		$advancedQueryData = json_decode($advancedQueryData, true);
-//		foreach ($advancedQueryData as $record) {
-//			if ($record['field']==$fieldName)
-//				return $record;
-//		}
-//		return false;
-//	}
-	
-		/**
-	 * Removes record with name $fieldName from $advancedQueryData contains.
-	 * @param String $fieldName
-	 * @param Array $advancedQueryData
-	 */
-//	protected function removeAdvancedQueryRecord($fieldName, &$advancedQueryData) {
-//		$advancedQueryData = json_decode($advancedQueryData, true);
-//		foreach ($advancedQueryData as $k=>$record) {
-//			if ($record['field']==$fieldName)
-//				unset($advancedQueryData[$k]);
-//		}
-//		$advancedQueryData = json_encode($advancedQueryData);
-//	}
-	
+
 	
 	/**
 	 * Checks for dates in the import model and performs an strtotime on it.
@@ -1215,11 +1106,12 @@ class AbstractModelController extends AbstractController {
 		}
 		
 		$mergeModels = json_decode($params['merge_models'], true);
-		
-		$targetModel = \GO::getModel($params['model_name'])->findByPk($params['target_model_id']);
-		
+
+		$model = $this->getRequestedModel($params['model_name']);
+		$targetModel = $model->findByPk($params['target_model_id']);
+
 		foreach($mergeModels as $id){
-			$mergeModel = \GO::getModel($params['model_name'])->findByPk($id);
+			$mergeModel = $model->findByPk($id);
 			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), !empty($params['delete_merge_models']));			
 		}
 		

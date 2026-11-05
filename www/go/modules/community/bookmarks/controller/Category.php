@@ -11,7 +11,8 @@ use go\modules\community\bookmarks\model;
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
- */ 
+ * @extends EntityController<\go\modules\community\bookmarks\model\Category>
+ */
 class Category extends EntityController {
 	
 	/**
@@ -63,12 +64,6 @@ class Category extends EntityController {
 	 */
 	public function changes($params) {
 		return $this->defaultChanges($params);
-	}
-
-	protected function canCreate(Entity $entity): bool
-	{
-		$r = $this->rights;
-		return $this->rights->mayManage;
 	}
 
 }

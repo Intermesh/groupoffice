@@ -1,6 +1,6 @@
 <?php
 return array (
-  'All users' => 'Tutti gli utilizzatori',
+  'All users' => 'Tutti gli utenti',
   'Create' => 'Crea',
   'Update' => 'Aggiorna',
   'Bad login' => 'Login Errato',
@@ -12,4 +12,8 @@ return array (
   'Entity' => 'Entità',
   'Item was never modified' => 'Mai modificato',
   'Delete entries after' => 'Elimina gli inserimenti dopo',
+  'Entity ID' => 'ID Entità',
+  'Request ID' => 'ID Richiesta',
+  'Datum' => 'Datum',
+  'Unknown user' => 'Utente sconosciuto',
 );

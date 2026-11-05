@@ -16,7 +16,15 @@ namespace GO\Summary\Controller;
 class AnnouncementController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected $model = 'GO\Summary\Model\Announcement';
-	
+
+
+	protected function actionStore($params)
+	{
+		\GO::session()->closeWriting();
+
+		return parent::actionStore($params);
+	}
+
 	protected function getStoreParams($params) {
 		if (!empty($params['active']))
 			return \GO\Base\Db\FindParams::newInstance()
@@ -43,7 +51,9 @@ class AnnouncementController extends \GO\Base\Controller\AbstractModelController
 	}
 	
 	protected function actionCheckLatestRead($params) {
-		
+
+		\GO::session()->closeWriting();
+
 		$response = array(
 			'has_unread' => \GO\Summary\Model\LatestReadAnnouncementRecord::userHasUnreadAnnouncement(\GO::user()->id),
 			'success' => true

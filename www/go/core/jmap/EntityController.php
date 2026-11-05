@@ -9,6 +9,7 @@ use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
+use go\core\http\PostResponseProcessor;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
@@ -31,6 +32,9 @@ use PDO;
 use PDOException;
 use ReflectionException;
 
+/**
+ * @template T of Entity
+ */
 abstract class EntityController extends Controller {
 
 	use EventEmitterTrait;
@@ -65,7 +69,7 @@ abstract class EntityController extends Controller {
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
-	 * @return class-string<Entity>
+	 * @return class-string<T>
 	 */
 	abstract protected function entityClass(): string;
 
@@ -382,7 +386,7 @@ abstract class EntityController extends Controller {
    *
    * @param string $id
    * @param array $properties
-   * @return boolean|Entity
+   * @return T|false
    * @throws Exception
    */
 	protected function getEntity(string $id, array $properties = []) {
@@ -508,9 +512,12 @@ abstract class EntityController extends Controller {
 					$arr['id'] = $e->id();
 					$unsorted[$arr['id']] = $arr;
 					$foundIds[] = $arr['id'];
-				} catch(\Throwable $e) {
-					ErrorHandler::logException($e);
+				} catch(\Throwable $ex) {
+					ErrorHandler::logException($ex);
 				}
+			} else {
+				go()->debug("not found: ");
+				go()->debug($e);
 			}
 		}
 
@@ -652,7 +659,7 @@ abstract class EntityController extends Controller {
 		$p = $this->paramsSet($params);
 
 		// make sure there are no concurrent set request to avoid clients missing states
-		$lock = new Lock("jmap-set-lock");
+		$lock = new Lock("jmap-set-" . $this->entityClass());
 		if (!$lock->lock()) {
 			throw new Exception("Could not obtain lock");
 		}
@@ -748,7 +755,10 @@ abstract class EntityController extends Controller {
 	}
 
   /**
-   * Override this if you want to implement permissions for creating entities
+   * Checks if a model may be created.
+	 *
+	 * You probably don't want to override this. Override {@see \go\core\orm\Entity::canCreate()} instead.
+	 *
    * New properties have already been set so you can validate per property too if needed.
    *
    * @param Entity $entity
@@ -1157,7 +1167,11 @@ abstract class EntityController extends Controller {
 	protected function defaultExport(array $params): ArrayObject
 	{
 		if(!go()->getEnvironment()->isCli()) {
-			go()->getEnvironment()->setMaxExecutionTime(10 * 60);
+			go()->getEnvironment()->setMaxExecutionTime(0);
+		}
+
+		if(empty($params['ids'])) {
+			throw new Exception(go()->t("There's nothing to export"));
 		}
 		
 		$params = $this->paramsExport($params);
@@ -1165,12 +1179,20 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 		
 		$convertor = $cls::findConverter($params['extension']);
-				
-		$entities = $this->getGetQuery($params);
 
-		$blob = $convertor->exportToBlob($entities, $params->getArray());
+		$response = new ArrayObject(['success' => true]);
+
+		if(!empty($params['background'])) {
+			PostResponseProcessor::get()->addTask(function () use ($convertor, $params) {
+				$convertor->exportToBlob($params['ids'], $params->getArray());
+			});
+		} else {
+			$blob = $convertor->exportToBlob($params['ids'], $params->getArray(), false);
+
+			$response['blob'] = $blob->toArray();
+		}
 		
-		return new ArrayObject(['blobId' => $blob->id, 'blob' => $blob->toArray()]);
+		return $response;
 	}
 
   /**

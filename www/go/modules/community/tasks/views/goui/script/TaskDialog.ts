@@ -9,24 +9,17 @@ import {
 import {
 	ArrayField,
 	arrayfield,
-	btn,
+	btn, Button,
 	collapsebtn,
 	colorfield,
 	combobox,
-	comp,
-	ContainerField,
-	containerfield,
-	DateField,
-	datefield,
-	DateInterval,
-	DateTime,
+	comp, ContainerField, containerfield, DateField,
 	datetimefield,
-	durationfield,
+	datefield, DateInterval, DateTime, durationfield,
 	fieldset,
-	h4,
-	htmlfield,
-	rangefield,
-	router,
+	h3,
+	hr,
+	htmlfield, rangefield, router,
 	t,
 	tbar,
 	textarea,
@@ -58,7 +51,7 @@ export class TaskDialog extends FormWindow {
 		this.resizable = true;
 
 		this.form.on("save", ({data}) => {
-			router.goto("tasks/" + data.id);
+			router.goto("tasks/" + data.id)
 		});
 
 		this.generalTab.items.add(
@@ -124,11 +117,12 @@ export class TaskDialog extends FormWindow {
 				)
 			),
 			fieldset({
-					flex: 1,
-					cls: "flow border-top"
+					flex: 1
 				},
-				tbar({},
-					h4({
+				tbar({
+						cls: "border-top"
+					},
+					h3({
 						text: t("Message")
 					})
 				),
@@ -140,6 +134,7 @@ export class TaskDialog extends FormWindow {
 					flex: 1,
 					cls: "flow border-top"
 				},
+				hr(),
 				this.categoryChips = taskcategorychips({
 					label: t("Categories"),
 					name: "categories"
@@ -153,17 +148,18 @@ export class TaskDialog extends FormWindow {
 				})
 			),
 			fieldset({
-					flex: 1,
-					cls: "flow border-top"
+					flex: 1
 				},
-				tbar({},
-					h4({
+				tbar({
+						cls: "border-top"
+					},
+					h3({
 						text: t("Date")
 					}),
 					"->",
 					collapsebtn({
 						stateId: "task-dialog-date",
-						collapseEl: btn => btn.parent!.nextSibling()!
+						target: b => b.parent!.nextSibling()!
 					})
 				),
 				comp({
@@ -234,17 +230,18 @@ export class TaskDialog extends FormWindow {
 				)
 			),
 			fieldset({
-					flex: 1,
-					cls: "flow border-top"
+					flex: 1
 				},
-				tbar({},
-					h4({
+				tbar({
+						cls: "border-top"
+					},
+					h3({
 						text: t("Description") + " / " + t("Location")
 					}),
 					"->",
 					collapsebtn({
 						stateId: "task-dialog-desc",
-						collapseEl: btn => btn.parent!.nextSibling()!
+						target: b => b.parent!.nextSibling()!
 					})
 				),
 				comp({
@@ -265,17 +262,18 @@ export class TaskDialog extends FormWindow {
 				)
 			),
 			fieldset({
-					flex: 1,
-					cls: "flow border-top"
+					flex: 1
 				},
-				tbar({},
-					h4({
+				tbar({
+						cls: "border-top"
+					},
+					h3({
 						text: t("Alerts")
 					}),
 					"->",
 					collapsebtn({
 						stateId: "task-dialog-alerts",
-						collapseEl: btn => btn.parent!.nextSibling()!
+						target: b => b.parent!.nextSibling()!
 					}),
 				),
 				comp({

@@ -1,12 +1,7 @@
-import {br, btn, comp, Component, h1, h3, hr, menu, t} from "@intermesh/goui";
-import {
-	addbutton,
-	DetailPanel,
-	Image,
-	jmapds,
-	linkbrowserbutton,
-} from "@intermesh/groupoffice-core";
+import {btn, comp, Component, hr, menu, t} from "@intermesh/goui";
+import {addbutton, DetailPanel, Image, linkbrowsebutton,} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog";
+import {commentDS} from "./Index.js";
 
 export class CommentDetail extends DetailPanel {
 	private content: Component;
@@ -33,7 +28,7 @@ export class CommentDetail extends DetailPanel {
 				}
 			}),
 			addbutton(),
-			linkbrowserbutton(),
+			linkbrowsebutton(),
 			btn({
 				icon: "more_vert",
 				menu: menu({},
@@ -49,15 +44,14 @@ export class CommentDetail extends DetailPanel {
 						icon: "delete",
 						text: "Delete",
 						handler: () => {
-							jmapds("Comment").confirmDestroy([this.entity!.id]);
+							void commentDS.confirmDestroy([this.entity!.id]);
 						}
 					})
 				)
 			})
 		)
 
-		this.on("load", ( {entity}) => {
-
+		this.on("load", ({entity}) => {
 			this.content.items.replace(Image.replace(entity.text));
 		});
 	}

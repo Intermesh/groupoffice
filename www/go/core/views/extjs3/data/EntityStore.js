@@ -37,21 +37,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	},
 
 	/**
-	 * Saves the JMAP state for this entity
-	 *
-	 * @param state
-	 * @returns {*|Promise<String>}
-	 */
-	setState : function(state) {
-		return window.groupofficeCore.jmapds(this.entity.name).getState();
-	},
-
-	/**
 	 * Get the saved JMAP entity state
 	 * @returns {Promise<String>}
 	 */
 	getState: function() {
 		return window.groupofficeCore.jmapds(this.entity.name).getState();
+	},
+
+	reset: function() {
+		return window.groupofficeCore.jmapds(this.entity.name).reset();
 	},
 
 	/**

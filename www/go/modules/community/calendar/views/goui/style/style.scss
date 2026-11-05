@@ -1,14 +1,23 @@
-@use '../../../../../../../views/goui/goui/style/_util.scss' as *;
-@use '../../../../../../../views/goui/goui/style/_config.scss' as *;
+@use '@intermesh/groupoffice-core/style/base' as *;
 
 %font-caption {
 	//text-transform: uppercase;
 	font-weight: 600;
-	font-size: 1.2em;
+	font-size: 1.1em;
 	color: $colorTextSecondary;
 }
 
 %event {
+	.multiline & {
+		height: dp(36);
+		> em { overflow: visible;
+			line-height: 1em;
+			max-height: dp(32);
+			font-weight: 500;
+			letter-spacing: -0.05em;
+			white-space: normal;
+		}
+	}
 	position: absolute;
 	cursor: pointer;
 	word-wrap: break-word;
@@ -16,15 +25,16 @@
 	box-sizing: border-box;
 	border-radius: dp(4);
 	height:dp(24);
-	padding: dp(2) dp(6);
+	padding: dp(2) 1px dp(2) dp(6);
 	text-align: left;
 	user-select: none;
 	> em, > span {
+		pointer-events: none;
 		color: $colorText;
 	}
 	> em {
-		mask-image: linear-gradient(to right, white 80%, transparent);
-		//text-overflow:ellipsis; // this is ugly
+		//mask-image: linear-gradient(to right, white 80%, transparent);
+		text-overflow:ellipsis; // this is ugly
 		overflow:hidden;
 		flex: 1 1 auto;
 	}
@@ -32,11 +42,11 @@
 		text-align:right;
 		white-space: nowrap;
 		font-weight: 400;
+		order: 2;
 		font-size: .85em;
 		color:$colorTextSecondary;
-	}
-	&::first-letter {
-		text-transform: capitalize;
+		padding-left: .4rem;
+		padding-right: .4rem;
 	}
 	&.new {
 		background-color: white !important;
@@ -66,6 +76,7 @@
 
 	&.undecided {
 		border: 1px dashed $colorText;
+		margin-left: -1px; //for border alignment
 		color: $colorText;
 		//background-color:transparent;
 		opacity: .6;
@@ -86,6 +97,16 @@
 		min-width: dp(16);
 		margin-right:dp(4);
 	}
+}
+.cal.plan li[data-date] > div {
+	@extend %event;
+	position: initial;
+	font-size: 1.1em;
+	height: auto !important;
+	overflow:visible;
+	margin-bottom: 2px;
+	background-color: color-mix(in srgb, currentColor 56%, transparent);
+	> span {float:right;}
 }
 
 .yearview {
@@ -180,6 +201,25 @@
 }
 
 .cal {
+	.stripes {
+		display: inline-flex;
+		flex: none;
+		align-self: center;
+		height: dp(16);
+		margin: dp(5);
+		border-radius: 999px;
+		overflow: hidden;
+		> i {
+			flex: none;
+			display: block;
+			width: dp(4) !important;
+			min-width: dp(4) !important;
+			height: 100% !important;
+			min-height: 0 !important;
+			margin: 0 !important;
+			background-color: currentColor;
+		}
+	}
 	i.cat {
 		background-color: currentColor;
 		border-radius: dp(3);
@@ -189,16 +229,16 @@
 	i.icon {
 		display:inline-block !important;
 	}
-	li {
+	ul > li, &.month li {
 
 		&.today {
 			em {
 				font-weight: 600;
-				border-radius: 999px;
+				border-radius: 50%;
 				display:inline-block;
-				margin-left:dp(8);
+				text-align: center;
 				min-width: dp(36);
-				line-height: dp(18);
+				//line-height: dp(18);
 				color: white !important;
 				background-color:$colorPrimary !important;
 			}
@@ -214,7 +254,6 @@
 		}
 		&.other {
 			color: $colorTextPlaceholder;
-
 		}
 
 		// another month
@@ -261,6 +300,13 @@
 			transform: translateY(-54%);
 			clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%);
 		}
+	}
+
+	&.period-title {
+		text-transform: capitalize;
+		flex: 1 1 50%;
+		min-width: 100px;
+		font-size: 1.8em;
 	}
 }
 
@@ -348,12 +394,16 @@
 			> div.more {
 				bottom:0;
 				position:absolute;
-				padding-left:dp(26);
+				padding: 0.6rem 2rem 0;
 				width: 14.2%;
 				background-color: $surfaceLowest;
-				color: $colorText;
 				display:none;
 				mask-image: linear-gradient(to top, white 80%, transparent);
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				color: $colorTextSecondary;
+				font-size: sp(12);
 
 			}
 			&:first-child,
@@ -376,10 +426,13 @@
 					&:not(.allday) {
 						padding-left: 0;
 						padding-right: 0;
+						&.merged::before {
+							display: none;
+						}
 						&::before {
 							content: '';
 							border-radius: 999px;
-							width:dp(6);
+							min-width:dp(4);
 							height:dp(16);
 							margin: dp(5); // same width as white-space in allday events
 							background-color: currentColor;
@@ -397,6 +450,7 @@
 		}
 	}
 }
+.cal.split ol > li > div.more { width: 100%; }
 
 $timeMargin: dp(72);
 
@@ -414,11 +468,17 @@ $timeMargin: dp(72);
 		> em { // date number
 			font-style: normal;
 			display: inline-block;
-			margin-left: dp(8);
-			padding: dp(8);
-			font-size: 1.1em;
+			margin: dp(6);
+			padding: dp(6);
+			font-size: 1em;
 			color: $colorText;
 			//border: 1px solid currentColor;
+		}
+		&.weeknb {
+			font-size: 0.9em;
+			position:absolute;
+			padding: dp(8) dp(16) ;
+			color: $colorPrimary;
 		}
 	}
 }
@@ -439,6 +499,7 @@ $timeMargin: dp(72);
 		position:absolute;
 		left: $timeMargin;
 		right:0;
+		pointer-events: none;
 		> div {
 			display: flex;
 			align-items: center;
@@ -597,12 +658,15 @@ $timeMargin: dp(72);
 		}
 	}
 }
-
+.cal.list-container {
+	border-top: $borderWidth solid $colorBorder;
+}
 .cal.list {
 	height:100%;
-	background-color: $surfaceLow;
+	background-color: $surfaceLowest;
 	overflow-y:scroll;
 	list-style: none;
+
 	li {
 		width:100%;
 		overflow: hidden;
@@ -649,6 +713,9 @@ $timeMargin: dp(72);
 			span:first-of-type { // time
 				margin-left:dp(8);
 				width: dp(198);
+			}
+			span:last-of-type {
+				flex: 1;
 			}
 		}
 	}
@@ -752,35 +819,31 @@ $timeMargin: dp(72);
 	label {
 		pointer-events: none;
 		input, .goui-toolbar {pointer-events: all;}
-		input[style]:checked:before {
-			color:white !important;
-		}
-
 	}
 	li {
 		padding-left: 11px;
 		&.selected {
 			background-color: $colorSelectedRowInactive;
 		}
-		menu{width:0;}
+		menu{width:0;overflow:hidden;}
 		&:hover menu, &:focus-within menu{width:auto;}
 	}
 	.goui-form-field .wrap menu.goui-toolbar {
 		border-left:0;
 	}
 }
-.goui.goui-toolbar.dense {
-	padding: 7px 3.5px 7px 11px !important;
-	> h3 {
-		flex: 1 !important;
-		color: $colorTextSecondary;
-		font-size:.9em;
-		~ button {
-			padding: 5.25px;
-			margin-right: 0;
-		}
-	}
-}
+//.goui.goui-toolbar.dense {
+//	padding: 7px 3.5px 7px 11px !important;
+//	> h3 {
+//		flex: 1 !important;
+//		color: $colorTextSecondary;
+//		font-size:.9em;
+//		~ button {
+//			padding: 5.25px;
+//			margin-right: 0;
+//		}
+//	}
+//}
 
 //.participant-field {
 //	.goui-pit {
@@ -793,11 +856,11 @@ $timeMargin: dp(72);
 //	}
 //}
 
-@media only screen and ((max-device-width: $breakpointMedium) or (max-device-height: $breakpointMedium)) {
+@media only screen and ((max-device-width: $breakpointMedium)) {
 	//.cal.week > ul:first-child em {
 	//	display:inline-block !important;
 	//}
-	.cal.lijst {
+	.cal.list-container {
 		.detail { display:none;}
 	}
 	.goui.cal {
@@ -825,5 +888,38 @@ $timeMargin: dp(72);
 #go-module-panel-calendar {
 	.datepicker {
 		margin: 0 auto;
+	}
+}
+
+.tooltip {
+
+	.categories {
+
+		margin-top: dp(8);
+
+		>* {
+			&:after {
+				content: ", ";
+			}
+
+			&:last-child {
+				&:after {
+					content: "";
+				}
+			}
+		}
+	}
+	i.cat {
+		display:inline-block;
+		font-size: inherit !important;
+		color: inherit;
+		min-height: dp(16);
+		height: dp(16);
+		width: dp(16);
+		min-width: dp(16);
+		background-color: currentColor;
+		border-radius: dp(3);
+		margin:dp(2);
+		vertical-align: middle;
 	}
 }

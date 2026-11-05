@@ -5,17 +5,21 @@ namespace go\core;
 use DateInterval;
 use DateTimeZone;
 use Exception;
-use go\core\data\Model;
+use GO\Base\Db\ActiveRecord;
+use go\core\db\Query;
+use go\core\model\Acl;
 use go\core\fs\Blob;
 use go\core\model\User;
-use go\core\orm\EntityType;
-use go\core\db\Query;
 use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\util\DateTime;
+use go\core\util\Markdown;
 use GO\Files\Model\Folder;
+use go\modules\community\comments\model\Comment;
 use Throwable;
 use Traversable;
 use function GO;
+
 
 /**
  * Template parser
@@ -127,7 +131,6 @@ use function GO;
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
  * ```
-
  * [assign contact = 1 | entity:Contact]
  * ```
  *
@@ -169,19 +172,34 @@ use function GO;
  * </tr>
  * ````
  *
+ *
+ * Find entities
+ * -------------
+ *
+ * @example find all users
+ * ```
+ * {{|find:User}}
+ * ```
+ *
+ * @example find all users but only username, and displayName
+ * ```
+ * {{|find:User:username,displayName}}
+ * ```
+ *
+ * Only entities the current user may read are returned.
  */
 class TemplateParser {	
 
-	private $models = [];
+	private array $models = [];
 
 	/**
 	 * Values in IF expressions will returned as "false" or "true"
 	 *
 	 * @var bool
 	 */
-	private $varsForIfStatement = false;
+	private bool $varsForIfStatement = false;
 
-	private $enableBlocks = true;
+	private bool $enableBlocks = true;
 
 
 	/**
@@ -194,7 +212,7 @@ class TemplateParser {
 	 * ``
 	 * @var string[]
 	 */
-	public $config = [
+	public array $config = [
 		'decimals' => 2,
 		'decimalSeparator' => '.',
 		'thousandsSeparator' => ',',
@@ -210,14 +228,21 @@ class TemplateParser {
 		$this->addFilter('sort', [$this, "filterSort"]);
 		$this->addFilter('rsort', [$this, "filterRsort"]);
 		$this->addFilter('count', [$this, "filterCount"]);
+		$this->addFilter('sum', [$this, "filterSum"]);
+		$this->addFilter('min', [$this, "filterMin"]);
+		$this->addFilter('max', [$this, "filterMax"]);
+		$this->addFilter('avg', [$this, "filterAvg"]);
 		$this->addFilter('multiply', [$this, "filterMultiply"]);
 		$this->addFilter('add', [$this, "filterAdd"]);
+		$this->addFilter('math', [$this, "filterMath"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
 		$this->addFilter('column', [$this, "filterColumn"]);
 		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
+		$this->addFilter('findEntity', [$this, "filterFindEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
+		$this->addFilter('find', [$this, "filterFind"]);
 
 
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
@@ -232,6 +257,7 @@ class TemplateParser {
 		$this->addFilter('blobUrl', [$this, "filterBlobUrl"]);
 		$this->addFilter('blobPath', [$this, "filterBlobPath"]);
 		$this->addFilter('newRow', [$this,'filterNewRow']);
+		$this->addFilter('comments', [$this, "filterComments"]);
 
 		$this->addModel('now', new DateTime());
 
@@ -239,6 +265,11 @@ class TemplateParser {
 			"title" => go()->getSettings()->title,
 			"url" => go()->getSettings()->URL
 		]);
+
+		if(go()->getAuthState()->isAuthenticated()) {
+			$this->addModel('user', $this->_currentUser());
+		}
+
 		$this->config = [
 			'decimals' => 2,
 			'decimalSeparator' => go()->getSettings()->defaultDecimalSeparator,
@@ -254,7 +285,7 @@ class TemplateParser {
 	protected function _currentUser(): ?User
 	{
 		if(!isset($this->_currentUser)) {
-			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
+			$this->_currentUser = go()->getAuthState()->getUser();
 		}
 		return $this->_currentUser;
 	}
@@ -371,7 +402,58 @@ class TemplateParser {
 		if($cls === "GO\Projects2\Model\Project") {
 			$cls .= "Entity";
 		}
-		return $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
+		$entity = $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
+		if(!$entity || !$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+			return null;
+		}
+		return $entity;
+	}
+
+	/**
+	 * Find related entities for current ID with seleceted key
+	 *
+	 * @param $id
+	 * @param string $entityName
+	 * @param string|null $key
+	 * @param array|null $properties
+	 * @return array|false|GO\Base\Db\ActiveStatement|null
+	 * @throws Exception
+	 * @example: [assign entries = entity.id|findEntity:TimeEntry:project_id]{{entries | column:units | sum}}
+	 */
+	private function filterFindEntity($id, string $entityName, ?string $key = 'id', ?array $properties = null): mixed
+	{
+		if (empty($id)) {
+			return null;
+		}
+		$et = EntityType::findByName($entityName);
+		if (!$et) {
+			return null;
+		}
+		$cls = $et->getClassName();
+		if ($cls === "GO\Projects2\Model\Project") {
+			$cls .= "Entity";
+		}
+		if (is_a($cls, ActiveRecord::class, true)) {
+			return $cls::model()->findByAttribute($key, $id);
+		} else {
+			$query = $cls::find($properties ?? [], true)->where([$key => $id]);
+			return $cls::applyAclToQuery($query, Acl::LEVEL_READ)->all();
+		}
+	}
+
+
+
+	private function filterFind(string $entityName, $properties = "") {
+		$et = EntityType::findByName($entityName);
+		if(!$et) {
+			return null;
+		}
+
+		$cls = $et->getClassName();
+
+		$props = empty($properties) ? [] : explode(",", $properties);
+
+		return $cls::applyAclToQuery($cls::find($props, true), Acl::LEVEL_READ);
 	}
 
 	/**
@@ -393,10 +475,7 @@ class TemplateParser {
 
 	private function filterMarkDown(?string $text): string
 	{
-		$pd = new \Parsedown();
-		$pd->setSafeMode(true);
-		$pd->setBreaksEnabled(true);
-		return $pd->text($text);
+		return Markdown::toHtml($text);
 	}
 
 
@@ -507,6 +586,76 @@ class TemplateParser {
 		return implode($glue, $array);
 	}
 
+	private function filterSum($array) : float|int
+	{
+		if (!isset($array)) {
+			return 0;
+		}
+		return array_sum($array);
+	}
+
+
+	private function filterMath($expression) {
+		try{
+
+			$expression = html_entity_decode($expression);
+
+			$evaluator = new TemplateExpressionEvaluator();
+			return $evaluator->evaluate($expression);
+
+		} catch(Throwable $e) {
+			return "Failed to evaluate expression: " .$e->getMessage();
+		}
+	}
+
+	private function filterAvg($array) : float|int|null
+	{
+		if (!isset($array)) {
+			return null;
+		}
+		foreach($array as $item) {
+			if(!is_numeric($item)) {
+				return null;
+			}
+		}
+		return array_sum($array) / count($array);
+	}
+
+	private function filterMin($array): float|int|null
+	{
+		if (!isset($array)) {
+			return null;
+		}
+		$v = null;
+		foreach ($array as $val) {
+			if (!is_numeric($val)) {
+				return null;
+			}
+			if (is_null($v)) {
+				$v = $val;
+			}
+			$v = min($v, $val);
+		}
+		return $v;
+	}
+
+	private function filterMax($array): float|int|null
+	{
+		if (!isset($array)) {
+			return null;
+		}
+		$v = null;
+		foreach ($array as $val) {
+			if (!is_numeric($val)) {
+				return null;
+			}
+			if (is_null($v)) {
+				$v = $val;
+			}
+			$v = max($v, $val);
+		}
+		return $v;
+	}
 
 
 	private function filterCount($countable): int
@@ -576,7 +725,12 @@ class TemplateParser {
 	{
 		return $idx % $numCols === 0 ? "1" : "0";
 	}
-	
+
+	private function filterComments($entity): array
+	{
+		return Comment::findForEntity($entity)->all();
+	}
+
 	/**
 	 * Add a filter function
 	 * 
@@ -594,8 +748,8 @@ class TemplateParser {
 	{
 			
 		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[\/(each|if)\]\n?/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[else\]\n?/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\\[config\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]\n?/', $str, $configMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 
@@ -607,7 +761,7 @@ class TemplateParser {
 		$tags = [];		
 		
 		for($i = 0; $i < $count; $i++) {
-			$offset = $openMatches[$i][0][1];
+			$offset = (int) $openMatches[$i][0][1];
 			$expression = $this->findExpression($offset + strlen($openMatches[$i][0][0]), $str);
 
 			$tags[$offset] = [
@@ -616,6 +770,12 @@ class TemplateParser {
 				'offset' => $offset, 
 				'expression' => $expression, 
 				'tagLength' => strlen($openMatches[$i][0][0]) + strlen($expression) + 1];
+
+			// strip new line if it is after the ']' in  [if ...]\n
+			$checkForNewLine = $offset + $tags[$offset]['tagLength'];
+			if(isset($str[$checkForNewLine]) && $str[$checkForNewLine] == "\n") {
+				$tags[$offset]['tagLength']++;
+			}
 		}
 		
 		
@@ -850,6 +1010,9 @@ class TemplateParser {
 		return $tag;
 	}
 
+
+
+
 	/**
 	 * @throws Exception
 	 */
@@ -858,22 +1021,25 @@ class TemplateParser {
 		//assign won't output
 		$tag['replacement'] = "";
 
-		if(is_numeric($tag['expression'])) {
-			//allow assigning a new numeric value for math operations
-			$value = $tag['expression'];
-		} else 	if(preg_match('/{{.*?}}/',$tag['expression'])) {
-			$sum = $this->parse($tag['expression']);
 
-			try{
-				$sum = $this->validateExpression($sum);
-				$value = eval($sum);
-			} catch(Throwable $e) {
-				$value = $e->getMessage();
-			}
-
-		} else {
+		// check if this is a direct variable assignment from another model. eg. [assign foo = contact.addresses | first]
+		if($this->isVarExpression($tag['expression'])) {
 			$value = $this->getVarFiltered($tag['expression']);
+		} else {
+
+			// Otherwise parse template and evaluate possible math expressions
+			$sum = $this->parse($tag['expression']);
+			$sum = html_entity_decode(trim($sum));
+
+			try {
+				$evaluator = new TemplateExpressionEvaluator();
+				$value = $evaluator->evaluate($sum);
+
+			} catch (Throwable $e) {
+				$value = "Failed to evaluate expression: " . $e->getMessage();
+			}
 		}
+
 
 		$path = explode(".", $tag['varName']);
 		$this->applyAssignToModels($tag, $path, $value,$this->models);
@@ -969,17 +1135,18 @@ class TemplateParser {
 		
 		$this->varsForIfStatement = true;
 		$this->enableBlocks = false;
-		$parsed = $this->parse($tag['expression']);		
+		$parsed = $this->parse($tag['expression']);
+		$parsed = html_entity_decode(trim($parsed));
 		$this->varsForIfStatement = false;
 		$this->enableBlocks = true;
-		
-		$expression = $this->validateExpression($parsed);	
+
 		try {
-			$ret = eval($expression);
+			$evaluator = new TemplateExpressionEvaluator();
+			$ret = (bool) $evaluator->evaluate($parsed);
 		} catch(Throwable $e) {
-			go()->warn('eval() failed '. $e->getMessage());
+			go()->warn('Evaluating expression failed '. $e->getMessage());
 			go()->warn($tag['expression']);
-			go()->warn($expression);
+			go()->warn($parsed);
 			$ret = false;
 		}
 		if($ret){
@@ -990,60 +1157,6 @@ class TemplateParser {
 		}
 		
 		return $tag;
-
-		
-//		return substr($str, 0, $block['offset']) . $replacement . substr($str, $block['close']['offset'] + $block['close']['tagLength']);
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	private function validateExpression($expression): string
-	{
-		$expression = html_entity_decode(trim($expression));
-
-		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
-		foreach(self::$tokens as $token) {
-			if($token == '-' || $token == '!') {
-				//skip for negative numbers
-				continue;
-			}
-			$expression = str_replace($token, ' '.$token.' ', $expression);
-		}
-		$expression = str_replace(';', ' ; ', $expression);
-		
-		//$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		$parts = empty($expression) ? [] : str_getcsv($expression,' ','"', "");
-		$parts = array_map('trim', $parts);
-		
-		$str = '';
-		
-		foreach($parts as $part) {
-			
-			if($part == ';') {
-				throw new Exception('; not allowed in expression: ' . $expression);
-			}
-
-			if($part == "") {
-				continue;
-			}
-
-
-			if(
-							(is_numeric($part) && substr($part, 0, 1) != "0") ||
-							$part == 'true' ||
-							$part == 'false' ||
-							$part == 'null' ||
-							in_array($part, self::$tokens)
-							//$this->isString($part)
-				) {
-				$str .= $part.' ';
-			}else
-			{
-				$str .= '"'. addslashes($part) . '" ';
-			}			
-		}		
-		return empty($str) ? 'return false;' : 'return ('.$str.');';
 	}
 
 	/**
@@ -1065,11 +1178,24 @@ class TemplateParser {
 
 			$value = is_scalar($value) ||
 			!isset($value) ||
-			(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', (string) $value) . '"' : !empty($value);
+			(is_object($value) && method_exists($value, '__toString')) ? '"' . addslashes((string) $value) . '"' : !empty($value);
 
 		}
 
 		return $value;
+	}
+
+
+	private function isVarExpression($expression) : bool
+	{
+		if(is_numeric($expression)) {
+			return false;
+		}
+		$filters = explode('|', $expression);
+
+		$varPath = trim(array_shift($filters)); //eg "contact.name";
+
+		return preg_match('/^[a-z0-9A-Z_.]+$/', $varPath);
 	}
 
 	/**
@@ -1079,18 +1205,39 @@ class TemplateParser {
 		$filters = explode('|', $expression);
 		
 		$varPath = trim(array_shift($filters)); //eg "contact.name";		
-		
-		$value = $this->getVar($varPath);		
+
+		$hasVar = !empty($varPath);
+
+		$value = $hasVar ? $this->getVar($varPath) : null;
+
+//		// if the var is enclosed with double quotes then treat it as a sting
+//		if(str_starts_with($varPath, '"') && str_ends_with($varPath, '"')) {
+//			$value = $this->parse(substr($varPath, 1, -1));
+//		} else {
+////			$value = $this->getVar($varPath);
+//		}
 		foreach($filters as $filter) {
 			
 			$args = array_map('trim', str_getcsv($filter, ':', '"', ""));
+
 			$filterName = strtolower(array_shift($args));
-			array_unshift($args, $value);
+
+			$args = array_map(function($a) {
+				if(substr($a, 0, 1) == '$') {
+					return $this->getVar(substr($a, 1));
+				}
+				return str_replace('\$', '$', $a);
+			}, $args);
+
+			if($hasVar) {
+				array_unshift($args, $value);
+			}
 
 			if(!isset($this->filters[$filterName])) {
 				throw new Exception("Filter '" . $filterName . "' is undefined");
 			}
 			$value = call_user_func_array($this->filters[$filterName], $args);
+			$hasVar = true;
 
 		}
 		

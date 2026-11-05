@@ -1,12 +1,19 @@
-# Group Office groupware and CRM
+# About GroupOffice
 
-Group-Office is an enterprise CRM and groupware tool. 
-Share projects, calendars, files and e-mail online with co-workers and clients. 
-Easy to use and fully customizable.
+![GroupOffice Calendar](https://github.com/Intermesh/groupoffice/raw/ee417a219bf63010f059039d3def36161689287f/media/screenshots/calendar.png)
+
+GroupOffice is an open-source groupware and CRM platform for enterprises and the public sector. It’s created and 
+maintained by the Dutch company Intermesh. You can self-host the software or run it on Intermesh’s secure cloud 
+infrastructure, where your data remains fully private.
+
+Collaborate with integrated file sharing, video conferencing, E-mail, calendar and contact management, project and 
+time tracking, quoting and invoicing, support ticketing, and the Collabora Online office suite. By combining all these 
+tools in a single platform, GroupOffice eliminates the need for multiple separate systems and streamlines your workflow.
+GroupOffice is easily extensible with custom modules, allowing you to tailor the platform to your specific needs.
 
 # Install
 
-If you're not a developer and you wish to use Group-Office please visit:
+If you're not a developer and you wish to use GroupOffice please visit:
 
 https://www.group-office.com/documentation.html
 
@@ -20,7 +27,7 @@ Our Docker image can be found here:
 https://github.com/Intermesh/docker-groupoffice
 
 ### Development
-If you'd like to get started with Group-Office development please have a look at
+If you'd like to get started with GroupOffice development please have a look at
 our docker compose project. You can get started in minutes with just a few commands:
 
 https://github.com/Intermesh/docker-groupoffice-development
@@ -55,5 +62,30 @@ https://github.com/Intermesh/docker-groupoffice-development
    ```
      
 7. Launch it in the web browser and follow the installer's instructions.
+
+## Helper shell scripts
+
+In the `scripts` subdirectory, there is a number of shell scripts available to help developers and system administrators
+alike:
+
+- `build.sh`: builds a single environment from source; installs composer dependencies, npm dependencies and will 
+compile typescript.
+- `cleanup.sql`: Cleans out deprecated database tables. To be run using your favourite MySQL or MariadDB client.
+- `deploy.php`: used in a multisite setting, will allow the administrator to roll out all sites of a certain GO version 
+in one go.
+- `install-composer.sh`; downloads and installs the latest [composer](https://getcomposer.org) version. Composer manages 
+third party package dependencies
+- `install-ioncube.sh`: Only needed when you upgrade from very old versions to versions up to 6.7 . Will download and 
+install the ioncube loader.
+- `install-npm.sh`: (re-)installs NPM dependencies, compiles typescript and sass
+- `link-goui.sh`: to be run after updating either the goui or the groupoffice-core pacakges: recreates symlinks to the
+source of both packages, 
+- `merge-branch.sh`: Merges feature branches in current code. Shortcut for CLI users and GUI users alinke
+- `update-git.sh`: Pulls the latest version of the current branch for Group-Office, its submodules and (if available)
+promodules and business modules
+- `upgrade-old-versions.sh`: A Wile E. Coyote style shell script that does a mass upgrade from 6.1 and earlier right up
+to 26.0 . Be sure to comment out all the versions before the one you are currently running (so 6.4 users should only run 
+th 6.5 upgrade and further).
+- `watch.sh`: launches file watchers for typescript and SASS files and compile updated files accordingly.
 
 Happy coding!

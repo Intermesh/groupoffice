@@ -1200,13 +1200,13 @@ class Net_Sieve
 					),
 				));
 			}
-			$crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
-			if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
-				$crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
-				$crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
-		  }
+//			$crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+//			if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
+//				$crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+//				$crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+//		  }
 		
-        if (!stream_socket_enable_crypto($this->_sock->fp, true, $crypto_method)) {
+        if (!stream_socket_enable_crypto($this->_sock->fp, true, STREAM_CRYPTO_METHOD_ANY_CLIENT)) {
             return PEAR::raiseError('Failed to establish TLS connection', 2);
         }
 

@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use BadMethodCallException;
+use DateTimeInterface;
 use Exception;
 use GO\Base\Cron\EmailReminders;
 use GO\Base\Db\ActiveRecord;
@@ -15,6 +16,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\modules\community\comments\model\Comment;
@@ -36,10 +38,10 @@ class Alert extends SingleOwnerEntity
 
 	public ?string $entityId;
 
-	public ?\DateTimeInterface $triggerAt;
-	public ?\DateTimeInterface $staleAt;
+	public ?DateTimeInterface $triggerAt;
+	public ?DateTimeInterface $staleAt;
 
-	public $recurrenceId;
+	public ?string $recurrenceId;
 	public ?string $tag;
 
 	/**
@@ -60,6 +62,12 @@ class Alert extends SingleOwnerEntity
 	 */
 	public $sendMail = false;
 
+	/**
+	 * If the User has Email alerts turn on this keeps track of the alert already being sent
+	 * @var bool
+	 */
+	public $isSent = false;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -72,6 +80,11 @@ class Alert extends SingleOwnerEntity
 	public function getEntity(): string
 	{
 		return EntityType::findById($this->entityTypeId)->getName();
+	}
+
+
+	public function getSearch() : Search {
+		return Search::find()->where(['entityTypeId'=>$this->entityTypeId, 'entityId'=>$this->entityId])->single();
 	}
 
 
@@ -94,7 +107,7 @@ class Alert extends SingleOwnerEntity
 		if(!($entity instanceof EntityType)) {
 			$entity = EntityType::findByName($entity);
 		}
-		$this->entity = $entity->getName();
+
 		$this->entityTypeId = $entity->getId();
 
 		return $this;
@@ -128,9 +141,6 @@ class Alert extends SingleOwnerEntity
 		if(isset($userId)) {
 			$query->andWhere('userId', '=', $userId);
 		}
-//			// Skip dismiss update in internalDelete below
-//			->setData(['preventDismiss' => true]);
-
 		return static::delete($query);
 	}
 
@@ -139,7 +149,31 @@ class Alert extends SingleOwnerEntity
 		return parent::defineFilters()
 			->add('userId', function(Criteria $criteria, $value) {
 				$criteria->where('userId', '=', $value);
+			})->add('toBeEmailed', function(Criteria $crit, $value) {
+				$now = new DateTime();
+				$now->setTimezone(new \DateTimeZone("UTC"));
+				$crit->where('triggerAt', '<=', $now->format('Y-m-d H:i'))
+					->andWhere('staleAt', '>', $now->format('Y-m-d H:i')) // it must be stale at some point
+					->andWhere('isSent','=',0);
+				// join user and see if mail_reminders is on
 			});
+	}
+
+	public function sendMail(): void {
+		if($this->isSent) return;
+		$this->isSent = true;
+
+		$searchRecord = Search::find()->where(['entityTypeId'=>$this->entityTypeId, 'entityId'=>$this->entityId])->single();
+		//$entity = $entityType->getClassName()::findById($this->entityId);
+		$user = User::find(['displayName', 'email', 'mail_reminders'])->where(['id'=> $this->userId])->single();
+		if($user->mail_reminders) {
+			$this->save(); // isSent was set
+			go()->getMailer()->compose()
+				->setTo($user->email)
+				->setSubject('⏰ ' . $searchRecord->name)
+				->setBody($searchRecord->description)
+				->send();
+		}
 	}
 
 	/**
@@ -188,13 +222,17 @@ class Alert extends SingleOwnerEntity
 	 * If this data contains a "title" and "description" property, then this will be
 	 * used as such.
 	 *
+	 * If an int progress (0-100) is added the client should show a progress bar
+	 *
+	 * "persistent" will make it non closable.
+	 *
 	 * @param array $data
 	 * @return Alert
 	 * @throws JsonException
 	 */
 	public function setData(array $data): Alert
 	{
-		$this->data = JSON::encode(array_merge((array) $this->getData(), $data));
+		$this->data = JSON::encode($data);
 
 		return $this;
 	}
@@ -256,41 +294,4 @@ class Alert extends SingleOwnerEntity
 
 		return parent::internalDelete($query);
 	}
-
-//	private $props;
-
-//	/**
-//	 * @throws AccessDenied
-//	 * @throws JsonException
-//	 */
-//	private function getProps(): array
-//	{
-//		if(!isset($this->props)) {
-//
-//			$data = $this->getData();
-//
-//			if(!empty($data->title) && !empty($data->body)) {
-//				$this->props = ['title' => $data->title, 'body' => $data->body];
-//			} else {
-//
-//				$e = $this->findEntity();
-//				if (!$e) {
-//					$this->props = ['title' => null, 'body' => null];
-//				} else {
-//					$this->props = $e->alertProps($this);
-//				}
-//			}
-//		}
-//
-//		return $this->props;
-//	}
-//
-//	public function getTitle() {
-//		return $this->getProps()['title'];
-//	}
-//
-//	public function getBody() {
-//		return $this->getProps()['body'];
-//	}
-
 }

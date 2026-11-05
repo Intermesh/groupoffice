@@ -15,6 +15,7 @@ use GO\Base\Mail\SmimeMessage;
 use GO\Base\Model\Acl;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
@@ -392,8 +393,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		//deletes must be confirmed if no trash folder is used or when we are in the trash folder to delete permanently
 		$response['deleteConfirm'] = empty($account->trash) || $account->trash==$params['mailbox'];
 
-
-		//$response['allowFTS'] =
+		$this->fireEvent('emailStoreLoaded', [&$response]);
 
 		return $response;
 	}
@@ -506,22 +506,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $response;
 	}
 
-
-	protected function actionSaveToFile(array $params)
-	{
-		$message = new \GO\Base\Mail\Message();
-		$alias = Alias::model()->findByPk($params['alias_id']);
-		$message->handleEmailFormInput($params);
-		$message->setFrom($alias->email, $alias->name);
-
-		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$params['save_to_path']);
-
-		$file->putContents($message->toStream());
-
-		$response['success']=$file->exists();
-
-		return $response;
-	}
 
 	private function _createAutoLinkTagFromParams(array $params, $account)
 	{
@@ -649,7 +633,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$mailer->send($message);
 		} catch(\Throwable $e) {
 			$msg = GO::t("Sorry, an error occurred") . ': '. $mailer->lastError(). ' - '. $e->getMessage();
-			throw new Exception($msg);
+			\go\core\ErrorHandler::logException($e, "Failed to send message");
+			throw new \go\core\exception\UserMessage($msg, 0, $e);
 		}
 
 
@@ -962,6 +947,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	protected function actionReply(array $params)
 	{
+		GO::session()->closeWriting();
 		if(!empty($params['uid'])){
 			$account = Account::model()->findByPk($params['account_id']);
 			if(!$account) {
@@ -1211,6 +1197,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	protected function actionForward(array $params)
 	{
+		GO::session()->closeWriting();
 		if (!empty($params['uid'])) {
 			$account = Account::model()->findByPk($params['account_id']);
 			$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
@@ -1314,6 +1301,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	public function actionView(array $params): array
 	{
+		GO::session()->closeWriting();
 		$params['no_max_body_size'] = !empty($params['no_max_body_size']) && $params['no_max_body_size']!=='false';
 
 		$account = Account::model()->findByPk($params['account_id']);
@@ -1511,9 +1499,24 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		if (empty($params['unblock'])){// && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
 			$blockUrl = 'about:blank';
-			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
+			$blocked = 0;
+			$response['htmlbody'] = preg_replace_callback(
+				'/<(?!a[\s>\/])[a-z][^>]*+>/iu',
+				function ($m) use ($blockUrl, &$blocked) {
+					// skip tags that can't contain a URL; cheap check avoids regex on big data: blobs
+					if (stripos($m[0], 'http') === false) {
+						return $m[0];
+					}
+					$count = 0;
+					$out = preg_replace('/https?:[^\s>\'"]*+/i', $blockUrl, $m[0], -1, $count);
+					$blocked += $count;
+					return $out;
+				},
+				$response['htmlbody']
+			);
+			$response['blocked_images'] = $blocked;
 			if($response['htmlbody'] === null) {
-				throw new \Exception("Could not block images: ". preg_last_error_msg());
+				$response['htmlbody'] ="Could not block images: ". preg_last_error_msg() . " you can only view without blocking external resources";
 			}
 		}
 
@@ -1567,12 +1570,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			exit();
 		}
 
-		exec(GO::config()->cmd_zip.' -r "winmail.zip" *', $output, $retVar);
-		if($retVar!=0) {
-			throw new \Exception("ZIP compression failed: " . implode("\n", $output));
-		}
-		
-		$zipFile = $tmpFolder->child('winmail.zip');
+		$zipFile = $tmpFolder->createChild('winmail.zip');
 		\GO\Base\Util\Http::outputDownloadHeaders($zipFile,false,true);
 		$zipFile->output();
 
@@ -1613,16 +1611,14 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$tmpFile = new \GO\Base\Fs\File(GO::config()->tmpdir.$params['tmp_file']);
 
-				chdir($tmpFolder->path());
-		exec(GO::config()->cmd_tnef.' -C '.$tmpFolder->path().' '.$tmpFile->path(), $output, $retVar);
+		chdir($tmpFolder->path());
+		exec(GO::config()->cmd_tnef.' -C '.escapeshellarg($tmpFolder->path()).' '.escapeshellarg($tmpFile->path()), $output, $retVar);
+
 		if($retVar!=0)
 			throw new \Exception("TNEF extraction failed: ".implode("\n", $output));
 
-		exec(GO::config()->cmd_zip.' -r "winmail.zip" *', $output, $retVar);
-		if($retVar!=0)
-			throw new \Exception("ZIP compression failed: ".implode("\n", $output));
-		
-		$zipFile = $tmpFolder->child('winmail.zip');
+		$zipFile = $tmpFolder->createChild('winmail.zip');
+		\GO\Base\Fs\Zip::create($zipFile, $tmpFolder, $tmpFolder->ls());
 		\GO\Base\Util\Http::outputDownloadHeaders($zipFile,false,true);
 		$zipFile->output();
 
@@ -1637,6 +1633,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$folder){
 			ErrorHandler::log("GO\Email\Controller\Message::actionSaveAttachment(".$params['folder_id'].") folder not found", E_USER_WARNING);
 			throw new NotFound("Specified folder not found");
+		}
+
+		if(!$folder->hasPermissionLevel(Acl::WRITE_PERMISSION)) {
+			throw new Forbidden("You do not have permission to write this folder");
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);		
@@ -1796,7 +1796,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 		
-		$filename = GO\Base\Fs\File::stripInvalidChars($message->subject.' - '.\GO\Base\Util\Date::get_timestamp($message->udate));
+		$filename = GO\Base\Fs\File::stripInvalidChars(date("Y-m-d_Hi", $message->udate) . "_". $message->from->getAddress()['email'] . "_" .$message->subject);
 		$filename .= empty($params['download']) ? ".txt" :".eml";
 		
 		\GO\Base\Util\Http::outputDownloadHeaders(new \GO\Base\Fs\File($filename), empty($params['download']));
@@ -1944,10 +1944,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$account = Account::model()->findByPk($params['account_id']);
 		$response = ['success' => true];
 		$message = ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
+		$nextUid = $message->getImapConnection()->get_uidnext();
 		if ($message->deleteAttachments()) {
 			$message->delete();
 			$message->getImapConnection()->expunge();
-			$response['uid'] = $message->getImapConnection()->get_uidnext();
+			$response['uid'] = $nextUid;
 		}
 
 		return $response;

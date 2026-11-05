@@ -30,11 +30,15 @@ class File extends FileSystemObject {
 	/**
 	 * Get a temporary file
 	 * 
-	 * @param string $extension
+	 * @param string $extension May be user input (eg. an uploaded filename). Path separators are stripped so the
+	 *  file can never be created outside the tmp folder.
 	 * @return static
 	 */
 	public static function tempFile(string $extension): File
 	{
+		 if($extension !== '') {
+			 $extension = static::stripInvalidChars($extension);
+		 }
 		 return go()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
 	}
 
@@ -322,7 +326,7 @@ class File extends FileSystemObject {
 
 			if(!$r->hasHeader('Content-Disposition')) {
 				$disp = $inline ? 'inline' : 'attachment';
-				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
+				$r->setHeader('Content-Disposition', Response::contentDisposition($disp, $this->getName()));
 			}
 			if(!$r->hasHeader('Content-Transfer-Encoding')) {
 				$r->setHeader('Content-Transfer-Encoding', 'binary');
@@ -426,7 +430,7 @@ class File extends FileSystemObject {
 			if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
 
 				Response::get()->setStatus(416);
-				Response::get()->setHeader("Content-Range,", "bytes $start-$end/$size");
+				Response::get()->setHeader("Content-Range", "bytes $start-$end/$size");
 				Response::get()->sendHeaders();
 				exit;
 			}

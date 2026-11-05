@@ -17,7 +17,7 @@
  */
 
 /**
- * 
+ * @deprecated - Use JMAP cron system
  * @package GO.base.cron
  */
 

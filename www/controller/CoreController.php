@@ -10,13 +10,11 @@
 
 namespace GO\Core\Controller;
 
-use Exception;
 use GO;
-use GO\Base\Language;
 use GO\Base\Util\Number;
-use GO\Base\Util\StringHelper;
 use go\core\ErrorHandler;
 use go\core\http\Client;
+use go\core\util\DateTime;
 use go\core\util\JSON;
 
 
@@ -31,82 +29,19 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionSaveSetting($params){
-		$response['success']=GO::config()->save_setting($params['name'], $params['value'], $params['user_id']);
-		
-		return $response;
-	}
-	
-	protected function actionDebug($params){
-		
-		if(empty(GO::session()->values['debug'])){
-			// if(!GO::user()->isAdmin())
-			// 	throw new \GO\Base\Exception\AccessDenied("Debugging can only be enabled by an admin. Tip: You can enable it as admin and switch to any user with the 'Switch user' module.");
-		
-			GO::session()->values['debug']=true;
-		}
-		
-		GO::session()->values['debugSql']=!empty($params['debugSql']);
-		
-		// The default length of the tail command, when passing the "length" parameter this can be increased or decreased
-		$length = 300;
-		if(isset($params['length'])){
-			$length = $params['length'];
-		}
-		
-		$debugFile = new \GO\Base\Fs\File(GO::config()->file_storage_path.'log/debug.log');
-		if(!$debugFile->exists())
-			$debugFile->touch(true);
 
-		
-		return array(
-				'success'=>true, 
-				'debugLog'=>$debugFile->tail($length)
-				);
-	}
-	
-	protected function actionInfo($params){
-		
-		if(empty(GO::session()->values['debug'])){
-			throw new \GO\Base\Exception\AccessDenied("Debugging can only be enabled by an admin");
+		if(go()->getModel()->getUserRights()->mayChangeUsers) {
+			$userId = $params['user_id'];
+		} else {
+			$userId = go()->getUserId();
 		}
-			
-		$response = array('success'=>true, 'info'=>'');
+
+		$response['success']=GO::config()->save_setting($params['name'], $params['value'], $userId);
 		
-		$info['username']=GO::user()->username;
-		$info['config']=GO::config()->get_config_file();
-		$info['db_name']=GO::config()->db_name;
-		$info['db_host']=GO::config()->db_host;
-		$info['db_type'] = go()->getDatabase()->isMariaDB() ? "MariaDB" : "MySQL";
-		$info['db_version']=go()->getDatabase()->getVersion();
-		
-		$modules = GO::modules()->getAllModules();		
-		foreach($modules as $module){
-			if(!isset($info['modules']))
-				$info['modules']=$module->name;
-			else
-				$info['modules'].=', '.$module->name;
-		}
-		
-		$info = array_merge($info,$_SERVER);
-		
-		
-		$response['info']='<table>';
-		
-		foreach($info as $key=>$value)
-			$response['info'] .= '<tr><td>'.$key.':</td><td>'.(is_scalar($value) ? $value : var_export($value, true)).'</td></tr>';
-		
-		$response['info'].='</table>';
-		
-		ob_start();
-		phpinfo();
-		$phpinfo = ob_get_contents();
-		ob_get_clean();
-		
-		$response['info'].= \GO\Base\Util\StringHelper::sanitizeHtml($phpinfo);
 		return $response;
-		
 	}
-	
+
+
 	protected function actionLink($params) {
 
 		$fromLinks = json_decode($params['fromLinks'], true);
@@ -116,10 +51,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 
 		foreach ($fromLinks as $fromLink) {
 			
-			$fromModel = GO::getModel($fromLink['model_name'])->findByPk($fromLink['model_id']);
+			$fromModel = $this->getRequestedModel($fromLink['model_name'])->findByPk($fromLink['model_id']);
 
 			foreach ($toLinks as $toLink) {
-				$model = GO::getModel($toLink['model_name'])->findByPk($toLink['model_id']);
+				$model = $this->getRequestedModel($toLink['model_name'])->findByPk($toLink['model_id']);
 				$fromModel->link($model, $params['description'], $from_folder_id, $to_folder_id);
 			}
 		}
@@ -130,16 +65,16 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionUnlink($params){
-		$linkedModel1 = GO::getModel($params['model_name1'])->findByPk($params['id1']);				
-		$linkedModel2 = GO::getModel($params['model_name2'])->findByPk($params['id2']);			
+		$linkedModel1 = $this->getRequestedModel($params['model_name1'])->findByPk($params['id1']);
+		$linkedModel2 = $this->getRequestedModel($params['model_name2'])->findByPk($params['id2']);
 		$linkedModel1->unlink($linkedModel2);	
 		
 		return array('success'=>true);
 	}
 	
 	protected function actionUpdateLink($params){
-		$model1 = GO::getModel($params['model_name1'])->findByPk($params['model_id1']);
-		$model2 = GO::getModel($params['model_name2'])->findByPk($params['model_id2']);
+		$model1 = $this->getRequestedModel($params['model_name1'])->findByPk($params['model_id1']);
+		$model2 = $this->getRequestedModel($params['model_name2'])->findByPk($params['model_id2']);
 		$model1->updateLink($model2, array('description'=>$params['description']));
 		$model2->updateLink($model1, array('description'=>$params['description']));
 		
@@ -304,6 +239,23 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		}
 	}
 
+	/**
+	 * A thumbnail shows the content of the file, so the user must be allowed to read it. The permissions of a file are
+	 * those of the folder it's in. Files that are not in the files module can't be shown either, because there's
+	 * nothing to check their permissions against. It's the same answer for both so it doesn't tell if a path exists.
+	 *
+	 * @param string $relativePath Relative to the file storage path
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function checkThumbFilePermission(string $relativePath): void
+	{
+		$fileModel = \GO\Files\Model\File::model()->findByPath($relativePath);
+
+		if (!$fileModel || !$fileModel->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
+
 	protected function actionThumb($params) {
 
 		GO::session()->closeWriting();
@@ -316,6 +268,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if(isset($params['foldericon'])){
 			
 			$src = $dir . $params['foldericon'].'.svg';
+
+
 		} else {
 		
 //		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
@@ -323,7 +277,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 //		} else {
 
 			switch (strtolower($file->extension())) {
-
 				case 'svg':
 				case 'ico':
 				case 'jpg':
@@ -331,6 +284,12 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'png':
 				case 'gif':
 				case 'xmind':
+				case 'heic':
+				case 'heif':
+					// This is the only branch that outputs the content of a file from the file storage. The other
+					// branches only use the extension to pick an icon.
+					$this->checkThumbFilePermission($params['src']);
+
 					$src = GO::config()->file_storage_path . $params['src'];
 					break;
 
@@ -390,6 +349,19 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		if($file->size() > \GO::config()->max_thumbnail_size*1024*1024){
 			throw new \Exception("Image may not be larger than " . Number::formatSize(\GO::config()->max_thumbnail_size*1024*1024));
 		}
+
+		if($file->extension() == 'svg')
+		{
+			header("Expires: " . date("D, j M Y G:i:s ", time() + (86400 * 365)) . 'GMT'); //expires in 1 year
+			header('Cache-Control: cache');
+			header('Pragma: cache');
+			header('Content-Type: ' . $file->mimeType());
+			header('Content-Disposition: inline; filename="' . $file->name() . '"');
+			header('Content-Transfer-Encoding: binary');
+
+			$file->output();
+			exit();
+		}
 		
 
 		$w = isset($params['w']) ? intval($params['w']) : 0;
@@ -440,7 +412,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		GO::debug("Thumb mtime: ".$thumbMtime." (".$cacheFilename.")");
 
 		if (!empty($params['nocache']) || !$thumbExists || $thumbMtime < $file->mtime() || $thumbMtime < $file->ctime()) {
-			
+
 			GO::debug("Resizing image");
 			$image = new \go\core\util\Image($file->path());
 
@@ -477,7 +449,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 						$image->resize($w, $h);
 					} elseif ($w) {
 						$image->resizeToWidth($w);
-					} else {
+					} else if($h) {
 						$image->resizeToHeight($h);
 					}
 				}
@@ -802,7 +774,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	
-	protected function actionAbout($params){
+	protected function actionAbout($params): array
+	{
 
 		$version = go()->getVersion();
 
@@ -814,11 +787,11 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			}
 		}
 
-		$about = strtr(GO::t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
+		$about = strtr(go()->t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
 			'{version}' => $version,
 			'{current_year}' => date('Y'),
 			'{company_name}' => 'Group-Office by Intermesh B.V.',
-			'{product_name}' => GO::config()->product_name
+			'{product_name}' => go()->getConfig()['product_name']
 		]);
 
 		if(!go()->getAuthState()->isAdmin()) {
@@ -828,25 +801,26 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			];
 		}
 
-		$lastRun = go()->getDbConnection()->selectSingleValue('lastrun')
-			->from("go_cron")
-			->where('job', '=', 'GO\\Base\\Cron\\CalculateDiskUsage')
+		$lastRun = go()->getDbConnection()->selectSingleValue('lastRunAt')
+			->from("core_cron_job")
+			->where('name', '=', 'CalculateDiskUsage')
 			->single();
 
-		$fileUsage = (int) GO::config()->get_setting('file_storage_usage');
-		$mailUsage = (int) GO::config()->get_setting('mailbox_usage');
-		$dbUsage = (int) GO::config()->get_setting('database_usage');
+		$fileUsage = (int) go()->getSettings()->fileStorageUsage;
+		$mailUsage = (int) go()->getSettings()->mailboxUsage;
+		$dbUsage = (int) go()->getSettings()->databaseUsage;
 
 		return [
 			'success' => true,
 			'data' => [
 				'about' => $about,
-				'date' => $lastRun ? \GO\Base\Util\Date::get_timestamp($lastRun) : go()->t("Never"),
+				'date' => $lastRun ? $lastRun : go()->t("Never"),
 				'users' => \go\core\model\User::find()->where('enabled=1')->selectSingleValue('count(*)')->single(),
-				'mailbox_usage' => Number::formatSize($mailUsage),
-				'file_storage_usage' => Number::formatSize($fileUsage) .' / '. Number::formatSize(GO::config()->quota * 1024),
-				'database_usage' => Number::formatSize($dbUsage),
-				'total_usage' => Number::formatSize($dbUsage + $fileUsage + $mailUsage),
+				'mailbox_usage' => $mailUsage,
+				'file_storage_usage' => $fileUsage,
+				'quota' => intval(go()->getConfig()['quota']) * 1024,
+				'database_usage' => $dbUsage,
+				'total_usage' => $dbUsage + $fileUsage + $mailUsage,
 				'has_usage' => true
 			]
 		];
@@ -882,7 +856,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	public function actionPasteUpload($model_id, $model_name, $filename, $filetype){
 		
-		$site = GO::getModel($model_name)->findByPk($model_id);
+		$site = $this->getRequestedModel($model_name)->findByPk($model_id);
 		
 		
 		$type = explode('/', $filetype);
@@ -952,63 +926,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		echo $response;
 	}
-	
-	/**
-	 * Send an email
-	 * 
-	 * @param string $email
-	 * @param string $subject
-	 * @param string $body
-	 * @param array $attachments Array like this: (The given className needs to implement the GO\Base\Mail\AttachableInterface)
-	 *	array(
-	 *		array(
-	 *			'className'=>'GO\Files\Model\File',
-	 *			'pk'=>3',
-	 *			'altName'=>'New attachment name'
-	 *		),
-	 *		array(
-	 *			'className'=>'GO\Files\Model\File',
-	 *			'pk'=>4',
-	 *			'altName'=>'New attachment name2'
-	 *		)
-	 *	)
-	 */
-	public function actionSendSystemEmail($email, $subject, $body, $attachments=array()){
-		
-		$response = array('success'=>false);
-		
-		//Build system email and mail with the given files
-		$systemMessage = new GO\Base\Mail\SystemMessage($subject,$body);
-		
-		foreach($attachments as $attachmentSpec) {
-			
-			if(!empty($attachmentSpec['className']) &&  !empty($attachmentSpec['pk'])){
-				
-				$className = $attachmentSpec['className'];
-				$record = $className::model()->findByPk($attachmentSpec['pk']);
-				
-				if($record){
-					
-					$altName = null;
-					if(!empty($attachmentSpec['altName'])){
-						$altName = $attachmentSpec['altName'];
-					}
 
-					$attachment = $record->getAttachment($altName);
-					
-					if($attachment !== false){
-						$systemMessage->attach($attachment);
-					}
-				}
-			}			
-		}
-
-		$systemMessage->send();
-
-		$response['success'] = true;
-
-		echo new \GO\Base\Data\JsonResponse($response);
-	}
-	
 	
 }

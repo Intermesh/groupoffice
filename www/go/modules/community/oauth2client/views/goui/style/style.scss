@@ -1,0 +1,15 @@
+@use '@intermesh/goui/style/util'  as *;
+@use '@intermesh/goui/style/config' as *;
+
+.ic-google {
+  //background-image: url('./www.collaboraoffice.com.ico');
+  background-image: url('./resources/google.png');
+}
+
+.ic-microsoft {
+  background-image: url('./resources/microsoft.png');
+}
+
+.ic-openid {
+  background-image: url('./resources/openid.png');
+}

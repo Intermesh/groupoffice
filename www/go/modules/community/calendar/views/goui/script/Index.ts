@@ -1,25 +1,117 @@
-import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
+import {AclLevel, client, jmapds, main, modules, principalDS, userSettingsPanels} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
+import {
+	BaseEntity,
+	datasourcestore,
+	DateTime,
+	E,
+	Format,
+	INotification,
+	router,
+	t as coreT,
+	translate,
+	Window
+} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
 import {EventWindow} from "./EventWindow";
-import {CalendarView} from "./CalendarView";
+import {CalendarAdapter} from "./CalendarAdapter";
 
 export * from "./Main.js";
 export * from "./CalendarList.js";
+export * from "./CategoryList.js";
+export * from "./ProviderList.js";
 export * from "./CalendarView.js";
 export * from "./CalendarItem.js";
 export * from "./MonthView.js";
+export * from "./SplitView.js";
 export * from "./WeekView.js";
-export * from "./CalendarAdapter.js"
+export * from "./ViewWindow.js";
+export * from "./CalendarAdapter.js";
+export * from "./OnlineMeetingService.js";
 
-export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list';
+translate.load(GO.lang.core.core, "core", "core");
+translate.load(GO.lang.community.calendar, "community", "calendar");
+
+export interface CalendarDefaultAlert {
+	/** {offset, relativeTo} | {when} */
+	trigger: any
+	acknowledged?: string
+	action?: 'display' | 'email'
+}
+
+export interface Calendar extends BaseEntity {
+	/** The user-visible name of the calendar */
+	name: string
+	description?: string | null
+	/** Any valid CSS color value used to display events of this calendar */
+	color: string | null
+	/** Sort order of calendars in the client UI */
+	sortOrder: number
+	/** User wishes to see this calendar in their client (per user) */
+	isSubscribed: boolean | null
+	/** Should the calendar's events be displayed at the moment (per user) */
+	isVisible: boolean | null
+	/** Should the calendar's events be used for availability calculation (per user) */
+	includeInAvailability: 'all' | 'attending' | 'none' | null
+	/** Default time zone for events. If null the user's time zone is used */
+	timeZone: string | null
+	syncToDevice: boolean | null
+	defaultAlertsWithTime?: Record<string, CalendarDefaultAlert>
+	defaultAlertsWithoutTime?: Record<string, CalendarDefaultAlert>
+	/** Calendar owner id. Null for shared calendars and resources */
+	ownerId: string | null
+	createdBy: string
+	webcalUri: string | null
+	/** Resource group id. Set when the calendar is a resource */
+	groupId: string | null
+	publishKey: string | null
+	/** Rights of the current user */
+	myRights: {
+		mayReadFreeBusy: boolean
+		mayReadItems: boolean
+		mayUpdatePrivate: boolean
+		mayRSVP: boolean
+		mayWriteOwn: boolean
+		mayWriteAll: boolean
+		mayAdmin: boolean
+		mayDelete: boolean
+	}
+}
+
+export type ValidTimeSpan = 'day' | 'days' | 'week' | 'weeks' | 'month' | 'year' | 'split' | 'list' | 'custom';
 export const calendarStore = datasourcestore({
-	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null}},
+	dataSource: jmapds<Calendar>('Calendar'),
+
+	filters: {
+		default: {
+			isSubscribed: true,
+			davaccountId : null
+		}
+	},
+	sort: [{property:'groupId'},{property:'sortOrder'},{property:'name'}],
+	relations: {
+		owner: {
+			path: "ownerId",
+			dataSource: principalDS
+		},
+		group: {
+			path: "groupId",
+			dataSource:jmapds('ResourceGroup')
+		}
+	}
+});
+
+export const writeableCalendarStore = datasourcestore({
+	dataSource:jmapds<Calendar>('Calendar'),
+	filters: {
+		default: {
+			isSubscribed: true,
+			davaccountId : null,
+			permissionLevel:30/*writeOwn*/
+		}
+	},
 	sort: [{property:'sortOrder'},{property:'name'}],
 	relations: {
 		owner: {
@@ -27,17 +119,6 @@ export const calendarStore = datasourcestore({
 			dataSource: principalDS
 		}
 	}
-});
-
-export const allCalendarStore = datasourcestore({
-	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{}},
-	sort: [{property:'sortOrder'},{property:'name'}]
-});
-export const writeableCalendarStore = datasourcestore({
-	dataSource:jmapds('Calendar'),
-	queryParams:{filter:{isSubscribed: true, davaccountId : null, isResource:false, permissionLevel:30/*writeOwn*/}},
-	sort: [{property:'sortOrder'},{property:'name'}]
 })
 
 export const categoryStore = datasourcestore({
@@ -50,6 +131,7 @@ export const viewStore = datasourcestore({
 	sort: [{property:'name'}]
 })
 
+export const adapter = new CalendarAdapter();
 
 export const t = (key:string,p='community',m='calendar') => coreT(key, p,m);
 export const statusIcons = {
@@ -59,8 +141,23 @@ export const statusIcons = {
 	'needs-action':['schedule', t('Awaiting reply'), 'orange']
 } as {[status:string]: string[]}
 
+export function getParticipantStatusIcon(p:any): string[] {
+	// error sending mail
+	if(p.scheduleStatus) {
+		if(p.scheduleStatus == "1.0") {
+			return ['pending', t("Invite not sent yet"), 'orange'];
+		}
+
+		if(p.scheduleStatus.substring(0, 1) != "1") {
+			return ['error', p.scheduleStatus, 'danger'];
+		}
+	}
+
+	return statusIcons[p.participationStatus] ? statusIcons[p.participationStatus] : statusIcons["needs-action"];
+}
+
 function addEmailAction() {
-	if(go) {
+	if(window.go) {
 		go.openIcs = (p: any) => {
 			const params = p.id ? {
 				fileId:p.id
@@ -106,6 +203,7 @@ function addEmailAction() {
 				const event = msg.itip.event,
 					btns = E('div').cls('btns'),
 					names: any = {accepted: t("Accept"), tentative: t("Maybe"), declined: t("Decline")},
+					pressedNames: any = {accepted: t("Accepted"), tentative: t("Maybe"), declined: t("Declined")},
 					updateBtns = (item: CalendarItem) => {
 
 						btns.innerHTML = '';
@@ -117,7 +215,7 @@ function addEmailAction() {
 						} else {
 							btns.append(
 								E('div',
-									...['accepted', 'tentative', 'declined'].map(s => E('button', names[s])
+									...['accepted', 'tentative', 'declined'].map(s => E('button', item.calendarPrincipal?.participationStatus == s ? pressedNames[s] : names[s])
 										.cls('goui-button')
 										.cls('disabled', item.calendarPrincipal?.participationStatus == s)
 										.cls('pressed', item.calendarPrincipal?.participationStatus == s)
@@ -181,17 +279,48 @@ function addEmailAction() {
 	}
 }
 
+export const mainPanel: {ui?:Main} = {};
 
 modules.register(  {
 	package: "community",
 	name: "calendar",
 	entities: [
-		"Calendar",
+		{
+			name:"Calendar",
+			permissions:[
+				{value: 5, name: t("Read free/busy")},
+				{value: 10,name: t("Read items")},
+				{value: 20,name: t("Update private")},
+				{value: 25,name: t("RSVP")},
+				{value: 30,name: t("Write own")},
+				{value: 35,name: t("Write all")},
+				{value: 40,name: t("Delete")},
+				{value: 50,name: t("Manage")}
+			]
+		},
+		{
+			name: "CalendarView",
+			permissions: [
+				{value: 10,name: t("Read")},
+				{value: 30,name: t("Write")},
+				{value: 50,name: t("Manage")}
+			]
+		},
+		"CalendarCategory",
+		{
+			name: "ResourceGroup"
+		},
 		{
 			name:"CalendarEvent",
-			filters: [
-				{name: 'text', type: "string", multiple: false, title: t("Query")},
-				{name: 'calendarId', type: 'go.form.ComboBox', typeConfig: {
+			filters: {
+				text: {
+					type: "string",
+					multiple: false,
+					title: t("Query")
+				},
+				calendarId: {
+					type: 'go.form.ComboBox',
+					typeConfig: {
 						fieldLabel: t("Calendar"),
 						hiddenName: 'calendarId',
 						anchor: '100%',
@@ -209,130 +338,170 @@ modules.register(  {
 							entityStore: "Calendar",
 							filters: {
 								default: {
-									permissionLevel: go.permissionLevels.write
+									permissionLevel: AclLevel.WRITE
 								}
 							}
 						}
-					}, multiple: true, title: t("Calendars")}
-			],
+					},
+					multiple: true,
+					title: t("Calendars")
+				}
+			},
 			links: [{
 				iconCls: 'entity ic-event red',
-				linkWindow:(entity:string, entityId) => {
-					return (new CalendarItem({key:'',data:{
-							start:(new DateTime).format('Y-m-d\TH:00:00.000'),
+				linkWindow: async (entity:string, entityId) => {
+					if(!calendarStore.loaded) {
+						// CalendarItem depends on the store being loaded
+						await calendarStore.load();
+					}
+
+					const dlg = go.openEventWindow({
+							start:(new DateTime).addDays(1).format('Y-m-d\TH:00:00.000'),
 							title: t('New event'),
 							showWithoutTime: client.user.calendarPreferences?.defaultDuration == null,
 							duration: client.user.calendarPreferences?.defaultDuration ?? "P1D",
 							calendarId: client.user.calendarPreferences?.defaultCalendarId
-						}})).open()
+						}, true);
+
+					if(entity == "Contact") {
+						try {
+							const p = await principalDS.single("Contact:" + entityId);
+							dlg.participantFld.addParticipant(p);
+						} catch(e) {
+							console.error(e);
+						}
+					}
+
+					return dlg;
 				},
-				linkDetail:() =>  new EventDetail()
+				linkDetail:() =>  new EventDetail(),
+				linkDetailCards () {
+
+					var forth = new go.links.DetailPanel({
+						link: {
+							title: t("Upcoming appointments"),
+							iconCls: 'icon ic-event orange',
+							entity: "CalendarEvent",
+							filter: null
+						}
+					});
+
+					forth.store.setFilter('date', {eventsAfter: true});
+
+					var past = new go.links.DetailPanel({
+						link: {
+							title: t("Past appointments"),
+							iconCls: 'icon ic-event orange',
+							entity: "CalendarEvent",
+							filter: null
+						}
+					});
+
+					past.store.setFilter('past', {eventsBefore: true});
+
+					return [forth, past];
+				}
 			}]
 		}
 	],
+
+	panels: {
+		calendar: {
+			cmp: Main,
+			title: t("Calendar"),
+			routes: {
+				'^calendar/(month|list|week|day|year)/(\\d{4}-\\d{2}-\\d{2})$'(span, ymd){
+					this.show();
+					this.goto(new DateTime(ymd)).setSpan(span as ValidTimeSpan, 0);
+				},
+				'^calendar/(days|weeks|split|custom)-(\\d+)/(\\d{4}-\\d{2}-\\d{2})$'(span, amount, ymd) {
+					this.show();
+					this.goto(new DateTime(ymd)).setSpan(span as ValidTimeSpan, Math.min(parseInt(amount),373));
+				},
+				async '^calendarevent/(\\d+)$' (id)  {
+					// for notification clicks
+					this.show();
+					const event = await jmapds('CalendarEvent').single(id);
+					if(event)
+						(new CalendarItem({data: event, key: id})).info();
+
+				}
+			}
+		}
+
+	},
+
+	userSettingsPanels: [PreferencesPanel],
+
 	init () {
 		//const user = client.user;
-		translate.load(GO.lang.core.core, "core", "core");
-		translate.load(GO.lang.community.calendar, "community", "calendar");
+
 
 		addEmailAction();
 
 		client.on("authenticated",  ({session}) => {
 
-			// OLD CODE
-			async function showBadge() {
-				const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
-				ui.inboxBtn.hidden = count<1;
-				GO.mainLayout.setNotification('calendar', count, 'orange');
-			}
-			go.Db.store("CalendarEvent").on("changes", () => {
-				showBadge();
-			});
-			showBadge();
-			// END OLD CODE
+
 			client.user.calendarPreferences ||= {};
 			if(!session.capabilities["go:community:calendar"]) {
 				return; // User has no access to this module
 			}
-			const ui = new Main(),
-				nav = (span:ValidTimeSpan, amount: number, ymd?: string) => {
-					modules.openMainPanel("calendar");
-					ui.goto(new DateTime(ymd)).setSpan(span, amount);
-				};
-			router.add(/^calendar\/(month|list|week|day|year)\/(\d{4}-\d{2}-\d{2})$/, (span, ymd) => {
-					nav(span as ValidTimeSpan, 0, ymd);
-				})
-				.add(/^calendar\/(days|weeks|split)-(\d+)\/(\d{4}-\d{2}-\d{2})$/, (span, amount, ymd) => {
-					nav(span as ValidTimeSpan, Math.min(parseInt(amount),373), ymd); // it fits on my machine
-				}).add(/^calendarevent\/(\d+)$/, async (id) => {
-					// for notification clicks
-					const event = await jmapds('CalendarEvent').single(id);
-					if(event)
-						(new CalendarItem({data: event, key: id})).open();
 
-				});
+			// // OLD CODE
+			// async function showBadge() {
+			// 	const count = await go.Jmap.request({method: "CalendarEvent/countMine"});
+			// 	mainPanel.ui!.inboxBtn.hidden = count<1;
+			// 	GO.mainLayout.setNotification('calendar', count, 'orange');
+			// }
+			// go.Db.store("CalendarEvent").on("changes", () => {
+			// 	showBadge();
+			// });
+			// showBadge();
+			// // END OLD CODE
 
-			modules.addMainPanel("community", "Calendar", 'calendar', t('Calendar'), () => ui);
 
-			go.Alerts.on("beforeshow", function(alerts: any, alertConfig: any) {
+			// TODO: Move to entity register?
+			main.notifier.regRenderer('CalendarEvent', (alert, closeFn) => {
+				const entity = alert.entityData
+				const msg = {
+					title: entity.title,
+					icon: {name:'event', color: 'red'},
+					category: 'event'
+				} as any;
+				switch(alert.tag) {
+					case 'created':
+						msg.text = t("New event created by {creator}").replace('{creator}', alert.data.creator);
+						break;
+					case 'reply':
+						msg.text = t("Invitation updated by {from}").replace('{from}', alert.data.from?.personal ?? t("Unknown"));
+						break;
+					case 'request':
+						msg.text = t('New invitation from {from}').replace('{from}', alert.data.from?.personal ?? t("Unknown"));
+						const item = new CalendarItem({key: alert.entityId + "", data: entity});
+						msg.actions = {
+							primary: {run:() => { item.updateParticipation("accepted", () => closeFn()); }},
+							secondary: {run:() => { item.updateParticipation("declined", () => closeFn()); }}
+						};
+						break;
+					default: // normal Event alert
 
-				const alert = alertConfig.alert,
-					msgs: {[key:string]: string} = {
-						request: t('New invitation from {from}'),
-						reply: t("Invitation updated by {from}"),
-						created: t("New event created by {creator}")
-					};
-				//debugger;
-				if(alert.entity == "CalendarEvent" || alert.entity == "Calendar") {
+						const startTime = new DateTime(alert.recurrenceId || entity.start),
+							diff = (new DateTime()).diff(startTime);
 
-					alertConfig.panelPromise = alertConfig.panelPromise.then(async (panelCfg: any) => {
+						diff.seconds = 0;
 
-						let msg: string = msgs[alert.tag] || '',
-							time = go.util.Format.shortDateTime(alert.triggerAt);
+						msg.text = t(`Starts {diff} ({startTime})`)
+							.replace("{diff}", diff.format("T"))
+							.replace("{startTime}", Format.smartDateTime(startTime));
 
-						if(alert.tag === 'created'){
-							msg = msg.replace('{creator}', alert.data.creator);
+						if(entity.location) {
+							msg.text += ", " + (entity.location.indexOf('http') === 0 ? "Online" : entity.location);
 						}
-						if(alert.tag === 'reply' || alert.tag === 'request') {
-							msg = msg.replace('{from}', alert.data.from?.personal ?? t("Unknown"));
-
-							if(alert.tag === 'request') {
-								const event = await jmapds("CalendarEvent").single(alert.entityId);
-								if (event) {
-									const item = new CalendarItem({key: alert.entityId + "", data: event});
-									panelCfg.buttons = [
-										{
-											text: t('Accept'), handler: (btn: any) => {
-												item.updateParticipation("accepted", () => btn.findParentByType("panel").destroy());
-											}
-										},
-										{
-											text: t('Maybe'), handler: (btn: any) => {
-												item.updateParticipation("tentative", () => btn.findParentByType("panel").destroy())
-											}
-										},
-										{
-											text: t('Decline'), handler: (btn: any) => {
-												item.updateParticipation("declined", () => btn.findParentByType("panel").destroy())
-											}
-										}
-									];
-								}
-							}
-						}
-
-						panelCfg.items = [{html: msg + '<br>'+time }];
-						panelCfg.notificationBody = msg + "\n"+time; // for desktop notifications (no html)
-						return panelCfg;
-					});
-
 				}
+				return msg as INotification;
 			});
 
 		});
 
-		modules.addAccountSettingsPanel("community", "calendar", "calendar", t("Calendar"), "today", () => {
-			return new PreferencesPanel();
-		});
 	}
 });

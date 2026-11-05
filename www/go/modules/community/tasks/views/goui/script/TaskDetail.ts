@@ -1,4 +1,4 @@
-import {addbutton, client, DetailPanel, img, modules, principalDS} from "@intermesh/groupoffice-core";
+import {addbutton, client, DetailPanel, img, principalDS} from "@intermesh/groupoffice-core";
 import {
 	avatar,
 	btn, Button,
@@ -14,7 +14,6 @@ import {
 import {ProgressType} from "./Main.js";
 import {ContinueTaskDialog} from "./ContinueTaskDialog.js";
 import {TaskDialog} from "./TaskDialog.js";
-import {CommentsPanel} from "@intermesh/community/comments";
 import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
 
 export class TaskDetail extends DetailPanel {
@@ -155,12 +154,8 @@ export class TaskDetail extends DetailPanel {
 			)
 		);
 
-		if(modules.isAvailable("community", "comments")) {
-			CommentsPanel.addToDetail(this);
-		}
-
 		this.addCustomFields();
-
+		this.addComments();
 		this.addLinks();
 		this.addHistory();
 

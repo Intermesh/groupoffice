@@ -1,99 +1,121 @@
 import {
-	arrayfield,
-	ArrayField,
-	btn, Button,
-	Component, ContainerField, containerfield, datasourcestore, DataSourceStore, displayfield,
-	fieldset, Format, hr,
-	htmlfield, menu,
+	arrayfield, browser,
+	btn,
+	Button,
+	comp,
+	Component,
+	ContainerField,
+	containerfield,
+	datasourcestore,
+	DisplayField,
+	displayfield,
+	EntityID,
+	hr,
+	htmlfield,
+	menu,
 	Notifier,
 	root,
 	t
 } from "@intermesh/goui";
-import {client, jmapds, HtmlFieldMentionPlugin} from "@intermesh/groupoffice-core";
+import {client, HtmlFieldMentionPlugin, Image, principalDS} from "@intermesh/groupoffice-core";
+import {commentLabelDS} from "./Index.js";
 
 export class CommentEditor extends Component {
-	public labels: ArrayField;
-	public attachments: ArrayField;
-	public store: DataSourceStore;
+	public readonly labels;
+	public readonly attachments;
+	public readonly store;
 
-	public addBtn!: Button;
+	public readonly addBtn;
+	public readonly editor;
+
 
 	constructor() {
 		super();
 
 		this.title = t("Comment");
 
+		this.cls = "vbox";
+
+		this.on("render", () => {
+			void this.store.load();
+		});
+
 		this.items.add(
-			fieldset({
-					cls: "group"
-				},
-				this.addBtn = btn({
-					disabled: true,
-					icon: "add",
-					title: t("Add labels"),
-					menu: menu({})
-				}),
-				htmlfield({
-					flex: 1,
-					name: "text",
-					required: true,
-					listeners: {
-
-						beforerender:ev => {
-							new HtmlFieldMentionPlugin(ev.target, async (text) => {
-								const r = await jmapds("Principal").query({
-									filter: {
-										entity: "User",
-										text: text
-									}
-								});
-								const get = await jmapds("Principal").get(r.ids);
-								return get.list.map(p => {return {value:p.description, display:p.name}});
-							}, 5);
-
-							ev.target.getToolbar().items.insert(6, hr());
-						},
-
-						insertimage: ( {file, img}) => {
-							root.mask();
-
-							client.upload(file).then(r => {
-								if (img) {
-									img.dataset.blobId = r.id;
-									img.removeAttribute("id");
-								}
-								Notifier.success("Uploaded " + file.name + " successfully");
-							}).catch((err) => {
-								console.error(err);
-								Notifier.error("Failed to upload " + file.name);
-							}).finally(() => {
-								root.unmask();
+			this.editor = htmlfield({
+				flex: 1,
+				name: "text",
+				required: true,
+				listeners: {
+					beforerender: ev => {
+						new HtmlFieldMentionPlugin(ev.target, async (text) => {
+							const r = await principalDS.query({
+								filter: {
+									entity: "User",
+									text: text
+								},
+								limit: 10,
+								sort: [{property: "description"}]
 							});
-						}
+							const get = await principalDS.get(r.ids);
+							return get.list.map(p => {
+								return {value: p.description!, display: p.description + " (" + p.name + ")"}
+							});
+						}, 6);
+
+						ev.target.getToolbar().items.insert(6, hr());
+					},
+
+					setvalue: ({target}) => {
+						void Image.replaceImages(target.el);
+					},
+
+					attachfile: async ({file}) => {
+						this.mask();
+						const blob = await client.upload(file);
+						this.unmask();
+
+						const attachments = this.attachments.value;
+						attachments.push({
+							name: blob.name,
+							blobId: blob.id
+						})
+						this.attachments.value = attachments;
+					},
+
+					insertimage: ({file, img}) => {
+						root.mask();
+
+						client.upload(file).then(r => {
+							if (img) {
+								img.dataset.blobId = r.id;
+								img.removeAttribute("id");
+							}
+							Notifier.success("Uploaded " + file.name + " successfully");
+						}).catch((err) => {
+							console.error(err);
+							Notifier.error("Failed to upload " + file.name);
+						}).finally(() => {
+							root.unmask();
+						});
 					}
-				}),
-				btn({
-					icon: "send",
-					type: "submit"
-				})
-			),
+				}
+			}),
 
 			this.attachments = arrayfield({
-				style: {padding: "0 1.2rem"},
-				cls: "vbox",
+				itemContainerCls: "",
 				name: "attachments",
 				buildField: (v) => {
 					return containerfield({
 							cls: "hbox comment-editor-attachment"
 						},
 						displayfield({
-							escapeValue: false,
+							htmlEncode: false,
 							flex: 1,
-							value: `<i class="icon">description</i> ${Format.escapeHTML(v!.name)}`,
+							value: `<i class="icon">description</i> ${v!.name.htmlEncode()}`,
 						}),
 						btn({
 							icon: "delete",
-							handler: (button, ev) => {
+							handler: (button) => {
 								button.findAncestorByType(ContainerField)!.remove()
 							}
 						})
@@ -101,36 +123,83 @@ export class CommentEditor extends Component {
 				}
 			}),
 
-			this.labels = arrayfield({
-				style: {padding: "0 1.2rem"},
-				cls: "hbox flow",
+			this.labels = arrayfield<EntityID>({
+				itemContainerCls: "",
 				name: "labels",
 				buildField: (v) => {
-					return containerfield({
-							cls: "hbox comment-editor-label"
-						},
-						displayfield({
-							escapeValue: false,
-							flex: 1,
-							value: `<i class="icon" style="color: #${v!.color}">label</i> ${v!.name}`,
-							style: {color: `#${v!.color}`}
-						}),
-						btn({
-							icon: "cancel",
-							handler: (button, ev) => {
-								button.findAncestorByType(ContainerField)!.remove()
-							}
-						})
-					)
+					return displayfield({
+						tagName: "div",
+						cls: "comment-editor-label",
+						htmlEncode: false,
+						flex: 1,
+						renderer: (value) => {
+							return commentLabelDS.single(value).then(lbl => {
+								return comp({
+										cls: "hbox fit",
+									},
+									comp({
+										html: `<i class="icon" style="color: #${lbl.color}">label</i> ${lbl.name.htmlEncode()}`,
+										flex: 1
+									}),
+									btn({
+							icon: "delete",
+										handler: (button) => {
+											button.findAncestorByType(DisplayField)!.remove()
+										}
+									})
+								);
+							});
+						}
+					});
 				}
 			})
 		);
 
+
+		this.editor.getToolbar().items.insert(0,
+			this.addBtn = btn({
+				disabled: true,
+				icon: "label",
+				title: t("Add labels"),
+				menu: menu({}),
+				tabIndex: -1, // Skip toolbar in tabbing through forms
+			}),
+			hr()
+		);
+
+
+		this.editor.getToolbar().items.insert(0,
+			 btn({
+				type: "button",
+				title: t("Attach files"),
+				icon: "attach_file",
+				tabIndex: -1,
+				handler: async () => {
+
+					const files = await browser.pickLocalFiles(true);
+					this.mask();
+					const blobs = await client.uploadMultiple(files);
+					this.unmask();
+
+
+					const atts = this.attachments.value;
+					for (let blob of blobs) {
+						atts.push({
+							name: blob.name,
+							blobId: blob.id
+						});
+					}
+					this.attachments.value = atts;
+
+				}
+			}),
+		);
+
 		this.store = datasourcestore({
-			dataSource: jmapds("CommentLabel"),
+			dataSource: commentLabelDS,
 			listeners: {
-				load: ( {records}) => {
-					if (records) {
+				load: ({records}) => {
+					if (records.length > 0) {
 						this.addBtn.disabled = false;
 
 						let labelButtons: string | Component | Button[] = [];
@@ -142,13 +211,13 @@ export class CommentEditor extends Component {
 									style: {color: "#" + label.color},
 									text: label.name,
 									handler: () => {
-										if (this.labels.value.some(l => l.id === label.id)) {
+										if (this.labels.value.some(l => l === label.id)) {
 											return
 										}
 
 										const labels = this.labels.value;
 
-										labels.push(label);
+										labels.push(label.id);
 
 										this.labels.value = labels;
 									}
@@ -160,6 +229,6 @@ export class CommentEditor extends Component {
 					}
 				}
 			}
-		})
+		});
 	}
 }

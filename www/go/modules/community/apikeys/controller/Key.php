@@ -6,6 +6,9 @@ use go\core\jmap\EntityController;
 use go\modules\community\apikeys\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\apikeys\model\Key>
+ */
 class Key extends EntityController {
 	
 	/**

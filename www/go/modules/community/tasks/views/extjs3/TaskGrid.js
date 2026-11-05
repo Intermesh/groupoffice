@@ -23,7 +23,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			{name: 'modifier', type: "relation"},
 			{name: 'tasklist', type: "relation"},
 			{name: 'categories', type: "relation"},
-
+			'priority',
 			'percentComplete',
 			'progress',
 			{
@@ -40,6 +40,10 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 		if(!this.support && go.Modules.isAvailable('business', 'projects3')) {
 			storeFields.push({name: 'project', type: "relation"});
+		}
+
+		if(this.support) {
+			storeFields.push({name: 'customer', type: "relation"})
 		}
 
 		this.store = new go.data.GroupingStore({
@@ -108,7 +112,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				{
 					id: 'title',
-					header: t('Title'),
+					header: this.support ? t("Subject") : t('Title'),
 					width: dp(300),
 					sortable: true,
 					dataIndex: 'title',
@@ -199,6 +203,22 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: this.forProject || this.support,
 					groupable: false
 				},{
+					hidden: true,
+					id: "priority",
+					sortable: true,
+					dataIndex: 'priority',
+					header: t('Priority', "tasks", "community"),
+					renderer: function(v) {
+						switch(parseInt(v)) {
+							case 1:
+								return t("High");
+							case 9:
+								return t("Low");
+							default:
+								return t("Normal");
+						}
+					}
+				},{
 					hidden: !this.support,
 					id:"progress",
 					width:dp(150),
@@ -237,14 +257,14 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					groupable: false
 				},
 				{	
-					header: t('Created by'),
+					header:  t('Created by'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'creator',
 					renderer: function(v) {
 						return v ? v.name : "-";
 					},
-					hidden: !this.support,
+					hidden: true,
 					groupable: true
 				},
 				{
@@ -311,12 +331,26 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 
 
 		if(!this.support) {
-			this.columns.splice(7, 0,	{
-				id: "project",
-				header: t('Project', "projects3", "business"),
+			if(go.Modules.isAvailable("business","projects3")) {
+				this.columns.splice(7, 0, {
+					id: "project",
+					header: t('Project', "projects3", "business"),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'project',
+					renderer: function (v) {
+						return v ? v.name : "-";
+					},
+					groupable: true
+				});
+			}
+		} else {
+			this.columns.splice(4, 0,	{
+				id: "customer",
+				header: t('Customer', "support", "business"),
 				width: dp(160),
 				sortable: true,
-				dataIndex: 'project',
+				dataIndex: 'customer',
 				renderer: function(v) {
 					return v ? v.name : "-";
 				},

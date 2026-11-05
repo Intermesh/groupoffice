@@ -63,4 +63,8 @@ return array (
   'Menu item' => 'メニュー項目',
   'Display children' => '子画面を表示する',
   'Multi File' => 'マルチファイル',
+  'Slug' => 'Slug',
+  'Parent' => '親',
+  'Target' => '対象',
+  'You can also type in your own url, please make sure you add http(s):// to it to make the url work.' => '独自のURLを入力することもできます。その場合は、URLが正しく機能するように、必ずhttp(s)://を追加してください。',
 );

@@ -30,7 +30,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			layout: 'hbox',
 			items:[
 				{
-					width: 150,					
+					width: dp(152),
 					items: [
 						this.avatarComp = new go.form.ImageField({			
 							name: 'avatarId'										
@@ -68,26 +68,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						vtype:'emailAddress',
 						allowBlank:false,
 						hint: t('The recovery e-mail is used to send a forgotten password request to.','users','core')+'<br>'+t('Please use an email address that you can access from outside Group-Office.','users','core')
-					}),
-						// new Ext.form.DisplayField({
-						// 	name: "authenticators",
-						// 	height: dp(44),
-						// 	fieldLabel: t("Authenticators"),
-						// 	setValue: function(v) {
-						//
-						// 			var result = '';
-						//
-						// 			for(var i = 0, method; method = v[i]; i++) {
-						// 				result += '<div style="display:inline-block;margin-right: 16px"><i title="'+method+'" class="icon go-module-icon-'+method+'"></i> ' + method + '</div>';
-						// 			}
-						//
-						// 			this.setRawValue(result);
-						//
-						//
-						// 	}
-						// })
-					]
-				
+					})
+				]
 			}]
 		});
 
@@ -101,19 +83,26 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			this.userFieldset.insert(1, this.displayNameField);
 		}
 
+		if (go.Modules.isInstalled("community", "ldapauthenticator")) {
+			if (go.User && go.User.authenticators.indexOf("ldap") > -1) {
+				this.recoveryEmailField.hide();
+			}
+		}
+
 		this.quotaFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),		
-			hidden: !go.User.isAdmin,
+			hidden: !go.Modules.get("core", "core").userRights.mayChangeUsers,
 			title: t('Disk space'),
 			items: [{
 				xtype: 'compositefield',
+
+				hint: t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space."),
 				items: [{
 						xtype: 'numberfield',
 						name: 'disk_quota',
 						fieldLabel: t('Disk quota'),
 						decimals: 0,
-						width: dp(300),
-						hint: t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")
+						width: dp(180)
 					},{
 						xtype: 'displayfield',
 						value: 'MB'
@@ -162,6 +151,45 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					autocomplete: 'new-password'					
 				}),
 
+
+			]
+		});
+
+		this.convertToLocalFieldset = new Ext.form.FieldSet({
+			title: t('Password','users','core'),
+			hidden: true,
+			items:[
+
+				{
+					xtype:"box",
+					autoEl:"p",
+					html: t("This user doesn't have a local password because it's authenticated using an external provider. Click the button below to set a password and convert it to a local user. The domain will be stripped off the username"),
+				},
+
+				{
+					xtype: "button",
+					text: t("Convert to local user"),
+					handler : function() {
+
+						this.usernameField.setDisabled(false);
+
+						const username = this.usernameField.getValue();
+						// strip off domain part
+						this.usernameField.setValue(username.split("@")[0]);
+
+						this.passwordField1.setDisabled(false);
+						this.passwordField2.setDisabled(false);
+						this.emailField.setDisabled(false);
+
+						this.passwordFieldset.setVisible(true);
+
+						this.convertToLocalFieldset.setVisible(false);
+
+						this.usernameField.el.focus();
+
+					},
+					scope: this
+				}
 
 			]
 		});
@@ -243,12 +271,13 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					text: t("Logout all"),
 					handler : () => {
 						this.authorizedClients.setValue({});
+						this.authorizedClients.dirty = true;
 					}
 				}]
 		})
 		
 		
-		if(go.User.isAdmin) {
+		if(go.Modules.get("core", "core").userRights.mayChangeUsers) {
 			this.passwordFieldset.insert(0, {
 				xtype:"checkbox",
 				hideLabel: true,
@@ -269,6 +298,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.userFieldset,
 				this.quotaFieldset,
 				this.passwordFieldset,
+				// The OTP module inserts the 2FA fieldset at index 3, so this ends up directly below it.
+				this.appPasswordsFieldset = new go.usersettings.AppPasswordsFieldset(),
+				this.convertToLocalFieldset,
 				this.authorizedClientsFieldSet
 			].concat(go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return !fs.fieldSet.isTab;}))
 		});
@@ -297,6 +329,14 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.usernameField.setDisabled(!visible);
 		this.passwordField1.setDisabled(!visible);
 		this.passwordField2.setDisabled(!visible);
+		this.emailField.setDisabled(!visible);
+		this.recoveryEmailField.setDisabled(!visible);
+
+		this.passwordFieldset.setVisible(visible);
+
+		if(go.Modules.get("core", "core").userRights.mayChangeUsers) {
+			this.convertToLocalFieldset.setVisible(!visible);
+		}
 	},
 	
 	onValidate : function() {

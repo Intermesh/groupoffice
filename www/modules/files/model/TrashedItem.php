@@ -74,6 +74,17 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		$t->name = $folder->name;
 		$t->fullPath = $folder->parent->path;
 		$t->save(true);
+
+		$this->touchAcl($folder);
+	}
+
+	private function touchAcl(Folder $folder) {
+		$acl = $this->acl;
+		if(!empty($acl)) {
+			//quick hack so that shares folder is rebuilt in SHaredRootFolder::rebuildCache()
+			$acl->mtime = time();
+			$acl->save();
+		}
 	}
 
 	/**
@@ -131,6 +142,8 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 			if (!$f) {
 				throw new Exception(404, GO()->t("Folder not found."));
 			}
+
+			$this->touchAcl($f);
 		}
 		if ($f->move($parentFolder, true, true)) {
 			$this->delete();
@@ -141,11 +154,11 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	{
 		$entityType = EntityType::findById($this->entityTypeId);
 		if ($entityType->getName() == 'File') {
-			$f = \GO\Files\Model\File::model()->findByPk($this->entityId, false, true);
+			$f = \GO\Files\Model\File::model()->findByPk($this->entityId, false, true, true);
 		} else {
-			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId, false, true);
+			$f = \GO\Files\Model\Folder::model()->findByPk($this->entityId, false, true, true);
 		}
-		if (isset($f)) {
+		if (!empty($f)) {
 			$f->delete(true);
 		}
 		$this->delete(true);

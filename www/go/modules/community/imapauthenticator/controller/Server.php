@@ -5,6 +5,9 @@ use go\core\controller;
 use go\core\jmap\Response;
 use go\modules\community\imapauthenticator\model;
 
+/**
+ * @extends EntityController<\go\modules\community\imapauthenticator\model\Server>
+ */
 class Server extends \go\core\jmap\EntityController {
 	
 	protected function entityClass(): string

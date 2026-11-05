@@ -3,6 +3,7 @@
 namespace go\core\controller;
 
 use go\core\customfield\Base;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
@@ -10,6 +11,9 @@ use go\core\model;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
 
+/**
+ * @extends EntityController<\go\core\model\FieldSet>
+ */
 class FieldSet extends EntityController {
 
 	protected function canUpdate(Entity $entity): bool
@@ -101,6 +105,10 @@ class FieldSet extends EntityController {
 	 */
 	public function exportToJson($params)
 	{
+		if(!$this->rights->mayChangeCustomFields) {
+			throw new Forbidden();
+		}
+
 		$jsonArray = ['entity' => $params['entity'], 'goVersion' => go()->getVersion(), 'fieldSets' => []];
 		$fieldSets = model\FieldSet::findByIds($params['fieldSetIds']);
 		$fieldSetArray = [];
@@ -172,6 +180,10 @@ class FieldSet extends EntityController {
 	 */
 	public function importFromJson($params)
 	{
+		if(!$this->rights->mayChangeCustomFields) {
+			throw new Forbidden();
+		}
+
 		$blob = Blob::findById($params['blobId']);
 		$json = $blob->getFile()->getContents();
 		$jsonArray = json_decode($json, true);

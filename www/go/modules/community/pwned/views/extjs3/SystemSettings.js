@@ -23,6 +23,7 @@ go.modules.community.pwned.AuthenticatorSystemSettingsFieldset = Ext.extend(Ext.
 			},
 			this.enableForGroupId = new go.groups.GroupComboReset({
 				submit: false,
+				allowBlank: false,
 				xtype: "groupcomboreset",
 				name: "pwned.enableForGroup",
 				value: go.Modules.get("community", "pwned").settings.enableForGroupId

@@ -82,7 +82,7 @@ go.AuthenticationManager = (function () {
 						go.Jmap.processDebugResponse(result.debug, 'auth');
 					}
           
-          this.userAuthenticators = result.authenticators || [];
+          			this.userAuthenticators = result.authenticators || [];
 					this.loginToken = result.loginToken;
 					this.username = result.username;
 
@@ -98,7 +98,7 @@ go.AuthenticationManager = (function () {
 								
 							case 403:
 								// Not allowed by IP filter AllowGroup or user not enabled.
-								Ext.MessageBox.alert(t("Account disabled"), response.statusText);
+								Ext.MessageBox.alert(t("Account disabled"), t(response.statusText));
 								break;
 								
 							case 401: //Bad login
@@ -123,12 +123,12 @@ go.AuthenticationManager = (function () {
 		},
 		
 		logout: function (first) {
-			if (Ext.Ajax.isLoading())
+			if (Ext.Ajax.isLoading() || window.groupofficeCore.client.isBusy())
 			{
 				if (first) {
 					Ext.getBody().mask(t("Loading..."));
 				}
-				this.logout.defer(500, this, [true]);
+				this.logout.defer(300, this, [true]);
 			} else
 			{
 				window.GOUI.browserStoreConnection.deleteDatabase().then(function() {
@@ -144,8 +144,7 @@ go.AuthenticationManager = (function () {
 		},
 
 		doAuthentication: function (authenticators, cb, scope) {
-
-			var loginData = {
+			const loginData = {
 				loginToken: this.loginToken, //while the user is authenticating only loginToken is set 
 				rememberLogin: this.rememberLogin,
 				authenticators: authenticators
@@ -155,8 +154,7 @@ go.AuthenticationManager = (function () {
 				url: this.getAuthUrl(),
 				jsonData: loginData,
 				callback: function (options, success, response) {
-					var result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
-					
+					const result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
 					if(!success) {
 						switch(response.status) {
 							case 503:
@@ -174,8 +172,7 @@ go.AuthenticationManager = (function () {
 						this.onAuthenticated(result).then(function() {
 							cb.call(scope || me, me, success, result);	
 						});
-					} else
-					{
+					} else {
 						cb.call(scope || me, me, success, result);
 					}
 

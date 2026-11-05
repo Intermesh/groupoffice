@@ -82,7 +82,7 @@ go.Modules.register("core", 'core', {
 			name: 'FieldSet', 
 			title: t("Custom field set")
 		}, 
-		'Module', 
+		'Module',
 		{
 			name: 'Link',
 			relations: {
@@ -219,12 +219,14 @@ GO.mainLayout.on('render', function () {
 		}
 		e.dataTransfer.dropEffect = "none";
 		e.preventDefault();
+		console.log("File over");
 	},false);
 	document.addEventListener("drop",function(e){
 		if(!e.dataTransfer || !e.dataTransfer.items.length || e.dataTransfer.items[0].kind != 'file') {
 			return;
 		}
 		e.preventDefault();
+		console.log("File dropped");
 	},false);
 
 

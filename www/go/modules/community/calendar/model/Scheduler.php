@@ -3,19 +3,21 @@
 namespace go\modules\community\calendar\model;
 
 use Exception;
-use GO\Base\Db\FindCriteria;
-use GO\Base\Db\FindParams;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
+use go\core\http\PostResponseProcessor;
 use go\core\mail\Address;
 use go\core\mail\Attachment;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\util\DateTime;
-use GO\Email\Model\Alias;
 use GO\Email\Model\ImapMessage;
-use PDO;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VEvent;
 
+/**
+ * Handles imip scheduling
+ */
 class Scheduler {
 
 	const EssentialScheduleProps = ['start', 'duration', 'location', 'title', 'description', 'showWithoutTime', 'recurrenceRule'];
@@ -24,12 +26,13 @@ class Scheduler {
 	 * Send all the needed imip schedule messages
 	 *
 	 * @param CalendarEvent $event
+	 * @param bool $willDelete
+	 * @throws JsonPointerException
+	 * @throws \PHPMailer\PHPMailer\Exception
 	 * @parma bool $delete if the event is about to be deleted
 	 */
-	static public function handle(CalendarEvent $event, bool $willDelete = false) {
-
-		if($event->isInPast())
-			return;
+	static public function handle(CalendarEvent $event, bool $willDelete = false): void
+	{
 
 		$current = $event->calendarParticipant();
 		if(!empty($current) && ($willDelete || $event->isModified('participants') || $event->isModified(self::EssentialScheduleProps))) {
@@ -37,9 +40,20 @@ class Scheduler {
 				$newOnly = !$willDelete && $event->isModified('participants') && !$event->isModified(self::EssentialScheduleProps);
 				$method = $willDelete ? 'CANCEL' : 'REQUEST';
 				self::organizeImip($event, $current, $method, $newOnly);
-			} else if (!empty($event->replyTo) && $current->isModified('participationStatus')) {
-				$status = $willDelete ? Participant::Declined : $current->participationStatus;
-				self::replyImip($event, $current, $status);
+
+				if(!$willDelete && $event->isModified('participants')) {
+					$removed = $event->removedParticipants();
+					if(!empty($removed)) {
+						self::organizeImip($event, $current, 'CANCEL', false, $removed);
+					}
+				}
+			} else if (!empty($event->replyTo) && ($willDelete || $current->isModified('participationStatus'))) {
+
+				if($willDelete) {
+					// Deleting the event from your own (or resource) calendar declines it
+					$current->participationStatus  = Participant::Declined;
+				}
+				self::replyImip($event, $current);
 			}
 		}
 
@@ -49,16 +63,23 @@ class Scheduler {
 
 	}
 
-	private static function replyImip(CalendarEvent $event, $participant, $status) {
+	/**
+	 * Sends a status reply to the organizer
+	 *
+	 * @param CalendarEvent $event
+	 * @param $participant
+	 * @throws \PHPMailer\PHPMailer\Exception
+	 */
+	public static function replyImip(CalendarEvent $event, $participant): void
+	{
 
 		$organizer = $event->organizer();
 		if(!empty($participant->language)) {
 			$old = go()->getLanguage()->setLanguage($participant->language);
 		}
 
-		$participant->participationStatus = $status;
+
 		// needed so organizer can find last response
-		$event->createdAt = new DateTime();
 		$event->modifiedAt = new DateTime();
 		$ics = ICalendarHelper::toInvite('REPLY', $event);
 
@@ -66,7 +87,8 @@ class Scheduler {
 		foreach($ics->vevent as $vevent) {
 			if(isset($vevent->attendee)) {
 				foreach($vevent->attendee as $a) {
-					if('mailto:'.strtolower($participant->email) !== (string) $a) {
+					// The same email can be used by an individual and a resource, so match on the type too
+					if('mailto:'.strtolower($participant->email) !== (string) $a || self::attendeeKind($a) !== $participant->kind) {
 						$vevent->remove($a);
 					}
 				}
@@ -76,7 +98,7 @@ class Scheduler {
 		$subject = go()->t('Reply').': '.$event->title;
 		$lang = go()->t('replyImipBody', 'community', 'calendar');
 
-		$body = strtr($lang[$status], [
+		$body = strtr($lang[$participant->participationStatus], [
 			'{name}' => $participant->name??'',
 			'{title}' => $event->title,
 			'{date}' => implode(' ',$event->humanReadableDate()),
@@ -99,7 +121,6 @@ class Scheduler {
 			unset($old);
 		}
 
-		return true;
 	}
 
 	/**
@@ -119,19 +140,36 @@ class Scheduler {
 	 * @param $event CalendarEvent an instance that needs scheduling
 	 * @param $method string 'REQUEST' or 'CANCEL' depending on what is happing to the event
 	 * @param $newOnly boolean Only send if participant was added
+	 * @param Participant[]|null $participants Only send to (and list in the ics) these participants instead of all
 	 * @return boolean
 	 */
-	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false) {
+	private static function organizeImip(CalendarEvent $event, $organizer, $method, $newOnly = false, ?array $participants = null): bool
+	{
 		$success=true;
 
+		// allow lots of time for sending invites
+		go()->getEnvironment()->setMaxExecutionTime(300);
 
 		// This does not only build the ics file but also changes event to an occurence if an occurence was modified. A
 		// participant could have been added as well.
+		// toInvite() replaces $event by a patched copy of the modified occurrence for the mail body. That copy has no id
+		// and its participants are never saved, so everything that is persisted must use the original event.
+		$origin = $event;
 		$ics = ICalendarHelper::toInvite($method,$event);
+
+		if($participants !== null) {
+			// Only addressed participants may be listed (RFC 5546 3.2.5), e.g. the removed ones in a CANCEL
+			foreach($ics->vevent as $vevent) {
+				$vevent->remove('ATTENDEE');
+				foreach($participants as $participant) {
+					$vevent->add(...ICalendarHelper::toAttendee($participant));
+				}
+			}
+		}
 
 		$mailer = go()->getMailer($organizer->email, $organizer->name);
 
-		foreach($event->participants as $participant) {
+		foreach($participants ?? $origin->participants as $participant) {
 			/** @var $participant Participant */
 			if(($newOnly && !$participant->isNew()) || $participant->isOwner())
 				continue;
@@ -145,6 +183,11 @@ class Scheduler {
 				$subject .= ' ('.go()->t('updated', 'community', 'calendar').')';
 			}
 
+			// An occurrence is a copy that is not saved, so it keeps the secret of the saved participant.
+			if($method === 'REQUEST' && !$origin->isInstance()) {
+				$participant->expectReply(true);
+			}
+
 			try {
 				$msg = $mailer->compose();
 
@@ -155,20 +198,51 @@ class Scheduler {
 					);
 				}
 
+				$participant->scheduleStatus = "1.0";
+
+				// Message will be sent after closing client connection to avoid timeouts.
 				$msg->setSubject($subject . ': ' . $event->title)
 						->setTo(new Address($participant->email, $participant->name))
 						->setBody(self::mailBody($event, $method, $participant, $subject), 'text/html')
-						->send();
+						->sendAfterResponse(
+							function($message) use ($participant, $event) {
 
+								go()->getDbConnection()
+									->update("calendar_participant",
+										['scheduleStatus' => '1.1;Successfully sent'],
+										$participant->primaryKeyValues()
+									)
+									->execute();
+							},
+							function($message, $exception) use ($participant,$event) {
+
+								go()->getDbConnection()
+									->update("calendar_participant",
+										['scheduleStatus' => "3.7;".$exception->getMessage()],
+										$participant->primaryKeyValues()
+									)
+									->execute();
+								ErrorHandler::logException($exception);
+							}
+						);
 			} catch(\Exception $e) {
 				go()->log($e->getMessage());
-				$success=false;
+				$success = false;
 			}
 			if(isset($old)) {
 				go()->getLanguage()->setLanguage($old);
 				unset($old);
 			}
 		}
+
+		// register a change because the participants have been updated
+		// An occurrence is a copy without an id. The saved event registers the change.
+		if($origin->id()) {
+			PostResponseProcessor::get()->addTask(function() use ($origin) {
+				CalendarEvent::entityType()->change($origin);
+			});
+		}
+
 		return $success;
 	}
 
@@ -179,7 +253,7 @@ class Scheduler {
 		ob_start();
 		$url = '';
 		if($method ==='REQUEST') {
-			$url = go()->getAuthState()->getPageUrl().'/community/calendar/invite/'.$event->uid.'/'.$participant->expectReply(true);
+			$url = go()->getAuthState()->getPageUrl().'/community/calendar/invite/'.$event->uid.'/'.$participant->scheduleSecret();
 		}
 		include __DIR__.'/../views/imip.php';
 		return ob_get_clean();
@@ -209,27 +283,33 @@ class Scheduler {
 		}
 		$vevent = $vcalendar->VEVENT[0];
 
-		$accountUserEmail = go()->getDbConnection()
-			->selectSingleValue("email")
-			->from("core_user", "u")
-			->where('id', '=', $imapMessage->account->user_id)
-			->single();
-
-		$accountUserEmail = strtolower($accountUserEmail);
-
 		$alreadyProcessed = false;
 		$accountEmail = false;
 		if($method ==='REPLY') {
+			$uid =(string) $vevent->UID;
 			// Find event data's replyTo by UID, we don't trust the organizer in the VEVENT
-			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', (string) $vevent->UID)->single();
-			if ($replyTo === $accountUserEmail) {
-				$accountEmail = $replyTo;
+			$replyTo = go()->getDbConnection()->selectSingleValue('replyTo')->from('calendar_event')->where('uid', '=', $uid)->single();
+
+			go()->debug("Reply to:  ".$replyTo);
+			if($replyTo) {
+				$userIds = User::findIdsByEmail($replyTo);
+
+				go()->debug(implode(', ', $userIds) . ' == '. $imapMessage->account->user_id);
+
+				if (in_array($imapMessage->account->user_id, $userIds)) {
+					$accountEmail = $replyTo;
+				}
 			}
 		} else {
 			if (isset($vevent->attendee)) {
 				foreach ($vevent->attendee as $vattendee) {
+					// todo, it could bne te that more than 1 user has this email...
 					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
-					if ($attendeeEmail === $accountUserEmail) {
+					$userIds = User::findIdsByEmail($attendeeEmail);
+
+					go()->debug("Find user for " . $attendeeEmail ." : " . implode(', ', $userIds) . ' == '. $imapMessage->account->user_id);
+
+					if (in_array($imapMessage->account->user_id, $userIds)) {
 						$accountEmail = $attendeeEmail;
 					}
 				}
@@ -239,7 +319,7 @@ class Scheduler {
 		if (!$accountEmail || $method === 'NONE') {
 			return [
 				'method' => $method,
-				'feedback' => $accountEmail ? "" : go()->t('You are not an invited to this event', "email"),
+				'feedback' => $accountEmail ? "" : ($method ==='REPLY' ? go()->t('Event not found', "email") : go()->t('You are not invited to this event', "email")),
 				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
 			];
 		} else {
@@ -303,9 +383,10 @@ class Scheduler {
 		}
 
 		$method = $vcalendar->method->getValue();
-		$event = self::eventByVEvent($vcalendar, $userId);
+		// A CANCEL for an event that's not in the user's calendar (anymore) must not pull in and cancel someone else's copy
+		$event = self::eventByVEvent($vcalendar, $userId, $method === 'REQUEST');
 
-		if($event->isNew() && $method !== 'REQUEST')
+		if(!$event || ($event->isNew() && $method !== 'REQUEST'))
 			return null;
 		switch($method){
 			case 'REQUEST': return self::processRequest($vcalendar,$event, $alreadyProcessed);
@@ -316,7 +397,7 @@ class Scheduler {
 		return null;
 	}
 
-	private static function eventByVEvent($vcalendar, $userId) {
+	private static function eventByVEvent($vcalendar, $userId, bool $addIfMissing = true) {
 		$vevent = $vcalendar->VEVENT[0];
 		$uid = (string)$vevent->uid;
 		$recurId = !empty($vevent->{'RECURRENCE-ID'}) ? $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s') : null;
@@ -337,6 +418,9 @@ class Scheduler {
 		}
 
 		go()->debug("NOT Found");
+		if(!$addIfMissing) {
+			return null;
+		}
 
 		// still not found. See if an event with the same UID exists in someone else its calendar and add it to ours
 		$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
@@ -371,7 +455,7 @@ class Scheduler {
 		$event = new CalendarEvent();
 		$event->calendarId = $calendarId;
 		$event->isOrigin = false;
-		$event->replyTo = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+		$event->replyTo = str_replace('mailto:', '', strtolower((string)$vcalendar->VEVENT[0]->{'ORGANIZER'}));
 
 		return $event;
 	}
@@ -405,14 +489,25 @@ class Scheduler {
 
 	private static function processCancel(VCalendar $vcalendar, CalendarEvent $existingEvent, bool &$alreadyProcessed) : CalendarEvent {
 
+		if($existingEvent->isOrigin) {
+			// This is the organizer's own event shared with a local participant that was removed. Cancelling it
+			// would cancel the event for everyone.
+			$alreadyProcessed = true;
+			return $existingEvent;
+		}
+
 		if ($existingEvent->isRecurring()) {
 			foreach($vcalendar->VEVENT as $vevent) {
 				if(!empty($vevent->{'RECURRENCE-ID'})) {
+
+					self::fixRecurrenceId($existingEvent, $vevent);
+
 					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+
 					if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
 						$existingEvent->recurrenceOverrides[$recurId] = (new RecurrenceOverride($existingEvent));
 					}
-					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['status' => CalendarEvent::Cancelled]);
+					$existingEvent->recurrenceOverrides[$recurId]->patchProps((object)['excluded' => true]);
 				} else {
 					$existingEvent->status = CalendarEvent::Cancelled;
 				}
@@ -441,32 +536,40 @@ class Scheduler {
 	private static function processReply(VCalendar $vcalendar, CalendarEvent $existingEvent, $sender, bool &$alreadyProcessed) : CalendarEvent {
 
 		foreach($vcalendar->VEVENT as $vevent) {
-			if(!isset($vevent->ATTENDEE['PARTSTAT'])) {
+			if(!isset($vevent->ATTENDEE)) {
 				continue;
 			}
-			$status = strtolower($vevent->ATTENDEE['PARTSTAT']->getValue());
-
 			$replyStamp = $vevent->DTSTAMP->getDateTime();
 
-			// MAKE PATCH
-			if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
-				$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
-
-				$alreadyProcessed = !self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp);
-				if($alreadyProcessed) {
-					return $existingEvent;
+			foreach($vevent->ATTENDEE as $attendee) {
+				if(!isset($attendee['PARTSTAT'])) {
+					continue;
 				}
+				$status = strtolower($attendee['PARTSTAT']->getValue());
+				$kind = self::attendeeKind($attendee);
 
-			} else {
-				// APPLY EVENT
-				$p = $existingEvent->participantByScheduleId($sender->email);
-				if (!$p) continue; // no party crashers
-				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
-					$p->participationStatus = $status;
-					$p->scheduleUpdated = new DateTime($replyStamp->format("Y-m-d H:i:s"), $replyStamp->getTimezone());
+				// MAKE PATCH
+				if(isset($vevent->{'RECURRENCE-ID'})) {// occurrence
+
+					Scheduler::fixRecurrenceId($existingEvent, $vevent);
+					$recurId = $vevent->{'RECURRENCE-ID'}->getDateTime()->format('Y-m-d\TH:i:s');
+
+					$alreadyProcessed = !self::updateRecurrenceStatus($existingEvent, $recurId, $sender->email, $status, $replyStamp, $kind);
+					if($alreadyProcessed) {
+						return $existingEvent;
+					}
+
 				} else {
-					$alreadyProcessed = true;
-					return $existingEvent;
+					// APPLY EVENT
+					$p = $existingEvent->participantByScheduleId($sender->email, $kind);
+					if (!$p) continue; // no party crashers
+					if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
+						$p->participationStatus = $status;
+						$p->scheduleUpdated = new DateTime($replyStamp->format("Y-m-d H:i:s"), $replyStamp->getTimezone());
+					} else {
+						$alreadyProcessed = true;
+						return $existingEvent;
+					}
 				}
 			}
 		}
@@ -475,6 +578,50 @@ class Scheduler {
 			throw new SaveException($existingEvent);
 		}
 		return $existingEvent;
+	}
+
+
+	/**
+	 * The participant kind of an ATTENDEE property (CUTYPE)
+	 */
+	private static function attendeeKind($attendee): string {
+		$k = isset($attendee['CUTYPE']) ? strtolower((string) $attendee['CUTYPE']) : 'individual';
+		return $k == 'room' ? 'location' : $k;
+	}
+
+	public static function fixRecurrenceId(CalendarEvent $existingEvent, VEvent $vevent) {
+
+
+		$recurId = $vevent->{'RECURRENCE-ID'}->getValue();
+
+		// Microsoft Exchange Server 2010 sends a string with zero time: 20251125T000000. Attempt to fix that.
+		if(!str_ends_with($recurId, "T000000")) {
+			return;
+		}
+
+		// put original time in recurrence ID
+		$recurId = substr($recurId, 0, -6) . $existingEvent->start()->format("His");
+		$vevent->{'RECURRENCE-ID'}->setValue($recurId);
+
+		//this code is too heavy and killed servers:
+
+//		if(isset($existingEvent->recurrenceOverrides[$recurId])) {
+//			// already present so assume it's valid
+//			return $recurId;
+//		}
+//
+//		if(RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+//			return $recurId;
+//		}
+//		$origRecurId = $recurId;
+//
+//		// Microsoft Exchange Server 2010 sends a string with zero time: 20251125T000000. Attempt to fix that.
+//		$recurId = RecurrenceRule::fixRecurrenceId($existingEvent, $recurId);
+//		if(!RecurrenceRule::validateRecurrenceId($existingEvent, $recurId)) {
+//			throw new Exception("Invalid recurrence ID given $origRecurId");
+//		}
+
+//		return $recurId;
 	}
 
 
@@ -489,11 +636,10 @@ class Scheduler {
 	 * @return bool True if a modification was made. False if already up to date.
 	 * @throws JsonPointerException
 	 */
-	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp): bool
+	public static function updateRecurrenceStatus(CalendarEvent $existingEvent, string $recurId, string $email, string $status, \DateTimeInterface $replyStamp, ?string $kind = null): bool
 	{
+
 		if(!isset($existingEvent->recurrenceOverrides[$recurId])) {
-			// TODO: check if the given RECURRENCE-ID is valid for $existingEvent->recurrenceRule
-			// If it is not valid an extra instance would be created (RDATE in iCal) GroupOffice does not display these at the moment.
 			$existingEvent->recurrenceOverrides[$recurId] = new RecurrenceOverride($existingEvent);
 			$exEvent = $existingEvent->patchedInstance($recurId);
 		} else {
@@ -505,7 +651,7 @@ class Scheduler {
 			$modifiedParticipants = $exEvent->participants;
 			$modified = false;
 			foreach ($modifiedParticipants as &$p) {
-				if ($p->email != $email) {
+				if ($p->email != $email || ($kind !== null && $p->kind !== $kind)) {
 					continue;
 				}
 				if (empty($p->scheduleUpdated) || $p->scheduleUpdated < $replyStamp) {
@@ -519,7 +665,8 @@ class Scheduler {
 			}
 			if ($modified) {
 				$existingEvent->recurrenceOverrides[$recurId]->patchProps(
-					(object)['participants' => $modifiedParticipants]
+					(object)['participants' => $modifiedParticipants],
+					false
 				);
 			}
 		}

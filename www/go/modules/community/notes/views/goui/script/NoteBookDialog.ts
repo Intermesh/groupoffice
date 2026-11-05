@@ -1,4 +1,4 @@
-import {fieldset, t, textfield} from "@intermesh/goui";
+import {checkbox, fieldset, t, textfield} from "@intermesh/goui";
 import {FormWindow} from "@intermesh/groupoffice-core";
 import {NoteBook} from "./Index";
 
@@ -16,6 +16,11 @@ export class NoteBookDialog extends FormWindow<NoteBook> {
 					name: "name",
 					label: t("Name"),
 					required: true
+				}),
+				checkbox({
+					name: "syncToDevice",
+					label: t("Sync to device"),
+					hint: t("Make notebook available in ActiveSync")
 				})
 			)
 		);

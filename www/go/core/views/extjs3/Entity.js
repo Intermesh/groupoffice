@@ -22,6 +22,14 @@ go.Entity = function (cfg) {
 			l.iconCls = "entity " + l.entity;
 		}
 	}, this);
+
+	if(!this.permissions) {
+		this.permissions = [
+			{value: 10,name: t("Read")},
+			{value: 30,name: t("Write")},
+			{value: 50,name: t("Manage")}
+		];
+	}
 	
 	if(!this.filters) {
 		this.filters = [{
@@ -123,22 +131,22 @@ Ext.apply(go.Entity.prototype, {
 		return current[last];
 	},
 
-	applyCustomFieldFilters: function() {
-		entityName = this.extends || this.name;
-
-		var existingNames = this.filters.column("name"),
-			customFieldFilters = go.customfields.CustomFields.getFilters(entityName),
-			me = this;
-
-		customFieldFilters = customFieldFilters.filter(function(f) {
-			var exists = existingNames.indexOf(f.name) > -1;
-			if(exists) {
-				console.warn("Custom field name " + f.name+ " can't be filtered as the name conflicts with an existing filter for entity " + me.name);
-			}
-			return !exists;
-
-		});
-		this.filters = this.filters.concat(customFieldFilters);
-	}
+	// applyCustomFieldFilters: function() {
+	// 	entityName = this.extends || this.name;
+	//
+	// 	var existingNames = this.filters.column("name"),
+	// 		customFieldFilters = go.customfields.CustomFields.getFilters(entityName),
+	// 		me = this;
+	//
+	// 	customFieldFilters = customFieldFilters.filter(function(f) {
+	// 		var exists = existingNames.indexOf(f.name) > -1;
+	// 		if(exists) {
+	// 			console.warn("Custom field name " + f.name+ " can't be filtered as the name conflicts with an existing filter for entity " + me.name);
+	// 		}
+	// 		return !exists;
+	//
+	// 	});
+	// 	this.filters = this.filters.concat(customFieldFilters);
+	// }
 
 });

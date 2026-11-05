@@ -1,4 +1,5 @@
 CREATE TABLE `addressbook_address` (
+  id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `address` text null COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -35,7 +36,7 @@ CREATE TABLE `addressbook_contact` (
   `lastName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `suffixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Suffixes like ''Msc.''',
   `salutation` VARCHAR(382) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gender` enum('M','F') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M for Male, F for Female or null for unknown',
+  `gender` enum ('M', 'F', 'N', 'P') null comment 'M for Male, F for Female, N for non-binary, P for private or null for unknown',
   `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isOrganization` tinyint(1) NOT NULL DEFAULT 0,
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'name field for companies and contacts. It should be the display name of first, middle and last name',
@@ -78,12 +79,14 @@ CREATE TABLE `addressbook_contact_star` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_date` (
+   id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'birthday',
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_email_address` (
+  id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL
@@ -96,12 +99,14 @@ CREATE TABLE `addressbook_group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_phone_number` (
+  id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_url` (
+   id int auto_increment primary key,
   `contactId` int(11) NOT NULL,
   `type` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
@@ -252,3 +257,20 @@ create index addressbook_contact_lastContactAt_index
 
 create index addressbook_contact_actionAt_index
     on addressbook_contact (actionAt);
+
+CREATE TABLE IF NOT EXISTS `addressbook_addressbook_user`
+(
+    `addressBookId` INT(11) NOT NULL,
+    `userId`        INT(11) NOT NULL,
+    `syncToDevice`  TINYINT(1)       DEFAULT 0 NOT NULL,
+    `modSeq`        INT     NOT NULL DEFAULT 0,
+    PRIMARY KEY (`addressBookId`, `userId`),
+    CONSTRAINT `fk_addressbook_addressbook_user_addresbook_addressbook1` FOREIGN KEY (`addressBookId`)
+        REFERENCES `addressbook_addressbook` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+    CONSTRAINT `fk_addressbook_addressbook_user_core_user` FOREIGN KEY (`userId`)
+        REFERENCES `core_user` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
+);

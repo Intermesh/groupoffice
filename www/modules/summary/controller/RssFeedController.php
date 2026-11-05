@@ -75,6 +75,7 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, FindParams $storeParams) {
+		\GO::session()->closeWriting();
 		$storeParams->getCriteria()->addCondition('user_id', \GO::user()->id);
 		return parent::beforeStoreStatement($response, $params, $store, $storeParams);
 	}

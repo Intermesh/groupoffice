@@ -3,6 +3,13 @@
 use go\core\App;
 use go\core\cache\None;
 
+// disable cache and flush
+ini_set('zlib.output_compression', 0);
+ini_set('implicit_flush', 1);
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 App::get()->setCache(new None());
 // no logged in user because it can cause trouble with tables not existing yet
 App::get()->setAuthState(new \go\core\auth\TemporaryState(null));
@@ -10,6 +17,7 @@ App::get()->setAuthState(new \go\core\auth\TemporaryState(null));
 require('../views/Extjs3/themes/Paper/pageHeader.php');
 
 try {
+	// nosemgrep
 	if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {
 	    echo "<section><fieldset>";
 	    echo("A config folder was found in /etc/groupoffice/" . $_SERVER['HTTP_HOST'] .". Please move all your domain configuration folders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.");

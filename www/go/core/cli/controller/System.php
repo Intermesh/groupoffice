@@ -24,8 +24,10 @@ use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\exception\SaveException;
 use go\core\util\Cli;
+use go\core\util\Crypt;
 use go\core\util\DateTime;
 use go\core\util\JSON;
+use go\core\util\Markdown;
 use go\core\util\PdfRenderer;
 use go\modules\business\license\model\License;
 use go\modules\community\history\Module as HistoryModule;
@@ -217,6 +219,7 @@ JSON;
 			$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
 			$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
 
+			$http->setHeader('X-GO-Cache-Token', Crypt::createInternalToken('clearcache'));
 			$response = $http->get(go()->getSettings()->URL . '/install/clearcache.php');
 			if($response['status'] != 200) {
 				echo "Failed to clear cache. Please run: '" .go()->getSettings()->URL . "install/' in the browser.\n";
@@ -368,6 +371,9 @@ JSON;
 		$modules = Module::find();
 
 		if(isset($params['package'])) {
+			if($params['package'] == "legacy") {
+				$params['package'] = null;
+			}
 			$modules->andWhere('package', '=', $params['package']);
 		}
 
@@ -423,6 +429,50 @@ JSON;
 	 */
 	public function checkBlobs() {
 		Blob::removeMissingFromFilesystem(!empty($params['delete']));
+	}
+
+
+	/**
+	 * Prints blob usage count per table and size on disk
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/blobReport
+	 *
+	 * @return void
+	 * @throws \go\core\db\DbException
+	 */
+	public function blobReport() {
+		$sql = "SELECT CONCAT(
+               GROUP_CONCAT(
+                       CONCAT(
+                               'SELECT ''', TABLE_NAME,
+                               ''' AS referencing_table, COUNT(b.id) as refs, IFNULL(sum(b.size),0) AS size FROM `',
+                               TABLE_NAME, '` INNER JOIN core_blob b on b.id = `', COLUMN_NAME, '`'
+                       )
+                       SEPARATOR ' UNION ALL '
+               ),
+           ' ORDER BY size DESC') AS generated_sql
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_SCHEMA = DATABASE()
+  AND REFERENCED_TABLE_NAME = 'core_blob'
+  AND REFERENCED_COLUMN_NAME = 'id';";
+
+		$genSql = go()->getDbConnection()->query($sql)->fetch(\PDO::FETCH_COLUMN, 0);
+
+		$rows = go()->getDbConnection()->query($genSql)->fetchAll(\PDO::FETCH_ASSOC);
+
+		$totalRefs = ['referencing_table' => 'REF TOTAL', 'refs' => 0, 'size' => 0];
+		foreach($rows as $row) {
+			$totalRefs['refs'] += $row['refs'];
+			$totalRefs['size'] += $row['size'];
+		}
+
+		$rows[] = $totalRefs;
+
+		$totals = go()->getDbConnection()->query("SELECT 'DISK TOTAL' as referencing_table, count(*) as refs, sum(size) as size from core_blob")->fetch(\PDO::FETCH_ASSOC);
+
+		$rows[] = $totals;
+
+		echo "\n" . Markdown::createTable($rows) . "\n";
 	}
 
 	/**
@@ -576,6 +626,84 @@ JSON;
 	}
 
 
+
+	/**
+	 * Generates an opcache preload script with the core and vendor classes that are used by typical JMAP requests.
+	 *
+	 * UNTESTED>, problematic with multiple version on the same fpm master
+	 *
+	 * Preloaded classes are linked once and shared between all PHP processes, which saves heap memory in every request.
+	 * Module classes are not included because modules can be installed or upgraded at runtime and preloaded code is not
+	 * reloaded until PHP is restarted. Legacy GO\ classes can't be preloaded because their autoloader only exists after
+	 * the application has booted.
+	 *
+	 * docker compose exec --user www-data groupoffice ./www/cli.php core/System/generatePreload --out=/path/to/preload.php
+	 *
+	 * Then set opcache.preload=/path/to/preload.php (and opcache.preload_user=www-data when starting as root) in php.ini
+	 * and restart PHP. Generate it again after every upgrade.
+	 *
+	 * @param array $params ['out' => path of the script to write, defaults to the system temp folder]
+	 * @return void
+	 * @throws Exception
+	 */
+	public function generatePreload(array $params = []): void
+	{
+		$out = $params['out'] ?? go()->getEnvironment()->getInstallPath() . '/preload.php';
+
+		// Load the classes that typical requests use: query and get for all core entities.
+		$requests = [];
+		foreach (EntityType::findAll() as $entityType) {
+			if (!str_starts_with($entityType->getClassName(), 'go\\core\\')) {
+				continue;
+			}
+			$name = $entityType->getName();
+			$requests[] = [$name . '/query', ['limit' => 5], $name . '-q'];
+			$requests[] = [$name . '/get', ['#ids' => ['resultOf' => $name . '-q', 'name' => $name . '/query', 'path' => '/ids']], $name . '-g'];
+		}
+		(new Router())->run($requests, false);
+		JSON::encode(Response::get()->getData());
+
+		$installPath = realpath(go()->getEnvironment()->getInstallPath());
+		$roots = [$installPath . '/go/core/', $installPath . '/vendor/'];
+
+		$names = [];
+		foreach (array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits()) as $name) {
+			if (str_starts_with($name, 'GO\\') || str_starts_with($name, 'go\\core\\cli\\') || str_starts_with($name, 'Composer') || str_contains($name, '@anonymous')) {
+				continue;
+			}
+
+			$file = (new \ReflectionClass($name))->getFileName();
+			if (!$file) {
+				continue; // internal class
+			}
+
+			$file = realpath($file);
+			foreach ($roots as $root) {
+				if ($file && str_starts_with($file, $root)) {
+					$names[] = $name;
+					break;
+				}
+			}
+		}
+
+		$script = "<?php\n" .
+			"// Generated by core/System/generatePreload on " . date('c') . ". Set opcache.preload to this file.\n" .
+			"// Regenerate it after every upgrade and restart PHP.\n" .
+			"require " . var_export($installPath . '/vendor/autoload.php', true) . ";\n\n" .
+			"foreach (" . var_export($names, true) . " as \$name) {\n" .
+			"\ttry {\n" .
+			"\t\tclass_exists(\$name) || interface_exists(\$name) || trait_exists(\$name);\n" .
+			"\t} catch (\\Throwable) {\n" .
+			"\t\t// Not loadable without the booted application. Skip it.\n" .
+			"\t}\n" .
+			"}\n";
+
+		if (file_put_contents($out, $script) === false) {
+			throw new Exception("Could not write to " . $out);
+		}
+
+		echo "Wrote " . count($names) . " classes to " . $out . "\n";
+	}
 
 	public function import(array $params) {
 

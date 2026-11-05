@@ -152,7 +152,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 					increment: 15,
 					format:GO.settings.time_format,
 					name:'time',
-					width:80,
+					width:120,
 					hideLabel:true,
 					autoSelect :true,
 					forceSelection:true

@@ -91,9 +91,11 @@ try {
 
 	echo"<h1>" . get_class($e) ."</h1>";
 
-	if(go()->getDebugger()->enabled) {
-		echo "<pre>";
+	// The entries have queries, parameters and traces: not for anonymous users of this public endpoint.
+	if(go()->getDebugger()->mayOutputToClient()) {
+		// they contain request data, so it must be escaped
+		ob_start();
 		go()->getDebugger()->printEntries();
-		echo "</pre>";
+		echo "<pre>" . htmlspecialchars(ob_get_clean()) . "</pre>";
 	}
 }

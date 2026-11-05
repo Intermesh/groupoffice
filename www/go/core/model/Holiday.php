@@ -87,7 +87,16 @@ class Holiday {
 		if(isset($lang->en))
 			return $lang->en;
 
-		return $data->_name ?? $data->name;
+		if(isset($data->_name)) {
+			return $data->_name;
+		}
+
+		if($data->name instanceof \stdClass) {
+			$firstKey = array_key_first((array) $data->name);
+			return $data->name->$firstKey;
+		}
+
+		return $data->name;
 	}
 
 	static private function findRegionName($obj) {
@@ -106,8 +115,9 @@ class Holiday {
 	}
 
 
-	static function generate(string $set, string $lang, DateTime $from, DateTime $till) {
+	static function generate(string $set, string $lang, \DateTimeInterface $from, \DateTimeInterface $till) {
 		$dir = __DIR__ . '/../language/holidays/';
+		$set = strtoupper($set);
 		self::$set = strtolower($set);
 		self::$lang = $lang;
 		self::$names = \json_decode(file_get_contents($dir.'names.json'))->names;
@@ -261,7 +271,11 @@ class Holiday {
 
 	private function parseIntl($calendar, $month, $dayOfMonth) {
 		$gregorianCalendar = \IntlCalendar::createInstance(null, '@calendar=gregorian');
-		$gregorianCalendar->set($this->year, 0, 1); // January 1, current year
+		if (version_compare(PHP_VERSION, '8.3.0') >= 0) { // 8.3 or up
+			$gregorianCalendar->setDate($this->year, 0, 1);
+		} else { // calling set with more then 2 parameters became deprecated in php 8.4
+			$gregorianCalendar->set($this->year, 0, 1); // January 1, current year
+		}
 
 		$otherCalendar = \IntlCalendar::createInstance(null, '@calendar='.$calendar);
 		$otherCalendar->setTime($gregorianCalendar->getTime());
@@ -288,7 +302,11 @@ class Holiday {
 	private function yearConvert($gregorian, $type) {
 		// get timestamp (ms) for Jan 1 of the Gregorian year
 		$gCal = \IntlCalendar::createInstance(null, 'gregorian');
-		$gCal->set($gregorian, 0, 1, 0, 0, 0);
+		if (version_compare(PHP_VERSION, '8.3.0') >= 0) {
+			$gCal->setDateTime($gregorian, 0, 1, 0, 0, 0);
+		} else {
+			$gCal->set($gregorian, 0, 1, 0, 0, 0);
+		}
 		$gCal->set(\IntlCalendar::FIELD_MILLISECOND, 0);
 		$ts_ms = $gCal->getTime();
 
@@ -408,7 +426,7 @@ class Holiday {
 			}
 			$label = $availableLanguages[$isoCode];
 			$holidaySets[$label] = [
-				'ise' => $isoCode,
+				'iso' => $isoCode,
 				'label' => $label
 			];
 		}

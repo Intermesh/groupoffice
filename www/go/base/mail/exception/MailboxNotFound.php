@@ -7,8 +7,9 @@ namespace GO\Base\Mail\Exception;
 
 
 use GO\Base\Mail\Imap;
+use go\core\exception\UserSafeException;
 
-class MailboxNotFound extends \Exception{
+class MailboxNotFound extends \Exception implements UserSafeException {
 	
 	public function __construct($mailbox, Imap $imap) {
 		

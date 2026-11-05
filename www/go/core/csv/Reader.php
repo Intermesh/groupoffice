@@ -58,7 +58,7 @@ class Reader {
 	public function setHeaderMappingByCSV(): void
 	{
 		$this->setFP();
-		$headers = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+		$headers = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure, "");
 		
 		//NAAM => 2, STRAAT => 3
 		$this->mapping = array_map('trim',$headers);
@@ -105,7 +105,7 @@ class Reader {
 	public function getRecord() : array | false{
 		$this->setFP();
 		
-		$record = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+		$record = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure, "");
 		
 		if(!$record) {
 			return false;

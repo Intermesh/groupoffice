@@ -24,6 +24,9 @@
 				cls: "go-hbox condensed-form",
 				items: [
 					{
+						xtype: "hidden",
+						name: "id" //for keeping records
+					},{
 						fieldLabel: t("Type"),
 						xtype: 'combo',
 						name: 'type',

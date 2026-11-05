@@ -31,6 +31,7 @@ class ReminderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionStore($params){
+		\GO::session()->closeWriting();
 		$params = \GO\Base\Db\FindParams::newInstance()
 						->order('vtime', 'DESC')
 						->select('t.*')
@@ -85,9 +86,6 @@ class ReminderController extends \GO\Base\Controller\AbstractController {
 		}else {
 			$record['local_time']=date(\GO::user()->time_format,$time);
 		}
-		
-		$record['text'] = htmlspecialchars_decode($record['text']);
-		
 		return $record;		
 	}
 	

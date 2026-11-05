@@ -4,6 +4,7 @@ namespace go\core\http;
 
 use CurlHandle;
 use Exception as CoreException;
+use go\core\exception\Forbidden;
 use go\core\fs\File;
 use go\core\util\JSON;
 
@@ -16,15 +17,29 @@ use go\core\util\JSON;
  */
 class Client
 {
+	/**
+	 * Base URI for all requests
+	 */
+	public string $baseUri = "";
 
-	protected CurlHandle|false $curl;
-
-	public $baseUri;
-	protected $lastBody;
+	/**
+	 * Default parameters for POST requests
+	 */
 	public array $baseParams = [];
 
 	private array $lastHeaders = [];
-	protected $headers = [];
+	protected array $headers = [];
+	protected ?string $lastBody;
+
+	protected CurlHandle|false $curl;
+
+	/**
+	 * Only allow URL's that resolve to a global IP address.
+	 *
+	 * See https://www.php.net/manual/en/filter.constants.php#constant.filter-flag-global-range
+	 * @var bool
+	 */
+	public bool $globalRangeOnly = false;
 
 	/**
 	 * @return false|CurlHandle
@@ -36,9 +51,11 @@ class Client
 			$this->curl = curl_init();
 			$this->setOption(CURLOPT_FOLLOWLOCATION, true)
 				->setOption(CURLOPT_ENCODING, "UTF-8")
-				->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)")
+				->setOption(CURLOPT_USERAGENT, "GroupOffice HttpClient " . go()->getVersion() . " (curl)")
 				->setOption(CURLOPT_CONNECTTIMEOUT, 5)
-				->setOption(CURLOPT_TIMEOUT, 360);
+				->setOption(CURLOPT_TIMEOUT, 360)
+				->setOption(CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS) // Only allow HTTP(s) to prevent unsafe  protocols like file:///
+				->setOption(CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 		}
 		return $this->curl;
 	}
@@ -46,31 +63,55 @@ class Client
 	/**
 	 * Set cUrl option
 	 *
+	 * @see https://www.php.net/manual/en/function.curl-setopt.php
 	 * @param int $option
 	 * @param mixed $value
-	 * @return bool
+	 * @return Client
 	 */
-	public function setOption(int $option, $value): static
+	public function setOption(int $option, mixed $value): static
 	{
 		curl_setopt($this->getCurl(), $option, $value);
 		return $this;
 	}
 
+	/**
+	 * Set an HTTP header for the request.
+	 *
+	 * @param string $name The name of the header.
+	 * @param string $value The value of the header.
+	 * @return Client Returns the current instance of the Client for method chaining.
+	 */
 	public function setHeader(string $name, string $value): Client
 	{
 		$this->headers[$name] = $value;
 		return $this;
 	}
 
+	/**
+	 * Unset an HTTP header for the request.
+	 *
+	 * @param string $name
+	 * @return void
+	 */
 	public function unsetHeader(string $name)
 	{
 		unset($this->headers[$name]);
 	}
 
-	private function initRequest($path)
+	/**
+	 * @throws Forbidden
+	 */
+	private function initRequest($path) : void
 	{
+		$url = $this->baseUri . $path;
+
+		$resolve = $this->checkUri($url);
+		if($resolve !== false) {
+			$this->setOption(CURLOPT_RESOLVE, [$resolve]);
+		}
+
 		$this->lastHeaders = [];
-		$this->setOption(CURLOPT_URL, $this->baseUri.$path)
+		$this->setOption(CURLOPT_URL, $url)
 			->setOption(CURLOPT_RETURNTRANSFER, true)
 			->setOption(CURLOPT_HEADERFUNCTION, function ($curl, $header) {
 				if (preg_match('/([\w-]+): (.*)/i', $header, $matches)) {
@@ -86,9 +127,65 @@ class Client
 	}
 
 	/**
+	 * When globalRangeOnly is true, only allow URL's that resolve to a global IP address.
+	 *
+	 * It returns the IP to harden security if an attacker controls DNS somehow.
+	 * curl_exec() does its own DNS lookup, an attacker controlling DNS (short TTL, rebinding) can return a
+	 * different IP the second time. So we'll use CURLOPT_RESOLVE later to pin this IP.
+	 *
+	 * @param $uri
+	 * @return string|false
+	 * @throws Forbidden
+	 */
+	private function checkUri($uri) : string|false {
+
+		if(!$this->globalRangeOnly) {
+			return false;
+		}
+
+		$parsed = parse_url($uri);
+
+		if(empty($parsed['host'])) {
+			throw new Forbidden("Invalid URI: " . $uri);
+		}
+
+		// check if the IP
+		$ips = $this->resolveHost($parsed['host']);
+		if(empty($ips)) {
+			throw new Forbidden("Can't resolve host for URI: " . $uri);
+		}
+		$firstIP = $ips[0];
+		foreach($ips as $ip) {
+			$retVal = filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]);
+
+			if ($retVal === false) {
+				throw new Forbidden("Invalid URI: " . $uri);
+			}
+		}
+
+		$port = $parsed['port'] ?? ($parsed['scheme'] === 'https' ? 443 : 80);
+
+		return $parsed['host'] . ":" . $port. ":" . $firstIP;
+	}
+
+
+	private function resolveHost(string $host): array {
+		$records = dns_get_record($host, DNS_A + DNS_AAAA);
+		if ($records === false) {
+			return [];
+		}
+		return array_map(fn($r) => $r['type'] === 'AAAA' ? $r['ipv6'] : $r['ip'], $records);
+	}
+
+	/**
 	 * Perform GET request
 	 *
 	 * @return array{status: int, body:string, headers: array, requestHeaders: array, info:array}
+	 *  - status: HTTP status code
+	 *  - body: HTTP response body
+	 *  - headers: HTTP response headers. Key is header name in lower case, value is header value.
+	 *  - requestHeaders: HTTP request headers
+	 *  - info: cURL info array
 	 * @throws CoreException
 	 */
 	public function get(string $url): array
@@ -115,7 +212,9 @@ class Client
 	}
 
 	/**
-	 * POST JSON body
+	 * Make POST request with JSON body
+	 *
+	 * The response body will be JSON decoded automatically.
 	 *
 	 * @param string $url
 	 * @param array $data
@@ -240,11 +339,12 @@ class Client
 	/**
 	 * Close the connection
 	 *
+	 * @deprecated
 	 * @return void
 	 */
 	public function close(): void
 	{
-		curl_close($this->curl);
+
 	}
 
 	protected function getHeadersForCurl(): array

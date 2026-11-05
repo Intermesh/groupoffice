@@ -1,4 +1,0 @@
-Module.js
-KeyGrid.js
-KeyDialog.js
-SystemSettingsPanel.js

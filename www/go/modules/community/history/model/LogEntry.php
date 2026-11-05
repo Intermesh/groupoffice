@@ -2,15 +2,11 @@
 
 namespace go\modules\community\history\model;
 
-use DateTime;
 use Exception;
 use GO\Base\Db\ActiveRecord;
-use go\core\acl\model\AclEntity;
-use go\core\acl\model\AclInheritEntity;
 use go\core\db\Criteria;
 use go\core\db\Query as DbQuery;
 use go\core\http\Request;
-use go\core\http\Response;
 use go\core\db\Expression;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -19,7 +15,6 @@ use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\acl\model\AclOwnerEntity;
 use GO\Files\Model\Folder;
-use go\modules\community\history\Module;
 
 /**
  * LogEntry model
@@ -116,7 +111,7 @@ class LogEntry extends AclOwnerEntity {
 
 	protected static function textFilterColumns(): array
 	{
-		return ['description', 'entityId'];
+		return ['description'];
 	}
 
 	protected static function search(Criteria $criteria, string $expression, DbQuery $query): Criteria
@@ -213,6 +208,11 @@ class LogEntry extends AclOwnerEntity {
 	protected static function checkAcl()
 	{
 		//don't update acl records usedin is history
+	}
+
+	protected function saveAcl() : void
+	{
+		// do nothing
 	}
 
 	protected function internalSave(): bool

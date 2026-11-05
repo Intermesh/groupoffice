@@ -18,7 +18,7 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-﻿/*
+/*
  * Serbian Cyrillic Translation
  * by Čolovic Vladan (cyrillic, utf8 encoding)
  * sr_RS (ex: sr_CS, sr_YU)

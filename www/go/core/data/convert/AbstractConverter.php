@@ -4,6 +4,7 @@ namespace go\core\data\convert;
 use Exception;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
@@ -15,6 +16,8 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\modules\business\support\Module;
+use JsonException;
+use Throwable;
 
 /**
  * Abstract converter class
@@ -98,7 +101,15 @@ abstract class AbstractConverter {
 	 */
 	protected $extension;
 
-	protected Alert $alert;
+	protected ?Alert $alert = null;
+	private string $exportId;
+
+
+	/**
+	 * Total records to import or export. If not set progress can't be calculated.
+	 * @var int
+	 */
+	public int $total = 0;
 
 	/**
 	 * AbstractConverter constructor.
@@ -108,6 +119,8 @@ abstract class AbstractConverter {
 	public function __construct(string $extension, string $entityClass) {
 		$this->extension = strtolower($extension);
 		$this->entityClass = $entityClass;
+
+		$this->exportId = uniqid();
 		$this->init();
 	}
 	
@@ -154,10 +167,23 @@ abstract class AbstractConverter {
 		return $this->extension;
 	}
 
-	private function notifyStart() {
-		$this->alert = new Alert();
+	protected function getAlert() {
 
-		$cls = $this->entityClass;
+		if(!$this->alert) {
+			$this->alert = new Alert();
+
+			$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
+
+			$this->alert->setEntity($module);
+			$this->alert->userId = go()->getUserId();
+			$this->alert->triggerAt = new DateTime();
+			$this->alert->tag = 'export-' . $this->exportId;
+		}
+
+	}
+
+	protected function notifyStart(bool $import = true) {
+		$this->alert = new Alert();
 
 		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
 
@@ -165,8 +191,10 @@ abstract class AbstractConverter {
 		$this->alert->userId = go()->getUserId();
 		$this->alert->triggerAt = new DateTime();
 		$this->alert->setData([
-				'title' => go()->t("Importing"),
-				'body' => go()->t("The import has started in the background")
+				'title' => $import ? go()->t("Importing") : go()->t("Exporting"),
+				'body' => $import ?  go()->t("The import has started in the background") : go()->t("The export has started in the background"),
+				'persistent' => true,
+				'progress' => 0
 			]
 		);
 
@@ -175,53 +203,69 @@ abstract class AbstractConverter {
 		}
 	}
 
-	private function notifyEnd(int $count, int $errorCount) {
-		$this->alert->setData([
-				'title' => go()->t("Import finished"),
-				'body' => go()->t("Imported") . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
-			]
-		);
+	protected function notifyEnd(bool $import, int $count, int $errorCount, Blob|null $blob = null) {
+
+		if($import) {
+			$this->alert->setData([
+					'title' => go()->t("Import finished"),
+					'body' => go()->t("Imported") . ': ' . $count . "\n" . go()->t("Errors") . ": " . $errorCount,
+					'persistent' => false
+				]
+			);
+		}else {
+			$url = go()->getAuthState()->getDownloadUrl($blob->id);
+
+			$this->alert->setData([
+					'title' =>  go()->t("Export finished"),
+					'link' => $url,
+					'body' => $blob->name,
+					'persistent' => false
+				]
+			);
+			$this->alert->sendMail = true;
+		}
 		if (!$this->alert->save()) {
 			throw new SaveException($this->alert);
 		}
 	}
 
-	private function notifyCount(int $count, int $errorCount) {
+	protected function notifyCount(bool $import, int $count, int $errorCount) {
 		$this->alert->setData([
-				'title' => go()->t("Import in progress"),
-				'body' => go()->t("Imported") . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount
+				'title' => $import ? go()->t("Import in progress") : go()->t("Export in progress"),
+				'body' =>  ($import ? go()->t("Imported") : go()->t("Exported")) . ": ". $count ."\n". go()->t("Errors"). ": ".$errorCount,
+				'persistent' => true,
+				'progress' => $this->total ? ceil($count * 100 / $this->total) : 0 ,
 			]
 		);
 		if (!$this->alert->save()) {
 			throw new SaveException($this->alert);
 		}
+		EntityType::push();
 	}
 
 	/**
 	 * @param string $error
 	 * @return void
 	 * @throws SaveException
-	 * @throws \JsonException
+	 * @throws JsonException
 	 * @throws Exception
 	 */
-	private function notifyError(string $error)
+	protected function notifyError(bool $import, string $error)
 	{
-		$a = new Alert();
-
-		$module = \go\core\model\Module::findByClass($this->entityClass, ['id', 'name', 'package']);
-
-		$a->setEntity($module);
-		$a->userId = go()->getUserId();
-		$a->triggerAt = new DateTime();
-		$a->setData([
-				'title' => go()->t("Import error"),
-				'body' => $error
+		if(!isset($this->alert)) {
+			//notify is off
+			return;
+		}
+		$this->alert->setData([
+				'title' => $import ? go()->t("Import error") : go()->t("Export error"),
+				'body' => $error,
+				'persistent' => false,
 			]
 		);
-
-		if (!$a->save()) {
-			throw new SaveException($a);
+		if (!$this->alert->save()) {
+			throw new SaveException($this->alert);
 		}
+		EntityType::push();
 	}
 
 
@@ -253,70 +297,78 @@ abstract class AbstractConverter {
 
 		$this->clientParams = $params;
 
-		$this->initImport($file);
-
 		$this->notifyStart();
 
-		$this->index = 0;
-		
-		while($this->nextImportRecord()) {
+		try {
 
-			try {
+			$this->initImport($file);
 
-				$entity = $this->importEntity();
-				
-				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
-				if (is_null($entity)) {
-					$this->index++;
-					continue;
-				}
+			$this->index = 0;
 
-				if($entity->hasPermissionLevel(Acl::LEVEL_CREATE)) {
-					$entity->save();
-				} else {
-					$msg = "Item ". $this->index . ": access denied";
-					$this->notifyError($msg);
+			while ($this->nextImportRecord()) {
 
-					$response['errors'][] = $msg;
-					continue;
-				}
+				try {
 
-				//push changes after each 100 imports
-				EntityType::push(100);
+					$entity = $this->importEntity();
 
-				if($entity->hasValidationErrors()) {
-					foreach ($entity->getValidationErrors() as $key =>  $validationError) {
-						$msg = "Validation error in item " . $this->index . ": " . $key . " - " . $validationError['description'];
-						$this->notifyError($msg);
+					//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
+					if (is_null($entity)) {
+						$this->index++;
+						continue;
+					}
+
+					if ($entity->hasPermissionLevel(Acl::LEVEL_CREATE)) {
+						$entity->save();
+					} else {
+						$msg = "Item " . $this->index . ": access denied";
+						$this->notifyError(true, $msg);
 
 						$response['errors'][] = $msg;
-
+						continue;
 					}
-				} elseif($this->afterSave($entity)) {
-					$response['count']++;
-				} else{
-					$msg = "Item ". $this->index . ": Import afterSave returned false";
-					$response['errors'][] = $msg;
 
-					$this->notifyError($msg);
+					//push changes after each 100 imports
+					EntityType::push(100);
+
+					if ($entity->hasValidationErrors()) {
+						foreach ($entity->getValidationErrors() as $key => $validationError) {
+							$msg = "Validation error in item " . $this->index . ": " . $key . " - " . $validationError['description'];
+							$this->notifyError(true, $msg);
+
+							$response['errors'][] = $msg;
+
+						}
+					} elseif ($this->afterSave($entity)) {
+						$response['count']++;
+					} else {
+						$msg = "Item " . $this->index . ": Import afterSave returned false";
+						$response['errors'][] = $msg;
+
+						$this->notifyError(true, $msg);
+					}
+
+					EntityType::push();
+
+					$this->notifyCount(true, $response['count'], count($response['errors']));
+				} catch (Exception $e) {
+					ErrorHandler::logException($e);
+					$response['errors'][] = "Item " . $this->index . ": " . $e->getMessage();
 				}
 
-				EntityType::push();
-
-				$this->notifyCount($response['count'], count($response['errors']));
-			}
-			catch(Exception $e) {
-				ErrorHandler::logException($e);
-				$response['errors'][] = "Item ". $this->index . ": ".$e->getMessage();
+				$this->index++;
 			}
 
-			$this->index++;
+			$this->finishImport();
+
+			$this->notifyEnd(true, $response['count'], count($response['errors']));
+
+		}catch(\Throwable $e) {
+
+			ErrorHandler::logException($e, "Failed to import file");
+
+			$this->notifyError(true, $e->getMessage());
 		}
 
-		$this->finishImport();
-
-		$this->notifyEnd($response['count'], count($response['errors']));
-		
 		return $response;
 	}
 
@@ -388,46 +440,79 @@ abstract class AbstractConverter {
 	/**
 	 * Export entities to a blob
 	 *
-	 * @param Query $entities
+	 * @param string[] $entityIds
 	 * @param array $params
-	 * @return Blob
-	 * @throws DbException
+	 * @param bool $notify
+	 * @return Blob|null
+	 * @throws JsonException
+	 * @throws SaveException
 	 */
-	public function exportToBlob(Query $entities, array $params = []): Blob
+	public function exportToBlob(array $entityIds, array $params = [], bool $notify = true): ?Blob
 	{
-		$stmt = $entities->execute();
-		if($this->exportMaxItems > 0 && $stmt->rowCount() > $this->exportMaxItems) {
-			throw new Exception(go()->t("Too many items to export. Max is " . $this->exportMaxItems));
+		$this->total = count($entityIds);
+
+		if($notify) {
+			$this->notifyStart(false);
 		}
+
 		$this->clientParams = $params;
-		$this->entitiesQuery = $entities;
-		$this->initExport();
-		//	$total = $entities->getIterator()->rowCount();
+		$this->exportEntityIds = $entityIds;
 
-		$this->index = 0;
-		foreach($stmt as $entity) {
-			$this->exportEntity($entity);
-			$this->index++;
+		try {
+			$this->initExport();
+
+			$errorCount = 0;
+			$this->index = 0;
+			foreach ($entityIds as $entityId) {
+
+				try {
+					$entity = $this->entityClass::findById($entityId);
+
+					if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+						throw new Forbidden();
+					}
+
+					$this->exportEntity($entity);
+
+				} catch (Throwable $e) {
+					$errorCount++;
+					ErrorHandler::logException($e);
+					$this->writeExportError($e);
+				}
+
+				$this->index++;
+
+				if($notify) {
+					$this->notifyCount(false, $this->index, $errorCount);
+				}
+			}
+
+			$blob = $this->finishExport();
+
+			if($notify) {
+				$this->notifyEnd(false, $this->index, 0, $blob);
+			}
+
+			return $blob;
+		} catch (Throwable $e) {
+			ErrorHandler::logException($e);
+
+			if($notify) {
+				$this->notifyError(false, $e->getMessage());
+			}
 		}
 
-		return $this->finishExport();
+		return null;
+	}
+
+	protected function writeExportError(Throwable $e) : void {
 
 	}
 
   /**
-   * @var Query
+   * @var string[]
    */
-  protected $entitiesQuery;
-
-  /**
-   * The query used for exporting entities
-   *
-   * @return Query
-   */
-	protected function getEntitiesQuery(): Query
-	{
-	  return $this->entitiesQuery;
-  }
+  protected array $exportEntityIds;
 
 	/**
 	 * Initialize the import. For example create temporary file and open it.

@@ -1,15 +1,15 @@
 import {
-	autocomplete, avatar, btn, Button, checkbox,
+	autocomplete, AutocompleteField, avatar, btn, Button, checkbox,
 	column,
 	comp,
-	Component, Config, containerfield, createComponent, datasourcestore, FieldEventMap, Format,
+	Component, Config, ContainerField, containerfield, createComponent, datasourcestore, DateTime, FieldEventMap, Format,
 	hr,
 	MapField,
-	mapfield, Menu, menu, ObservableListenerOpts,
+	mapfield, Menu, menu,
 	table
 } from "@intermesh/goui";
-import {statusIcons, t} from "./Index.js";
-import {client, jmapds, validateEmail} from "@intermesh/groupoffice-core";
+import {getParticipantStatusIcon, statusIcons, t} from "./Index.js";
+import {client, jmapds, principalDS, RecipientPicker,validateEmail} from "@intermesh/groupoffice-core";
 
 interface ParticipantFieldEventMap extends FieldEventMap {
 	beforeadd: {principal: any}
@@ -19,7 +19,6 @@ export const participantfield = (config?: Config<ParticipantField>) => createCom
 export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 	list!: MapField
-	btnFreeBusy!: Button
 
 	constructor() {
 		super();
@@ -30,8 +29,10 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 		this.items.add(
 			this.list = mapfield({name: 'participants', cls:'goui-pit',
 				listeners: {
-					'change': (newValue) => {
-						this.fire('change', {newValue, oldValue:null});
+					'setvalue': (e) => {
+						this.fire('setvalue', e);
+					},'change': (e) => {
+						this.fire('change', e);
 					}
 				},
 				buildField: (v: any) => {
@@ -39,13 +40,15 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 							'manage_accounts' : (v.kind=='resource' ?
 								'meeting_room' : (v.name ?
 									'person' : 'contact_mail')
-							) ,
-						statusIcon = statusIcons[v.participationStatus] || v.participationStatus;
+							),
+						statusIcon = getParticipantStatusIcon(v);
+
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						comp({tagName:'i',cls:'icon',html:userIcon, style:{margin:'0 8px'}}),
 						comp({
+							itemId: 'name',
 							flex: '1 0 60%',
-							html: v.name ? v.name + (v.email ? '<br>' + v.email :'') : v.email
+							html: v.name ? v.name.htmlEncode() + (v.email ? '<br>' + v.email :'') : v.email
 						}),
 						comp({tagName:'i',cls:'icon '+statusIcon[2],html:statusIcon[0],title:statusIcon[1], style:{margin:'0 8px'}}),
 						btn({icon:'more_vert', menu: menu({},
@@ -72,6 +75,25 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 				}
 			}),
 			autocomplete({
+				buttons: [
+					btn({
+						icon: "person_add",
+						width: 48,
+						title: t('Add attendees'),
+						handler: () => {
+							const picker = new RecipientPicker();
+							picker.show();
+
+							picker.on("select",
+								async ({recipients}) => {
+
+									recipients.forEach(r => this.addParticipant(r));
+								}
+							)
+						}
+					})
+				],
+				freeInput: true,
 				placeholder:t('Invite people') + ' / ' + t('Resource request'),
 				//valueProperty: "id",
 				listeners: {
@@ -85,28 +107,46 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						}
 					},
 					'render' : ({target}) => {
+
+						 const submitEMail = (target:AutocompleteField) => {
+							if(validateEmail(target.input.value)) {
+								const email = target.input.value;
+								this.addParticipant({id:email,email});
+								target.menu.hide();
+								target.input.value = "";
+							}
+						}
+
 						target.el.on('keydown' , ev => {
 							if(ev.key === 'Enter') {
 								ev.preventDefault();
-								if(validateEmail(target.input!.value)) {
-									const email = target.input!.value;
-									this.addParticipant({id:email,email});
-									target.menu.hide();
-									target.value = "";
-								}
+								submitEMail(target);
+								// if(validateEmail(target.input!.value)) {
+								// 	const email = target.input!.value;
+								// 	this.addParticipant({id:email,email});
+								// 	target.menu.hide();
+								// 	target.value = "";
+								// }
 							}
 						});
 					},
+					'blur': ({target})=> {
+						if(validateEmail(target.input!.value)) {
+							const email = target.input!.value;
+							this.addParticipant({id:email,email});
+						}
+						target.input!.value = "";
+						target.value = "";
+					},
 					'select': ({target, record}) => {
-
 						if(record)
 							this.addParticipant(record);
 
 						target.value = "";
 					}
 				},
+				valueToTextField: async () => "",
 				list:table({
-					style:{minWidth:'100%'},
 					headers: false,
 					store: datasourcestore({
 						dataSource: jmapds('Principal'),
@@ -151,6 +191,45 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 		return super.internalRender();
 	}
 
+	private pendingAvailabilityIds : {[id:string]:true} = {};
+	checkAvailability(start: DateTime, end: DateTime, allDay: boolean) {
+		if(allDay)
+			end = end.clone().addDays(1);
+
+		const fm = allDay ? 'Y-m-d' : 'Y-m-d H:i:s',
+			rows = this.list.value;
+		this.list.clearInvalid();
+		for (const id in rows) {
+			// not already pending and is user or resource
+			if(this.shouldCheckAvailability(id))
+				client.jmap('Principal/getAvailability', {start:start.format(fm),end:end.format(fm),id}).then((response)=> {
+					const f = this.list.items?.find(v => v.dataSet.key === id) as ContainerField;
+					if(f) {
+						const name = f.findChild(f => f.itemId === 'name')!;
+						if(response.list.length > 0) {
+							name.style.color = 'red';
+							if(id.startsWith('Calendar:')) {
+								this.list.setInvalid(t('Resource already booked'))
+							}
+						} else {
+							name.style.color = 'inherit';
+						}
+
+					}
+
+				this.pendingAvailabilityIds = {};
+			});
+			this.pendingAvailabilityIds[id]=true;
+		}
+	}
+
+	private shouldCheckAvailability(id:string) : boolean {
+		const existingKeys = Object.keys(this.list.getOldValue());
+		if(existingKeys.indexOf(id)!==-1) return false;
+		if(this.pendingAvailabilityIds[id]) return false;
+		return id.startsWith('Calendar:') || !isNaN(+id); // Resource or User
+	}
+
 	private organizerId?: string;
 	addOrganiser(p:any) {
 		if(this.organizerId) this.list.items.removeAt(0);
@@ -168,7 +247,7 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 
 	addParticipant(principal: any) {
 		this.fire('beforeadd', {principal});
-
+		if(principal.id !== this.organizerId)
 		this.list.add({
 			email:principal.email,
 			name: principal.name || principal.email,

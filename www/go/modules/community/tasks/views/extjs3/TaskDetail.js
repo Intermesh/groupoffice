@@ -1,15 +1,19 @@
 /* global go, Ext, GO, mcrypt */
 
 go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
-	
+
 	entityStore: "Task",
 	stateId: 'ta-tasks-detail',
-	relations: ["tasklist", "responsible", 'categories'],
+	relations: ["tasklist", "responsible", 'categories', 'project'],
 	cls: "go-detail-view tasks-task",
 
 	support: false,
 
 	initComponent: function () {
+
+		if (this.support) {
+			this.relations = [...this.relations, "customer"];
+		}
 
 
 		this.tbar = this.initToolbar();
@@ -22,22 +26,22 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 					handler: () => {
 						this.changeProgress("needs-action");
 					}
-				},{
+				}, {
 					text: t("In progress"),
 					handler: () => {
 						this.changeProgress("in-progress");
 					}
-				},{
+				}, {
 					text: t("Completed"),
 					handler: () => {
 						this.changeProgress("completed");
 					}
-				},{
+				}, {
 					text: t("Failed"),
 					handler: () => {
 						this.changeProgress("failed");
 					}
-				},{
+				}, {
 					text: t("Cancelled"),
 					handler: () => {
 						this.changeProgress("cancelled");
@@ -50,44 +54,46 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		Ext.apply(this, {
 			items: [{
-				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">'+title+'</h3>\
+				tpl: new Ext.XTemplate('<h3 class="title s8" style="{[values.color ? \'color:#\'+values.color : \'\']}">' + title + '</h3>\
 					<h4 class="status {[this.progressColor(values.progress)]}-fill">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
 				<p class="s6 pad">\
-					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
-					<label>'+t("Tasklist")+'</label><span><tpl for="tasklist">{name}</tpl></span><br><br>\
-					<tpl if="values.recurrenceRule"><label>'+t('Recurrence')+'</label><span>{[this.rruleToText(values.recurrenceRule)]}</span><br><br></tpl>\
+					<label>' + t("Start at") + '</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
+					<label>' + t("Tasklist") + '</label><span><tpl for="tasklist">{name}</tpl></span><br><br>\
+					<tpl if="values.project"><label>' + t("Project") + '</label><span><tpl for="project"><a class="normal-link" href="#project3/{id}">{number}: {name}</a></tpl></span><br><br></tpl>\
+					<tpl if="values.recurrenceRule"><label>' + t('Recurrence') + '</label><span>{[this.rruleToText(values.recurrenceRule)]}</span><br><br></tpl>\
 				</p>\
 				<p class="s6">\
-					<label>'+t("Due at")+'</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
-					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><span>{[go.util.avatar(values.responsible.name, values.responsible.avatarId)]} {[values.responsible.name]}</span><br><br></tpl>\
+					<label>' + t("Due at") + '</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
+					<tpl if="values.responsible"><label>' + t("Responsible") + '</label><a onclick="go.lookupPrincipal(\'{[values.responsible.id]}\')">{[go.util.avatar(values.responsible.name, values.responsible.avatarId)]} {[Ext.util.Format.htmlEncode(values.responsible.name)]}</a><br><br></tpl>\
+					<tpl if="values.customer"><label>' + t("Customer") + '</label><a onclick="go.lookupPrincipal(\'{[values.customer.id]}\')">{[go.util.avatar(values.customer.name, values.customer.avatarId)]} {[Ext.util.Format.htmlEncode(values.customer.name)]}</a><br><br></tpl>\
 				</p>\
 				<tpl if="values.percentComplete">\
 				<div class="s12 pad">\
-					<label>'+t("Percent complete")+'</label>\
+					<label>' + t("Percent complete") + '</label>\
 					<div class="go-progressbar" style="clear:both"><div style="width:{[Math.ceil(values.percentComplete)]}%"></div></div>\
 				</div>\
 				</tpl>\
 				<tpl if="!GO.util.empty(description)"><p class="s12 pad">\
-					<label>'+t('Description')+'</label>\
+					<label>' + t('Description') + '</label>\
 					<span>{[go.util.textToHtml(values.description)]}</span>\
 				</p></tpl>\
 				<tpl if="!GO.util.empty(location)"><p class="s12 pad">\
-					<label>'+t('Location')+'</label>\
+					<label>' + t('Location') + '</label>\
 					<span>{[go.util.textToHtml(values.location)]}</span>\
 				</p></tpl>\
 				<tpl if="categories.length">\
 					<p class="s12 pad">\
-					<label>'+t('Categories')+'</label>\
+					<label>' + t('Categories') + '</label>\
 					<span>\
 						<tpl for="categories"><span class="tasks-category">{name}</span></tpl>\
 					</span>\
 					</p>\
-				</tpl>',{
-					rruleToText: function(rrule) {
+				</tpl>', {
+					rruleToText: function (rrule) {
 						const fieldDummy = new go.form.RecurrenceField();
 						return fieldDummy.parseRule(rrule);
 					},
-					progressColor: function(p) {
+					progressColor: function (p) {
 						return {
 							'needs-action': 'yellow',
 							'in-progress': 'blue',
@@ -97,10 +103,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 						}[p] || 'cyan';
 					}
 				}),
-				listeners : {
+				listeners: {
 					afterrender: (item) => {
 						item.getEl().on("click", (e) => {
-							if(e.target.tagName != 'H4') {
+							if (e.target.tagName != 'H4') {
 								return;
 							}
 
@@ -116,23 +122,26 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		});
 
 
-		if(!this.support) {
+		if (!this.support) {
 			this.buttons = [{
 				iconCls: 'ic-forward',
-				text:t("Continue task", "tasks", "community"),
-				handler:() => {
+				text: t("Continue task", "tasks", "community"),
+				handler: () => {
 					const continueTaskDialog = new go.modules.community.tasks.ContinueTaskDialog();
 					continueTaskDialog.load(this.currentId).show();
 				}
 			}];
 		}
-		
+
 
 		go.modules.community.tasks.TaskDetail.superclass.initComponent.call(this);
 		this.addCustomFields();
 		this.addComments(this.support);
+		if (this.support && this.comments) {
+			this.comments.commentList.stripQuotes = true;
+		}
 
-		if(this.support) {
+		if (this.support) {
 
 			if (go.Modules.isAvailable("community", "comments")) {
 				const wrapper = new go.GOUIWrapper({
@@ -176,13 +185,13 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		//
 
 
-		this.on("destroy" , () => {
+		this.on("destroy", () => {
 			this.progressMenu.destroy();
 		})
 	},
 
-	addContracts: function() {
-		if(go.Modules.isInstalled("business", "contracts")) {
+	addContracts: function () {
+		if (go.Modules.isInstalled("business", "contracts")) {
 			this.contractGrid = new go.modules.business.contracts.ContractGrid({
 				title: t("Contracts", "contracts", "business"),
 				autoHeight: true,
@@ -213,7 +222,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 			this.on("load", async () => {
 
-				if(!this.data.createdBy) {
+				if (!this.data.createdBy) {
 					this.noContractWarning.show();
 					return;
 				}
@@ -228,12 +237,12 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		}
 	},
 
-	changeProgress : function(progress) {
+	changeProgress: function (progress) {
 		this.getEl().mask(t("Saving..."));
 		go.Db.store(this.support ? "SupportTicket" : "Task").save({
 			progress: progress
 		}, this.data.id).finally(() => {
-			this.getEl().unmask();
+				this.getEl().unmask();
 			}
 		)
 	},
@@ -241,11 +250,16 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 	onLoad: function () {
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
-		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
+		// this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
+		this.deleteItem.setVisible(this.data.permissionLevel >= go.permissionLevels.writeAndDelete);
 
 		this.assignMeBtn.setVisible(!this.data.responsibleUserId);
 
-		this.privateComments.load(this.data.id);
+		if (this.privateComments) {
+			this.privateComments.load(this.data.id);
+		}
+
+
 
 		go.modules.community.tasks.TaskDetail.superclass.onLoad.call(this);
 	},
@@ -260,7 +274,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			this.assignMeBtn = new Ext.Button({
 				text: t("Assign me"),
 				scope: this,
-				handler: function() {
+				handler: function () {
 					this.getEl().mask(t("Saving..."));
 					go.Db.store(this.support ? "SupportTicket" : "Task").save({
 						responsibleUserId: go.User.id,
@@ -288,7 +302,6 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			new go.detail.addButton({
 				detailView: this
 			}),
-
 
 
 			this.moreMenu = {
@@ -325,9 +338,9 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 
 		]);
-		
-		if(go.Modules.isAvailable("legacy", "files")) {
-			this.moreMenu.menu.splice(1,0,{
+
+		if (go.Modules.isAvailable("legacy", "files")) {
+			this.moreMenu.menu.splice(1, 0, {
 				xtype: "filebrowsermenuitem"
 			});
 		}

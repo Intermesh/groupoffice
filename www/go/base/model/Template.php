@@ -460,6 +460,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		if(isset($this->_lineBreak)){
 			foreach($attributes as $key=>$value) {
 				$attributes[$key] = str_replace("\n", $this->_lineBreak, $attributes[$key]);
+				$attributes[$key] = str_replace("\t", "</w:t><w:tab/><w:t>", $attributes[$key]);
 			}
 		}
 		

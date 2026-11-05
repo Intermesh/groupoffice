@@ -30,7 +30,7 @@ abstract class AbstractExportController extends AbstractController{
 		$className = get_class($this);
 		$selected = \GO::config()->get_setting($className.'_attributes');
 		if($selected){
-			$selected=  unserialize($selected);
+			$selected=  unserialize($selected, ['allowed_classes' => false]);
 		}else
 		{
 			$selected=array();

@@ -22,7 +22,8 @@ use go\core\util\JSON;
  * @param int $status
  * @param ?string $statusMsg
  */
-function output(array $data = [], int $status = 200, string|null $statusMsg = null) {
+function output(array $data = [], int $status = 200, string|null $statusMsg = null): void
+{
 
 	Response::get()->setHeader('Content-Type', 'application/json;charset=utf-8');
 	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -118,8 +119,13 @@ try {
 				exit();
 			}
 
+			if(!isset($data['user']) || !is_array($data['user'])) {
+				output([], 400, "Missing 'user' object");
+			}
+
 			$user = new User();
-			$user->setValues($data['user']);
+			// Only allow the basic profile properties. Otherwise anyone could choose their own groups.
+			$user->setValues(User::filterRegistrationValues($data['user']));
 			if(!$user->save()) {
 				$errors = $user->getValidationErrors();
 				$first = array_shift($errors);
@@ -143,8 +149,17 @@ try {
 			break;
 		case 'forgotten':
 
+			if(empty($data['email']) || !is_string($data['email'])) {
+				output([], 400, "Missing 'email'");
+			}
+
 			// Don't change log message as fail2ban relies on it
 			ErrorHandler::log("Lost password request from IP: '" . Request::get()->getRemoteIpAddress() . "'");
+
+			// Otherwise this form can be used to flood somebody's mailbox. Every request is counted, also for addresses
+			// that don't exist, so it doesn't reveal if a user exists. Throws Forbidden when there were too many.
+			$auth->checkThrottle(trim($data['email']), 'recovery');
+			$auth->registerFailure(trim($data['email']), 'recovery');
 
 			$start = (int) (microtime(true) * 1000);
 
@@ -187,6 +202,7 @@ try {
 			if (isset($data['accessToken'])) {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
 				if ($token && $token->isAuthenticated()) {
+					$auth->assertUserIdMayLogin($token->userId);
 					$token->refresh();
 				}
 			} else if(isset($data['rememberMeToken'])) {
@@ -205,6 +221,10 @@ try {
 				}
 			} elseif (isset($data['loginToken'])) {
 				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
+				// The login token is only valid for Token::LOGIN_LIFETIME. Expired ones stay in the database until garbage collection.
+				if ($token && $token->isExpired()) {
+					$token = null;
+				}
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {
@@ -217,11 +237,17 @@ try {
 
 				$user = $auth->passwordLogin($data['username'], $data['password']);
 				if (!$user) {
+					$errorDescription = 'Bad username or password';
+					$errorCode = ErrorCode::INVALID_INPUT;
+					if ($pwAuth = $auth->getUsedPasswordAuthenticator()) {
+						$errorDescription = $pwAuth->getErrorMessage();
+						$errorCode = $pwAuth->getErrorCode();
+					}
 					output([
 						'errors' => [
-							'username' => ["description" => "Bad username or password", "code" => ErrorCode::INVALID_INPUT]
+							'username' => ["description" => $errorDescription, "code" => $errorCode]
 						]
-					], 401, "Bad username or password");
+					], 401, $errorDescription);
 				}
 
 
@@ -244,6 +270,11 @@ try {
 				$data['authenticators'] = $data['methods'];
 			}
 
+			$throttleUsername = $token->getUser()->username;
+			if(!empty($data['authenticators'])) {
+				$auth->checkThrottle($throttleUsername, 'secondary');
+			}
+
 			$testedAuthenticators = $token->validateSecondaryAuthenticators($data['authenticators'] ?? []);
 
 			$authenticators = array_map(function ($o) {
@@ -253,6 +284,8 @@ try {
 			$authenticated = empty($authenticators);
 
 			if ($authenticated) {
+
+				$auth->clearThrottle($throttleUsername, 'secondary');
 
 				$rememberMeToken = null;
 				if(!empty($data['rememberLogin'])) {
@@ -287,6 +320,7 @@ try {
 
 			if (!empty($validationErrors)) {
 				$user = $token->getUser();
+				$auth->registerFailure($user->username, 'secondary');
 				User::fireEvent(User::EVENT_BADLOGIN, $user->username, $user);
 
 				$response['errors'] = $validationErrors;

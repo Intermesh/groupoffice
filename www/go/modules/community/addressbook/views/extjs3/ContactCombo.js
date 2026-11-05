@@ -1,10 +1,7 @@
 /* global Ext, go, GO */
 
-/**
- * 
- * @type |||
- */
-go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
+(function() {
+var cfg = {
 	fieldLabel: t("Contact"),
 	hiddenName: 'contactId',
 	anchor: '100%',
@@ -102,7 +99,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 			}
 		 );
 
-		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);
+		this.supr().initComponent.call(this);
 
 	},
 
@@ -116,6 +113,12 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	// 	debugger;
 	// 	return this.supr().setValue(v);
 	// }
-});
+};
+
+go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, cfg);
+go.modules.community.addressbook.ContactComboReset = Ext.extend(go.form.ComboBoxReset, cfg);
 
 Ext.reg("contactcombo", go.modules.community.addressbook.ContactCombo);
+Ext.reg("contactcomboreset", go.modules.community.addressbook.ContactComboReset);
+
+})();

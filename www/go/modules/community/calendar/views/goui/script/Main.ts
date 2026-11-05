@@ -1,33 +1,46 @@
 import {
-	btn, Button,
+	btn,
+	Button,
 	CardContainer,
 	cards,
-	checkbox, column,
+	checkbox,
+	column,
 	comp,
-	Component, datasourcestore,
+	Component,
+	ComponentState,
+	DataSourceStore,
+	datasourcestore,
 	DatePicker,
 	datepicker,
-	DateTime, Format,
-	FunctionUtil, h3, hr, List,
+	DateTime,
+	Format,
+	FunctionUtil,
+	h3,
+	hr,
+	selectallcheckboxfield,
 	list,
-	menu, router,
-	splitter, table,
+	menu,
+	menucolumn,
+	router,
+	splitter,
+	table,
 	tbar,
 } from "@intermesh/goui";
 import {MonthView} from "./MonthView.js";
 import {WeekView} from "./WeekView.js";
-import {calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
+import {adapter, CalendarEvent, calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SplitView.js";
-import {client, filterpanel, jmapds, modules} from "@intermesh/groupoffice-core";
+import {client, filterpanel, JmapDataSource, jmapds, modules, principalDS, userDS} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
-import {Settings} from "./Settings.js";
 import {ResourcesWindow} from "./ResourcesWindow.js";
 import {CalendarAdapter} from "./CalendarAdapter.js";
 import {ListView} from "./ListView.js";
 import {CalendarItem} from "./CalendarItem.js";
 import {CalendarList} from "./CalendarList.js";
+import {CategoryList} from "./CategoryList.js";
+import {ProviderList} from "./ProviderList.js";
 import {ViewWindow} from "./ViewWindow";
 
 export class Main extends Component {
@@ -51,22 +64,29 @@ export class Main extends Component {
 	spanAmount?: number = 31 // 2-7, 14, 21, 28
 
 	//eventStore: DataSourceStore<JmapDataSource<CalendarEvent>>
-	adapter = new CalendarAdapter()
+	declare adapter
 
 	private calendarList: CalendarList
-	private categoryList: List
+	private categoryList: CategoryList
 
-	/**
-	 * Used to check if we're ready to populate the view. When initial render is done and a route is given the
-	 * view will be loaded twice if we don't have this check.
-	 *
-	 * @private
-	 */
-	private initialized: boolean = false;
+	/** Set once the inCalendars filter is applied. Events are not loaded before, to avoid flashing all calendars. */
+	private calendarsApplied = false
+	private categoryLoad: Promise<void> = Promise.resolve()
+
+	/** The view that is currently shown. While set, the calendar list is disabled */
+	private activeView?: any
+	/** The route (e.g. 'month' or 'days-5') that was shown before the view was entered */
+	private routeBeforeView?: string
+	private viewBar!: Component
 
 	constructor() {
 		super();
 		this.cls = 'hbox fit tablet-cards';
+
+		this.stateId = "calendar-main";
+
+		this.registerProviders(adapter);
+		this.adapter = adapter;
 
 		this.adapter.onLoad = () => {
 			this.view.update();
@@ -101,8 +121,14 @@ export class Main extends Component {
 		});
 		const rights = modules.get("community", "calendar")!.userRights;
 
+		const providerList = new ProviderList(this.adapter).on('change', () => this.updateView());
+		this.categoryList = new CategoryList().on('change', ({ids}) => {
+			this.adapter.byType('event').store.setFilter('inCategories', ids.length ? {inCategories: ids} : undefined);
+			this.updateView();
+		});
+
 		this.items.add(
-			this.west = comp({tagName: 'aside', width: 274, cls:'scroll',style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
+			this.west = comp({tagName: 'aside', width: 274, cls:'scroll', style: {paddingTop:'1.2rem', minWidth: '27.4rem'}},
 				tbar({cls: "for-medium-device"},
 					'->',
 					btn({
@@ -115,12 +141,13 @@ export class Main extends Component {
 				),
 				this.picker = datepicker({
 					cls:'not-medium-device',
-					showWeekNbs: false, // Wk nbs in datepicker are broken // client.user.calendarPreferences.showWeekNumbers,
+					showWeekNbs: false,// client.user.calendarPreferences.showWeekNumbers,
 					enableRangeSelect: true,
 					listeners: {
 						'select': ({date}) => {
 							this.date = date!;
-							this.updateView();
+							const span = this.timeSpan += (this.timeSpan.endsWith('s') ? '-'+this.spanAmount : '');
+							this.routeTo(span, this.date);
 						},
 						'select-range': ( {start, end}) => {
 							const days = Math.round((end!.clone().setHours(12).getTime() - start!.clone().setHours(12).getTime()) / 8.64e7) + 1;
@@ -140,29 +167,32 @@ export class Main extends Component {
 				comp({cls:'scroll'},
 					this.renderViews(),
 					this.calendarList = new CalendarList(),
-					tbar({cls: 'dense'},comp({tagName: 'h3', html: t('Other')})),
-					comp({tagName:'ul', cls:'goui check-list'}, ...this.renderAdapterBoxes()),
-					tbar({cls: 'dense'},
-						comp({tagName: 'h3', html: t('Categories','core','core')}),
-						btn({
-							hidden: !rights.mayChangeCategories,
-							icon: 'add', menu: menu({},
-								btn({
-									text: t('Create category') + '…', handler: () => {
-										const dlg = new CategoryWindow();
-										dlg.show();
-										dlg.form.create({});
-
-									}
-								})
-							)
-						})
+					tbar({cls: "compact table-aligned"},
+						selectallcheckboxfield({list: providerList.list}),
+						comp({tagName: 'h4', text: t('Other')})
 					),
-					this.categoryList = this.buildCategoryFilter(),
+					providerList,
+					tbar({cls: "compact table-aligned"},
+						selectallcheckboxfield({list: this.categoryList.list}),
+						comp({tagName: 'h4', text: t('Categories','core','core')}),
+						"->",
+
+						btn({
+							icon: "add",
+							hidden: !rights.mayChangeCategories,
+							title: t('Create category'), handler: () => {
+								const dlg = new CategoryWindow();
+								dlg.show();
+								dlg.form.create({});
+							}
+						})
+
+					),
+					this.categoryList,
 					filterpanel({
 						entityName: "CalendarEvent",
 						store: this.adapter!.byType('event').store
-					})
+					}).on('filterchange', (f) => {  })
 				)
 			),
 			splitter({
@@ -171,6 +201,21 @@ export class Main extends Component {
 			}),
 			comp({cls: 'vbox active', flex: 1},
 				tbar({},
+					btn({
+						cls: "for-large-device",
+						listeners: {
+							render: ({target}) => {
+								target.icon = this.west.hidden ? "left_panel_open" : "left_panel_close";
+							}
+						},
+						icon: "left_panel_close",
+							handler: btn => {
+							const h = this.west.hidden;
+							this.west.hidden = !h;
+							btn.icon = h ? 'left_panel_close' : 'left_panel_open';
+							this.saveState();
+						}
+					}),
 					btn({cls: "for-medium-device", icon: "menu", handler: _ => {
 						this.west.el.cls('!active');
 					}}),
@@ -220,10 +265,11 @@ export class Main extends Component {
 						}))
 
 					}),
-					this.currentText = comp({tagName: 'h3', text: t('Today'), flex: '1 1 50%', style: {minWidth: '100px', fontSize: '1.8em'}}),
+					this.currentText = comp({cls: "cal period-title", tagName: 'h3', text: t('Today')}),
 					//'->',
 					this.cardMenu = comp({cls: 'group not-medium-device', flex:'0 0 auto'},
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('5 Days'), handler: _b => this.routeTo('days-5', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_compact', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
@@ -232,6 +278,7 @@ export class Main extends Component {
 					),
 					btn({icon:'view_agenda',cls: 'for-medium-device', flex:'0 0 auto', menu:menu({},
 						btn({icon: 'view_day', text: t('Day'), handler: _b => this.routeTo('day', this.date)}),
+						btn({icon: 'view_week', text: t('5 days'), handler: _b => this.routeTo('days-5', this.date)}),
 						btn({icon: 'view_week', text: t('Week'), handler: _b => this.routeTo('week', this.date)}),
 						btn({icon: 'view_module', text: t('Month'), handler: _b => this.routeTo('month', this.date)}),
 						btn({icon: 'view_compact', text: t('Year'), handler: _b => this.routeTo('year', this.date)}),
@@ -250,14 +297,15 @@ export class Main extends Component {
 						btn({icon: 'keyboard_arrow_right', title: t('Next'), allowFastClick:true, handler: b => this.forward()}),
 					),
 					btn({icon:'more_vert',cls: 'not-small-device', menu:menu({},
-						btn({icon:'video_call',hidden:!client.user.isAdmin,text:t('Video meeting')+'…', handler: _ => {(new Settings()).openLoad()}}),
 						btn({
 							icon: 'print', text:t('Print'), menu: menu({},
 								this.printCurrentBtn = btn({icon: 'print', text: t('Current view'), handler:() => {
 									let view = this.timeSpan;
-									if(['day', 'week', 'month', 'list'].includes(view)) {
+									//if(['day', 'week', 'month', 'list'].includes(view)) {
 										this.openPDF(view);
-									}
+									// } else {
+									// 	this.openPDF(view);
+									// }
 								}}),
 								//'-',
 								btn({icon: 'view_list', text: t('List'), handler:() => { this.openPDF('list'); }}),
@@ -267,7 +315,24 @@ export class Main extends Component {
 								btn({icon: 'view_module', text: t('Month'), handler:() => { this.openPDF('month'); }})
 							)
 						}),
-						btn({icon:'meeting_room',hidden: !rights.mayChangeResources, text:t('Resources')+'…', handler: _ => { (new ResourcesWindow()).show()}})
+
+						btn({
+							icon:'meeting_room',
+							//hidden: !rights.mayChangeResources,
+							text:t('Resources')+'…',
+							handler: _ => { (new ResourcesWindow()).show()}
+						}),
+
+						checkbox({
+							name:'showDeclined',
+							label: t('Show declined events'),
+							listeners: {
+								change: async ({newValue}) => {
+									await userDS.update(client.user.id, {"calendarPreferences/showDeclined": newValue});
+									this.updateView();
+								}
+							}
+						}),
 					)})
 				),
 				this.cards = cards({flex: 1, activeItem:1, listeners: {render: ({target}) => this.applySwipeEvents(target)}},
@@ -279,34 +344,33 @@ export class Main extends Component {
 				)
 			)
 		);
-		if(client.user.calendarPreferences?.startView) {
-			const parts = client.user.calendarPreferences?.startView.split('-');
-			this.setSpan(parts[0], parseInt(parts[1] ?? 0));
-		} else {
-			this.setSpan('month', 0);
-		}
+
 		this.date = new DateTime();
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
 		this.calendarList.on('changevisible', ({ids}) => {
-			if(!this.initialized) {
-				// after initial load. check for changed
-				calendarStore.on('load', () => {
-					categoryStore.reload();
-					this.view.update();
-				});
-				this.initialized = true;
+			// A view has its own set of calendars. Ignore the calendar list until the view is left.
+			if(this.activeView) {
+				return;
 			}
-			this.applyInCalendarFilter(ids);
-			this.updateView();
+			this.applyCalendars(ids);
 		});
-		this.on('render', () => { inviteStore.load(); });
+		this.on('render', () => {
+			this.cards.cls = client.user.calendarPreferences.multiLine ? 'multiline':'';
+			if(client.user.calendarPreferences?.startView) {
+				const parts = client.user.calendarPreferences?.startView.split('-');
+				this.setSpan(parts[0], parseInt(parts[1] ?? 0));
+			} else {
+				this.setSpan('month', 0);
+			}
+
+			inviteStore.load();
+		});
 	}
 
 	private applySwipeEvents(cards: CardContainer) {
 		let initX = 0, initY = 0;
 		cards.el.on('touchstart', e => {
-			console.log('touchstart');
 			initX = e.changedTouches[0].screenX;
 			initY = e.changedTouches[0].screenY;
 		}).on('touchend', e => {
@@ -322,19 +386,113 @@ export class Main extends Component {
 	}
 
 
+	private applyCalendars(ids: string[]) {
+		this.calendarsApplied = true;
+		this.applyInCalendarFilter(ids);
+		this.updateView();
+
+		// isVisible is saved to the server with a delay, so pass the visible calendars explicitly
+		// instead of letting the server use the stored (stale) isVisible values.
+		categoryStore.setFilter('inCalendars', {operator: "OR", conditions: [{inCalendars: ids}, {mine: true}]});
+		// Never run two loads at once. A slow, older response could otherwise replace the newer filtered one.
+		this.categoryLoad = this.categoryLoad.catch(() => {}).then(() => categoryStore.load()).then(() => {});
+	}
+
+	private enterView(view: any) {
+		// when switching from one view to another, keep the route from before the first view
+		if(!this.activeView) {
+			this.routeBeforeView = this.spanRoute();
+		}
+		this.activeView = view;
+		this.calendarList.disabled = true;
+		this.viewBar.items.get(0)!.text = view.name;
+		this.viewBar.hidden = false;
+
+		// A view may contain calendars that are not in the calendar list. isVisible is left untouched.
+		this.applyCalendars(view.calendarIds ?? []);
+
+		if(view.defaultView) {
+			this.routeTo(view.defaultView, this.date);
+		}
+	}
+
+	private leaveView() {
+		if(!this.activeView) {
+			return;
+		}
+		this.activeView = undefined;
+		this.calendarList.disabled = false;
+		this.viewBar.hidden = true;
+
+		this.applyCalendars(this.calendarList.visibleIds());
+
+		if(this.routeBeforeView && this.routeBeforeView !== this.spanRoute()) {
+			this.routeTo(this.routeBeforeView, this.date);
+		}
+		this.routeBeforeView = undefined;
+	}
+
+	/**
+	 * The current time span as used in the route. Spans with a variable length have their amount appended.
+	 */
+	private spanRoute() {
+		const fixed = ['day', 'week', 'month', 'list', 'year'];
+		return fixed.includes(this.timeSpan) ? this.timeSpan : this.timeSpan + '-' + this.spanAmount;
+	}
+
 	private applyInCalendarFilter(calendarIds: string[]) {
 		const store = this.adapter.byType('event').store;
 
 		//const calendarIds = Object.keys(this.inCalendars).filter(key => this.inCalendars[key])
-
-		Object.assign(store.queryParams.filter ||= {}, {
+		store.setFilter('inCalendars', {
 			inCalendars: calendarIds
 		});
 
 	}
 
 	private openPDF(type:string) {
-		window.open(client.pageUrl('community/calendar/print/'+type+'/'+this.date.format('Y-m-d')));
+
+		let start = this.picker.value;
+
+			if(type == "list") {
+
+			let end = start.clone();
+
+			switch (this.timeSpan) {
+
+				case 'days':
+				case 'weeks':
+					end.addDays(this.spanAmount!);
+					break;
+
+				case 'split':
+					end.addDays(this.spanAmount!);
+					break;
+				/** @fallthough */
+				case 'week':
+					end.addDays(7);
+					break;
+				case 'month':
+				case 'list':
+					start.setDate(1);
+					end.setDate(1).addMonths(1).addDays(-1);
+					break;
+				case 'year':
+					start.setDate(1);
+					start.setMonth(1);
+					end = start.clone().addYears(1).addDays(-1);
+					break;
+			}
+
+			window.open(client.pageUrl('community/calendar/printList/' + start.format('Y-m-d') + "/" + end.format('Y-m-d')));
+		} else if(['day', 'month', 'list'].includes(type)) {
+			window.open(client.pageUrl('community/calendar/print/' + type + '/'+ this.date.format('Y-m-d')));
+		} else if(type ==='week') {
+			start.setDay(DateTime.firstWeekDay);
+			window.open(client.pageUrl('community/calendar/printRange/week/7/' + start.format('Y-m-d')));
+		} else {
+			window.open(client.pageUrl('community/calendar/printRange/' + type + '/' + this.spanAmount + '/' + start.format('Y-m-d')));
+		}
 	}
 
 	private get view() : CalendarView {
@@ -342,25 +500,17 @@ export class Main extends Component {
 	}
 
 	private renderViews() {
-		const rights = modules.get("community", "calendar")!.userRights;
-		return table({
+
+		const viewsTable = table({
 			store: viewStore,
 			emptyStateHtml:'',
-			fitParent: true,
 			headers:false,
 			rowSelectionConfig: {
 				multiSelect: false,
 				listeners: {
 					'selectionchange': ({selected}) => {
 						if(selected[0]) {
-							this.applyInCalendarFilter(selected[0].record.calendarIds??[]);
-							if(selected[0].record.defaultView) {
-								this.routeTo(selected[0].record.defaultView, this.date);
-								// const parts = selected[0].record.defaultView.split('-');
-								// if(!parts[1]) parts[1] = 0;
-								// this.setSpan(parts[0], parseInt(parts[1] ?? 0));
-							}
-							this.updateView();
+							this.enterView(selected[0].record);
 						}
 					}
 				}
@@ -368,7 +518,6 @@ export class Main extends Component {
 			listeners: {
 				'render': ({target}) => {
 					void target.store.load();
-					this.calendarList.on('changevisible', () => { target.rowSelection?.clear() })
 				},
 			},
 			columns:[
@@ -378,96 +527,53 @@ export class Main extends Component {
 					renderer: (value, record) => comp({tagName: "i", cls: "icon", text:'group'})
 				}),
 				column({id:'name'}),
-				column({ width: 50,
-					id: '-', renderer: (v, data) => btn({
-						//hidden: !rights.mayChangeViews,
-						icon: 'more_horiz', menu: menu({},
-							btn({
-								icon: 'edit', text: t('Edit'), disabled: !data.myRights.mayAdmin, handler: async _ => {
-									const dlg = new ViewWindow();
-									await dlg.load(data.id);
-									dlg.show();
+				menucolumn({
+					menu: menu({
+							listeners: {
+								show: ({target}) => {
+									const record = viewStore.get(target.dataSet.rowIndex)!;
+									target.findChild("edit")!.disabled = !record.myRights.mayAdmin;
+									target.findChild("delete")!.disabled = !record.myRights.mayAdmin;
 								}
-							}),
-							btn({
-								icon: 'delete', text: t('Delete'), disabled: !data.myRights.mayAdmin, handler: async _ => {
-									viewStore.dataSource.confirmDestroy([data.id]);
-								}
-							})
-						)
-					})
+							}
+						},
+						btn({itemId: "edit", icon: 'edit', text: t('Edit'), handler: async (me) => {
+							const record = viewStore.get(me.parent!.dataSet.rowIndex)!;
+							const dlg = new ViewWindow();
+							await dlg.load(record.id);
+							dlg.show();
+						}}),
+						btn({itemId: "delete", icon: 'delete', text: t('Delete'), handler: (me) => {
+							const record = viewStore.get(me.parent!.dataSet.rowIndex)!;
+							void viewStore.dataSource.confirmDestroy([record.id]);
+						}})
+					)
 				})]
 		});
+
+		this.viewBar = tbar({cls: 'compact table-aligned', hidden: true},
+			comp({tagName: 'h4'}),
+			'->',
+			btn({icon: 'close', text: t('Close views'), handler: () => {
+				viewsTable.rowSelection?.clear();
+				this.leaveView();
+			}})
+		);
+
+		return comp({}, this.viewBar, viewsTable);
 	}
 
-	private renderAdapterBoxes() {
-		const boxes: any = {
-			birthday:['#009c63', t('Birthdays')],
-			task: 	['#7e472a',	t('Tasks')],
-			holiday: ['#025d7b', t('Holidays')]
-		};
-		return Object.keys(boxes).map(key => comp({tagName:'li'}, checkbox({
-			color: boxes[key][0], label: boxes[key][1], value: this.adapter.byType(key).enabled,
-			listeners: {
-				'change': ({newValue}) => {
-					this.adapter.byType(key).enabled = newValue;
-					jmapds('User').update(client.user.id, {calendarPreferences: {[key+'sAreVisible']: newValue}});
-					this.updateView();
-				}
-			}
-		})));
+	protected buildState(): ComponentState {
+		const s = super.buildState();
+
+		s.westHidden = this.west.hidden;
+		return s;
 	}
 
-	private buildCategoryFilter() {
-		const rights = modules.get("community", "calendar")!.userRights;
-		const selected: any = {},
-			selectionChange = () => {
-				const store = this.adapter.byType('event').store;
-				const categoryIds = Object.keys(selected);
+	protected restoreState(state: ComponentState) {
+		super.restoreState(state);
 
-				if(categoryIds.length) {
-					Object.assign(store.queryParams.filter ||= {}, {
-						inCategories: categoryIds
-					});
-				} else {
-					delete store.queryParams.filter?.inCategories;
-				}
-				this.updateView();
-			};
-		return list({
-			store: categoryStore,
-			cls: 'check-list',
-			listeners: {'render': ({target}) => { void target.store.load() }},
-			renderer: (data) => {
-				return [checkbox({
-					color: '#' + data.color,
-					label: data.name,
-					listeners: {
-						'change': ({newValue}) => {
-							if (newValue) {
-								selected[data.id] = true;
-							} else {
-								delete selected[data.id];
-							}
-							selectionChange();
-						}
-					},
-					buttons: [btn({
-						hidden: !rights.mayChangeCategories,
-						icon: 'more_horiz', menu: menu({},
-							btn({icon:'edit', text: t('Edit'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-								const dlg = new CategoryWindow();
-								await dlg.load(data.id);
-								dlg.show();
-							}}),
-							btn({icon:'delete', text: t('Delete'), disabled:!data.myRights.mayAdmin, handler: async _ => {
-									jmapds("CalendarCategory").confirmDestroy([data.id]);
-							}})
-						)
-					})]
-				})];
-			}
-		})
+		this.west.hidden = state.westHidden;
 	}
 
 	routeTo(view:string, date: DateTime) {
@@ -510,6 +616,9 @@ export class Main extends Component {
 			case 'year':
 				this.date.addYears(value);
 				break;
+			default:
+				this.date.addDays(value * this.spanAmount!);
+				route += '-'+this.spanAmount;
 		}
 		// set path silent to buffer the update
 		//router.suspendEvent = true;
@@ -519,13 +628,16 @@ export class Main extends Component {
 	}
 
 
+	/**
+	 * Sets the time span that the calendar displays and refreshes the view.
+	 *
+	 * @param value The type of time span to display (e.g. day, week, month)
+	 * @param amount The number of days the span covers, used for variable length spans (e.g. 2-7, 14, 21, 28)
+	 */
 	setSpan(value: ValidTimeSpan, amount: number) {
 		this.timeSpan = value;
-		this.printCurrentBtn.disabled = !['day', 'week', 'month'].includes(value);
 		this.spanAmount = amount;
-
-		if(this.initialized)
-			this.updateView();
+		this.updateView();
 	}
 
 	updateView(buffered?:boolean) {
@@ -533,12 +645,13 @@ export class Main extends Component {
 			// timeSpan : [cardIndex, cardnameIndex]
 			'day': [0, 0],
 			'days': [0, -1],
-			'week': [0, 1],
+			'week': [0, 2],
 			'weeks': [1, -1],
-			'month': [1, 2],
-			'year': [2, 3],
-			'split': [3,4],
-			'list': [4,5]
+			'month': [1, 3],
+			'year': [2, 4],
+			'split': [3,5],
+			'list': [4,6],
+			'custom': [5,-1]
 		})[this.timeSpan];
 
 		this.cardMenu.items.forEach(i => i.el.cls('-active'));
@@ -573,6 +686,7 @@ export class Main extends Component {
 				break;
 			case 'days':
 				if(this.spanAmount === 5) {
+					this.cardMenu.items.get(1)!.el.cls('+active');
 					start.setWeekDay(0); // workweek. start monday
 				}
 				end = start.clone().addDays(this.spanAmount! - 1);
@@ -585,6 +699,11 @@ export class Main extends Component {
 		}
 		this.picker.setValue(start, end);
 
+		if(!this.calendarsApplied) {
+			// applyCalendars() calls updateView() again when the calendar list has loaded
+			return;
+		}
+
 		if(buffered) {
 			// for the fast previous/forward clickers
 			this.bufferedUpdate(start);
@@ -596,4 +715,210 @@ export class Main extends Component {
 	private bufferedUpdate = FunctionUtil.buffer(200, (start: DateTime)=> {
 		this.view.goto(start, this.spanAmount!);
 	})
+
+	private registerProviders(adapter: CalendarAdapter){
+
+		const onChange = (v: boolean, key: string) => {
+			this.adapter.byType(key).enabled = v;
+			jmapds('User').update(client.user.id, {calendarPreferences: {[key+'sAreVisible']: v}});
+		};
+
+		adapter.registerProvider('event', {
+			enabled: true,
+			watch:true,
+			store:datasourcestore({
+			dataSource:jmapds('CalendarEvent'),
+			relations: {
+				modifier: {dataSource: principalDS, path: "modifiedBy"},
+				creator: {dataSource: principalDS, path:'createdBy'}
+			}}),
+			*items(start:DateTime,end:DateTime) {
+				// Sort personal calendar events on top so merged events will favor the personal one over shared items.
+				const pId = client.user.calendarPreferences?.personalCalendarId;
+				const events = (this.store as DataSourceStore<JmapDataSource<CalendarEvent>>).data
+					.sort((a,b) => (b.calendarId === pId ? 1 : 0) - (a.calendarId === pId ? 1 : 0));
+
+				for (const e of events) {
+					for(const item of CalendarItem.expand(e as CalendarEvent, start, end)) {
+						if ((!item.isDeclined || client.user.calendarPreferences.showDeclined!==false) ) {
+							yield item;
+						}
+					}
+				}
+			},
+			load(start:DateTime,end:DateTime) {
+				this.store!.setFilter('period', {
+					after: start.format('Y-m-d'),
+					before: end.format('Y-m-d')
+				});
+
+				return this.store!.load();
+			}
+		});
+
+		adapter.registerProvider('holiday', {
+			enabled: client.user.calendarPreferences?.holidaysAreVisible,
+			checkbox: {color:'#025d7b', label: t('Holidays'), onChange},
+			list:[],
+			open(){},
+			load(start:DateTime,end:DateTime) {
+				if(!client.user.holidayset) {
+					client.user.holidayset = client.user.language;
+				}
+				let [lang,country] = client.user.holidayset.split('_');
+				if(!country) country = lang;
+				if(country=='uk')
+					country ='gb';
+				return client.jmap("core/Holiday/fetch",{
+					set: country.toUpperCase(), lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
+				}).then(r => {
+					this.list = r.list;
+				});
+			},
+			*items(start: DateTime, end: DateTime) {
+				for(const o of this.list) {
+					const start = DateTime.createFromFormat(o.start,'Y-m-d')!;
+
+					let title  = o.title;
+					if(o.region) {
+						title += " (" + o.region + ")";
+					}
+					yield new CalendarItem({
+						key: '',
+						start,
+						extraIcons: ['family_star'],
+						defaultColor: '025d7b',
+						data: {
+							title: title,
+							duration: o.duration,
+							showWithoutTime: true,
+						},
+						cal: {
+							name: t("Holidays")
+						}
+					});
+				}
+			}
+		});
+
+		if(modules.isAvailable("community", "tasks"))
+		adapter.registerProvider('task', {
+			enabled: client.user.calendarPreferences?.tasksAreVisible,
+			checkbox: {color:'#7e472a', label: t('Tasks', 'community', 'tasks'), onChange},
+			store: datasourcestore({
+				dataSource: jmapds('Task'),
+				relations: {
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
+				}
+			}),
+			*items(from:DateTime,until:DateTime) {
+				for(const task of this.store!.items) {
+					let date;
+
+					if(task.progress == 'completed') {
+						date = task.progressUpdated || (new DateTime()).format('Y-m-d'); // slice date
+					} else {
+						date = task.due || task.start || (new DateTime()).format('Y-m-d');
+					}
+
+//if(task.title =='test taak met bogus timezone') debugger;
+					const start = DateTime.createFromFormat(date.substring(0,10), 'Y-m-d');
+
+					if(!start) {
+						continue;
+					}
+
+					if(start.date <= until.date && start.date >= from.date) {
+						// console.log(task.progress, date, start, task.title, task);
+						task.duration = 'PT1H';
+						task.showWithoutTime = true;
+						yield new CalendarItem({
+							key: '-',
+							start,
+							open() {
+								const dlg = new go.modules.community.tasks.TaskDialog();
+								dlg.show();
+								dlg.load(task.id);
+							},
+							extraIcons: [task.progress == 'completed' ? 'task_alt' : 'radio_button_unchecked'],
+							defaultColor: '7e472a',
+							data: task,
+							cal: {
+								name: t("Tasks")
+							}
+						});
+					}
+				}
+			},
+			load(start:DateTime,end:DateTime) {
+				// this.store!.setFilter("todo", {
+				// 	start: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
+				// }).setFilter('done', {
+				// 	progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d'),
+				// 	//progress: 'NOT needs-action OR in-progress'
+				// });
+				this.store.setFilter('range',{
+					operator: "OR",
+					conditions: [
+						{start:null,due:null},
+						{start: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+						{due: start.format('Y-m-d')+'..'+end.format('Y-m-d')},
+						{progressUpdated: start.format('Y-m-d')+'..'+end.format('Y-m-d')}
+					]
+				});
+				this.store.setFilter('showInCalendar' , {showInCalendar: true})
+				return this.store!.load();
+			}
+		});
+
+		if(modules.isAvailable("community", "addressbook"))
+		adapter.registerProvider('birthday', {
+			enabled: client.user.calendarPreferences?.birthdaysAreVisible,
+			checkbox: {color:'#009c63', label: t('Birthdays'), onChange},
+			store: datasourcestore({
+				dataSource: jmapds('Contact'),
+				relations: {
+					modifier: {dataSource: principalDS, path: "modifiedBy"},
+					creator: {dataSource: principalDS, path:'createdBy'}
+				}
+			}),
+			*items(from:DateTime,end:DateTime) {
+				const sy= from.getYear(),
+					ey= end.getYear();
+				for(const b of this.store.items) {
+					const start = DateTime.createFromFormat(b.birthday,'Y-m-d')!;
+					const born = start.getYear();
+					start.setYear(b.birthday.split('-')[1]<7?ey:sy);
+					const age = start.getYear()- born;
+					yield new CalendarItem({
+						key: "",
+						start,
+						open() {
+							const dlg = new go.modules.community.addressbook.ContactDialog();
+							dlg.show();
+							dlg.load(b.id);
+						},
+						extraIcons: ['cake'],
+						defaultColor: '009c63',
+						data:{
+							title: t('{name}\'s birthday').replace('{name}',b.name)+ ' ('+age+')',
+							duration: 'P1D',
+							showWithoutTime:true,
+						},
+						cal: {
+							name: t("Birthdays")
+						}
+					});
+				}
+			},
+			load(start:DateTime,end:DateTime) {
+				start = start.clone().addDays(1);// birthday filter end date in inclusive
+				this.store! //.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
+					.setFilter('isOrganisation', {isOrganization: false})
+					.setFilter('birthday', {birthday: start.format('Y-m-d')+'..'+end.format('Y-m-d')})
+				return this.store!.load();
+			}
+		});
+	}
 }

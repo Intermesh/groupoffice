@@ -1,3 +1,4 @@
+
 go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	title: t("Task"),
 	entityStore: "Task",
@@ -24,23 +25,32 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			this.closeOnSubmit = false;
 
 			this.commentComposer.show();
-			this.commentComposer.editor.allowBlank = this.role !== "support";
+			this.commentComposer.comp.required = this.role === "support";
 			if(this.role === "support") {
 				this.descriptionFieldset.hide();
 			}
 
-			this.commentComposer.editor.on("ctrlenter", () => {
-				this.submit();
-			})
+			// this.commentComposer.editor.on("ctrlenter", () => {
+			// 	this.submit();
+			// })
 
 			this.on("submit", () => {
-				if(this.commentComposer.editor.getValue() != "") {
+				if(this.commentComposer.comp.editor.value) {
 					// we need to use setTimeout otherwise the change event of the Comment entity fires during the store load and
 					// it won't be reloaded.
-					setTimeout(() => {
-						this.commentComposer.save(this.role == "support" ? "SupportTicket" : "Task", this.currentId);
+					// setTimeout(() => {
+						go.Db.store("Comment").save({
+							entity: this.role === "support" ? "SupportTicket" : "Task",
+							entityId: this.currentId,
+							labels: this.commentComposer.comp.labels.value.map(l=>l.id),
+							text: this.commentComposer.comp.editor.value,
+							attachments: this.commentComposer.comp.attachments.value
+						}).catch((err) => {
+							GO.errorDialog.show(err);
+						})
+					this.closeWithModifications = true;
 						this.close();
-					});
+					// });
 				}else {
 					this.closeWithModifications = true;
 					this.close();
@@ -48,7 +58,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			}, {single:true})
 		} else {
 			this.commentComposer.hide();
-			this.commentComposer.editor.allowBlank = true;
+			this.commentComposer.comp.required = false;
 			this.descriptionFieldset.show();
 		}
 	},
@@ -63,12 +73,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 			case "board":
 			case "project":
-				break;
-
-			default:
-				if(this.redirectOnSave) {
-					this.entityStore.entity.goto(this.currentId);
-				}
 				break;
 		}
 	},
@@ -327,6 +331,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								flex: 1,
 								anchor: undefined,
 								role: this.role,
+								value:  this.role != "support" ? go.User.tasksSettings.defaultTasklistId : go.User.supportSettings.defaultTasklistId,
 								listeners: {
 									change: this.onTaskListChange,
 									setvalue: this.onTaskListChange,
@@ -350,6 +355,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						entityStore: "TaskCategory",
 						comboStoreConfig: {
 							filters: {
+								role: {role: this.role},
 								tasklistId: {
 									operator: "OR",
 									conditions: [
@@ -442,9 +448,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 		];
 
 		if(go.Modules.isAvailable("community", "comments")) {
-			this.commentComposer = new go.modules.comments.ComposerFieldset();
+			this.commentComposer = new go.GOUIWrapper({
+				comp: new GO.comments.CommentEditor(false)
+			});
 
-			items.splice(1,0, this.commentComposer);
+			items.splice(1,0, {xtype: "fieldset",items:this.commentComposer});
 		}
 
 		return items;

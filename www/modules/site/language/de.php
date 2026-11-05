@@ -69,5 +69,5 @@ return array (
   'Website Manager' => 'Website Manager',
   'SSL' => 'SSL',
   'Mod rewrite' => 'Mod rewrite',
-  'Mod rewrite base path' => 'Mod rewrite base path',
+  'Mod rewrite base path' => 'Mod rewrite Basispfad',
 );

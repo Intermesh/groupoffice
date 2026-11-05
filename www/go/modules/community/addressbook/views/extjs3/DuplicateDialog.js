@@ -3,7 +3,7 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
   title: t("Filter duplicates"),
   layout: "border",
   modal: true,
-  width: dp(1000),
+  width: dp(1200),
   height: dp(800),
   initComponent: function () {
     this.items = [
@@ -16,6 +16,11 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
       {
         text: t("Merge selected"),
         handler: function() {
+
+          if(this.grid.getSelectionModel().getSelections().length < 2) {
+            Ext.MessageBox.alert(t("Error"), t("Please select at least two items to merge."));
+            return;
+          }
 
           Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to merge the selected items? This can't be undone."), function(btn) {
             if(btn != 'yes') {
@@ -63,11 +68,12 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
     this.filter = new Ext.Panel({
       region: "north",
       autoHeight: true,
+      style: "margin-left: 1.6rem",
       layout: "fit",
       items: [this.duplicate = new go.form.FormContainer({
+
         region: 'north',        
         layout: "form",
-        
         items: [{
           defaults : {
             listeners: {
@@ -81,7 +87,6 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
           },
           xtype: "checkboxgroup",
           items: [{
-            
             name: "name",
             boxLabel: t("Name"),
             checked: true

@@ -7,6 +7,7 @@
 
 namespace go\modules\community\calendar\model;
 
+use DateInterval;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
@@ -17,6 +18,7 @@ use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\JsonPointerException;
 use go\core\fs\Blob;
+use go\core\http\PostResponseProcessor;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
 use go\core\model\Principal;
@@ -76,6 +78,11 @@ class CalendarEvent extends AclItemEntity {
 
 
 	static bool $sendSchedulingMessages = false;
+
+	/**
+	 * Only true when saving from JMAP controller
+	 * @var bool
+	 */
 	static bool $fromClient = false;
 
 	public string $calendarId;
@@ -139,9 +146,6 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public ?DateTimeInterface $start;
 
-	public $utcStart;
-	public $utcEnd;
-
 	/**
 	 * The duration of the event (or the occurence)
 	 * (optional, default: PT0S)
@@ -181,11 +185,14 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $privacy = self::Public;
 
+	const FREEBUSY_BUSY = 'busy';
+	const FREEBUSY_FREE = 'free';
+
 	/**
 	 * Is event Transparent or Opaque
-	 * @var boolean
+	 * @var ?string
 	 */
-	public $freeBusyStatus = 'busy';
+	public ?string $freeBusyStatus = self::FREEBUSY_BUSY;
 
 	/**
 	 * @var string
@@ -221,14 +228,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public $modifiedAt;
 	public $createdAt;
-	public $modifiedBy;
-	public $createdBy;
+	public ?string $modifiedBy;
+	public ?string $createdBy;
 
 	/** The end time of the last occurrence in the series. or end time if not recurring */
 	protected $lastOccurrence;
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
-	protected $ownerId; // find calendar owner to see if Private events needs to be altered
+	protected ?string  $ownerId = null; // find calendar owner to see if Private events needs to be altered
 
 	public static function customFieldsTableName(): string
 	{
@@ -237,6 +244,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public function customFieldsModelId() : string|int|null {
 		return $this->eventId;
+	}
+
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return ['veventBlobId', 'uri', 'uid'];
 	}
 
 	protected function internalGetPermissionLevel(): int
@@ -448,18 +463,33 @@ class CalendarEvent extends AclItemEntity {
 //		$this->title = $value;
 //	}
 
-	public function start($withoutTime = false) {
-		return new \DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+	public function start($withoutTime = false, string|null $setTimeZoneTo = null): DateTime
+	{
+		if(!isset($this->start)) {
+			$this->start = new DateTime();
+		}
+		$dt = new DateTime($this->start->format("Y-m-d". ($withoutTime?'':" H:i:s")), $this->timeZone());
+		if(isset($setTimeZoneTo)) {
+			$dt->setTimezone(new DateTimeZone($setTimeZoneTo));
+		}
+		return $dt;
 	}
 
-	public function end($withoutTime = false) {
+	public function end($withoutTime = false, string|null $setTimeZoneTo = null): DateTime
+	{
 		if(empty($this->start)) {
 			$end = new DateTime();
 		} else {
 			$end = $this->start();
 		}
 		if(!empty($this->duration))
-			$end->add(new \DateInterval($this->duration));
+			$end->add(new DateInterval($this->duration));
+
+
+		if(isset($setTimeZoneTo)) {
+			$end->setTimezone(new DateTimeZone($setTimeZoneTo));
+		}
+
 		return $end;
 	}
 
@@ -468,30 +498,37 @@ class CalendarEvent extends AclItemEntity {
 	 * Would be 2 datetimes, 1 date and 2 times if same day, or just 1 or 2 dates when full-day(s)
 	 * @return string[] 2 lines of human readable text
 	 */
-	public function humanReadableDate()
+	public function humanReadableDate(?string $tz = null): array
 	{
-		$start = $this->start;
-		$end = $this->end();
-		$oneDay = $start->format('Ymd') === $end->format('Ymd');
-		$line1 = go()->t($oneDay ? 'At' : 'From') . ' ' .
-			go()->t($start->format('l')) .
-			$start->format(' j ') . go()->t('full_months')[$start->format('n')] .
-			$start->format(' Y');
-		if (!$oneDay) {
-			if (!$this->showWithoutTime)
-				$line1 .= ', ' . $start->format('H:i');
-			$line1 .= ' ' . go()->t('until');
+		$fmtDate = fn($d) => go()->t($d->format('l')) . $d->format(' j ') .
+			go()->t('full_months')[$d->format('n')] . $d->format(' Y');
+
+		$start = $this->start(false, $tz);
+		$end   = $this->end();
+
+		if ($this->showWithoutTime) {
+			$end->modify('-1 day');
 		}
-		if ($oneDay) {
-			$line2 = $start->format('H:i') . ' - ' . $end->format('H:i');
-		} else {
-			$line2 = go()->t($end->format('l')) .
-				$end->format(' j ') . go()->t('full_months')[$end->format('n')] .
-				$end->format(' Y');
+
+		$sameDay = $start->format('Ymd') === $end->format('Ymd');
+
+		if ($sameDay && $this->showWithoutTime) {
+			return [$fmtDate($start), ''];
+		}
+
+		$line1 = go()->t($sameDay ? 'At' : 'From', 'community', 'calendar') . ' ' . $fmtDate($start);
+
+		if (!$sameDay) {
 			if (!$this->showWithoutTime) {
-				$line2 .= ', ' . $end->format('H:i');
+				$line1 .= ', ' . $start->format('H:i');
 			}
+			$line1 .= ' ' . go()->t('until', 'community', 'calendar');
 		}
+
+		$line2 = $sameDay
+			? $start->format('H:i') . ' - ' . $end->format('H:i')
+			: $fmtDate($end) . (!$this->showWithoutTime ? ', ' . $end->format('H:i') : '');
+
 		return [$line1, $line2];
 	}
 
@@ -574,49 +611,13 @@ class CalendarEvent extends AclItemEntity {
 		return !empty($this->recurrenceId);
 	}
 
-	/**
-	 * @param $blobIds
-	 * @param $calendarId
-	 * @param $uid string 'check', 'ignore', 'new'
-	 * @return object
-	 */
-	static function import($blobIds, $calendarId, $uid='check') {
-		$r = (object)[
-			'saved'=>0,
-			'failed'=>0,
-			'skipped'=>0,
-			'failureReasons'=>[]
-		];
-		foreach($blobIds as $blobId) {
-			foreach(ICalendarHelper::calendarEventFromFile($blobId, ['calendarId' => $calendarId]) as $ev) {
-				if(is_array($ev)){
-					$r->failureReasons[$r->failed] = 'Parse error '.$ev['vevent']->VEVENT[0]->UID. ': '. $ev['error']->getMessage();
-					$r->failed++;
-					continue;
-				}
-
-				if($uid === 'new') {
-					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && self::find()->selectSingleValue('cce.id')->where(['uid'=>$ev->uid])->single() !== null) {
-					$r->skipped++;
-					continue;
-					// check if exists
-				} // else use UID from ics file without checking.
-				if($ev->save()){ // will fail if UID exists. We dont want to modify existing events like this
-					$r->saved++;
-				} else {
-					$r->failureReasons[$r->failed] = 'Validate error '.$ev->uid. ': '. var_export($ev->getValidationErrors(),true);
-					$r->failed++;
-				}
-			}
-		}
-		return $r;
-	}
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
 			$this->uri = strtr($this->uid, '+/=', '-_.') . '.ics';
 		}
+
+		$this->checkScheduleFor();
 
 		if($this->isNew() || $this->isModified(['start','duration','recurrenceRule','recurrenceOverrides'])) {
 			$this->updateOccurrenceSpan();
@@ -630,7 +631,7 @@ class CalendarEvent extends AclItemEntity {
 
 		if(!$this->isNew()) {
 			// is modified, but not calendarId, isDraft or modifiedAt, per-user prop, participants
-			if($this->isModified(self::EventProperties) && $this->isOrigin) {
+			if($this->isModified([...self::EventProperties, 'participants', 'recurrenceOverrides']) && $this->isOrigin) {
 				if(!$this->isModified('sequence') || $this->sequence <= $this->getOldValue('sequence'))
 					$this->sequence += 1;
 			}
@@ -641,7 +642,7 @@ class CalendarEvent extends AclItemEntity {
 				}
 
 				$currPart = $this->calendarParticipant();
-				if ($currPart && !$currPart->isOwner()) { // not owner
+				if ($currPart && !$currPart->isOwner() && $this->ownerId !== null) { // not owner, not shared
 					if ($this->isModified(self::OwnerOnlyProperties)) {
 						throw new Forbidden('Trying to change properties but not the organizer');
 					} else if ($this->isModified(['participants'])) {
@@ -658,10 +659,24 @@ class CalendarEvent extends AclItemEntity {
 		}
 		if(!empty($this->alerts)) {
 			$this->useDefaultAlerts = false;
+//			$this->checkAlertOwner();
 		}
 		if(empty($this->prodId) || $this->prodId === 'Unknown') {
 			$this->prodId = self::prodId();
 		}
+
+//		if($this->isModified(['participants'])) {
+//			//if the principal ID is not numeric it's not a user. We'll try to find a user for it.
+//			foreach($this->participants as $pid => $participant) {
+//				if ($participant->isNew() && !is_numeric($pid) && $participant->kind == 'individual') {
+//					$principalId = User::findIdByEmail($participant->email);
+//					if ($principalId) {
+//						// Override ID with user ID
+//						$this->participants[$pid]->pid($principalId);
+//					}
+//				}
+//			}
+//		}
 
 		if(!empty($this->participants)) {
 			// reset participation status if event changes "materially"
@@ -669,28 +684,124 @@ class CalendarEvent extends AclItemEntity {
 				foreach ($this->participants as $participant) {
 					if (!$participant->isNew() && !$participant->isOwner())
 						$participant->participationStatus = Participant::NeedsAction;
+
+					// AUTO-ACCEPT resources if checkbox is on
+					if($participant->kind === 'resource') {
+						$resource = Calendar::findById(str_replace('Calendar:', '', $participant->pid()));
+						if($resource && !empty($resource->groupId)) {
+							$rgroup = ResourceGroup::findById($resource->groupId);
+							if ($rgroup && $rgroup->autoAccept && $participant->isFree($this->start(), $this->end())) {
+								$participant->participationStatus = Participant::Accepted;
+							}
+						}
+					}
 				}
 			}
 			if (empty($this->replyTo)) {
-				$owner = $this->organizer();
-				if (!empty($owner)) {
-					$this->replyTo = $owner->email;
+
+				// In calendars without an owner the creator will be the organizer. Otherwise the calendar owner is
+				// the organizer.
+				$calendar = Calendar::findById($this->calendarId, ['ownerId']);
+				if($calendar->isOwned()) {
+					$owner = Principal::findById($calendar->getOwnerId(), ['email']);
+				} else {
+					$owner = $this->organizer();
+					if (empty($owner)) {
+						$owner = go()->getAuthState()->getUser(['email']);
+					}
 				}
+				$this->replyTo = $owner->email;
 			}
 		}
-
 
 		if(self::$sendSchedulingMessages) {
 			Scheduler::handle($this);
 		}
 
+		$removedParticipants = $this->removedParticipants();
 		$success = parent::internalSave();
 
 		if($success) {
-			$this->addToResourceCalendars();
-			$this->updateAlerts(go()->getUserId());
+			$this->addToKnownCalendars();
+			$this->removeFromKnownCalendars($removedParticipants);
+			$this->updateAlerts($this->forUserId());
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
+		}
+		return $success;
+	}
+
+	protected static function internalDelete(Query $query): bool
+	{
+
+		$declinedEventIds = [];
+		$events = CalendarEvent::find()->mergeWith(clone $query);
+		foreach ($events as $event) {
+			/** @var CalendarEvent $event */
+			if(!empty($event->participants)) {
+				$current = $event->calendarParticipant();
+				if(!empty($current) && $current->isOwner()) {
+					// when owner deletes, free resources
+					foreach ($event->participants as $pid => $participant) {
+						if ($participant->kind === 'resource') {
+							$calId = str_replace( 'Calendar:', '', $participant->pid());
+							go()->getDbConnection()->delete('calendar_calendar_event', [
+								'calendarId' => $calId, 'eventId' => $event->eventId
+							])->execute();
+						}
+						if($participant->kind == 'individual' && is_numeric($pid)) {
+							$personalCalendarId = Calendar::fetchPersonal($pid);
+							if ($personalCalendarId) {
+								go()->getDbConnection()->delete('calendar_calendar_event', [
+									'calendarId'=>$personalCalendarId, 'eventId'=>$event->eventId
+								])->execute();
+							}
+						}
+					}
+				} else if(!empty($current) && $current->participationStatus !== Participant::Declined) {
+					// Deleting the event from your own (or resource) calendar declines it. The participants are shared
+					// with the organizer's event, so store it also when no reply is sent ("Save only").
+					go()->getDbConnection()->update('calendar_participant',
+						['participationStatus' => Participant::Declined],
+						['eventId' => $event->eventId, 'id' => $current->pid()]
+					)->execute();
+					$declinedEventIds[] = $event->eventId;
+				}
+				if(self::$sendSchedulingMessages) {
+					Scheduler::handle($event, true);
+				}
+			}
+			CoreAlert::deleteByEntity($event);
+
+		}
+
+		//$q->andWhere(['isOrigin' => 1]);
+
+		//$ids = $q->all();
+//		self::$lastDeleteStmt = go()->getDbConnection()->delete('calendar_event_user', (new Query)
+//			->where('userId', '=', go()->getUserId())
+//			->where('eventId', 'in', $q)
+//		);
+//		if(!self::$lastDeleteStmt->execute()) {
+//			return false;
+//		}
+//		return true;
+		$calendarModSeq = clone $query;
+		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
+		// Garbage collector will delete event when last user instance is removed
+		$success =  parent::internalDelete($query); // delete none recurring or complete series
+		if($success && !empty($calIds)) {
+			Calendar::updateHighestModSeq($calIds);
+		}
+		if($success && !empty($declinedEventIds)) {
+			// Let the organizer and other participants sync the declined status
+			foreach(array_unique($declinedEventIds) as $eventId) {
+				$remaining = CalendarEvent::find()->where('cce.eventId', '=', $eventId)->single();
+				if($remaining) {
+					$remaining->changeEventsWithSameUID();
+					$remaining->incrementCalendarModSeq();
+				}
+			}
 		}
 		return $success;
 	}
@@ -700,13 +811,13 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function currentUserIsOwner() {
-		return $this->ownerId === go()->getUserId() ||
+		return $this->isNew() || $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(array|null $properties = null): array
 	{
-		if(!($this->start instanceof DateTime)) {
+		if(!($this->start instanceof DateTimeInterface)) {
 			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
 			$this->start = new DateTime($this->start);
 		}
@@ -718,25 +829,77 @@ class CalendarEvent extends AclItemEntity {
 			$arr['title'] = '';
 			$arr['description'] = '';
 			$arr['location'] = '';
+			$arr['categoryIds'] = [];
 		}
 		unset($arr['recurrenceId'], $arr['excluded']);
 		return $arr;
 	}
 
-	private function addToResourceCalendars() {
+	private function addToKnownCalendars() {
 		if(empty($this->participants)) return;
 		foreach($this->participants as $pid => $participant) {
-			if($participant->kind == 'resource') {
-				$resourceCalendar = Calendar::findById(str_replace('Calendar:', '', $pid));
-				if(!empty($resourceCalendar)) {
-					 go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
-						['calendarId'=>$resourceCalendar->id, 'eventId'=>$this->eventId]
-					])->execute();
-				}
+			// Don't re-add a resource when its admin removed the event from the resource calendar
+			$isNew = $participant->kind == 'resource' ? ($participant->isNew() || $participant->isModified('participationStatus')) : $participant->isNew();
+			$calendarId = $isNew ? self::participantCalendarId($pid, $participant) : null;
+			if($calendarId) {
+				go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
+					['calendarId'=>$calendarId, 'eventId'=>$this->eventId]
+				])->execute();
 			}
 		}
 	}
-	private function updateAlerts($userId) {
+
+	/**
+	 * Participants (not the organizer) that were removed from the event in this save
+	 *
+	 * @return Participant[] by participant id
+	 */
+	public function removedParticipants(): array {
+		if($this->isNew() || !$this->isModified('participants')) return [];
+		$removed = [];
+		foreach($this->getOldValue('participants') ?? [] as $pid => $participant) {
+			if(!isset($this->participants[$pid]) && !$participant->isOwner()) {
+				$removed[$pid] = $participant;
+			}
+		}
+		return $removed;
+	}
+
+	/**
+	 * The calendar an event is shown in for a resource or local user participant
+	 */
+	private static function participantCalendarId(string|int $pid, Participant $participant): ?int {
+		if($participant->kind == 'resource') {
+			$calendar = Calendar::findById(str_replace('Calendar:', '', $pid));
+			return $calendar ? (int) $calendar->id : null;
+		}
+		if($participant->kind == 'individual' && is_numeric($pid)) {
+			return Calendar::fetchPersonal($pid) ?: null;
+		}
+		return null;
+	}
+
+	/**
+	 * Take the event out of the calendars of removed participants
+	 *
+	 * @param Participant[] $removed
+	 */
+	private function removeFromKnownCalendars(array $removed): void {
+		foreach($removed as $pid => $participant) {
+			$calendarId = self::participantCalendarId($pid, $participant);
+			if($calendarId && $calendarId != $this->calendarId) {
+				go()->getDbConnection()->delete('calendar_calendar_event', [
+					'calendarId' => $calendarId,
+					'eventId' => $this->eventId
+				])->execute();
+			}
+		}
+	}
+
+	/**
+	 * @param int|null $userId null when nobody is logged in. For example when a participant replies on the public invite page.
+	 */
+	private function updateAlerts(?int $userId) : void {
 		if(!CoreAlert::$enabled) {
 			return;
 		}
@@ -745,10 +908,25 @@ class CalendarEvent extends AclItemEntity {
 			$this->isModified(['useDefaultAlerts', 'alerts', 'start','duration','recurrenceOverrides']) ||
 			($this->useDefaultAlerts && $this->isModified('calendarId'))
 		) {
-			CoreAlert::deleteByEntity($this, '1', $userId); // this will reschedule if recurring and existing
-			foreach ($this->alerts() as $alert) {
-				$alert->schedule($this);
+			// loop all calendar subscribers
+			$subscribers = go()->getDbConnection()->query('select userId from calendar_calendar_user where id = '.$this->calendarId.' AND isSubscribed = 1')->fetchAll(\PDO::FETCH_COLUMN);
+			foreach($subscribers as $subscriber) {
+				CoreAlert::deleteByEntity($this, '1', $subscriber); // this will reschedule if recurring and existing
+
+				// string = int comparison
+				if($subscriber != $userId) { // find only default calendar alerts (if any)
+					$calendar = Calendar::findFor($subscriber, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime'])
+						->where('id', '=', $this->calendarId)->single();
+					$alerts =  ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
+				} else {
+					$alerts = $this->alerts();
+				}
+
+				foreach ($alerts as $alert) {
+					$alert->schedule($this, $subscriber);
+				}
 			}
+
 		}
 
 	}
@@ -810,20 +988,24 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public function calendarParticipant() {
 		if($this->calendarParticipant === null && !empty($this->participants)) {
-			$scheduleId = Calendar::find()
-				->join('core_user', 'u', 'IFNULL(calendar_calendar.ownerId, '.go()->getUserId().') = u.id')
-				->where(['id' => $this->calendarId])
-				->selectSingleValue('u.email')->single();
-			$this->calendarParticipant = $this->participantByScheduleId($scheduleId);
-//			foreach ($this->participants as $p) {
-//				if ($scheduleId == $p->email) {
-//					$this->calendarParticipant = $p;
-//					break;
-//				}
-//			}
-//			if (!isset($this->calendarParticipant)) {
-//				$this->calendarParticipant = false;
-//			}
+
+			$ownerId = go()->getDbConnection()
+				->selectSingleValue("ownerId")
+				->from("calendar_calendar")
+				->where('id', '=', $this->calendarId)
+				->single() ?? go()->getUserId();
+
+			$scheduleIds = User::findEmailAliases($ownerId);
+
+			foreach ($this->participants as $p) {
+				if (in_array(strtolower($p->email), $scheduleIds)) {
+					$this->calendarParticipant = $p;
+					break;
+				}
+			}
+			if (!isset($this->calendarParticipant)) {
+				$this->calendarParticipant = false;
+			}
 		}
 		return $this->calendarParticipant;
 	}
@@ -832,7 +1014,7 @@ class CalendarEvent extends AclItemEntity {
 	 * @param $email string the scheduleId
 	 * @return false|Participant
 	 */
-	public function participantByScheduleId(string $email): bool|Participant
+	public function participantByScheduleId(string $email, ?string $kind = null): bool|Participant
 	{
 		if(empty($this->participants))
 			return false;
@@ -840,7 +1022,7 @@ class CalendarEvent extends AclItemEntity {
 		$email = strtolower($email);
 
 		foreach($this->participants as $participant) {
-			if(strtolower($participant->email) === $email) {
+			if(strtolower($participant->email) === $email && ($kind === null || $participant->kind === $kind)) {
 				return $participant;
 			}
 		}
@@ -879,36 +1061,8 @@ class CalendarEvent extends AclItemEntity {
 		}
 	}
 
-	protected static function internalDelete(Query $query): bool
+	public function isInPast(): bool
 	{
-		if(self::$sendSchedulingMessages) {
-			$events = CalendarEvent::find()->mergeWith(clone $query);
-			foreach ($events as $event) {
-				Scheduler::handle($event, true);
-			}
-		}
-		//$q->andWhere(['isOrigin' => 1]);
-
-		//$ids = $q->all();
-//		self::$lastDeleteStmt = go()->getDbConnection()->delete('calendar_event_user', (new Query)
-//			->where('userId', '=', go()->getUserId())
-//			->where('eventId', 'in', $q)
-//		);
-//		if(!self::$lastDeleteStmt->execute()) {
-//			return false;
-//		}
-//		return true;
-		$calendarModSeq = clone $query;
-		$calIds = $calendarModSeq->selectSingleValue('calendarId')->distinct()->all();
-		// Garbage collector will delete event when last user instance is removed
-		$success =  parent::internalDelete($query); // delete none recurring or complete series
-		if($success && !empty($calIds)) {
-			Calendar::updateHighestModSeq($calIds);
-		}
-		return $success;
-	}
-
-	public function isInPast() {
 		if($this->lastOccurrence === null)
 			return false;
 		return $this->lastOccurrence <= new DateTime();
@@ -1007,25 +1161,27 @@ class CalendarEvent extends AclItemEntity {
 			}
 			return;
 		}
-
-		$r = $this->getRecurrenceRule();
-		if(isset($r->until)) {
-			$until = (new DateTime($r->until,$this->timeZone()))->add(new \DateInterval($this->duration));
-			if($this->lastOccurrence === null || $until > $this->lastOccurrence) {
-				$this->lastOccurrence = $until;
+		if($this->isModified('recurrenceRule')) {
+			$r = $this->getRecurrenceRule();
+			if (isset($r->until)) {
+				$until = (new DateTime($r->until, $this->timeZone()))->add(new DateInterval($this->duration));
+				if ($this->lastOccurrence === null || $until > $this->lastOccurrence) {
+					$this->lastOccurrence = $until;
+				}
+			} else  {
+				$this->lastOccurrence = null;
+				if (isset($r->count)) {
+					$it = ICalendarHelper::makeRecurrenceIterator($this);
+					$maxDate = new \DateTime(self::MAX_RECUR);
+					while ($it->valid()) {
+						$dt = $it->current(); // will clone :(
+						if ($dt > $maxDate) break;
+						if ($dt > $this->lastOccurrence) $this->lastOccurrence = $dt;
+						$it->next();
+					}
+					$this->lastOccurrence->add(new DateInterval($this->duration));
+				}
 			}
-		} else if(isset($r->count)) {
-			$it = ICalendarHelper::makeRecurrenceIterator($this);
-			$maxDate = new \DateTime(self::MAX_RECUR);
-			while ($it->valid()) {
-				$dt = $it->current(); // will clone :(
-				if($dt > $maxDate) break;
-				if($dt > $this->lastOccurrence) $this->lastOccurrence = $dt;
-				$it->next();
-			}
-			$this->lastOccurrence->add(new \DateInterval($this->duration));
-		} else {
-			$this->lastOccurrence = null;
 		}
 
 		if($this->isModified('recurrenceOverrides')) {
@@ -1048,21 +1204,60 @@ class CalendarEvent extends AclItemEntity {
 		return ['calendarId' => 'id'];
 	}
 
+	protected function getSearchModifiedAt(): DateTimeInterface
+	{
+		// Link panel modifiedAt is always saved as UTC
+		$date = $this->start()->setTimeZone(new DateTimeZone("UTC"));
+		$year = (int) $date->format('Y');
+		if( $year >= 1000 && $year <= 9999) //is valid year for mysql
+			return $date;
+		return new DateTime("1970-01-01 00:00:00");
+
+	}
+
+	public function title(): string {
+		return $this->isPrivate() ? '' : $this->title;
+	}
+
+	protected function includeInSearch(): bool{
+		return !$this->isPrivate();
+	}
+
+	protected static function neededSearchProperties(): array {
+		return ['id', 'showWithoutTime', 'start', 'timeZone','location', 'title','privacy', 'description'];
+	}
+
+	private static $calNameCache = [];
+
 	protected function getSearchDescription(): string
 	{
-		$calendar = Calendar::findById($this->calendarId, ['name'], true);
+		if(!isset(self::$calNameCache[$this->calendarId])) {
+			self::$calNameCache[$this->calendarId] = Calendar::findById($this->calendarId, ['name'], true)->name;
+		}
 
 		$u = go()->getAuthState()->getUser();
-		$format = $u ? $u->dateFormat : "d-m-Y";
+		if($this->showWithoutTime) {
+			$format = $u ? $u->dateFormat : "d-m-Y";
+		} else {
+			$format = $u ? $u->dateFormat . ' '. $u->timeFormat : "d-m-Y H:i";
+		}
 
-		return $calendar->name .': '. $this->title . ' - '. $this->start->format($format);
+		return self::$calNameCache[$this->calendarId] .': '. $this->title() . ' - '. $this->start->format($format);
+	}
+
+	protected function getSearchKeywords(): ?array {
+		$kw = [$this->title, $this->description, self::$calNameCache[$this->calendarId]];
+		if(!str_starts_with(($this->location ?? ''), 'http')) {
+			$kw[] = $this->location;
+		}
+		return $kw;
 	}
 
 	/**
 	 * When the series start time changes all the recurrence id's must be recreated.
 	 *
 	 * @return void
-	 * @throws \DateMalformedStringException
+	 * @throws Exception
 	 */
 	private function reindexRecurrenceOverrides(): void
 	{
@@ -1080,6 +1275,37 @@ class CalendarEvent extends AclItemEntity {
 			$date = new DateTime($recurrenceId);
 			$date->setTime($newHour, $newMin);
 			$o->changeRecurrenceId($date);
+		}
+
+	}
+
+	/**
+	 * When a secretary makes an appointment on behalf of the calendar owner. We need to change the alerts
+	 * to the calendar owner.
+	 *
+	 * This is not according to JMAP standards but it makes sense for users. The downside this only happens when
+	 * creating the event. It can't be changed afterwards.
+	 *
+	 * It also only happens for non-default alerts. So only when a user explicitly sets an alert.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	private function checkScheduleFor() : void
+	{
+		if(!$this->isNew()) {
+			return;
+		}
+
+		$calendar = Calendar::findById($this->calendarId, ['ownerId', 'groupId']);
+		$calendarOwnerId = $calendar->getOwnerId();
+		if(!$calendarOwnerId || $this->forUserId() == $calendarOwnerId) {
+			return;
+		}
+
+		$this->forUserId($calendarOwnerId);
+		foreach($this->alerts as $alert) {
+			$alert->forUserId($calendarOwnerId);
 		}
 
 	}

@@ -24,5 +24,5 @@ return array (
   'Modules' => 'Module',
   'Allowed' => 'Erlaubt',
   'Version' => 'Version',
-  'Is trial' => 'Is trial',
+  'Is trial' => 'Ist Testversion',
 );

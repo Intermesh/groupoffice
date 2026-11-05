@@ -5,26 +5,35 @@ use DateInterval;
 use Faker\Generator;
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\db\Criteria;
+use go\core\exception\Forbidden;
+use go\core\http\PostResponseProcessor;
+use go\core\jmap\Entity;
+use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Link;
 use go\core\model\Module as GoModule;
 use go\core\model\Permission;
 use go\core\model\User;
+use go\core\orm\Filters;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\model\Module as CoreModule;
+use go\core\util\DateTime;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\Participant;
 use go\modules\community\calendar\model\Preferences;
 use go\modules\community\calendar\model\BusyPeriod;
 use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\calendar\model\ICalendarHelper;
-use go\modules\community\calendar\model\Settings;
-use Sabre\VObject\Component\VCalendar;
+use go\modules\community\calendar\model\Scheduler;
 
 class Module extends core\Module
 {
-
+	public static function getCategory(): string
+	{
+		return go()->t("Calendar", static::getPackage(), static::getName());
+	}
 	public function autoInstall(): bool
 	{
 		return true;
@@ -48,8 +57,9 @@ class Module extends core\Module
 		return "Intermesh BV <mdhart@intermesh.nl>";
 	}
 
-	public function getSettings() {
-		return Settings::get();
+	public function getDocumentationURL(): ?string
+	{
+		return "https://groupoffice.readthedocs.io/en/latest/using/calendar.html";
 	}
 
 	protected function rights(): array
@@ -58,10 +68,19 @@ class Module extends core\Module
 			'mayChangeCalendars', // allows Calendar/set (hide ui elements that use this)
 			'mayChangeCategories', // allows creating global categories for everyone. Personal cats can always be created.
 			'mayChangeResources',
-			'mayChangeViews'
+			'mayChangeViews',
+			'mayChangeOrganizer'
 		];
 	}
 
+	/**
+	 * Retrieves the availability for a given ID within the specified time range if the user has permissions.
+	 *
+	 * @param string $id The principal ID to check availability for.
+	 * @param mixed $start The start time of the availability range.
+	 * @param mixed $end The end time of the availability range.
+	 * @return mixed The availability information for the specified parameters.
+	 */
 	public static function getAvailability($id, $start, $end) {
 		return BusyPeriod::fetch($id, $start, $end);
 	}
@@ -70,8 +89,28 @@ class Module extends core\Module
 	{
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(User::EVENT_AFTER_SAVE, static::class, 'onUserSave');
+		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
 		User::on(User::EVENT_ARCHIVE, static::class, 'onUserArchive');
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
+	}
+
+	public static function onLinkFilter(Filters $filters) {
+		$filters->add('eventsBefore', function(Criteria $criteria, $value, \go\core\db\Query $query, array $filter){
+			$query->join('calendar_calendar_event', 'ce', 'search.entityId = ce.id')
+				->join('calendar_event', 'e', 'e.eventId = ce.eventId');
+			$criteria
+				->where('search.entityTypeId', '=', CalendarEvent::entityType()->getId())
+				->andWhere('e.start','<', date('Y-m-d'));
+		});
+
+		$filters->add('eventsAfter', function(Criteria $criteria, $value, Query $query, array $filter){
+			$query->join('calendar_calendar_event', 'ce', 'search.entityId = ce.id')
+				->join('calendar_event', 'e', 'e.eventId = ce.eventId');
+			$criteria
+				->where('search.entityTypeId', '=', CalendarEvent::entityType()->getId())
+				->andWhere('e.start','>=', date('Y-m-d'));
+		});
+		return true;
 	}
 
 	static function onUserSave(User $user, bool $wasNew) {
@@ -117,59 +156,119 @@ class Module extends core\Module
 		$mapping->addHasOne('calendarPreferences', Preferences::class, ['id' => 'userId'], true);
 	}
 
+	// https://uri/path/api/download.php?blob=community/calendar/calendar/1
 	public function downloadCalendar($id) {
+
 		$calendar = Calendar::findById($id);
-		if($calendar->getPermissionLevel() < 50) {
-			throw new core\exception\Forbidden('You need manage permission to export this calendar');
+		if(!$calendar || $calendar->getPermissionLevel() < Acl::LEVEL_MANAGE) {
+			throw new Forbidden('You need manage permission to export this calendar');
 		}
-		$events = CalendarEvent::find()->where(['calendarId' => $id]);
+		$this->outputIcs($calendar);
+	}
+
+	private function outputIcs(Calendar $calendar, $after = null) {
+		set_time_limit(0);
+
+		$events = CalendarEvent::find()->filter(['inCalendars' => $calendar->id]);
+		if($after !== null) {
+			$events->filter(['after' => $after]);
+		}
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
-		header('Content-Disposition: attachment; filename="'.$calendar->name.'export_'.$calendar->id.'_'.date('Y-m-d').'.ics"');
-		$vcalendar = new VCalendar([
-			'PRODID' => str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD),
-			'METHOD' => 'PUBLISH'
-		]);
-		if($calendar->timeZone) $vcalendar->add("X-WR-TIMEZONE", $calendar->timeZone);
-		if($calendar->description) $vcalendar->add("X-WR-CALDESC", $calendar->description);
-		foreach($events as $ev) {
-			ICalendarHelper::toVObject($ev, $vcalendar);
+		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
+
+		echo "BEGIN:VCALENDAR\r\n";
+		echo "VERSION:2.0\r\n";
+		echo "PRODID:".str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD)."\r\n";
+		echo "METHOD:PUBLISH\r\n";
+
+		if ($calendar->timeZone) {
+			echo "X-WR-TIMEZONE:" . $calendar->timeZone . "\r\n";
+			$tz = new model\VTimezone($calendar->timeZone);
+			echo $tz->serialize();
 		}
-		echo $vcalendar->serialize();
+
+		if($calendar->description) echo "X-WR-CALDESC:". $calendar->description. "\r\n";
+		ob_end_flush();
+
+		foreach($events as $ev) {
+			$vcal = ICalendarHelper::toVObject($ev);
+			foreach($vcal->VEVENT as $vevent) {
+				echo $vevent->serialize();
+			}
+			flush();
+		}
+		echo "END:VCALENDAR\r\n";
+	}
+
+	// https://uri/path/api/page.php/community/calendar/ics/key
+	public function pageIcs($key) {
+		// No auth needed but publishKey most be known to read
+		$calendar = Calendar::find()->where(['publishKey' => $key])->single();
+		if($calendar) {
+			$this->outputIcs($calendar, date('Y-m-d', strtotime('first day of last month')));
+		} else {
+			throw new Forbidden("Unauthorized");
+		}
 	}
 
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
+		if (!$ev || !$ev->getPermissionLevel()) {
+			throw new Forbidden();
+		}
 
 		header('Content-Type: text/calendar; charset=UTF-8; component=vevent');
 		echo $ev->toVObject();
 	}
 
-	public function pagePrint($type,$date) {
+	/**
+	 * The calendars of the logged in user that are shown in the calendar. For the print pages, which are loaded
+	 * directly by the browser through api/page.php, so nothing has checked the login before they run.
+	 *
+	 * @return string[]
+	 * @throws Forbidden when not logged in
+	 */
+	private function visibleCalendarIds(): array
+	{
 		go()->setAuthState(new core\jmap\State());
-		$calendarIds = Calendar::find()->selectSingleValue('calendar_calendar.id')
+		if(!go()->getAuthState()->isAuthenticated()) {
+			throw new Forbidden();
+		}
+
+		return Calendar::find()->selectSingleValue('calendar_calendar.id')
 			//->join('calendar_calendar_user', 'cu','cu.userId = '.go()->getUserId().' AND cu.calendarId = t.id')
 			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
+	}
+
+	public function pagePrint($type,$date) {
+		$calendarIds = $this->visibleCalendarIds();
 		//$calendarIds = json_decode($calendars);
 		switch($type) {
 			case 'day': $this->printDay(new \DateTime($date), $calendarIds); break;
 			case 'days': $this->printWeek($date, $calendarIds, 5);break;
 			case 'week' : $this->printWeek($date, $calendarIds, 7);break;
 			case 'month' : $this->printMonth(new \DateTime($date), $calendarIds);break;
-			case 'list' : $this->printList(new \DateTime($date), $calendarIds);break;
+			//case 'list' : $this->printList(new \DateTime($date), new DateTime($end), $calendarIds);break;
 		}
 	}
 
-	private function printList($date, $calendarIds) {
-		$start = (clone $date)->modify('first day of this month');
-		$end = (clone $start)->modify('+3 months');
+	public function pagePrintRange($type,$days, $date) {
+		$calendarIds = $this->visibleCalendarIds();
+
+		$this->printWeeks(new \DateTime($date),$days, $calendarIds);
+	}
+
+	public function pagePrintList($start, $end) {
+
+		$calendarIds = $this->visibleCalendarIds();
 
 		$report = new reports\ListView();
-		$report->day = $start;
-		$report->end = $end;
+		$report->day = new DateTime($start);;
+		$report->end = new DateTime($end);
 		$report->calendarIds = $calendarIds;
 		$report->render();
 
-		$report->Output('list.pdf');
+		$report->Output('calendar_list_'.$start.'_'.$end.'.pdf');
 	}
 
 	private function printDay($start, $calendarIds){
@@ -191,7 +290,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('day.pdf');
+		$report->Output('calendar_day_'.$start->format('Y-m-d').'.pdf');
 	}
 
 	private function printWeek($date, $calendarIds, $span){
@@ -199,7 +298,7 @@ class Module extends core\Module
 		$report = new reports\Week();
 
 		$date = (new \DateTime($date));
-		$dayDiff = (int) $date->format('w') + $report->firstWeekday;
+		$dayDiff = (int) $date->format('w') - $report->firstWeekday;
 
 		$start = $date->sub(new DateInterval("P" . $dayDiff . "D"));
 		$end = (clone $start)->modify('+'.$span.' days');
@@ -220,30 +319,59 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output('week.pdf');
+		$report->Output($report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
 	}
 
-	private function printMonth($date, $calendarIds) {
-		$start = (clone $date)->modify('first day of this month');
-		$end = (clone $start)->modify('+1 month');
+	private function printWeeks($date, $amount, $calendarIds) {
+		$start = clone $date;
+		$end = (clone $start)->modify("+$amount days");
+
+		$events = CalendarEvent::find()->filter([
+			'before'=>$end->format('Y-m-d'),
+			'after'=>$start->format('Y-m-d'),
+			'inCalendars'=>$calendarIds
+		])->all();
+
+		$days = $start->diff($end)->days;
+		$firstWd = go()->getAuthState()->getUser(['firstWeekday'])->firstWeekday;
+		$dayName = $firstWd===1 ? 'Monday' : 'Sunday';
+		if($days > 6 && $start->format('w') != $firstWd)
+			$start->modify('last '.$dayName);
 
 		$report = new reports\Month();
 		$report->day = $start;
 		$report->end = $end;
-		foreach($calendarIds as $id) {
+		$report->printMonth = false;
+
+
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$report->calendars = array_column($rows, null, 'id');
+		$report->setEvents($events);
+		$report->render();
+
+		$report->Output($report->Output('calendar_weeks_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
+	}
+
+	private function printMonth($date, $calendarIds) {
+
+		$report = new reports\Month();
+		$dates = $report->getStartEndOfMonth($date->format("n"), $date->format("Y"));
+		$report->day = $dates[0];
+		$report->end = $dates[1];
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$report->calendars = array_column($rows, null, 'id');
+		foreach($report->calendars as $id => $attr) {
 
 			$events = CalendarEvent::find()->filter([
-				'before'=>$end->format('Y-m-d'),
-				'after'=>$start->format('Y-m-d'),
+				'before'=>$report->end->format('Y-m-d'),
+				'after'=>$report->day->format('Y-m-d'),
 				'inCalendars'=>[$id]
 			])->all();
-
-
 			$report->setEvents($events);
 			$report->render();
-			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
+			$report->calendarName = $attr['name'];
 		}
-		$report->Output('month.pdf');
+		$report->Output($report->Output('calendar_month_'.$date->format('Y-m').'.pdf'));
 	}
 
 
@@ -255,7 +383,7 @@ class Module extends core\Module
 			->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId', 'LEFT')
 			->where(['p.scheduleSecret' => $secret, 'eventdata.uid'=>$uid])->single();
 		if(!$event) {
-			throw new core\exception\Forbidden();
+			throw new Forbidden();
 		}
 		$title = go()->t('Event page', 'community', 'calendar');
 		$method = 'PAGE'; // will show participation statusses or other participants
@@ -266,10 +394,11 @@ class Module extends core\Module
 			}
 		}
 		if(!$participant) {
-			throw new core\exception\Forbidden();
+			throw new Forbidden();
 		}
-		if(isset($_GET['reply']) && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
+		if(isset($_GET['reply']) && $participant->participationStatus !== $_GET['reply'] && in_array($_GET['reply'], ['accepted', 'tentative', 'declined'])) {
 			$participant->participationStatus = $_GET['reply'];
+			CalendarEvent::$sendSchedulingMessages=true;
 			if(!$event->save()) {
 				throw new \Exception('Could not update participation status');
 			}
@@ -278,7 +407,6 @@ class Module extends core\Module
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');
 		include __DIR__.'/views/imip.php'; // use same html as email because why not
 		require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageFooter.php');
-
 	}
 
 	protected function beforeInstall(GoModule $model): bool
@@ -292,8 +420,9 @@ class Module extends core\Module
 
 	protected function afterInstall(CoreModule $model): bool {
 		cron\ScanEmailForInvites::install("*/5 * * * *");
+		cron\ImportWebcalIcs::install("*/15 * * * *");
 
-		Calendar::entityType()->setDefaultAcl([core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ]);
+		Calendar::entityType()->setDefaultAcl([core\model\Group::ID_INTERNAL => Acl::LEVEL_READ]);
 
 		return parent::afterInstall($model);
 	}
@@ -324,7 +453,7 @@ class Module extends core\Module
 				$calendar->setOwnerId($user->id);
 				$calendar->createdBy = $user->id; // This will make the ACL owned by the user too
 				$calendar->setAcl([
-					core\model\Group::ID_INTERNAL => core\model\Acl::LEVEL_READ
+					core\model\Group::ID_INTERNAL => Acl::LEVEL_READ
 				]);
 				if(!$calendar->save()) {
 					throw new core\orm\exception\SaveException($calendar);

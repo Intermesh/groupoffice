@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\SingletonTrait;
+use http\Exception\InvalidArgumentException;
 
 class Extjs3 {
 
@@ -47,6 +48,7 @@ class Extjs3 {
 
           $file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
           if ($file->exists()) {
+			  $css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
             $css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 
             if($debug && $file->getModifiedAt() > $modifiedAt) {
@@ -57,6 +59,7 @@ class Extjs3 {
 
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
+						$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
@@ -66,6 +69,7 @@ class Extjs3 {
 
 					$file = $folder->getFile('views/goui/dist/style.css');
 					if ($file->exists()) {
+						$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 
 						if($debug && $file->getModifiedAt() > $modifiedAt) {
@@ -80,6 +84,7 @@ class Extjs3 {
 				$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module->name);
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
+					$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 					if($debug && $file->getModifiedAt() > $modifiedAt) {
 						$modifiedAt = $file->getModifiedAt();
@@ -88,6 +93,7 @@ class Extjs3 {
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
+					$css .= "\n\n/** ".$file->getRelativePath(go()->getEnvironment()->getInstallFolder())." */\n\n";
 					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 					if($debug && $file->getModifiedAt() > $modifiedAt) {
 						$modifiedAt = $file->getModifiedAt();
@@ -105,6 +111,8 @@ class Extjs3 {
 	
 	
 	private function replaceCssUrl($css, File $file){
+
+//		$css .= "\n\n/*".$file->getPath() ." */\n\n";
 		
 		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', $this->getRelativeUrl(), $file->getFolder()->getPath()).'/';
 		
@@ -286,7 +294,7 @@ class Extjs3 {
 
 	public $density = 140;
 
-	private $gouiScripts;
+	private $gouiScripts = [];
 	private $goScripts = [];
 	private $cacheFile = null; // stays null when debugging
 
@@ -371,6 +379,11 @@ class Extjs3 {
 			GO::debug("External function parameters:");
 			GO::debug($fp);
 
+			if(preg_match("/[^a-z_]/", $fp['m']) || preg_match("/[^a-z]/i", $fp['f'])) {
+				throw new InvalidArgumentException("Invalid function given");
+			}
+
+			// nosemgrep
 			echo 'if (GO.' . $fp['m'] .'){GO.mainLayout.on("render", function () {GO. '. $fp['m'] . '.' . $fp['f'] . '.call(this,  '. json_encode($fp['p']) .');});}';
 		}
 
@@ -378,7 +391,7 @@ class Extjs3 {
 		echo 'Ext.onReady(GO.mainLayout.boot, GO.mainLayout);</script>';
 	}
 
-	private function clientSettings(){
+	public function clientSettings(){
 		return [
 			'max_row_list' => 50,
 			'config' => [

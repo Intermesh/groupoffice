@@ -17,6 +17,7 @@ go.modules.community.tasks.TaskListGroupingCombo = Ext.extend(go.form.ComboBox, 
 	selectOnFocus: false,
 	forceSelection: true,
 	allowNew: true,
+	role: "list",
 	initComponent: function () {
 
 		Ext.applyIf(this, {
@@ -29,9 +30,12 @@ go.modules.community.tasks.TaskListGroupingCombo = Ext.extend(go.form.ComboBox, 
 				sortInfo: {
 					field: "name",
 					direction: 'ASC' 
-				}
+				},
+				filters: {role: {role: this.role}},
 			})
 		});
+
+		this.allowNew = {role: this.role}
 
 		go.modules.community.tasks.TaskListGroupingCombo.superclass.initComponent.call(this);
 

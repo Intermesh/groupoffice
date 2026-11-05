@@ -11,6 +11,9 @@ use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\tasks\model;
 
+/**
+ * @extends EntityController<\go\modules\community\tasks\model\Category>
+ */
 class Category extends EntityController {
 
 	protected function entityClass(): string

@@ -120,6 +120,32 @@ class Response extends Singleton{
 	 * @param string|StringUtil[] $value
 	 * @return $this
 	 */
+	/**
+	 * Build a safe Content-Disposition header value for a user supplied file name.
+	 *
+	 * The plain "filename" parameter only contains printable ASCII without quotes, backslashes or percent signs so
+	 * the name can't break out of the parameter. The full name is sent in the RFC 5987 "filename*" parameter.
+	 *
+	 * @param string $disposition "inline" or "attachment"
+	 * @param string $filename
+	 * @return string
+	 */
+	public static function contentDisposition(string $disposition, string $filename): string
+	{
+		$disposition = $disposition === 'inline' ? 'inline' : 'attachment';
+
+		$pattern = '/[^\x20-\x7e]|["\\\\%]/';
+		// one underscore per character when valid UTF-8, per byte otherwise
+		$fallback = preg_replace($pattern . 'u', '_', $filename) ?? preg_replace($pattern, '_', $filename);
+		$header = $disposition . '; filename="' . $fallback . '"';
+
+		if ($fallback !== $filename) {
+			$header .= "; filename*=UTF-8''" . rawurlencode($filename);
+		}
+
+		return $header;
+	}
+
 	public function setHeader(string $name, $value): self
 	{
 		$lcname = strtolower($name);
@@ -314,6 +340,12 @@ class Response extends Singleton{
 		return (isset($this->modifiedAt) && $ifModifiedSince >= $this->modifiedAt->format('U')) || isset($this->etag) && $etagHeader == $this->etag;
 	}
 
+	public function noCache() : void {
+		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+	}
+
 	/**
 	 * Stop running if client has up to date cache.
 	 */
@@ -380,18 +412,46 @@ class Response extends Singleton{
 
 				try {
 					$data = JSON::encode($data, $this->jsonOptions);
-
 				} catch(\Throwable $e) {
 					$error = new ProblemDetails(SetError::ERROR_SERVER_FAIL, 500, $e->getMessage());
 					$data = JSON::encode($error, $this->jsonOptions);
 				}
 			}
-			if(!headers_sent())
+
+			if(!headers_sent()) {
 				$this->sendHeaders();
+			}
+
+			if($this->continueAfterOutput) {
+				ob_start();
+				ignore_user_abort(true);
+			}
+
 			echo $data;
+
+			if($this->continueAfterOutput) {
+				header('Connection: close');
+				header('Content-Length: '.ob_get_length());
+				ob_end_flush();
+				@ob_flush();
+				flush();
+				// Close the connection with the client
+				if (function_exists('fastcgi_finish_request')) {
+					fastcgi_finish_request(); // For Nginx with FastCGI
+				}
+			}
+
 		} else if(!headers_sent()){
 			$this->sendHeaders();
 		}
 	}
+
+	/**
+	 * Enable to close the connection but keep the process running.
+	 *
+	 * @see PostResponseProcessor
+	 * @var bool
+	 */
+	public bool $continueAfterOutput = false;
 
 }

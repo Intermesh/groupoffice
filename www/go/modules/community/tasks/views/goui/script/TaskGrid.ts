@@ -57,7 +57,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 					id: "complete",
 					hidable: false,
 					listeners: {
-						change: async ({checked, record}) => {
+						change: async ({record, checked}) => {
 							this.mask();
 							try {
 								await taskDS.update(record.id, {progress: (checked ? 'completed' : 'needs-action')})

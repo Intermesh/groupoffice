@@ -43,7 +43,7 @@ export class ImportTaskDialog extends Window {
 				searchbtn({
 					listeners: {
 						input: ({text}) => {
-							(this.tasklistGrid.store.queryParams.filter as Filter).text = text;
+							this.tasklistGrid.store.setFilter("text", {text: text});
 							void this.tasklistGrid.store.load();
 						}
 					}
@@ -55,7 +55,6 @@ export class ImportTaskDialog extends Window {
 				},
 				this.tasklistGrid = tasklistgrid({
 					cls: "bg-lowest",
-					fitParent: true,
 					columns: [
 						column({
 							id: "id",
@@ -91,8 +90,8 @@ export class ImportTaskDialog extends Window {
 					rowSelectionConfig: {
 						multiSelect: false,
 						listeners: {
-							selectionchange: (rowSelect) => {
-								const tasklistId = rowSelect.selected.map((row) => row.record.id)[0];
+							selectionchange: ({target}) => {
+								const tasklistId = target.getSelected().map((row) => row.record.id)[0];
 
 								if (tasklistId) {
 									this.selectedTasklistId = tasklistId;

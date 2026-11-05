@@ -1,0 +1,125 @@
+publiccodeYmlVersion: 0.5.0
+name: GroupOffice
+url: https://github.com/Intermesh/groupoffice
+landingURL: https://www.group-office.com
+softwareVersion: 26.0.12
+releaseDate: 2026-03-05
+logo: https://github.com/Intermesh/groupoffice/blob/master/www/views/Extjs3/themes/Paper/img/logo-blue.svg
+platforms:
+  - web
+  - windows
+  - linux
+  - mac
+  - ios
+  - android
+categories:
+  - collaboration
+  - email-management
+  - contact-management
+  - document-management
+  - task-management
+  - appointment-scheduling
+organisation:
+  uri: https://www.intermesh.nl
+  name: Intermesh
+developmentStatus: stable
+softwareType: standalone/web
+intendedAudience:
+  countries:
+    - NL
+    - DE
+    - GB
+    - ES
+    - FR
+    - PT
+    - CZ
+    - PL
+    - AT
+    - CH
+    - NO
+    - SE
+    - FI
+    - LV
+    - LT
+    - BE
+    - IT
+  scope:
+    - agriculture
+    - culture
+    - defence
+    - education
+    - emergency-services
+    - employment
+    - energy
+    - environment
+    - finance-and-economic-development
+    - foreign-affairs
+    - healthcare
+    - government
+    - infrastructures
+    - local-authorities
+    - society
+    - welfare
+    - transportation
+    - sport
+    - tourism
+    - security
+    - science-and-technology
+    - research
+    - manufacturing
+    - justice
+description:
+  en:
+    localisedName: GroupOffice
+    shortDescription: "GroupOffice is an open-source groupware and CRM platform for
+      enterprises and the public sector. "
+    longDescription: >-
+      GroupOffice is an open-source groupware and CRM platform for enterprises
+      and the public sector. It’s created and maintained by the Dutch company
+      Intermesh. You can self-host the software or run it on Intermesh’s secure
+      cloud infrastructure, where your data remains fully private.
+
+
+      Collaborate with integrated file sharing, video conferencing, E-mail,
+      calendar and contact management, project and time tracking, quoting and
+      invoicing, support ticketing, and the Collabora Online office suite. By
+      combining all these tools in a single platform, GroupOffice eliminates the
+      need for multiple separate systems and streamlines your workflow.
+
+      GroupOffice is easily extensible with custom modules, allowing you to
+      tailor the platform to your specific needs.
+    documentation: https://groupoffice.readthedocs.io/en/latest/
+    apiDocumentation: https://groupoffice.readthedocs.io/en/latest/developer/jmap.html
+    features:
+      - Email
+      - Calendar
+      - Address book
+      - Tasks
+      - Document Editing
+      - File management
+legal:
+  license: AGPL-3.0-or-later
+maintenance:
+  type: internal
+  contacts:
+    - name: Merijn Schering
+      email: mschering@intermesh.nl
+      affiliation: Lead developer
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - en
+    - de
+    - nl
+    - es
+    - it
+    - fr
+    - pl
+    - cs
+    - sv
+    - no
+    - fi
+    - hr
+    - pt
+    - zh-Hans
+    - ja

@@ -62,13 +62,14 @@ go.grid.GridTrait = {
 
 		if(this.autoHeight && this.maxHeight) {
 			this.store.on("load" , ()  => {
-				this.getView().scroller.setStyle({
-
-					overflow: 'auto',
-					position: 'initial',
-					"max-height": this.maxHeight + "px"
-				});
-			});
+				if (this.getView().scroller) {
+					this.getView().scroller.setStyle({
+						overflow: 'auto',
+						position: 'initial',
+						"max-height": this.maxHeight + "px"
+					});
+				}
+			}, this, {delay: 100});
 		}
 
 

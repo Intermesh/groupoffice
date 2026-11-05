@@ -139,9 +139,9 @@ GO.email.EmailComposer = function(config) {
 
 			case "User":
 					go.Jmap.request({
-						method: "User/get",
+						method: "Principal/get",
 						params: {
-							properties: ["displayName", "email"],
+							properties: ["name", "email"],
 							ids: ids
 						}
 					}).then(function(result) {
@@ -153,7 +153,7 @@ GO.email.EmailComposer = function(config) {
 							if(!go.util.empty(v)) {
 								v += ", ";
 							}							
-							v += '"' + go.util.addSlashes(user.displayName) + '" <' + user.email + '>';
+							v += '"' + go.util.addSlashes(user.name) + '" <' + user.email + '>';
 							combo.setValue(v);
 						});
 					}).finally(function(){
@@ -949,15 +949,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		} else {
 			//keep attachments when switching from text <> html
 			this.reset();
-			
-			//save the mail to a file location
-			if(config.saveToPath){
-				this.sendParams.save_to_path=config.saveToPath;
-				this.sendButton.hide();
-			}else
-			{
-				this.sendButton.show();
-			}
 
 			this.initFrom(config);
 
@@ -1268,10 +1259,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.sendButton.setDisabled(true);
 
 		if(autoSave) {
-			go.Notifier.flyout({
-				description: t("Autosaving e-mail message to drafts (every 2 mins)"),
-				time: 2000
-			});
+			window.GOUI.Notifier.notice(t("Autosaving e-mail message to drafts (every 2 mins)"));
 		}
 
 		var strNoSubjectMsg = draft ?
@@ -1290,9 +1278,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				this.stopAutoSave();
 			
 			var sendUrl = this.sendURL;
-			if(this.sendParams.save_to_path)
-				sendUrl = GO.url("email/message/saveToFile");
-			else if(draft || autoSave)
+			if(draft || autoSave)
 				sendUrl = GO.url("email/message/save");
 			
 			const newLinks = this.createLinkButton.getNewLinks();

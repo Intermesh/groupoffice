@@ -10,6 +10,9 @@ use go\core\orm\Query;
 use go\core\util\ArrayObject;
 
 
+/**
+ * @extends EntityController<\go\core\model\Link>
+ */
 class Link extends EntityController {
 	
 	/**

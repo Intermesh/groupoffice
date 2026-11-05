@@ -23,7 +23,9 @@
 namespace GO\Base\Exception;
 
 
-class NotFound extends \Exception
+use go\core\exception\UserSafeException;
+
+class NotFound extends \Exception  implements UserSafeException
 {
 
 	public function __construct($message='') {

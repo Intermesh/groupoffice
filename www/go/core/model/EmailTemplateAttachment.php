@@ -51,7 +51,7 @@ class EmailTemplateAttachment extends Property {
    * 
    * @var bool
    */
-  public bool $attachment = true;
+  public bool $attachment = false;
 
 	protected static function defineMapping(): Mapping
 	{

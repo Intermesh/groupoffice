@@ -118,4 +118,5 @@ return array (
   'Create personal address book for each user' => 'Créer un carnet d\'adresse personnel pour chaque utilisateur',
   'Automatically link e-mail to contacts' => 'Lier automatiquement les mails aux contacts',
   'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'Avertissement: ceci copiera des mails vers l\'espace de stockage Group-Office et donc utilisera de l\'espace. Le mail sera visible par tous les utilisateurs ayant accès à ce contact.',
+	'Upcoming birthdays' => 'Prochains anniversaires'
 );

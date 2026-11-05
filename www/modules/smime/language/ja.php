@@ -13,7 +13,7 @@ return array (
   'Download certificate' => '証明書をダウンロード',
   'PKCS12 certificate' => 'PKCS12証明書',
   'You have uploaded a certificate already. SMIME support is enabled for this account.' => '証明書は既にアップロードされています。このアカウントでは SMIME サポートが有効になっています。',
-  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => '新しい PKCS12 証明書をアップロードするには、Group-Office パスワードを入力する必要があります。セキュリティ上の理由から、Group-Office パスワードは PCSK12 証明書とは異なる必要があります。パスワードも禁止されていません。',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => '新しい PKCS12 証明書をアップロードするには、{product_name} パスワードを入力する必要があります。セキュリティ上の理由から、{product_name} パスワードは PCSK12 証明書とは異なる必要があります。パスワードも禁止されていません。',
   'Select new PKCS12 Certificate' => '新しい PKCS12 証明書を選択してください',
   'SMIME settings' => 'SMIME設定',
   'Always sign messages' => '常にメッセージに署名する',

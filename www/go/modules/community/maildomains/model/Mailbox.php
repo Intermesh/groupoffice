@@ -143,6 +143,11 @@ final class Mailbox extends AclItemEntity
 	{
 		$d = $this->getDomain();
 
+		if(!$d) {
+			$this->setValidationError('domainId', ErrorCode::INVALID_INPUT, "The domain does not exist");
+			return;
+		}
+
 		if($this->isNew() && !$this->isModified(['quota'])) {
 			$this->quota = $d->defaultQuota;
 		}
@@ -170,9 +175,13 @@ final class Mailbox extends AclItemEntity
 
 		if ($this->isNew() || empty($this->homedir)) {
 			$d = $this->getDomain();
+			if(!$d) {
+				$this->setValidationError('domainId', ErrorCode::INVALID_INPUT, "The domain does not exist");
+				return false;
+			}
 			$parts = explode('@', $this->username);
-			$this->homedir = $d->domain . '/' . $parts[0] . '/';
-			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir/';
+			$this->homedir = $d->domain . '/' . $parts[0];
+			$this->maildir = $d->domain . '/' . $parts[0] . '/Maildir';
 		}
 
 		return parent::internalSave();
@@ -262,23 +271,23 @@ final class Mailbox extends AclItemEntity
 	}
 
 
-	/**
-	 * Save mailbox usage from dovecot input
-	 *
-	 * @return bool
-	 * @throws \Exception
-	 */
-	public function cacheUsage()
-	{
-		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
-
-		if ($this->usage === false) {
-			$folder = $this->getMaildirFolder();
-			$this->usage = $folder->exists() ? $folder->calculateSize() / 1024 : 0;
-		}
-
-		return $this->save();
-	}
+//	/**
+//	 * Save mailbox usage from dovecot input
+//	 *
+//	 * @return bool
+//	 * @throws \Exception
+//	 */
+//	public function cacheUsage()
+//	{
+//		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
+//
+//		if ($this->usage === false) {
+//			$folder = $this->getMaildirFolder();
+//			$this->usage = $folder->exists() ? $folder->calculateSize() / 1024 : 0;
+//		}
+//
+//		return $this->save();
+//	}
 
 
 	/**

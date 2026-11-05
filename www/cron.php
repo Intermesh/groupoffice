@@ -3,6 +3,9 @@
 /**
  * CRON script
  * Runs scheduled tasks for the system like garbage collection, sending of newsletters etc. *
+ *
+ * sudo -u www-data php ./cli.php core/System/runCron --module='something' --package='community' --name='GarbageCollection' --debug
+ *
  */
 use GO\Base\Cron\CronJob;
 use GO\Base\Db\FindCriteria;
@@ -35,15 +38,17 @@ App::get()->setAuthState(new State());
 
 //for debugging
 //go()->getDebugger()->enable();
-//go()->getDebugger()->output = true;
+go()->getDebugger()->output = true;
 //go()->getDbConnection()->debug = true;
 
 if(go()->getSettings()->databaseVersion != go()->getVersion()) {
     echo "Aborting CRON because an update is needed: " . go()->getSettings()->databaseVersion . " -> " . go()->getVersion() . "\n";
 	exit();
 }
+$date = new go\core\util\DateTime();
 
-GO::config()->save_setting('cron_last_run', time());
+go()->getSettings()->cronLastRun = $date;
+go()->getSettings()->save();
 
 $lock = new Lock("cron", false);
 
@@ -53,37 +58,5 @@ if(!$lock->lock()) {
 }
 
 
-//new framework
 CronJobSchedule::runNext();
-
-$date = new DateTime();
-
-//old framework
-require('GO.php');
-GO::session()->runAsRoot();
-
-/**
- * @return mixed
- * @throws Exception
- */
-function findNextCron(){
-	$currentTime = new DateTimeAlias("now", new DateTimeZone("UTC"));
-
-		$findParams = FindParams::newInstance()
-			->single()
-			->criteria(FindCriteria::newInstance()
-				->addCondition('nextrun', $currentTime->getTimestamp(),'<')
-				->addCondition('active',true)
-			);
-		
-		return CronJob::model()->find($findParams);
-}
-
-$jobAvailable = false;
-while($cronToHandle = findNextCron()){
-	$jobAvailable = true;
-	GO::debug('CRONJOB FOUND');
-	$cronToHandle->run();
-}
-
 

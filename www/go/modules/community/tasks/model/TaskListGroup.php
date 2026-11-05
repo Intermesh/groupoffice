@@ -24,7 +24,7 @@ class TaskListGroup extends Property
 	protected $sortOrder;
 
 	/** @var Progress if set the progress of a task will change when the task goes into this column */
-	protected $progressChange;
+	protected ?int $progressChange;
 
 	protected static function defineMapping(): Mapping
 	{

@@ -5,6 +5,9 @@ namespace GO\Email\Controller;
 use go\core\jmap\EntityController;
 use go\core\model;
 
+/**
+ * @extends EntityController<\GO\Email\Model\EmailTemplate>
+ */
 class EmailTemplate extends EntityController {
 	
 	/**

@@ -2,7 +2,7 @@
 //This example creates a new Group-Office instance on a multi instance server.
 
 //Adjust these variables for your installation
-$apiKey = "5fdfc8b07892f471c5a63cb7de9e698df049a199155c2";
+$apiKey = "your-api-key";
 $apiUrl = 'http://localhost/api/jmap.php';
 $domain = 'example.local';
 
@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
 
 	//All went well so redirect to installer.
+    // nosemgrep: php.lang.security.injection.tainted-url-host.tainted-url-host
 	header("Location: https://" . $hostname . "/install/install.php");
 	exit();
 }

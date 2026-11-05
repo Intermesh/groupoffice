@@ -35,7 +35,7 @@ GO.files.FolderPropertiesDialog = function(config){
 					name: 'name',
 					anchor: '100%',
 					validator:function(v){
-						return !v.match(/[&\/:\*\?"<>|\\]/);
+						return !v.match(/[&\/:\*\?"<>|\\]/) && !v.match(/[\s.]$/);
 					}
 				},{
 					xtype: 'plainfield',

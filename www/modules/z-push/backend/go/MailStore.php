@@ -1250,13 +1250,10 @@ class MailStore extends Store implements ISearchProvider {
 		// old framework sets user timezone :(
 		date_default_timezone_set("UTC");
 
-		// TODO this is inefficient because it reads the icalendar twice
 		$vcalendar = $imapMessage->getInvitationVcalendar();
 		if(!$vcalendar) {
 			return;
 		}
-
-		Scheduler::handleIMIP($imapMessage);
 
 		$message->meetingrequest = new SyncMeetingRequest();
 		$method = $vcalendar->method ? strtolower($vcalendar->method->getValue()) : "request";
@@ -1340,7 +1337,7 @@ class MailStore extends Store implements ISearchProvider {
 			$message->meetingrequest->endtime = $vevent->dtend->getDateTime()->format("U");
 		} else if(isset($vevent->duration)) {
 			try {
-				$message->meetingrequest->endtime = $vevent->dtstart->getDateTime()->add(new DateInterval($vevent->duration));
+				$message->meetingrequest->endtime = (clone $vevent->dtstart->getDateTime())->add(new DateInterval($vevent->duration))->format("U");
 			} catch(Exception $e) {
 				ZLog::Write(LOGLEVEL_WARN, "Failed to add duration: " . $vevent->duration ." :" . $e->getMessage());
 				$message->meetingrequest->endtime = $message->meetingrequest->starttime + 3600;

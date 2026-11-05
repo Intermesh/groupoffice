@@ -1,4 +1,3 @@
-Module.js
 MainPanel.js
 LogEntryGrid.js
 HistoryDetailPanel.js

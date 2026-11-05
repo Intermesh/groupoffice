@@ -12,12 +12,12 @@ use go\core\validate\ErrorCode;
 
 class SmtpAccount extends AclOwnerEntity
 {
-	public ?string $id;
+	public ?string $id = null;
 	protected $moduleId;
 	public string $hostname;
 	public int $port = 587;
-	public ?string $username;
-	protected ?string $password;
+	public ?string $username = null;
+	protected ?string $password = null;
 	public ?string $encryption = "tls"; // null, 'tls' or 'ssl'
 	public bool $verifyCertificate = true;
 	public string $fromName;
@@ -35,6 +35,7 @@ class SmtpAccount extends AclOwnerEntity
 	public static function buildSmtpAccountFromEmailAccount(int $accountId, int $maxMessagesPerMinute): SmtpAccount
 	{
 		$e = \GO\Email\Model\Account::model()->find(\GO\Base\Db\FindParams::newInstance()
+			->ignoreAcl()
 			->select("t.acl_id, t.id,t.username, t.password, t.smtp_host,t.smtp_port,t.smtp_encryption,t.smtp_username,t.smtp_password,t.force_smtp_login,t.smtp_allow_self_signed,a.email, a.name")
 			->criteria(FindCriteria::newInstance()->addCondition('id', $accountId))
 			->joinModel(array(

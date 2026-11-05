@@ -1,12 +1,11 @@
 <?php
-use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module;
 use GO\Base\Observable;
 use go\core\ErrorHandler;
-use go\core\event\EventEmitterTrait;
 use go\core\mail\Util;
 use go\core\App;
 use go\core;
+use go\core\model\CronJobSchedule;
 use go\core\model\User;
 
 require('../vendor/autoload.php');
@@ -95,7 +94,7 @@ if (!empty($_POST)) {
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
 			    try {
-                    Module::install($moduleController->name(), false, $moduleController::getDefaultSortOrder());
+                    Module::install($moduleController->name());
                 }
                 catch(Exception $e) {
 			        //could be a license error due to an unlicensed module depending
@@ -107,46 +106,44 @@ if (!empty($_POST)) {
 
 
 		//Insert default cronjob record for email reminders
-		$cron = new CronJob();
+        // TODO? If needed, refactor to JMAP Cronbjob and create here
+//		$cron = new CronJob();
+//
+//		$cron->name = 'Email Reminders';
+//		$cron->active = true;
+//		$cron->runonce = false;
+//		$cron->minutes = '*/5'; // Every 5 minutes
+//		$cron->hours = '*';
+//		$cron->monthdays = '*';
+//		$cron->months = '*';
+//		$cron->weekdays = '*';
+//		$cron->job = 'GO\Base\Cron\EmailReminders';
 
-		$cron->name = 'Email Reminders';
-		$cron->active = true;
-		$cron->runonce = false;
-		$cron->minutes = '*/5'; // Every 5 minutes
-		$cron->hours = '*';
-		$cron->monthdays = '*';
-		$cron->months = '*';
-		$cron->weekdays = '*';
-		$cron->job = 'GO\Base\Cron\EmailReminders';
+//		if(!$cron->save()) {
+//			var_dump($cron->getValidationErrors());
+//			throw new Exception("Could not save email reminders cron");
+//		}
 
-		if(!$cron->save()) {
-			var_dump($cron->getValidationErrors());
-			throw new Exception("Could not save email reminders cron");
-		}
+        $module = core\model\Module::findByName("core", "core");
 
-		$cron = new CronJob();
+        $cron = new CronJobSchedule();
+        $cron->moduleId = $module->id;
+        $cron->name = "CalculateDiskUsage";
+        $cron->expression = "1 1 * * *";
+        $cron->description = "Calculate disk usage";
 
-		$cron->name = 'Calculate disk usage';
-		$cron->active = true;
-		$cron->runonce = false;
-		$cron->minutes = '1';
-		$cron->hours = '1';
-		$cron->monthdays = '*';
-		$cron->months = '*';
-		$cron->weekdays = '*';
-		$cron->job = 'GO\Base\Cron\CalculateDiskUsage';
-
-		if(!$cron->save()) {
-			var_dump($cron->getValidationErrors());
-			throw new Exception("Could not save calculate disk usage cron");
-		}
-
+        if(!$cron->save()) {
+            throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+        }
 		Observable::cacheListeners();
 
 
 		User::findById(1)->legacyOnSave();
 
-        if(\go\modules\business\license\model\License::isValid()) {
+		// Log in the new administrator. The license page that follows requires an administrator.
+		(new core\auth\Authenticate())->setAuthenticated(User::findById(1));
+
+        if(go()->getEnvironment()->hasIoncube() && \go\modules\business\license\model\License::isValid()) {
             header("Location: finished.php");
         } else {
             header("Location: license.php?install=true");
@@ -186,23 +183,23 @@ require('header.php');
 
 			<p>
 				<label>E-mail</label>
-				<input type="email" name="email" value="<?= $_POST['email'] ?? ""; ?>" required>
+				<input type="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? ""); ?>" required>
 				
 			</p>
 			<p>
 				<label>Username</label>
-				<input type="text" autocomplete="username" name="username" pattern="[A-Za-z0-9\-_@\.]+" title="<?= htmlentities(go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @)"); ?>" value="<?= $_POST['username'] ?? "admin"; ?>" required />
+				<input type="text" autocomplete="username" name="username" pattern="[A-Za-z0-9\-_@\.]+" title="<?= htmlentities(go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @)"); ?>" value="<?= htmlentities($_POST['username'] ?? "admin"); ?>" required />
 			</p>
 
 			
 			<p>
 				<label>Password</label>
-				<input type="password" name="password" autocomplete="new-password" pattern=".{6,}" value="<?= $_POST['password'] ?? ""; ?>" title="Minimum length is 6 chars" required>
+				<input type="password" name="password" autocomplete="new-password" pattern=".{6,}" value="<?= htmlspecialchars($_POST['password'] ?? ""); ?>" title="Minimum length is 6 chars" required>
 			</p>
 
 			<p>
 				<label>Confirm</label>
-				<input type="password" name="passwordConfirm" autocomplete="new-password" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required>
+				<input type="password" name="passwordConfirm" autocomplete="new-password" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= htmlspecialchars($_POST['passwordConfirm'] ?? ""); ?>" required>
 			</p>
 
             <p>

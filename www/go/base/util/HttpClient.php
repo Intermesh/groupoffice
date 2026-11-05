@@ -56,8 +56,9 @@ class HttpClient{
 		curl_setopt($this->_curl, CURLOPT_COOKIEFILE, $this->_cookieFile);
 
 		//for self-signed certificates
-		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, false);
+//		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
+//		curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, false);
+
 		@curl_setopt($this->_curl, CURLOPT_FOLLOWLOCATION, TRUE);
 		curl_setopt($this->_curl, CURLOPT_ENCODING, "UTF-8");
 		
@@ -71,6 +72,9 @@ class HttpClient{
 
 		$this->setCurlOption(CURLOPT_CONNECTTIMEOUT, 5);
 		$this->setCurlOption(CURLOPT_TIMEOUT, 60);
+
+		$this->setCurlOption( CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS); // Only allow HTTP(s) to prevent unsafe  protocols like file:///
+		$this->setCurlOption(CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 
 	}
 	
@@ -228,8 +232,6 @@ class HttpClient{
 	}
 	
 	public function __destruct(){
-		if($this->_curl)
-			curl_close($this->_curl);
 		
 		if(file_exists($this->_cookieFile))
 			unlink($this->_cookieFile);

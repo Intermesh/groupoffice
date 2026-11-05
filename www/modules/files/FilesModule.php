@@ -25,6 +25,7 @@ use Faker\Generator;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\User;
+use go\core\util\ArrayObject;
 use go\core\util\ClassFinder;
 use GO\Files\Filehandler\FilehandlerInterface;
 use GO\Base\Util\ReflectionClass;
@@ -38,6 +39,11 @@ class FilesModule extends \GO\Base\Module{
 	public function getRights()
 	{
 		return ['mayManage' => 1, 'mayAccessMainPanel' => 2];
+	}
+
+	public function getCategory(): string
+	{
+		return go()->t("Files", $this->getPackage(), $this->getName());
 	}
 	
 	public static function initListeners() {
@@ -79,15 +85,40 @@ class FilesModule extends \GO\Base\Module{
 			//$folder->syncFilesystem();		
 			
 		}
+
+		$mod = \go\core\model\Module::findByName(null, "files", null);
 		
 		$folder = Model\Folder::model()->findByPath("log", true);
-		if(!$folder->acl){
+
+		if(!$folder->acl || $folder->acl_id == $mod->getShadowAclId()){
 			$folder->setNewAcl();
 			$folder->readonly=1;
-			$folder->save();
+			$folder->systemSave = true;
+			$folder->save(true);
+		}
+
+		$folder = Model\Folder::model()->findByPath("tmp", true);
+		if(!$folder->acl || $folder->acl_id == $mod->getShadowAclId()) {
+			$folder->setNewAcl();
+			$folder->readonly = 1;
+			$folder->systemSave = true;
+			$folder->save(true);
+		}
+
+		$folder = Model\Folder::model()->findByPath("trash", true);
+		if(!$folder->acl) {
+			$folder->setNewAcl();
+			$folder->visible = 1;
+			$folder->readonly = 1;
+			$folder->systemSave = true;
+			$folder->save(true);
+			$folder->acl->addGroup(\GO::config()->group_root, \GO\Base\Model\Acl::MANAGE_PERMISSION);
 		}
 
 		go()->getDbConnection()->exec("update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl);");
+
+		go()->getDbConnection()->exec("update fs_folders set readonly=1, acl_id = ".$mod->getShadowAclId()." where acl_id=0 and parent_id=0;");
+		go()->getDbConnection()->exec("delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select id from core_entity where name='Folder') and f.visible=0;");
 
 		parent::checkDatabase($response);
 	}
@@ -144,7 +175,12 @@ class FilesModule extends \GO\Base\Module{
 
 				//For new framework
 				$cf = new ClassFinder();
-				self::$fileHandlers = array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class));
+				$handlers = new ArrayObject(array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class)));
+
+				$handlers->sortValueOnTop('go\modules\community\wopi\filehandler\Collabora');
+				$handlers->sortValueOnTop('go\modules\community\pdfeditor\filehandler\PdfFileHandler');
+
+				self::$fileHandlers = $handlers->getArrayCopy();
 
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}
@@ -214,8 +250,21 @@ class FilesModule extends \GO\Base\Module{
 		$folder->setNewAcl();
 		$folder->visible = 1;
 		$folder->readonly = 1;
-		$folder->save();
+		$folder->save(true);
 		$folder->acl->addGroup(\GO::config()->group_root, \GO\Base\Model\Acl::MANAGE_PERMISSION);
+
+
+		$folder = Model\Folder::model()->findByPath("log", true);
+		$folder->setNewAcl();
+		$folder->readonly=1;
+		$folder->save(true);
+
+		$folder = Model\Folder::model()->findByPath("tmp", true);
+		$folder->setNewAcl();
+		$folder->readonly=1;
+		$folder->save(true);
+
+
 	}
 	
 	

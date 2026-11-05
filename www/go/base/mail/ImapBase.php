@@ -76,17 +76,17 @@ abstract class ImapBase {
 					$valid = true;
 				}
 				break;
-			case 'uid_list';
+			case 'uid_list':
 				if (preg_match("/^(?:\d+:\d+|\*:\d+|\d+:\*|\d+)(?:,(?:\d+:\d+|\*:\d+|\d+:\*|\d+))*$/", $val)) {
 					$valid = true;
 				}
 				break;
-			case 'mailbox';
+			case 'mailbox':
 				if (preg_match("/^[^\r\n]+$/", $val)) {
 					$valid = true;
 				}
 				break;
-			case 'keyword';
+			case 'keyword':
 				if (in_array(strtoupper($val), $this->imap_keywords)) {
 					$valid = true;
 				}

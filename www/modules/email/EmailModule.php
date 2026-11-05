@@ -47,6 +47,11 @@ class EmailModule extends \GO\Base\Module{
 		return parent::initListeners();
 	}
 
+	public function getCategory(): string
+	{
+		return go()->t("E-mail", $this->getPackage(), $this->getName());
+	}
+
 	/**
 	 * Default sort order when installing. If null it will be auto generated.
 	 * @return int|null

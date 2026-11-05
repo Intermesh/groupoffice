@@ -14,6 +14,7 @@ use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use Exception;
 use go\core\db\Criteria;
+use Throwable;
 
 class CronJobSchedule extends Entity
 {
@@ -116,12 +117,15 @@ class CronJobSchedule extends Entity
 
 	/**
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getCronClass(): string
 	{
 		$module = Module::findById($this->moduleId);
-		
-		if($module->package == "core" && $module->name == "core") {
+		// As per 26.1 the old ActiveRecard based cron system is gone. Therefore, we need to support the old namespacing
+		if (is_null($module->package)) {
+			return "GO\\".ucfirst($module->name) . "\\Cron\\" .$this->name;
+		} elseif($module->package == "core" && $module->name == "core") {
 			return "go\\core\\cron\\" . $this->name;
 		}
 		
@@ -133,7 +137,7 @@ class CronJobSchedule extends Entity
 	 * Run the job or schedule it if it has not been scheduled yet.
 	 * @throws Exception
 	 */
-	public function run()
+	public function run(): void
 	{
 		//set runningSince to now
 		$this->runningSince = $this->getLocalDateTime();
@@ -146,30 +150,17 @@ class CronJobSchedule extends Entity
 		$cls = $this->getCronClass();
 
 		go()->debug("Running CRON method: " . $cls);
-		ob_start();
 		try {
 			$cron = new $cls;			
 			$cron->run($this);
-			
-		} catch (\Throwable $ex) {
-			$errorString = ErrorHandler::logException($ex);
-			echo $errorString . "\n";
+		} catch (Throwable $ex) {
+			ErrorHandler::logException($ex);
 			$this->lastError = $ex->getMessage();
-		}
-
-		$output = ob_get_contents();
-		ob_end_clean();
-
-		if(!empty($output)) {
-			echo $cls . " output: \n\n" . $output . "\n---\n\n";
 		}
 
 		$this->lastRunAt = $this->getLocalDateTime();
 		$this->runningSince = null;
-
 		$this->nextRunAt = $this->getNextRunDate();
-
-//		echo "Next running at: " . $this->nextRunAt->format("c") . "\n";
 
 		if (!$this->save()) {
 			throw new Exception("Could not save CRON job");
@@ -188,15 +179,18 @@ class CronJobSchedule extends Entity
 	public static function runNext(): bool
 	{
 		$now = (new self)->getLocalDateTime();
-		$jobs = self::find()->where('enabled', '=', true)
+		$jobs = CronJobSchedule::find()->where('enabled', '=', true)
 						->andWhere((new Criteria())
 							->andWhere('nextRunAt', '<=', $now)
 							->orWhere('nextRunAt', 'IS', null)
 						)
-						->orderBy(['nextRunAt' => 'ASC'])->all();
+						->orderBy(['nextRunAt' => 'ASC'])
+						->all();
+
 		if(count($jobs) === 0) {
 			return false;
 		}
+
 		foreach($jobs as $job) {
 			go()->debug("Running " . $job->name);
 			$job->run();

@@ -28,7 +28,6 @@ use go\modules\business\license\exception\LicenseException;
  * @property \GO\Base\Module $moduleManager The module class to install, initialize etc the module.
  * @property int $aclId
  * @property boolean $admin_menu
- * @property int $sort_order
  * @property int $version
  * @property int $acl_write
  * @property boolean $enabled
@@ -148,22 +147,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 
 		return $this->userRights($userId);
 	}
-	
-	protected function nextSortOrder() {
-		$query = new \go\core\db\Query();			
-		$query->from("core_module");
 
-		if($this->package == "core") {
-			$query->selectSingleValue("COALESCE(MAX(sort_order), 0) + 1")
-				->where(['package' => "core"]);
-		} else
-		{
-			$query->selectSingleValue("COALESCE(MAX(sort_order), 100) + 1")
-				->where('package', '!=', "core");
-		}
-
-		return max($query->single(), 100);
-	}
 	
 	/**
 	 * Install's a module with all it's dependencies
@@ -172,7 +156,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	 * @return \GO\Base\Model\Module
 	 * @throws \GO\Base\Exception\Save
 	 */
-	public static function install($name,$ignoreDependentModule=false, $sort_order = null){
+	public static function install($name,$ignoreDependentModule=false){
 		
 		
 		GO::debug("install($name,$ignoreDependentModule)");
@@ -180,7 +164,6 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		if(!($module = Module::model()->findByName($name))){
 			$module = new Module();
 			$module->name=$name;
-			$module->sort_order = $sort_order;
 
 			if(!$ignoreDependentModule) {
 
@@ -249,9 +232,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			return '';
 	}
 	
-	public function getSortOrderColumn() {
-		return 'sort_order';
-	}
+
 	
 	public function validate() {
 		
@@ -263,8 +244,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 	protected function beforeSave() {
 		if($this->isNew){			
-			$this->version = $this->moduleManager->databaseVersion();		
-			$this->admin_menu = $this->moduleManager->adminModule();
+			$this->version = $this->moduleManager->databaseVersion();
 		}
 
 		if($this->isModified('enabled')) {
@@ -283,7 +263,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	
 	protected function afterSave($wasNew) {
 		
-		if(!$this->admin_menu && $wasNew) {
+		if(!$this->moduleManager->adminModule() && $wasNew) {
 			go()->getDbConnection()->insert('core_permission', ['moduleId' => $this->id, 'groupId' => \go\core\model\Group::ID_INTERNAL])->execute();
 		}
 
@@ -397,6 +377,6 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	 * @return self
 	 */
 	public function findByName($name) {
-		return $this->findSingleByAttributes(['name'=> $name, 'package' => null], (new \GO\Base\Db\FindParams())->ignoreAcl());
+		return $this->findSingleByAttributes(['name'=> $name, 'package' => $name == "core" ? "core" : null], (new \GO\Base\Db\FindParams())->ignoreAcl());
 	}
 }

@@ -4,6 +4,7 @@ namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\auth\Authenticate;
+use go\core\ErrorHandler;
 use go\core\http\Exception;
 use go\core\jmap\EntityController;
 use go\core\model\User;
@@ -16,6 +17,9 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 
 use TheNetworg\OAuth2\Client\Token\AccessToken;
 
+/**
+ * @extends EntityController<\go\modules\community\oauth2client\model\Oauth2Client>
+ */
 final class Oauth2Client extends EntityController
 {
 
@@ -112,6 +116,9 @@ final class Oauth2Client extends EntityController
 	}
 
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {
+
+		go()->getSettings()->allowRegistration = true;
+
 		$user = User::findOrCreateByUsername($response['email'], $response['email'], $response['name']);
 
 		//register as oauth user
@@ -187,7 +194,6 @@ final class Oauth2Client extends EntityController
 		}
 
 		$this->auth($account->id);
-//		header("Location: " . go()->getSettings()->URL);
 
 	}
 
@@ -203,6 +209,7 @@ final class Oauth2Client extends EntityController
 
 		try {
 			$acct = Account::findById($accountId);
+
 			$acct->oauth2_account->token = $token->getToken();
 			$acct->oauth2_account->expires = $token->getExpires();
 
@@ -215,7 +222,14 @@ final class Oauth2Client extends EntityController
 			}
 
 			$account = \GO\Email\Model\Account::model()->findByPk($accountId);
-			$account->createDefaultFolders();
+
+
+			// Don't overwrite: shared-mailbox tokens may belong to a different user.
+			if(empty($account->username) && method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email'])) {
+				$account->username = $token->getIdTokenClaims()['email'];
+				$account->save();
+			}
+
 			if(method_exists($token, "getIdTokenClaims") && !empty($token->getIdTokenClaims()['email']) && $account->smtp_username != $token->getIdTokenClaims()['email']) {
 				$account->smtp_username = $token->getIdTokenClaims()['email'];
 				$account->save();
@@ -223,10 +237,14 @@ final class Oauth2Client extends EntityController
 				$account->smtp_username = $account->username;
 				$account->save();
 			}
+
+			$account->createDefaultFolders();
 			//$ownerDetails = $provider->getResourceOwner($token);
 		} catch (\Exception $e) {
 			// Failed to get user details
 			exit('Something went wrong: ' . $e->getMessage());
+
+			ErrorHandler::logException($e);
 		}
 		unset($_SESSION['oauth2state']);
 		unset($_SESSION['accountId']);

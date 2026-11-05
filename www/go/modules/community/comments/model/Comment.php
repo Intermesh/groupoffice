@@ -52,8 +52,6 @@ class Comment extends AclItemEntity {
 	/**
 	 * By default the section is NULL. This property can be used to create multiple comment blocks per entity. 
 	 * This works with a 'section' filter that defaults to NULL.
-	 * 
-	 * @var string
 	 */
 	public ?string $section = null;
 
@@ -64,6 +62,8 @@ class Comment extends AclItemEntity {
 	protected array $images = [];
 
 	/**
+	 * File attachments
+	 *
 	 * @var CommentAttachment[]
 	 */
 	public array $attachments = [];
@@ -73,6 +73,14 @@ class Comment extends AclItemEntity {
 	 * The MIME message ID from the outgoing or incoming email (used in support module)
 	 */
 	public ?string $mimeMessageId = null;
+
+
+	const MAIL_STATUS_RECEIVED = 'received';
+	const MAIL_STATUS_PENDING = 'pending';
+	const MAIL_STATUS_SENT = 'sent';
+	const MAIL_STATUS_SENDERROR = 'senderror';
+
+	public ?string $mailStatus = null;
 
 	use SearchableTrait;
 
@@ -255,7 +263,7 @@ class Comment extends AclItemEntity {
 	protected function internalSave(): bool
 	{
 		if($this->isModified('text')) {
-			$this->images = Blob::parseFromHtml($this->text, true);
+			$this->images = Blob::parse($this->text, true);
 			$this->findMentions();
 		}
 
@@ -347,6 +355,11 @@ class Comment extends AclItemEntity {
 		return StringUtil::cutString($this->getAsText(), 100);
 	}
 
+
+	/**
+	 * Get plain text version of the comment. Useful for search indexing.
+	 * @return string
+	 */
 	private function getAsText() : string {
 		if(!isset($this->asText)) {
 			$this->asText = preg_replace("/<style>.*<\/style>/usi", "", $this->text);
@@ -373,6 +386,9 @@ class Comment extends AclItemEntity {
 
 	private function findMentions()
 	{
+		if(!Alert::$enabled) {
+			return;
+		}
 
 		$old = $this->getOldValue('text');
 		$oldMentions = self::parseMentions($old);

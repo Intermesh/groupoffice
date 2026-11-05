@@ -39,7 +39,8 @@ use Throwable;
  * docker compose exec -u www-data groupoffice ./www/cli.php core/System/runCron --name='GarbageCollection' --debug
  * 
  */
-class GarbageCollection extends CronJob {
+class GarbageCollection extends CronJob
+{
 
 	use EventEmitterTrait;
 
@@ -50,10 +51,12 @@ class GarbageCollection extends CronJob {
 
 	/**
 	 * @throws Exception
+	 * @throws Throwable
 	 */
-	public function run(CronJobSchedule $schedule) {
-		$this->blobs();
+	public function run(CronJobSchedule $schedule): void
+	{
 		$this->change();
+		$this->blobs();
 		$this->links();
 		$this->acls();
 		$this->alerts();
@@ -84,27 +87,47 @@ class GarbageCollection extends CronJob {
 		}
 	}
 
-	private function alerts() {
+	private function alerts(): void
+	{
 		go()->debug("Cleaning up stale Alerts");
-		Alert::delete(Alert::findStale());
-		go()->debug("Deleted " . (isset(Alert::$lastDeleteStmt) ? Alert::$lastDeleteStmt->rowCount() : 0) . " stale alerts");
+		$count = 0;
+		do {
+			Alert::delete(Alert::findStale()->limit(200));
+			EntityType::push();
+			$count += Alert::deleteLastCount();
+		}while(Alert::deleteLastCount());
+			go()->debug("Deleted " . $count . " stale alerts");
 	}
 
-	private function blobs() {
+	private function blobs(): void
+	{
 		go()->debug("Cleaning up BLOB's");
-		$query = Blob::findStale();
-		go()->debug($query);
-		Blob::delete($query);
-		go()->debug("Deleted " . (isset(Blob::$lastDeleteStmt) ? Blob::$lastDeleteStmt->rowCount() : 0) . " stale blobs");
+		$count = 0;
+		do {
+			$query = Blob::findStale()->limit(200);
+			Blob::delete($query);
+			EntityType::push();
+
+			$count += Blob::deleteLastCount();
+		}while(Blob::deleteLastCount());
+
+		go()->debug("Deleted " . $count . " stale blobs");
 	}
 
-	private function acls() {
+	private function acls(): void
+	{
 		go()->debug("Cleaning up ACL's");
-		Acl::delete(Acl::findStale());
-		go()->debug("Deleted " .  (isset(Acl::$lastDeleteStmt) ? Acl::$lastDeleteStmt->rowCount() : 0). " stale ACL's");
+		$count = 0;
+		do {
+			$query = Acl::findStale()->limit(200);
+			Acl::delete($query);
+			EntityType::push();
+			$count += Acl::deleteLastCount();
+		}while(Acl::deleteLastCount());
+		go()->debug("Deleted " .  $count . " stale ACL's");
 	}
 
-	private function change() {
+	private function change() : void {
 
 		go()->debug("Cleaning up changes");
 		$date = new DateTime();

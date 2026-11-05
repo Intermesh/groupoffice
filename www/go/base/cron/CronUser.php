@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @deprecated - Will remove soon-sish
+ */
 namespace GO\Base\Cron;
 
 

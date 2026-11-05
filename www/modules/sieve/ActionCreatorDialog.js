@@ -39,7 +39,12 @@ GO.sieve.ActionRecord = Ext.data.Record.create([
 	{
 		name: 'reason',
 		type: 'string'
-	}]);
+	},
+	{
+		name: 'subject',
+		type: 'string'
+	}
+]);
 
 GO.sieve.ActionCreatorDialog = function(config){
 	config = config || {};
@@ -133,6 +138,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 					this.txtEmailAddressOptional.setValue(record.get('addresses'));
 					this.txtDays.setValue(record.get('days'));
 					this.txtMessage.setValue(record.get('reason'));
+					this.txtSubject.setValue(record.get('subject'));
 					break;
 				case 'addflag':
 					if(record.get('target') == '\\Seen'){
@@ -153,6 +159,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 		var _days = '';
 		var _addresses = '';
 		var _reason = '';
+		var _subject = '';
 		var _text = '';
 
 		switch(this.cmbAction.getValue())
@@ -194,6 +201,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 				_days = this.txtDays.getValue();
 				_addresses = this.txtEmailAddressOptional.getValue();
 				_reason = this.txtMessage.getValue();
+				_subject = this.txtSubject.getValue();
 				if (!GO.util.empty(_addresses))
 					var addressesText = t("Autoreply is active for", "sieve")+': '+_addresses+'. ';
 				else
@@ -220,6 +228,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			target:_target,
 			days: _days,
 			reason: _reason,
+			subject: _subject === '' ? null : _subject,
 			addresses: _addresses,
 			text: _text
 		};
@@ -231,6 +240,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 		this._toggleComponentUse(this.cmbFolder,false);
 		this._toggleComponentUse(this.txtEmailAddressOptional,false);
 		this._toggleComponentUse(this.txtEmailAddress,false);
+		this._toggleComponentUse(this.txtSubject, false);
 		this._toggleComponentUse(this.txtMessage,false);
 		this._toggleComponentUse(this.txtDays,false);
 		this.doLayout();
@@ -247,6 +257,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 				this._toggleComponentUse(this.txtEmailAddressOptional,false);
 				this._toggleComponentUse(this.txtEmailAddress,false);
 				this._toggleComponentUse(this.txtDays,false);
+				this._toggleComponentUse(this.txtSubject, false);
 				this._toggleComponentUse(this.txtMessage,false);
 				break;
 			case 'redirect':
@@ -255,6 +266,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 				this._toggleComponentUse(this.txtEmailAddressOptional,false);
 				this._toggleComponentUse(this.txtEmailAddress,true);
 				this._toggleComponentUse(this.txtDays,false);
+				this._toggleComponentUse(this.txtSubject, false);
 				this._toggleComponentUse(this.txtMessage,false);
 				break;
 			case 'reject':
@@ -262,6 +274,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 				this._toggleComponentUse(this.txtEmailAddressOptional,false);
 				this._toggleComponentUse(this.txtEmailAddress,false);
 				this._toggleComponentUse(this.txtDays,false);
+				this._toggleComponentUse(this.txtSubject, false);
 				this._toggleComponentUse(this.txtMessage,true);
 				break;
 			case 'vacation':
@@ -269,6 +282,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 				this._toggleComponentUse(this.txtEmailAddressOptional,true);
 				this._toggleComponentUse(this.txtEmailAddress,false);
 				this._toggleComponentUse(this.txtDays,true);
+				this._toggleComponentUse(this.txtSubject, true);
 				this._toggleComponentUse(this.txtMessage,true);
 				break;
 			case 'set_read':
@@ -278,6 +292,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 				this._toggleComponentUse(this.txtEmailAddressOptional,false);
 				this._toggleComponentUse(this.txtEmailAddress,false);
 				this._toggleComponentUse(this.txtDays,false);
+				this._toggleComponentUse(this.txtSubject, false);
 				this._toggleComponentUse(this.txtMessage,false);
 				break;
 		}
@@ -337,6 +352,16 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			disabled: true
 		});
 
+		this.txtSubject = new Ext.form.TextField({
+			name: 'subject',
+			allowBlank: true,
+			anchor: '100%',
+			width: 300,
+			fieldLabel:t("Subject"),
+			hidden: true,
+			disabled: true
+		});
+
 		this.txtMessage = new Ext.form.TextArea({
 			name: 'message',
 			allowBlank:false,
@@ -375,6 +400,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 					this.cmbAction,
 					this.cmbFolder,
 					this.txtDays,
+					this.txtSubject,
 					this.txtMessage,
 					this.txtEmailAddressOptional,
 					this.txtEmailAddress
@@ -387,6 +413,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			this.txtEmailAddress.reset();
 			this.txtDays.reset();
 			this.txtMessage.reset();
+			this.txtSubject.reset();
 			this._transForm(record.data.value);
 		},this);
 	},

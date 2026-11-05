@@ -1,6 +1,7 @@
 <?php
 namespace go\core\fs;
 
+use DateTimeZone;
 use go\core\db\Query;
 use go\core\model\User;
 use go\core\util\DateTime;
@@ -10,6 +11,8 @@ class BlobTest extends TestCase
 {
 	public function testGarbageCollection() {
 
+		date_default_timezone_set("UTC");
+
 		$blobsQuery = Blob::findStale();
 		$blobsStmt = $blobsQuery->execute();
 
@@ -17,17 +20,27 @@ class BlobTest extends TestCase
 		$staleCountAtStart = $blobsStmt->rowCount();
 
 		//create unused blob
+
 		$blob = Blob::fromString("test blob text " . uniqid());
 		$blob->type = 'text/plain';
 		$blob->name = 'test.txt';
-		$blob->staleAt = new DateTime("-1 min");
+		$blob->staleAt = new DateTime("-10 min", new DateTimeZone('UTC'));
+//		go()->getDbConnection()->debug = true;
 		$success = $blob->save();
+
+
+//		echo $blob->staleAt->format('Y-m-d H:i:s')."\n\n";
+//
+//		echo go()->getDbConnection()->query("SELECT NOW()")->fetchColumn() . "\n\n";
+
+
 		$this->assertEquals(true, $success);
 
 		$this->assertEquals(true, $blob->getFile()->exists());
 
 		$blobsStmt = $blobsQuery->execute();
-//		echo $blobsQuery;
+
+//		echo $blobsQuery ."\n\n";
 //		var_dump($blobsStmt->fetchAll());
 		$this->assertEquals($staleCountAtStart + 1, $blobsStmt->rowCount());
 
@@ -51,7 +64,7 @@ class BlobTest extends TestCase
 		$blob = Blob::fromString(base64_decode($blackPixel));
 		$blob->type = 'image/gif';
 		$blob->name = 'black-pixel.gif';
-		$blob->staleAt = new DateTime("-1 min");
+		$blob->staleAt = new DateTime("-1 min", new DateTimeZone('UTC'));
 		$success = $blob->save();
 		$this->assertEquals(true, $success);
 
@@ -75,9 +88,12 @@ class BlobTest extends TestCase
 		// all blobs used?
 		$this->assertEquals(0, $blobsStmt->rowCount());
 
+		$contact= $admin->getProfile();
+
 		//remove avatar again
-		$admin->avatarId = null;
-		$success = $admin->save();
+		$admin->avatarId = $contact->photoBlobId  = null;
+
+		$success = $admin->save() && $contact->save();
 		$this->assertEquals(true, $success);
 
 		Blob::delete($blobsQuery);
@@ -92,4 +108,29 @@ class BlobTest extends TestCase
 
 
 
+	public function testParse() {
+		$id1 = sha1("a");
+		$id2 = sha1("b");
+		$id3 = sha1("c");
+		$id4 = sha1("d");
+
+		$html = '<p><img src="https://example.com/api/download.php?blob=' . $id1 . '" alt="a"></p>' .
+			'<img data-blob-id="' . $id2 . '" src="blob:https://example.com/123">' .
+			'<a href="download.php?foo=bar&amp;blob=' . $id3 . '">c</a>' .
+			'<img src="https://example.com/api/download.php?blob=' . $id1 . '">';
+
+		$this->assertEquals([$id1, $id2, $id3], Blob::parse($html));
+
+		$markdown = "![a.png](https://example.com/api/download.php?blob=$id1)\n" .
+			"[d.pdf](../api/download.php?foo=bar&blob=$id4)\n" .
+			"Again ![a](https://example.com/api/download.php?blob=$id1)\n" .
+			"Not a blob: noblob=$id2 and blob=tooshort and blob={$id3}0";
+
+		$this->assertEquals([$id1, $id4], Blob::parse($markdown));
+		$this->assertEquals([], Blob::parse(null));
+		$this->assertEquals([], Blob::parse("No images"));
+
+		// deprecated alias
+		$this->assertEquals([$id1, $id2, $id3], Blob::parseFromHtml($html));
+	}
 }

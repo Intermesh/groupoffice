@@ -33,7 +33,14 @@ go.modules.community.addressbook.AddressBookDialog = Ext.extend(go.form.Dialog, 
 					fieldLabel: t("Name"),
 					anchor: '100%',
 					allowBlank: false
-				}]
+				},
+				{
+					xtype: 'checkbox',
+					name: 'syncToDevice',
+					boxLabel: t('Sync to device'),
+					hint: t('Make address book available in CardDAV')
+				}
+			]
 		}
 		];
 	}

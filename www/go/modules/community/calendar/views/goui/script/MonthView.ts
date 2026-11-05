@@ -1,5 +1,5 @@
 import {CalendarView} from "./CalendarView.js";
-import {ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
+import {Component, ComponentEventMap, DateInterval, DateTime, ObservableListenerOpts} from "@intermesh/goui";
 import {E} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {client} from "@intermesh/groupoffice-core";
@@ -19,8 +19,10 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 
 	weekRows: [DateTime, HTMLElement][] = []
 
+	protected wdays = 7
+
 	protected internalRender() {
-		this.makeDraggable(this.el);
+		this.makeDraggableDay(this.el);
 
 		this.el.tabIndex = 0;
 		this.el.on('keydown', (e: KeyboardEvent) => {
@@ -36,6 +38,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 			e.preventDefault();
 			const day = e.target.up('li[data-date]');
 			if(day) {
+				this.contextMenuEmpty.dataSet.viewSupportsTime = false;
 				this.contextMenuEmpty.dataSet.date = day.dataset.date;
 				this.contextMenuEmpty.showAt(e);
 			}
@@ -58,8 +61,11 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		return super.internalRender();
 	}
 
+	private month?:number;
+
 	goto(date: DateTime, days?: number) {
 		//this.el.cls('reverse',(day < this.day));
+		this.month = date.getMonth();
 		this.day = date.setHours(0,0,0, 0);
 		this.start = date.clone()
 		const endMonth = this.start.clone();
@@ -76,89 +82,6 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.adapter.goto(this.start, endMonth);
 	}
 
-	private makeDraggable(el: HTMLElement) {
-		let from : HTMLElement,
-			till: HTMLElement,
-			last: HTMLElement,
-			anchor: HTMLElement,
-			currentH = (new DateTime).format('H'),
-			ev: CalendarItem,
-			action: (day:HTMLElement) => void,
-			hasMoved= false;
-
-		const create = (day: HTMLElement) => {
-			[from, till] = (anchor.compareDocumentPosition(day) & 0x02) ? [day,anchor] : [anchor,day];
-
-			ev.data.showWithoutTime = from !== till || !client.user.calendarPreferences.defaultDuration;
-			if(ev.data.showWithoutTime) {
-				ev.start = new DateTime(from.dataset.date!+' 00:00:00.000');
-				ev.end = new DateTime(till.dataset.date!+' 00:00:00.000').addDays(1);
-			} else {
-				const time = ' '+currentH+':00:00.000';
-				ev.start = new DateTime(from.dataset.date!+time);
-				ev.end = new DateTime(till.dataset.date!+time).add(new DateInterval(ev.data.duration));
-			}
-		},
-		move = (day:HTMLElement) => {
-			let [y,m,d] = day.dataset.date!.split('-').map(Number);
-			ev.start.setYear(y).setMonth(m).setDate(d);
-			ev.end = ev.start.clone().add(new DateInterval(ev.data.duration));
-		},
-		mouseMove = (e: MouseEvent & {target: HTMLElement}) => {
-
-			const day = e.target.up('li[data-date]');
-			if(day && day != last) {
-				hasMoved = true;
-				last = day;
-				action(day)
-				Object.values(ev.divs).forEach(d => d.remove());
-				ev.divs = {};
-				this.updateItems();
-			}
-		},
-		mouseUp = (_e: MouseEvent) => {
-			el.un('mousemove', mouseMove);
-			(hasMoved || action === create) && ev.save( () => {
-				this.currentCreation = undefined;
-				this.populateViewModel();
-			});
-		};
-		el.on('mousedown', (e) => {
-			if(e.button !== 0) return;
-			e.preventDefault(); // no text selection
-			const day = e.target.up('li[data-date]');
-			if(day) {
-				const dd = client.user.calendarPreferences.defaultDuration,
-					startStr = day.dataset.date! + (dd ? (new DateTime).format(' H:00:00.000') : ' 00:00:00.000');
-				const data = {
-						start: startStr,
-						title: t('New event'),
-						duration: dd ?? 'P1D',
-						calendarId: CalendarView.selectedCalendarId,
-						showWithoutTime: !dd
-					},
-					start = (new DateTime(data.start));
-				this.currentCreation = ev = new CalendarItem({start, data, key: ''});
-				this.viewModel.unshift(ev);
-				this.updateItems();
-				//this.drawEvent(ev, weekStart);
-				//eventsContainer.prepend(ev.divs[0]);
-				anchor = from = till = day;
-				action = create;
-				el.on('mousemove', mouseMove);
-				window.addEventListener('mouseup', mouseUp, {once:true});
-			}
-			const event = e.target.up('div[data-key]');
-			if(event) {
-				ev = this.viewModel.find(m => m.key == event.dataset.key)!;
-				if(!ev || !ev.mayChange) return;
-				action = move;
-				el.on('mousemove', mouseMove);
-				window.addEventListener('mouseup', mouseUp, {once:true});
-			}
-		});
-	}
-
 	protected clear() {
 		this.viewModel.forEach(ev => {
 			Object.values(ev.divs).forEach(d => d.remove());
@@ -169,7 +92,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	protected populateViewModel() {
 		this.clear()
 
-		for(const item of this.adapter.items) {
+		for(const item of this.mergeDuplicates(this.adapter.items)) {
 			this.viewModel.push(item);
 		}
 		if(this.currentCreation)
@@ -197,15 +120,22 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 				eventContainer = E('li').cls('events'),
 				row = E('ol',eventContainer);
 			for (i = 0; i < 7; i++) {
+
 				const cDay = day.clone();
+
+				if(it > 20 && i == 0 && cDay.getMonth() != this.month!) {
+					// stop if we're starting a new row with the next month
+					return;
+				}
+
 				row.append(E('li',
-					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub','W '+day.getWeekOfYear()).cls('weeknb').cls('not-small-device')
+					(i==0 && client.user.calendarPreferences.showWeekNumbers) ? E('sub',t('W ')+day.getWeekOfYear()).cls('weeknb').cls('not-small-device')
 						.on('click',_e => this.fire('selectweek', {day: weekStart}))
 						.on('mousedown',e=>e.stopPropagation()):'',
 					E('span',E('em', day.format( 'j')), day.format( day.getDate() === 1 ?' M' :'')).on('click', _e => {
 						this.fire('dayclick', {day: cDay});
 					}).on('mousedown', e => { e.stopPropagation()}),
-					E('div','+ 0 more').cls('more').on('click', _e => {
+					E('div','+ 0 more').css({height:this.ROWHEIGHT+'rem'}).cls('more').on('click', _e => {
 						this.fire('dayclick', {day: cDay});
 					}).on('mousedown',e=>e.stopPropagation())
 				).attr('data-date', day.format('Y-m-d'))
@@ -223,12 +153,11 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	}
 
 
-	private updateHasMore() {
+	protected updateHasMore() {
 		// height of the week row
-		const height = (this.el.clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
-		// how many event fit in the week row (todo: rem to pix != /10)
-		const fit = Math.floor((height/10) / this.ROWHEIGHT);
-
+		const height = this.el.children[2].clientHeight;//(this.el.children[1].clientHeight - this.el.firstElementChild!.clientHeight) / this.weekRows.length;
+		// how many event fit in the week row
+		const fit = Math.floor(((Component.pxToRem(height)/10 - 3.4) / this.ROWHEIGHT)) ;
 		const ols = this.el.getElementsByTagName('ol');
 		for (let i = 0; i < ols.length; i++) {
 			const lis = ols[i].getElementsByTagName('li');
@@ -243,14 +172,14 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		}
 	}
 
-	private updateItems() {
+	protected updateItems() {
 		this.continues = [];
 		this.iterator = 0;
 		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
 		for(const [ws, container] of this.weekRows) {
 			container.append(...this.drawWeek(ws));
 			this.slots.forEach((v, i) => {
-				container.parentElement!.children[i+1]!.setAttribute('amount', ''+Object.keys(v).length);
+				container.parentElement!.children[i+1]?.setAttribute('amount', ''+Object.keys(v).length);
 			})
 		}
 
@@ -260,14 +189,14 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	iterator!: number
 	continues: CalendarItem[] = []
 
-	private drawWeek(wstart: DateTime) {
-		let end = wstart.clone().addDays(7),
+	protected drawWeek(wstart: DateTime) {
+		let end = wstart.clone().addDays(this.wdays),
 			e: any;
 		let eventEls = [];
-		this.slots = [{},{},{},{},{},{},{}];
+		this.slots = Array.from({length: this.wdays}, _ => ({}) );
 		let stillContinueing = [];
 		while(e = this.continues.shift()) {
-			eventEls.push(this.drawEventLine(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart, true));
 			if(e.end.date > end.date) {
 				stillContinueing.push(e); // push it back for next week
 			}
@@ -275,7 +204,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.continues = stillContinueing;
 
 		while((e = this.viewModel[this.iterator]) && e.start.format('Ymd') < end.format('Ymd')) {
-			eventEls.push(this.drawEventLine(e, wstart));
+			eventEls.push(this.drawEventLine(e, wstart, true));
 			if(e.end.date > end.date) {
 				this.continues.push(e);
 			}

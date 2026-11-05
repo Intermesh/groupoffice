@@ -34,7 +34,7 @@ GO.email.SelectAccount = function (config) {
 		}),
 		valueField:'id',
 		displayField:'username',
-		typeAhead: true,
+		typeAhead: false,
 		mode: 'remote',
 		triggerAction: 'all',
 		editable: true,

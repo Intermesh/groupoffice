@@ -141,7 +141,7 @@ go.data.StoreTrait = {
 	watchRelations : function() {
 
 		this.proxy.getEntityFields().forEach(function(field) {
-			var relation =  this.entityStore.entity.findRelation(field.name);
+			var relation = window.groupofficeCore.entities.findRelation(this.entityStore.entity,field.name);
 
 			if(!relation) {
 				throw "'" + field.name + "' is not a relation of '" + this.entityStore.entity.name + "'";
@@ -152,7 +152,7 @@ go.data.StoreTrait = {
 
 	unwatchRelations : function() {
 		this.proxy.getEntityFields().forEach(function(field) {
-			var relation = this.entityStore.entity.findRelation(field.name);
+			var relation = window.groupofficeCore.entities.findRelation(this.entityStore.entity,field.name);
 
 			go.Db.store(relation.store).un("changes", this.onRelationChanges, this);
 		}, this);

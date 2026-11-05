@@ -17,4 +17,8 @@ return array (
   'name' => 'Başlangıç Sayfası',
   'description' => 'Farklı nesneler ile ilgili önizlem göster',
   'Start page' => 'Özet',
+  "welcomeTitle" => "Group-Office'e Hoş Geldiniz!",
+  "welcomeContent" => "<p>Group-Office'i yüklediğiniz için teşekkür ederiz!</p>
+<p>İşte başlamanıza yardımcı olacak bir bağlantı: {{link}}</p>
+<p>Group-Office'ten keyif alacağınızı umuyoruz!</p>"
 );

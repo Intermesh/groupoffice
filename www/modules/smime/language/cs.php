@@ -40,4 +40,11 @@ return array (
   'Certificate added' => 'Certifikát byl přidán',
   'SMIME certificate was added for' => 'SMIME certifikát byl přidán pro',
   'Could not add SMIME certificate for' => 'Nelze přidat SMIME certifikát pro',
+  'Old SMIME certificates are needed to decrypt old e-mail' => 'Staré SMIME certifikáty jsou potřebné pro dešifrování starého e-mailu',
+  'Are you sure you want to delete this?' => 'Jste si jisti, že jej chcete smazat?',
+  'Upload certificate' => 'Nahrát certifikát',
+  'PKCS12 certificates' => 'Certifikáty PKCS12',
+  'valid' => 'platné',
+  'since' => 'od',
+  'Certificate' => 'Certifikát',
 );

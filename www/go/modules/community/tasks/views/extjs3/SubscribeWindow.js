@@ -1,13 +1,17 @@
 go.modules.community.tasks.SubscribeWindow = Ext.extend(Ext.Window, {
 	layout:'fit',
 	width: 400,
+	height: 500,
+	resizable: true,
+	stateId: 'community_tasks_subscription_window',
 	initComponent() {
 		this.title = t('Subscribe to Tasklist');
-		this.height = 800;
 		const store = new go.data.Store({
 			filters:{subscribed: {isSubscribed: false}, "role": {role: this.support ? "support" : "list"}},
 			fields: ['id', 'name', 'isSubscribed'],
-			sort:[{property:'name',isAscending:true}],
+			sortInfo: {
+				field: "name"
+			},
 			entityStore: this.support ? 'SupportList' : 'TaskList',
 		});
 
@@ -38,7 +42,9 @@ go.modules.community.tasks.SubscribeWindow = Ext.extend(Ext.Window, {
 						text : t("Subscribe"),
 						handler: (me,row) => {
 							let record = me.store.getAt(row);
-							me.store.entityStore.save({isSubscribed: true}, record.data.id);
+							me.store.entityStore.save({isSubscribed: true}, record.data.id).catch(e => {
+								GO.errorDialog.show(e);
+							})
 						}
 					}]}
 

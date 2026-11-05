@@ -1,0 +1,22 @@
+<?php
+return array (
+  'Host' => 'Serveris',
+  'Path' => 'Kelias',
+  'Common name' => 'Įprastas pavadinimas',
+  'Refresh calendars' => 'Atnaujinami kalendoriai',
+  'Every quarter' => 'Kas ketvirtį',
+  'Every hour' => 'Kas valandą',
+  'Connect' => 'Jungtis',
+  'Server' => 'Serveris',
+  'Collections' => 'Kolekcijos',
+  'Sync now' => 'Sinchronizuoti dabar',
+  'Remove from sync' => 'Pašalinkite iš sinchronizavimo',
+  'DAV Accounts' => 'DAV paskyros',
+  'Calendar' => 'Kalendorius',
+  'Last Sync' => 'Paskutinis sinchronizavimas',
+  'Keep calendar data?' => 'Saugoti kalendoriaus duomenis?',
+  'Do you want to keep the synchronised calendars or delete those as well?' => 'Ar norite laikyti sinchronizuotus kalendorius, ar juos ištrinti?',
+  'If only the account is deleted the calendars can still be deleted manually' => 'Jei tik paskyra ištrinta, kalendoriai vis tiek gali būti ištrinti rankiniu būdu',
+  'Keep calendar data' => 'Saugoti kalendoriaus duomenis',
+  'Delete all' => 'Ištrinkite visus',
+);

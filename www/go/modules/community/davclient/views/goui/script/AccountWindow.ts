@@ -22,12 +22,13 @@ export class AccountWindow extends FormWindow {
 				enabledCb,
 				textfield({name:'name', label: t('Name')}),
 				textfield({name:'host', label: t('Host')}),
+				checkbox({name: 'verifySSL', label: t('Verify SSL certificate'), value: true}),
 				// textfield({name:'principalUri', label: t('Path')}),
 				textfield({name:'username', label: t('Username')}),
 				textfield({name:'password', label: t('Password'), type:'password'}),
 				//textfield({name:'uri', readOnly:true, label: t('Common name')}),
 				select({name:'refreshInterval', label: t('Refresh calendars'), value:15,options: [
-					{name: t('Every quarter'), value: 15},
+					{name: t('Every 15 minutes'), value: 15},
 					{name: t('Every hour'), value: 60}
 				]}),
 				displayfield({itemId: 'lastError',name:'lastError', cls:'warning'})
@@ -80,7 +81,7 @@ export class AccountWindow extends FormWindow {
 
 		this.addSharePanel();
 
-		this.form.on('load' , ({data}) => {
+		this.form.on('beforeload' , ({data}) => {
 			this.submitBtn.text = t(data.lastError  ? "Connect":"Save")
 			enabledCb.hidden = !!data.lastError;
 			if(!data.lastError){

@@ -21,6 +21,7 @@ class Address extends Property {
 	const TYPE_HOME = "home";
 	const TYPE_DELIVERY = "delivery";
 
+	public ?int $id;
 	protected int $contactId;
 	public ?string $type = '';
 	public ?string $address = '';

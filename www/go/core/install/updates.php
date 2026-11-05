@@ -1788,13 +1788,124 @@ $updates['202509121219'][] = function() {
 
 };
 
+$updates['202510301100'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'EmailAlerts', '* * * * *', 'Email alerts')";
+$updates['202510301100'][] = "ALTER TABLE `core_alert` ADD COLUMN `isSent` TINYINT(1) NOT NULL DEFAULT 0 AFTER `sendMail`;";
+
 
 // 25.1 starts here
 
-$updates['202507031141'][] = "alter table core_alert
+$updates['202510301100'][] = "alter table core_alert
                          add createdBy varchar(60) null after entityId";
 
-$updates['202507031141'][] = "alter table core_alert
+
+
+$updates['202510301100'][] = function() {
+
+	go()->getDbConnection()->exec("ALTER TABLE core_alert 
+  CONVERT TO CHARACTER SET utf8mb4 
+  COLLATE utf8mb4_unicode_ci;");
+
+	try {
+
+		go()->getDbConnection()->exec("alter table core_alert
                          add constraint core_alert_core_principal_id_fk
                              foreign key (createdBy) references core_principal (id)
-                                 on delete set null";
+                                 on delete set null");
+	} catch(Throwable $e) {
+		echo "ERROR: " . $e->getMessage() ."\n\n";
+	}
+};
+
+$updates['202601151348'][] = "update core_email_template_attachment set attachment=0 where inline=1;";
+
+$updates['202604131511'][] ="delete from core_entity where clientName in (
+    'ContactStar',
+		'Filter',
+		'Log',
+		'View',
+		'Service',
+		'UserDisplay',
+		'TasklistCompat'
+    )";
+
+$updates['202604221150'][] = "ALTER TABLE core_email_template CHANGE subject subject VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE utf8mb4_unicode_ci";
+$updates['202604230937'][] = "delete from core_setting where name='primaryColorTransparent';";
+
+$updates['202608241101'][] = "ALTER TABLE `core_principal` ADD UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC)";
+
+
+$updates['202610021331'][] = "CREATE TABLE `core_app_password`
+(
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userId`       INT(11)      NOT NULL,
+    `label`        VARCHAR(150) NOT NULL,
+    `passwordHash` VARCHAR(255) NOT NULL,
+    `createdAt`    DATETIME     NOT NULL,
+    `lastUsedAt`   DATE         NULL,
+    `lastUsedIp`   VARCHAR(39)  NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_user`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);";
+
+$updates['202610021331'][] = "CREATE TABLE `core_app_password_scope`
+(
+    `id`            INT UNSIGNED                                    NOT NULL AUTO_INCREMENT,
+    `appPasswordId` INT UNSIGNED                                    NOT NULL,
+    `protocol`      ENUM ('dav', 'caldav', 'carddav', 'activesync') NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_app_password_scope`
+        FOREIGN KEY (`appPasswordId`)
+            REFERENCES `core_app_password` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);";
+
+
+$updates['202610021331'][] = "ALTER TABLE `core_app_password` MODIFY `lastUsedIp` VARCHAR(45) NULL;";
+
+$updates['202610021331'][] = "ALTER TABLE `core_app_password_scope` ADD UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`);";
+
+// Refresh tokens of the OAuth2 server can be revoked now. Refresh tokens that were issued before this update are not in
+// this table so they are no longer valid. The clients have to log in again.
+$updates['202610191400'][] = "CREATE TABLE `core_oauth_refresh_token` (
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `clientId` int(11) NOT NULL,
+  PRIMARY KEY (`identifier`),
+  KEY `userIdentifier` (`userIdentifier`),
+  KEY `clientId` (`clientId`),
+  CONSTRAINT `core_oauth_refresh_token_core_user` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `core_oauth_refresh_token_core_oauth_client` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+// 26.1
+$updates['202610271542'][] = "alter table core_module
+    drop column sort_order;";
+
+$updates['202610271542'][] = "alter table core_module
+    drop column admin_menu;";
+
+
+$updates['202610271542'][] = "create table if not exists core_module_user
+(
+	userId   int          not null,
+    moduleId int          not null,
+    pinned   int unsigned null comment 'Pinned sort order, NULL if not pinned',
+    primary key (userId, moduleId),
+    constraint core_module_user_core_module_id_fk
+        foreign key (moduleId) references core_module (id)
+            on delete cascade,
+    constraint core_module_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade
+);";
+
+$updates['202610271542'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
+
+$updates['202610191331'][] = "alter table core_alert
+    add isSent boolean default false not null;";

@@ -124,6 +124,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
+		this.addPanel(go.usersettings.NoticiationPanel);
 
 		if(go.Modules.get("core", "core").userRights.mayChangeUsers) {
 			this.addPanel(go.usersettings.VisibleToPanel);
@@ -201,7 +202,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			if(!config.userSettingsPanels) {
 				continue;			
 			}
-			
 			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
 				pnlCls = eval(config.userSettingsPanels[i1]);
 				pnl = new pnlCls({header: false, loaded: false, submitted: false});
@@ -477,11 +477,20 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				url += "?SET_LANGUAGE=" + langField.getValue();
 			}
 
-			document.location = url;
-		} else
-		{
+			this.reload(url);
+
+		} else {
 			this.close();
 		}
+	},
+
+	reload: function(url) {
+		if(window.groupofficeCore.client.isBusy() || Ext.Ajax.isLoading()) {
+			console.log("deferring...");
+			return this.reload.defer(300, this,[url]);
+		}
+
+		document.location = url;
 	},
 		
 	/**
@@ -498,7 +507,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User").getUpdates().then(() => {
+			go.Db.store("User").reset().then(() => {
 
 				go.Db.store("User").single(me.currentUserId).then(async function(user){
 					me.user = user;

@@ -1,11 +1,16 @@
-@use '../../../../../../../views/goui/goui/style/_util.scss'  as *;
-@use '../../../../../../../views/goui/goui/style/_config.scss' as *;
+@use '@intermesh/goui/style/util'  as *;
+@use '@intermesh/goui/style/config' as *;
 
+.goui .comments-list {
+  padding: 0 1.8rem;
+}
 .goui .comment-comment {
   border-radius: 0.8rem;
   padding: 0.8rem 1.6rem;
+  padding-right: 3.4rem; // for status icon
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
 }
 
 .goui > .count-badge {
@@ -46,9 +51,13 @@
   border-radius: 2.5rem;
   background-color: var(--bg-mid);
   margin: 0.3rem;
-  max-width: 135px;
+  //max-width: 135px;
+  float: left;
   overflow: hidden;
   text-overflow: ellipsis;
+  > div > div{
+    padding: 1.2rem 1.6rem
+  }
 }
 
 .goui .comment-editor-label button, .goui .comment-editor-attachment button {
@@ -61,4 +70,58 @@
   margin: 0.3rem;
   overflow: hidden;
   text-overflow: ellipsis;
+  float: left;
+  .goui-display-field{
+
+    .wrap {
+      background-color: var(--bg-mid);
+    }
+
+  }
+}
+
+.goui .comment-editor-fieldset {
+  align-items: unset;
+  .goui-form-field {
+    min-width: 0;
+  }
+}
+
+
+.goui.comment-mail-status {
+
+  &:after {
+    position: absolute;
+    top: dp(8);
+    right: dp(16);
+    margin: dp(6) 0 0 0;
+    padding: 0;
+    font-size: .85em !important;
+    min-height: dp(16);
+    height: dp(16);
+    width: dp(16);
+    min-width: dp(16);
+  }
+
+  &.received:after {
+    color: $colorPrimary;
+    content: "email";
+  }
+
+
+  &.pending:after {
+    color: $colorNotice;
+    content: "hourglass";
+  }
+
+
+  &.sent:after {
+    color: $colorSuccess;
+    content: "outgoing_mail";
+  }
+
+  &.senderror:after {
+    color: $colorError;
+    content: "error";
+  }
 }

@@ -25,11 +25,28 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	 * @param {object} customfield Field entity from custom fields
 	 * @returns {unresolved}
 	 */
-	renderDetailView: function (value, data, customfield) {		
-		var text = this.findRecursive(value, customfield.dataType.options);
-		return text ? text.substr(3) : null;
-	},
+	renderDetailView: function (value, data, customfield, detailComponent) {
 
+		// var text = this.findRecursive(value, customfield.dataType.options);
+		// return text ? text.substr(3) : null;
+		const o = this.findRecursiveOption(value, customfield.dataType.options);
+		if(!o) {
+			return null;
+		}
+		if(!o.backgroundColor && !o.foregroundColor) {
+			return o.text;
+		}
+		const styles = [];
+		if(o.foregroundColor) {
+			styles.push("color: #" + o.foregroundColor + ";");
+		}
+		if(o.backgroundColor) {
+			styles.push("background-color: #" + o.backgroundColor + ";");
+		}
+		// TODO: add a background and / or foreground color
+		return `<div style="${styles.join(" ")}">${o.text}</div>`;
+	},
+	/*
 	findRecursive: function (value, options, text) {
 		if(!text) {
 			text = "";
@@ -53,6 +70,24 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 		}
 
 		return null;
+	},
+	*/
+	findRecursiveOption: function (value, options, text) {
+		text = text || "";
+		let o;
+		for(let i = 0, l = options.length; i < l; i++) {
+			o = options[i];
+			if (o.id == value) {
+				return o;
+			}
+
+			if(o.children.length) {
+				const nested = this.findRecursiveOption(value, o.children, text + " > " + o.text);
+				if (nested) {
+					return nested;
+				}
+			}
+		}
 	},
 	
 	/**

@@ -5,13 +5,15 @@ namespace go\modules\community\calendar\model;
 use DateTimeInterface;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
-use go\core\util\DateTime;
 
 /**
  * Class Participant
  *
  * This is unused, originally written for the task module but we decided to take
  * a simpler approach for task participants.
+ *
+ * @link https://www.rfc-editor.org/rfc/rfc8984.html#name-participants
+ * @property CalendarEvent $owner
  */
 class Participant extends Property
 {
@@ -78,7 +80,10 @@ class Participant extends Property
 	/** @var ?DateTimeInterface The timestamp for the most recent response from this participant. */
 	public ?DateTimeInterface $scheduleUpdated = null;
 
-	/** @var ?string The requestStatus received when the participant sends an REPLY iTip */
+	/**
+   * @var ?string The requestStatus received when the participant sends an REPLY iTip
+	 * @link https://www.rfc-editor.org/rfc/rfc5545#section-3.8.8.3
+	 */
 	public ?string  $scheduleStatus = null;
 	/** @var ?string used for access to the invite page to accept/decline */
 	protected ?string $scheduleSecret = null;
@@ -109,9 +114,27 @@ class Participant extends Property
 		}
 		return (object)$roles;
 	}
-	public function pid() {
-		// scheduler needs this after finding participant by scheduleId
+
+	/**
+	 * Get or set the ID
+	 *
+	 * scheduler needs this after finding participant by scheduleId
+	 *
+	 * @param int|null $id
+	 * @return int|string|null
+	 */
+	public function pid(int|null $id = null) {
+		if(isset($id)) {
+			$this->id = $id;
+		}
 		return $this->id;
+	}
+
+	/**
+	 * The secret that gives access to the invite page, as it is saved
+	 */
+	public function scheduleSecret(): ?string {
+		return $this->scheduleSecret;
 	}
 
 	public function expectReply(bool $v) {
@@ -138,6 +161,11 @@ class Participant extends Property
 	public function hasRole($name) {
 		$bitPosition = self::ValidRoles[$name];
 		return ($this->rolesMask & (1 << $bitPosition)) !== 0;
+	}
+
+	public function isFree(\DateTimeInterface $start, \DateTimeInterface $end) : bool {
+		$result = BusyPeriod::fetch($this->id, $start->format('c'), $end->format('c'),!empty($this->owner) ? $this->owner->uid : null);
+		return empty($result['list']);
 	}
 
 	public function setRoles(array|\stdClass $roles) {

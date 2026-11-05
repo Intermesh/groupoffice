@@ -2,6 +2,7 @@
 
 namespace go\core\db;
 
+use Closure;
 use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
@@ -687,19 +688,6 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		}
 		return $stmt;
 	}
-//
-//	private $debug = false;
-//
-//	/**
-//	 * Output query to debugger
-//	 *
-//	 * @return $this
-//	 */
-//	public function debug() {
-//		$this->debug = true;
-//
-//		return $this;
-//	}
 
   /**
    * Executes the query and returns a single object
@@ -725,6 +713,17 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    */
 	public function all() : array {
 		return $this->execute()->fetchAll();
+	}
+
+
+	/**
+	 * Map the ressults to a callable function
+	 *
+	 * @param callable $fn
+	 * @return mixed
+	 */
+	public function map(callable $fn) {
+		return array_map($fn, $this->all());
 	}
 
 	/**
@@ -782,10 +781,10 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * Convert all results of this query to arrays
    *
    * @param array|null $properties
-   * @return array|null
-   * @throws Exception
+   * @return array
+	 * @throws Exception
    */
-  public function toArray(array|null $properties = null): array|null
+  public function toArray(array|null $properties = null): array
   {
 		$arr = [];
 		foreach($this->execute() as $entity) {

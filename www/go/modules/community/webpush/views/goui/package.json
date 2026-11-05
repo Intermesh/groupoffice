@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "name": "community-webpush",
+  "devDependencies": {
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "5.9.*"
+  },
+  "scripts": {
+    "start": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+
+    "build": "npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
+  }
+}

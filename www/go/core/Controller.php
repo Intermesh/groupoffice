@@ -3,6 +3,7 @@
 namespace go\core;
 
 use go\core\http\Exception;
+use go\core\jmap\Request;
 use stdClass;
 
 abstract class Controller {

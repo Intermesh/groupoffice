@@ -1,11 +1,11 @@
 <?php
 return array (
-  'LDAP Authenticator' => 'LDAPオーセンティケータ',
+  'LDAP Authenticator' => 'LDAP認証',
   'Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'この LDAP サーバーが認証に使用するドメインを入力してください。ユーザーは自分の電子メール アドレスでログインする必要があり、ドメインがこのプロファイルと一致する場合はそれが使用されます。',
   'Verify SSL certicate' => 'SSL証明書を確認する',
   'Enable this if the LDAP server requires autentication to lookup users or groups' => 'LDAPサーバーがユーザーまたはグループを検索するために認証を必要とする場合、これを有効にします',
   'Follow referrals' => '紹介に従う',
-  'For older Microsoft ActiveDirectory installation this has to be disabled' => '古い Microsoft ActiveDirectory のインストールでは、これを無効にする必要があります',
+  'For older Microsoft ActiveDirectory installation this has to be disabled' => '古い Microsoft ActiveDirectory の導入では、これを無効にする必要があります',
   'Username attribute' => 'ユーザー名属性',
   'Use \'samaccountname\' for Microsoft ActiveDirectory.' => 'Microsoft ActiveDirectory には \'samaccountname\' を使用してください。',
   'Login with e-mail address' => 'メールアドレスでログイン',
@@ -23,8 +23,10 @@ return array (
   'Synchronize users' => 'ユーザーを同期する',
   'Delete users' => 'ユーザーを削除する',
   'Max delete percentage' => '最大削除率',
-  'Synchronize groups' => '同期グループ',
+  'Synchronize groups' => 'グループを同期する',
   'Delete groups' => 'グループを削除する',
   'Group query' => 'グループクエリ',
   'For Microsoft ActiveDirectory use \'(objectCategory=group)\'' => 'Microsoft ActiveDirectory の場合、\'(objectCategory=group)\' を使用します',
+  'For Microsoft ActiveDirectory it\'s typically \'cn=Users,dc=example,dc=com\'.' => 'Microsoft ActiveDirectoryの場合、典型的には \'cn=Users,dc=example,dc=com\' です。',
+  'For Microsoft ActiveDirectory it\'s typically \'cn=Groups,dc=example,dc=com\'.' => 'Microsoft ActiveDirectoryの場合、典型的には \'cn=Groups,dc=example,dc=com\' です。',
 );

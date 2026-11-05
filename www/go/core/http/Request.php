@@ -3,6 +3,7 @@ namespace go\core\http;
 
 use Exception;
 use go\core\Singleton;
+use go\core\util\IpAddress;
 use go\core\util\JSON;
 use go\core\util\StringUtil;
 use JsonException;
@@ -321,7 +322,7 @@ class Request extends Singleton{
 				}
 			}
 
-			$this->host = trim($this->host);
+			$this->host = trim($this->host ?? "");
 		}
 
     // Remove port number from host
@@ -369,51 +370,45 @@ class Request extends Singleton{
 		return $this->isHttps() ? 'https:' : 'http:';
 	}
 
-//	/**
-//	 * Get port number of request
-//	 *
-//	 * @return int| false
-//	 */
-//	public function getPort() {
-//		$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST');
-//		$host = '';
-//		foreach ($possibleHostSources as $source)
-//		{
-//			if (!empty($host)) break;
-//			if (empty($_SERVER[$source])) continue;
-//			$host = $_SERVER[$source];
-//			if (array_key_exists($source, $sourceTransformations))
-//			{
-//				$host = $sourceTransformations[$source]($host);
-//			}
-//		}
-//
-//		$pos = strpos($host, ':');
-//
-//		if($pos === false) {
-//			return false;
-//		}
-//
-//		return (int) substr($host, $pos);
-//
-//	}
-
   /**
    * Get the IP address of the user's client
+   *
+   * This is the address of the connection ($_SERVER['REMOTE_ADDR']). Headers like "X-Forwarded-For" are set by the
+   * client so they can't be trusted. They are only used when the connection comes from a proxy that is listed in
+   * the "trustedProxies" config option. Then the right most address that is not a trusted proxy is the client.
+   *
+   * If you use a web server or load balancer in front that sets the real IP itself (nginx "set_real_ip_from",
+   * Apache "mod_remoteip") then no configuration is needed here.
    *
    * @return ?string
    */
 	public function getRemoteIpAddress(): ?string
 	{
-    if(!empty($_SERVER['HTTP_CLIENT_IP'])){
-      //ip from share internet
-      return $_SERVER['HTTP_CLIENT_IP'];
-    }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
-      //ip pass from proxy
-      return $_SERVER['HTTP_X_FORWARDED_FOR'];
-    }else{
-      return $_SERVER['REMOTE_ADDR'] ?? null;
-    }
+		$remoteAddr = $_SERVER['REMOTE_ADDR'] ?? null;
+		if(empty($remoteAddr) || empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			return $remoteAddr;
+		}
+
+		$trustedProxies = go()->getConfig()['trustedProxies'] ?? [];
+
+		if(empty($trustedProxies) || !IpAddress::inRanges($remoteAddr, $trustedProxies)) {
+			return $remoteAddr;
+		}
+
+		// Every proxy appends the address it received the request from. Walk back from the proxy that talks to us.
+		$client = $remoteAddr;
+		foreach(array_reverse(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])) as $hop) {
+			$hop = trim($hop);
+			if(!filter_var($hop, FILTER_VALIDATE_IP)) {
+				break;
+			}
+			$client = $hop;
+			if(!IpAddress::inRanges($hop, $trustedProxies)) {
+				break;
+			}
+		}
+
+		return $client;
   }
   
   /**

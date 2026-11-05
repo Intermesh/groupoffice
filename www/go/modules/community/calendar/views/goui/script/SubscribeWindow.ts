@@ -14,8 +14,8 @@ import {
 } from "@intermesh/goui";
 import {client, jmapds, modules} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
-import {ResourceWindow} from "./ResourcesWindow";
 import {CalendarWindow} from "./CalendarWindow";
+import {ResourceWindow} from "./ResourceWindow.js";
 
 export class SubscribeWindow extends Window {
 
@@ -62,7 +62,6 @@ export class SubscribeWindow extends Window {
 			this.scroller = comp({cls:'scroll', flex:1},
 
 			this.grid = table({
-			//fitParent:true,
 			style:{width:'100%'},
 			headers: false,
 			store,
@@ -76,6 +75,7 @@ export class SubscribeWindow extends Window {
 				}),
 				column({id: 'more', width:60, renderer: (_, data)=> btn({
 						icon: "more_vert",
+						hidden: !rights.mayChangeResources && !rights.mayChangeCalendars && data.groupId,
 						menu: menu({},
 							btn({icon:'share', text: t('Permissions')+'…', hidden: data.davaccountId || (data.groupId && !rights.mayChangeResources), disabled:!data.myRights.mayReadItems, handler: async _ => {
 									const dlg = data.groupId ? new ResourceWindow() : new CalendarWindow();

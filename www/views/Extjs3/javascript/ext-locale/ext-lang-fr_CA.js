@@ -18,12 +18,12 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-﻿/*
+/*
  * France (Canadian) translation
  * By BernardChhun
  * 04-08-2007, 03:07 AM
  */
-
+debugger;
 Ext.UpdateManager.defaults.indicatorText = '<div class="loading-indicator">En cours de chargement...</div>';
 
 if(Ext.View){
@@ -143,7 +143,8 @@ if(Ext.DatePicker){
       prevText          : 'Mois précédent (CTRL+Fléche gauche)',
       monthYearText     : 'Choissisez un mois (CTRL+Fléche haut ou bas pour changer d\'année.)',
       todayTip          : "{0} (Barre d'espace)",
-      format            : "d/m/y"
+      format            : "d/m/y",
+       startDay: 1
    });
 }
 

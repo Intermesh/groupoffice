@@ -18,7 +18,7 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-﻿/**
+/**
  * List compiled by Tewodros Wondimu on the extjs.com forums Oct 18, 2010.
  *
  * Amharic Translations

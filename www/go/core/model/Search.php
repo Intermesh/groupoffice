@@ -54,7 +54,7 @@ class Search extends AclOwnerEntity {
 	 * @param string $searchPhrase
 	 * @throws Exception
 	 */
-	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase)
+	public static function addCriteria(Criteria $criteria, Query $query, string $searchPhrase): void
 	{
 
 		go()->setOptimizerSearchDepth();
@@ -64,16 +64,21 @@ class Search extends AclOwnerEntity {
 		$words = array_unique($words);
 
 		foreach ($words as $word) {
-			$query->join(
-				"core_search_word",
-				'w' . $i, 'w' . $i . '.searchId = search.id',
-				'INNER'
-			);
+			if (!$query->isJoined('core_search_word', 'w' . $i)) {
+				$query->join(
+					"core_search_word",
+					'w' . $i, 'w' . $i . '.searchId = search.id',
+					'INNER'
+				);
+			}
 
 			$criteria->where('w' . $i . '.word', 'LIKE', $word . '%');
 
 			$i++;
 		}
+
+		// joining the search can lead to duplicates so group by to onky return unique results
+		$query->groupBy(['id']);
 	}
 
 	protected function createAcl() : void

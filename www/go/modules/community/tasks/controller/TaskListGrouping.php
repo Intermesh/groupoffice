@@ -12,6 +12,9 @@ use go\core\jmap\EntityController;
 use go\modules\business\supportclient\Module;
 use go\modules\community\tasks\model;
 
+/**
+ * @extends EntityController<\go\modules\community\tasks\model\TaskListGrouping>
+ */
 class TaskListGrouping extends EntityController {
 
 	protected function entityClass(): string

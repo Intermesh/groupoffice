@@ -17,13 +17,16 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\model\Search;
+use go\core\model\User;
 use go\core\orm\exception\SaveException;
+use go\core\db\DbException;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Files\Model\Folder;
 use InvalidArgumentException;
+use Throwable;
 use function go;
 use go\core\db\Query as DbQuery;
 use go\core\util\ArrayObject;
@@ -206,7 +209,7 @@ abstract class Entity extends Property {
 
 	public static final function createFor(int $userId): static {
 		$instance = new static();
-		$instance->_forUserId = $userId;
+		$instance->forUserId($userId);
 		return $instance;
 	}
 	/**
@@ -406,7 +409,7 @@ abstract class Entity extends Property {
 			}
 
 			return $success;
-		} catch(\Throwable $e) {
+		} catch(Throwable $e) {
 			ErrorHandler::logException($e);
 			$this->rollback();
 			throw $e;
@@ -489,10 +492,7 @@ abstract class Entity extends Property {
 
 		//See \go\core\orm\PrincipalTrait;
 		if(method_exists($this, 'savePrincipal') && $this->isModified()) {
-			if(!$this->savePrincipal()) {
-				$this->setValidationError("principal", ErrorCode::INVALID_INPUT, "Could not save core_principal entry");
-				return false;
-			}
+			$this->savePrincipal();
 		}
 
 		return true;
@@ -540,12 +540,16 @@ abstract class Entity extends Property {
 	 *
 	 *
 	 * @return boolean
-	 * @throws Exception
+	 * @throws Throwable
+	 * @throws DbException
 	 */
 	public static final function delete($query): bool
 	{
 
+		static::$lastDeleteCount = 0;
+
 		$query = self::normalizeDeleteQuery($query);
+		$query->setModel(static::class);
 
 		go()->getDbConnection()->beginTransaction();
 
@@ -594,12 +598,22 @@ abstract class Entity extends Property {
 			}
 
 			return true;
-		} catch(\Throwable $e) {
+		} catch(Throwable $e) {
 			if(go()->getDbConnection()->inTransaction()) {
 				go()->getDbConnection()->rollBack();
 			}
 			throw $e;
 		}
+	}
+
+
+
+	/**
+	 * Number of models deleted in last {@see delete()} call.
+	 * @return int
+	 */
+	public static function deleteLastCount() : int {
+		return static::$lastDeleteCount;
 	}
 
 
@@ -669,17 +683,43 @@ abstract class Entity extends Property {
 		return $this->internalGetPermissionLevel();
 	}
 
+	/**
+	 * Override to implement custom permission logic.
+	 *
+	 * Example on how to use the module's manage permission flag:
+	 * ```
+	 * public function internalGetPermissionLevel(): int
+	 * {
+	 * 	if(\go\core\model\Module::findByName('business', 'catalog')
+	 * 		->getUserRights()
+	 * 		->mayManage) {
+	 * 		return Acl::LEVEL_MANAGE;
+	 * 	}
+	 *
+	 * 	return parent::internalGetPermissionLevel();
+	 * }
+	 *
+	 * ```
+	 * @return int
+	 */
 	protected function internalGetPermissionLevel(): int
 	{
+		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+			return Acl::LEVEL_MANAGE;
+		}
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : 0;
 		}
-		return go()->getAuthState() && go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+		return Acl::LEVEL_READ;
 	}
 
 	/**
 	 * Check if the current user is allowed to create new entities
 	 *
+	 * Override to implement permission logic. Eg.:
+	 * ```
+	 * return Module::findByName('community', 'calendar')->getUserRights()->mayChangeViews;
+	 * ```
 	 * @return boolean
 	 */
 	protected function canCreate(): bool
@@ -689,7 +729,15 @@ abstract class Entity extends Property {
 
 	/**
 	 * Applies conditions to the query so that only entities with the given permission level are fetched.
-	 * 
+	 *
+	 * This is also applied for admins so in overrides it might be useful to:
+	 *
+	 * ```
+	 * if(User::isAdminById($userId ?? go()->getAuthState()->getUserId())) {
+	 * 	return $query;
+	 * }
+	 * ```
+	 *
 	 * @param Query $query
 	 * @param int $level
 	 * @param int|null $userId Leave to null for the current user
@@ -824,12 +872,12 @@ abstract class Entity extends Property {
 			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
 
 				// security check. Only admins may query on behalf of others permissions
-				if(!empty($filter['permissionLevelUserId']) && $filter['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
+				if(!empty($filterCondition['permissionLevelUserId']) && $filterCondition['permissionLevelUserId'] != go()->getUserId() && !go()->getAuthState()->isAdmin()) {
 					throw new Forbidden("Only admins can pass 'permissionLevelUserId'");
 				}
 
 				// security check. Perhaps extend this later to check if the given groups are accessible by the user
-				if(!empty($filter['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
+				if(!empty($filterCondition['permissionLevelGroups']) && !go()->getAuthState()->isAdmin()) {
 					throw new Forbidden("Only admins can pass 'permissionLevelGroups'");
 				}
 
@@ -843,16 +891,16 @@ abstract class Entity extends Property {
 			})
 
 			->add('text', function (Criteria $criteria, $value, Query $query) {
-			if (!is_array($value)) {
-				$value = [$value];
-			}
-
-			foreach ($value as $q) {
-				if (!empty($q)) {
-					static::search($criteria, $q, $query);
+				if (!is_array($value)) {
+					$value = [$value];
 				}
-			}
-		})
+
+				foreach ($value as $q) {
+					if (!empty($q)) {
+						static::search($criteria, $q, $query);
+					}
+				}
+			})
 			->add('exclude', function (Criteria $criteria, $value) {
 				if (!empty($value)) {
 					$criteria->andWhere('id', 'NOT IN', $value);
@@ -949,33 +997,40 @@ abstract class Entity extends Property {
 			$criteria->where('comment.text ', $comparator, $value);
 		});
 
-
-		/*
-			find all items with link to:
-
-		link : {
-			entity: "Contact",
-			id: 1
-		}
-
-		or leave id empty to find items that link to any contact
-
-		*/
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
 
-			if(!isset($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
+			if(!isset($value['entity'])) {
 				throw new \LogicException("link filter must have 'entity' and an optional 'id' parameter");
 			}
 
+			$fromEntityTypeId = EntityType::findByName($value['entity'])->getId();
 
 			$linkAlias = 'link_' . uniqid();
-			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
+			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' .
+				$linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' .
+				$linkAlias . '.fromEntityTypeId = ' . $fromEntityTypeId;
 
 			$query->join('core_link', $linkAlias, $on, "LEFT");
-			$criteria->where('toId', '!=');
+
 
 			if (!empty($value['id'])) {
 				$criteria->andWhere('fromId', '=', $value['id']);
+			}
+
+			if(!empty($value['filter'])) {
+				//$criteria->andWhere($value['filter']);
+				$query->bind(':filter_'.$linkAlias, $value['filter']);
+
+				$query->join('core_search',
+					'search_' . $linkAlias,
+					'search_' . $linkAlias . '.entityId = ' . $linkAlias . '.fromId AND '.
+						'search_' . $linkAlias . '.entityTypeId=' . $fromEntityTypeId.' AND ' .
+						'search_' . $linkAlias . '.filter = :filter_'.$linkAlias,
+					'LEFT'
+				);
+				$criteria->where('search_' . $linkAlias.'.entityId', '!=', null);
+			} else {
+				$criteria->where($linkAlias . '.toId', '!=', null);
 			}
 
 			$query->groupBy([$query->getTableAlias() . '.id']);
@@ -1124,9 +1179,9 @@ abstract class Entity extends Property {
 			return $criteria;
 		}
 
-    $columns = static::textFilterColumns();
+        $columns = static::textFilterColumns();
 
-    if(empty($columns)) {
+        if(empty($columns)) {
 			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		

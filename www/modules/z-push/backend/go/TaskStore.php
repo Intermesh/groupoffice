@@ -357,6 +357,7 @@ class TaskStore extends Store {
 
 		$tasklists = TaskList::find()
 			->selectSingleValue('tasklist.id')
+			->filter(['permissionLevel' => Acl::LEVEL_READ])
 			->andWhere('role', '=',1)
 			->andWhere('isSubscribed', '=', 1)
 			->andWhere('syncToDevice', '=', 1);
@@ -370,6 +371,10 @@ class TaskStore extends Store {
 		return $folders;
 	}
 
+
+	public function getSinkEntityName(): ?string {
+		return 'Task';
+	}
 
 	public function getNotification($folder = null) {
 

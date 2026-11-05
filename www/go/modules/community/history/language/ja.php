@@ -2,7 +2,7 @@
 return array (
   'History' => '履歴',
   'Entity ID' => 'エンティティID',
-  'Delete entries after' => '後にエントリを削除',
+  'Delete entries after' => 'エントリ保持期間',
   'All users' => 'すべてのユーザー',
   'Create' => '作成',
   'Update' => 'アップデート',

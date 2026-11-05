@@ -379,5 +379,26 @@ $updates['202504141045'][] = function() {
 	}
 };
 
+
+$updates['202504141045'][] = "delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select e.id from core_entity e inner join core_module m on m.id=e.moduleId where e.name='Folder' and m.name='files') and f.visible=0;";
+
 $updates['202508051525'][] = "alter table fs_files
     modify name varchar(260) collate utf8mb4_bin not null;";
+
+
+$updates['202508051525'][] = "delete s from core_search s inner join fs_folders f on f.id=s.entityId where entityTypeId=(select e.id from core_entity e inner join core_module m on m.id=e.moduleId where e.name='Folder' and m.name='files') and f.visible=0;";
+
+$updates['202607061104'][] = function() {
+	//make sure tmp has it's own acl and not shared with anyone
+	$folder =  \GO\Files\Model\Folder::model()->findByPath("tmp", true);
+	$folder->setNewAcl();
+	$folder->readonly=1;
+	$folder->save(true);
+};
+
+
+$updates['202609071447'][] = "alter table fs_files
+    add lock_expires_at bigint null after locked_user_id;";
+
+$updates['202609071447'][] = "update fs_files set lock_expires_at = unix_timestamp() + 1800 where locked_user_id > 0;";
+

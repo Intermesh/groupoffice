@@ -140,9 +140,9 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 	 * @param mixed $value
 	 * @return void
 	 */
-	public function unshift($value) {
+	public function unshift(...$value) {
 		$copy = $this->getArrayCopy();
-		array_unshift($copy, $value);
+		array_unshift($copy, ...$value);
 		$this->exchangeArray($copy);
 	}
 
@@ -152,8 +152,10 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 	 * @param mixed $value
 	 * @return void
 	 */
-	public function push($value) {
-		$this->offsetSet($this->count(), $value);
+	public function push(...$value) {
+		$copy = $this->getArrayCopy();
+		array_push($copy, ...$value);
+		$this->exchangeArray($copy);
 	}
 
 	/**
@@ -249,6 +251,18 @@ class ArrayObject extends CoreArrayObject implements JsonSerializable {
 		$this->uasort(
 			sorter($key)
 		);
+	}
+
+
+	public function sortValueOnTop($value): void
+	{
+		$array = array_filter($this->getArrayCopy(), function($item) use ($value){
+			return $item !== $value;
+		});
+
+		array_unshift($array, $value);
+
+		$this->exchangeArray($array);
 	}
 
 	

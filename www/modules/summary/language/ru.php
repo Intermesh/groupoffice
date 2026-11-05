@@ -22,4 +22,8 @@ return array (
   'name' => 'Резюме',
   'description' => 'Модуль для отображения обобщенной информации.',
   'Start page' => 'Резюме',
+  "welcomeTitle" => "Добро пожаловать в Group-Office!",
+  "welcomeContent" => "<p>Спасибо за установку Group-Office!</p>
+<p>Вот ссылка, которая поможет вам начать работу: {{link}}</p>
+<p>Мы надеемся, что вам понравится Group-Office!</p>"
 );

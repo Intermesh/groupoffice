@@ -19,6 +19,8 @@ class EmailAddress extends Property {
 	const TYPE_HOME = "home";
 	const TYPE_BILLING = "billing";
 
+	public ?int $id;
+
 	/**
 	 * 
 	 * @var int

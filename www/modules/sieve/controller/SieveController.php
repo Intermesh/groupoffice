@@ -178,6 +178,9 @@ class SieveController extends \GO\Base\Controller\AbstractModelController{
 					if($rule['actions'][$i]['type']=='vacation') {
 						if (!empty(\GO::config()->sieve_vacation_subject))
 							$rule['actions'][$i]['subject']=\GO::config()->sieve_vacation_subject;
+						if ($rule['actions'][$i]['subject'] === null) {
+							unset($rule['actions'][$i]['subject']);
+						}
 					}
 
 					$rule['actions'][$i]['addresses']= is_array($rule['actions'][$i]['addresses']) ? $rule['actions'][$i]['addresses'] : explode(',',$rule['actions'][$i]['addresses']);

@@ -6,13 +6,16 @@ namespace go\modules\community\ldapauthenticator\cli\controller;
 
 use Exception;
 use go\core\Controller;
+use go\core\db\DbException;
 use go\core\event\EventEmitterTrait;
 use go\core\exception\NotFound;
 use go\core\ldap\Connection;
 use go\core\ldap\Record;
 use go\core\model\Group;
 use go\core\model\User;
+use go\core\orm\Entity;
 use go\core\orm\EntityType;
+use go\modules\community\ldapauthenticator\model\Authenticator;
 use go\modules\community\ldapauthenticator\model\Server;
 use go\modules\community\ldapauthenticator\Module;
 
@@ -34,16 +37,15 @@ class Sync extends Controller
 	 * eg.
 	 * sudo -u www-data php /usr/share/groupoffice/cli.php community/ldapauthenticator/Sync/test --id=1 --username=john --debug
 	 *
-	 * @param $id
-	 * @param $username
+	 * @param array $params
 	 * @throws NotFound
 	 * @throws Exception
 	 */
-	public function test($params)
+	public function test(array $params): void
 	{
 
 		extract($this->checkParams($params, ['id', 'username']));
-		//objectClass	inetOrgPerson)
+
 		$server = Server::findById($id);
 		if (!$server) {
 			throw new NotFound("No LDAP config found with id = " . $id);
@@ -63,27 +65,84 @@ class Sync extends Controller
 
 		foreach ($records as $record) {
 
-//			var_dump($record->getAttributes());
-//
-//			var_dump($record->getObjectClass());
-
-
 			echo $record->getDn() . "\n";
-//
+
 			$user = $this->ldapRecordToUser($record, $server, false);
-//
+
 			echo "User: " . $user->username . "\n";
-//			var_dump($record->memberOf);
 		}
+	}
+
+
+	public function testUsers(array $params) {
+		extract($this->checkParams($params, ['id', 'dryRun' => false, 'delete' => false, 'maxDeletePercentage' => 5]));
+		//objectClass	inetOrgPerson)
+		$server = Server::findById($id);
+		if (!$server) {
+			throw new NotFound("No LDAP config found with id = " . $id);
+		}
+
+		$this->serverId = $id;
+
+		go()->getDebugger()->logTimers = true;
+		go()->getDbConnection()->debug = true;
+
+		$connection = $server->connect();
+
+		if (!empty($xserver->username)) {
+			if (!$connection->bind($server->username, $server->getPassword())) {
+				throw new Exception("Invalid password given for '" . $server->username . "'");
+			} else {
+				go()->debug("Authenticated with user '" . $server->username . '"');
+			}
+		}
+
+		$usersInLDAP = [];
+
+		$this->domains = array_map(function ($d) {
+			return $d->name;
+		}, $server->domains);
+
+		$records = Record::find($connection, $server->peopleDN, $server->syncUsersQuery);
+
+		$i = 0;
+		foreach ($records as $record) {
+			$i++;
+
+			go()->debug(" ---   User start   --- ");
+			go()->getDebugger()->startTimeStampTimer();
+			$user = $this->ldapRecordToUser($record, $server, $dryRun);
+			if ($user) {
+				$usersInLDAP[] = $user->id;
+			}
+
+			//push changes after each user
+			EntityType::push();
+
+
+			go()->debug(" ---   User end   --- ");
+
+			if($i == 10) {
+				exit();
+			}
+		}
+
+		if ($delete) {
+			$this->deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun);
+		}
+
+		$this->output("Done\n\n");
 	}
 
 
 	/**
 	 * docker compose exec --user www-data groupoffice php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
+	 *
+	 * @param array $params
 	 * @throws NotFound
 	 * @throws Exception
 	 */
-	public function users($params)
+	public function users(array $params): void
 	{
 		extract($this->checkParams($params, ['id', 'dryRun' => false, 'delete' => false, 'maxDeletePercentage' => 5]));
 		//objectClass	inetOrgPerson)
@@ -132,9 +191,13 @@ class Sync extends Controller
 	}
 
 	/**
-	 * @throws Exception
+	 * @param Record $record
+	 * @param Server $server
+	 * @param bool $dryRun
+	 * @return false|User|mixed|null
+	 * @throws DbException
 	 */
-	private function ldapRecordToUser(Record $record, Server $server, $dryRun)
+	private function ldapRecordToUser(Record $record, Server $server, bool $dryRun)
 	{
 
 		$username = $this->getGOUserName($record, $server);
@@ -171,9 +234,21 @@ class Sync extends Controller
 		$this->fireEvent(self::EVENT_SYNC_USER, $user, $record);
 
 		if (!$dryRun) {
-			if ($user->isModified() && !$user->save()) {
-				echo "Error saving user: " . var_export($user->getValidationErrors(), true);
+			try {
+				if ($user->isModified() && !$this->saveWithRetry($user)) {
+					echo "Error saving user: " . var_export($user->getValidationErrors(), true);
+					return false;
+				}
+			} catch(DbException $e) {
+				echo 'DbException while saving user: "' . $user->username .'":'. $e->getMessage() ."\n";
+
 				return false;
+			}
+
+			try {
+				(new Authenticator())->syncEmailPasswords($server, $user, Module::mappedValues($record));
+			} catch (Exception $e) {
+				$this->output("Could not sync e-mail account password for '" . $username . "': " . $e->getMessage());
 			}
 
 			go()->getDbConnection()
@@ -185,7 +260,39 @@ class Sync extends Controller
 		return $user;
 	}
 
-	private function getGOUserName(Record $record, Server $server)
+	/**
+	 * Run a database operation and retry it when the record was changed by another transaction since the
+	 * snapshot was taken (MariaDB error 1020).
+	 *
+	 * @template T
+	 * @param callable():T $fn
+	 * @return T
+	 * @throws DbException
+	 */
+	private function retryOnRecordChanged(callable $fn, int $attempts = 3): mixed
+	{
+		for ($i = 1; ; $i++) {
+			try {
+				return $fn();
+			} catch (DbException $e) {
+				if (!$e->isRecordChanged() || $i >= $attempts) {
+					throw $e;
+				}
+				$this->output("Record changed during save, retrying (" . $i . "/" . $attempts . ")");
+				usleep(100000 * $i);
+			}
+		}
+	}
+
+	/**
+	 * @throws DbException
+	 */
+	private function saveWithRetry(Entity $entity): bool
+	{
+		return $this->retryOnRecordChanged(fn() => $entity->save());
+	}
+
+	private function getGOUserName(Record $record, Server $server): bool|string
 	{
 		$username = $record->{$server->usernameAttribute}[0] ?? null;
 
@@ -250,7 +357,7 @@ class Sync extends Controller
 	/**
 	 * @throws Exception
 	 */
-	private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun)
+	private function deleteUsers(array $usersInLDAP, int $maxDeletePercentage, bool $dryRun): void
 	{
 		$users = User::find(['id', 'username'])
 			->join('ldapauth_server_user_sync', 's', 's.userId = u.id')
@@ -275,7 +382,10 @@ class Sync extends Controller
 			foreach ($deleteUsers as $u) {
 				$this->output("Deleting: " . $u[1]);
 				if (!$dryRun) {
-					User::delete(['id' => $u[0]]);
+					$this->retryOnRecordChanged(fn() => User::delete(['id' => $u[0]]));
+
+					//push changes after each user
+					EntityType::push();
 				}
 			}
 		}
@@ -283,7 +393,7 @@ class Sync extends Controller
 
 	private $serverId;
 
-	private function output($str)
+	private function output(string $str): void
 	{
 		go()->debug($str);
 
@@ -296,7 +406,7 @@ class Sync extends Controller
 	 * docker compose exec --user www-data groupoffice php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
 	 * @throws Exception
 	 */
-	public function groups($params)
+	public function groups(array $params)
 	{
 
 		extract($this->checkParams($params, ['id', 'dryRun' => false, 'delete' => false, 'maxDeletePercentage' => 5]));
@@ -373,8 +483,14 @@ class Sync extends Controller
 			$this->fireEvent(self::EVENT_SYNC_GROUP, $group, $record);
 
 			if (!$dryRun) {
-				if (!$group->save()) {
-					throw new Exception("Could not save group");
+				try {
+					if (!$this->saveWithRetry($group)) {
+						echo "Error saving group: " . var_export($group->getValidationErrors(), true);
+					}
+				} catch(DbException $e) {
+					echo 'DbException while saving group: "' . $group->name .'":'. $e->getMessage() ."\n";
+					//The user was not saved, so it can't be linked to the server (the foreign key would fail).
+					return false;
 				}
 
 				go()->getDbConnection()
@@ -401,7 +517,7 @@ class Sync extends Controller
 	/**
 	 * @throws Exception
 	 */
-	private function deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun)
+	private function deleteGroups(array $groupsInLDAP, int $maxDeletePercentage, bool $dryRun): void
 	{
 		$groups = Group::find(['id', 'name'])
 			->join('ldapauth_server_group_sync', 's', 's.groupId = g.id')
@@ -428,7 +544,10 @@ class Sync extends Controller
 				$this->output("Deleting: " . $g[1]);
 
 				if (!$dryRun) {
-					Group::delete(['id' => $g['id']]);
+					$this->retryOnRecordChanged(fn() => Group::delete(['id' => $g[0]]));
+
+					//push changes after each user
+					EntityType::push();
 				}
 			}
 		}
@@ -467,7 +586,7 @@ class Sync extends Controller
 		return $members;
 	}
 
-	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server): ?array
+	private function queryActiveDirectoryUser(Connection $ldapConn, string $groupMember, Server $server): ?array
 	{
 		$parts = preg_split('~(?<!\\\),~', $groupMember);
 		$query = str_replace('\\,', ',', array_shift($parts));
@@ -490,16 +609,20 @@ class Sync extends Controller
 	/**
 	 * @param array $deleteIds
 	 * @param int $totalInLDAP
-	 * @param $maxDeletePercentage
+	 * @param int $maxDeletePercentage
 	 * @param int $totalInGO
 	 * @return void
 	 * @throws Exception
 	 */
-	private function logDeletes(array $deleteIds, int $totalInLDAP, $maxDeletePercentage, int $totalInGO): void
+	private function logDeletes(array $deleteIds, int $totalInLDAP, int $maxDeletePercentage, int $totalInGO): void
 	{
 		$deleteCount = count($deleteIds);
 
 		$this->output("Delete count: " . $deleteCount);
+
+		if(!$deleteCount || !$totalInGO) {
+			return;
+		}
 
 		$percentageToDelete = $totalInLDAP > 0 ? round(($deleteCount / $totalInGO) * 100, 2) : 0;
 

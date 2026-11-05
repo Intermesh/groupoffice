@@ -16,20 +16,16 @@ use go\core\db\Expression;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
-use go\core\model\Link;
 use go\core\model\Principal;
 use go\core\model\User;
-use go\core\model\Module;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
-use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
-use go\core\util\{ArrayObject, DateTime, Recurrence, StringUtil, Time, UUID};
+use go\core\util\{ArrayObject, DateTime, Recurrence, Time, UUID};
 use go\core\validate\ErrorCode;
-use go\modules\business\projects3\model\Project3;
 use go\modules\community\comments\model\Comment;
 use go\modules\community\tasks\convert\Spreadsheet;
 use go\modules\community\tasks\convert\VCalendar;
@@ -135,7 +131,7 @@ class Task extends AclItemEntity {
 	protected ?string $uri = null;
 
     /** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
-	public array $alerts = [];
+	public ?array $alerts = [];
 
 	public ?string $vcalendarBlobId = null;
 
@@ -160,6 +156,15 @@ class Task extends AclItemEntity {
 	protected static function aclEntityKeys(): array
 	{
 		return ['tasklistId' => 'id'];
+	}
+
+
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return ['vcalendarBlobId', 'uri', 'uid'];
 	}
 
 	protected static function internalRequiredProperties() : array
@@ -285,7 +290,7 @@ class Task extends AclItemEntity {
 	protected static function defineFilters(): Filters
 	{
 
-		return parent::defineFilters()
+		$filters = parent::defineFilters()
 			->addText("title", function(Criteria $criteria, $comparator, $value, Query $query, array $filters){
 				$criteria->where('title', $comparator, $value);
 			})
@@ -299,8 +304,7 @@ class Task extends AclItemEntity {
 				}
 
 			}, "subscribedOnly")
-			->addColumn('mileStoneId')
-			->addColumn('projectId')
+
 			->add('projectId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					if(go()->getModule("business", "projects3")) {
@@ -321,6 +325,11 @@ class Task extends AclItemEntity {
 				$roleID = array_search($value, TaskList::Roles, true);
 
 				$criteria->where(['tasklist.role' => $roleID]);
+			})->add('showInCalendar',  function (Criteria $criteria, $value, Query $query) {
+				if(!$query->isJoined("tasks_tasklist_user", "tlu") ){
+					$query->join("tasks_tasklist_user", "tlu", 'task.tasklistId = tlu.tasklistId AND tlu.userId = '.go()->getAuthState()->getUserId());
+				}
+				$criteria->where(['tlu.showInCalendar' => $value]);
 			})
 			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
@@ -357,6 +366,13 @@ class Task extends AclItemEntity {
 					$criteria->where('progress', '=',$value);
 				}
 			});
+
+		if(go()->getModule("business", "projects3")) {
+			$filters->addColumn('mileStoneId')
+				->addColumn('projectId');
+		}
+
+		return $filters;
 
 	}
 
@@ -432,6 +448,8 @@ class Task extends AclItemEntity {
 		}
 		$this->incrementTasklistModSeq();
 		$this->createSystemAlerts();
+
+
 
 		// if alert can be based on start / due of task check those properties as well
 		$modified = $this->getModified('alerts');
@@ -576,7 +594,7 @@ class Task extends AclItemEntity {
 		$nextTask->freeBusyStatus = 'free';
 
 		$rrule = $this->getRecurrenceRule();
-			
+
 		if(!empty($rrule->count)) {
 			$rrule->count--;
 			$nextTask->setRecurrenceRule($rrule->count > 0 ? $rrule : null);
@@ -626,11 +644,18 @@ class Task extends AclItemEntity {
 		}
 
 		if(isset($sort['project'])) {
-
-			if(!$query->isJoined("business_projects3_project3", "project")) {
-				$query->join("business_projects3_project3", "project", "project.id = task.projectId", "left");
+			if(go()->getModule("business", "projects3")) {
+				if (!$query->isJoined("business_projects3_project3", "project")) {
+					$query->join("business_projects3_project3", "project", "project.id = task.projectId", "left");
+				}
+				$sort->renameKey('project', 'project.number');
+			} else {
+				if (!$query->isJoined("tasks_tasklist", "tasklist")) {
+					$query->join("tasks_tasklist", "tasklist", "tasklist.id = task.tasklistId")
+						->join('pr2_projects', 'pr2', 'pr2_projects.id = tasklist.projectId', 'left');
+				}
+				$sort->renameKey('project', 'pr2.name');
 			}
-			$sort->renameKey('project','project.number');
 		}
 
 
@@ -662,6 +687,14 @@ class Task extends AclItemEntity {
 			$query->join('tasks_task_category', 'tc', 'tc.taskId = '.$query->getTableAlias() . '.id', 'LEFT');
 			$query->join('tasks_category', 'categorySort', 'tc.categoryId = categorySort.id', 'LEFT');
 			$sort->renameKey('categories', 'categorySort.name');
+		}
+
+		if (isset($sort['priority'])) {
+			$i = array_search('priority', $sort->keys());
+			$dir = strtolower($sort['priority']) == 'asc' ? 'DESC' : 'ASC';
+			$al = $query->getTableAlias();
+			$exp = new Expression("IF(" . $al . ".priority=9, -1, " . $al . ".priority) ". $dir);
+			$sort->insert($i, $exp);
 		}
 
 		return parent::sort($query, $sort);
@@ -709,7 +742,7 @@ class Task extends AclItemEntity {
 
 	public function getUid(): string
 	{
-		return $this->uid;		
+		return $this->uid;
 	}
 
 	public function setUid(string $uid) {
@@ -817,7 +850,10 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		if($comment->createdBy == $this->responsibleUserId) {
+		// don't set Ticket to in progress when support agent sent the e-mail
+		$existingComments = Comment::findForEntity($this)->all();
+
+		if($comment->createdBy == $this->responsibleUserId && count($existingComments) > 1) {
 			$this->progress = Progress::InProcess;
 		} else {
 			$this->progress = Progress::NeedsAction;

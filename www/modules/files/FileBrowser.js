@@ -498,20 +498,10 @@ GO.files.FileBrowser = function(config){
 
 	this.moveToTrashButton = new Ext.menu.Item({
 		iconCls: "ic-delete",
-		text: t("Move to trash"),
+		text: t("Move to Trash", "files"),
 		handler: () => {
 			this.onMoveToTrash('grid');
 		}
-	});
-
-	this.deleteButton = new Ext.menu.Item({
-		iconCls: 'ic-delete',
-		text: t("Delete"),
-		overflowText:t("Delete"),
-		handler: function(){
-			this.onDelete('grid');
-		},
-		scope: this
 	});
 
 	this.cutButton= new Ext.Button({
@@ -624,7 +614,7 @@ GO.files.FileBrowser = function(config){
 	}));
 
 	if(!config.hideActionButtons) {
-		this.moreBtn.menu.add(this.deleteButton, this.moveToTrashButton);
+		this.moreBtn.menu.add(this.moveToTrashButton);
 	}
 
 
@@ -709,7 +699,7 @@ GO.files.FileBrowser = function(config){
 		this.contextTreeID = node.id;
 
 		var coords = e.getXY();
-		this.filesContextMenu.showAt(coords, records);
+		this.filesContextMenu.showAt(coords, records, 'grid');
 
 	}, this);
 
@@ -785,8 +775,7 @@ GO.files.FileBrowser = function(config){
 
 	this.cardPanel.on('afterrender', function() {
 		GO.files.DnDFileUpload(function (blobs, folder_id) {
-
-			if(this.permission_level < GO.permissionLevels.write) {
+			if(this.permission_level < GO.permissionLevels.create) {
 				GO.errorDialog.show(t("Access denied"));
 				return
 			}
@@ -1539,7 +1528,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				},
 				count: 1,
 				callback: function (responseParams) {
-
 					if (responseParams.success) {
 						const treeNode = this.treePanel.getNodeById(records[0].data.id);
 						if (treeNode) {
@@ -1587,7 +1575,33 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	onMoveToTrash: function (clickedAt) {
 		if (clickedAt === 'tree') {
-			// TODO?
+			const records = this.getSelectedTreeRecords(),
+
+				params = {
+				deleteParam: "trash_keys"
+			}, me = this;
+			params["trash_keys"] = Ext.encode([records[0].data.type_id]);
+
+			let deleteItemsConfig = {
+				store: this.gridStore,
+				params: params,
+				count: 1,
+				callback: function (responseParams) {
+					const treeNode = me.treePanel.getNodeById(records[0].data.id);
+					if (treeNode) {
+						//parentNode is destroyed after remove so keep it for later use
+						const parentNodeId = treeNode.parentNode.id;
+						treeNode.remove();
+
+						const activeTreenode = me.treePanel.getNodeById(me.folder_id);
+						if (!activeTreenode) {
+							//current folder must have been removed. Let's go up.
+							this.setFolderID(parentNodeId);
+						}
+					}
+				}
+			};
+			GO.deleteItems(deleteItemsConfig);
 		} else {
 			//detect grid on selModel. thumbs doesn't have that
 			if (this.cardPanel.getLayout().activeItem.id === this.gridPanel.id) {
@@ -2058,7 +2072,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		var createPermission=permissionLevel>=GO.permissionLevels.create;
 
 		this.newButton.setDisabled(!createPermission);
-		this.deleteButton.setDisabled(!deletePermission);
 		this.moveToTrashButton.setDisabled(!deletePermission);
 
 		this.cutButton.setDisabled(!deletePermission);
@@ -2161,7 +2174,11 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		const entityId = (entity.name === "File" ? "f": "d")+":"+id;
 		const detailViewName = entity.name.toLowerCase() + "Panel";
 		this[detailViewName].on("load", function(dv){
-			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+            if(entity.name === "Folder") {
+                this.setFolderID(dv.data.id, true);
+            } else {
+                this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+            }
 		}, this, {single: true});
 		
 		this.gridStore.on("load", function(a,b,c) {

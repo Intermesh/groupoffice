@@ -1,8 +1,8 @@
 <?php
 extract($data);
 
-$module = isset($m) && preg_match('/[a-z]+/', $m) ? $m : '';
-$function = isset($f) && preg_match('/[a-z]+/i', $m) ? $f : '';
+$module = isset($m) && preg_match('/^[a-z]+$/', $m) ? $m : '';
+$function = isset($f) && preg_match('/^[a-z]+$/i', $f) ? $f : '';
 $funcParams = isset($p) ? $p : '';
 
 //if(strpos($_SERVER['QUERY_STRING'], '<script') || strpos(urldecode($_SERVER['QUERY_STRING']), '<script'))

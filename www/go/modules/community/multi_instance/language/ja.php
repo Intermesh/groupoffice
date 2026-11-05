@@ -5,7 +5,7 @@ return array (
   'Multi instance' => 'マルチインスタンス',
   'Instance' => '実例',
   'Storage quota' => 'ストレージクォータ',
-  'Size in GB' => 'GB 単位のサイズ',
+  'Size in GB' => 'サイズ(GB)',
   'Maximum number of users' => '最大利用人数',
   'Show trials' => 'トライアルを見せる',
   'E-mail selected' => '選択したメール',
@@ -22,4 +22,5 @@ return array (
   'Activate instance' => 'インスタンスをアクティブ化',
   'Login as administrator' => '管理者としてログイン',
   'Deactivate' => '無効にする',
+  'Is trial' => '試験利用',
 );

@@ -47,9 +47,9 @@ class EmailTemplate extends Entity
 	public ?string $moduleId;
 	public ?string $key = null;
 	public string $language = "en";
-	public string $body;
+	public string $body = "";
 	public string $name;
-	public string $subject;
+	public string $subject = "";
 
 	/**
 	 * 
@@ -118,20 +118,23 @@ class EmailTemplate extends Entity
 	}
 	
 	/**
-	 * @param $module array{package:string, module:string} | int
-	 */ 
-  public function setModule( $module) {
+	 * @param array|int|string $module array{package:string, module:string}
+	 *
+	 * @return void
+	 */
+	public function setModule(array|int|string $module): void
+	{
 
-	if(is_numeric($module)) {
-		$this->moduleId = (int) $module;
-		return;
+		if (is_numeric($module)) {
+			$this->moduleId = (int)$module;
+			return;
+		}
+		$module = Module::findByName($module['package'], $module['name']);
+		if (!$module) {
+			$this->setValidationError('module', ErrorCode::INVALID_INPUT, 'Module was not found');
+		}
+		$this->moduleId = $module->id;
 	}
-    $module = Module::findByName($module['package'], $module['name']);
-    if(!$module) {
-      $this->setValidationError('module', ErrorCode::INVALID_INPUT, 'Module was not found');
-    }
-    $this->moduleId = $module->id;
-  }
 
 	protected function internalSave(): bool
 	{		
@@ -172,8 +175,9 @@ class EmailTemplate extends Entity
 	}
 
 	/**
-	 * @todo Template permissions should be connected to an entity just like a comment.
 	 * @return int
+	 * @throws Exception
+	 * @todo Template permissions should be connected to an entity just like a comment.
 	 */
 	protected function internalGetPermissionLevel(): int
 	{
@@ -187,7 +191,7 @@ class EmailTemplate extends Entity
 
 	private function parseImages()
 	{
-		$cids = Blob::parseFromHtml($this->body);
+		$cids = Blob::parse($this->body);
 
 		$existing = [];
 		foreach ($this->attachments as $a) {
@@ -214,7 +218,7 @@ class EmailTemplate extends Entity
 		}
 	}
 
-	public function toArray(array|null $properties = null): array|null
+	public function toArray(?array $properties = null): array
 	{
 		$array =  parent::toArray($properties);
 
@@ -236,7 +240,7 @@ class EmailTemplate extends Entity
 	 */
 	public function toMessage(TemplateParser $templateParser): Message
 	{
-  	$message = go()->getMailer()->compose();
+  	    $message = go()->getMailer()->compose();
 		$subject = $templateParser->parse($this->subject);
 		$body = $templateParser->parse($this->body);
 

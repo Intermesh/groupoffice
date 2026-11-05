@@ -25,7 +25,7 @@ abstract class Base{
 	
 	protected $path;
 	
-	const INVALID_CHARS = '/[\/:\*\?"<>|\\\]/';
+	const INVALID_CHARS = '/[!\/:\*\?"<>|\\\\\x00-\x1f\x7f]/';
 
 	/**
 	 * Constructor of a file or folder
@@ -265,7 +265,7 @@ abstract class Base{
 	 */	
 	public static function checkPathInput($path){
 		$path = '/'.str_replace('\\','/', $path);
-		return strpos($path, '/../') === false;
+		return !in_array('..', explode('/', $path), true);
 	}
 	
 	

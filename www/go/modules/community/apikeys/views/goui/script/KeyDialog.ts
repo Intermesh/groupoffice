@@ -1,4 +1,4 @@
-import {FormWindow, principalcombo} from "@intermesh/groupoffice-core";
+import {client, FormWindow, principalcombo} from "@intermesh/groupoffice-core";
 import {fieldset, t, textfield} from "@intermesh/goui";
 
 export class KeyDialog extends FormWindow {
@@ -18,9 +18,11 @@ export class KeyDialog extends FormWindow {
 					required: true
 				}),
 				principalcombo({
+					entity: "User",
 					name: "userId",
 					label: t("User"),
-					required: true
+					required: true,
+					value: client.user.id
 				})
 			)
 		)

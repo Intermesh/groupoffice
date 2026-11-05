@@ -1,5 +1,5 @@
 import {comp, Component, DataSourceStore} from "@intermesh/goui";
-import {img, client} from "@intermesh/groupoffice-core";
+import {client, img} from "@intermesh/groupoffice-core";
 import {BookmarkContextMenu} from "./BookmarkContextMenu.js";
 
 export class BookmarksGridView extends Component {
@@ -47,7 +47,7 @@ export class BookmarksGridView extends Component {
 								target.el.addEventListener("contextmenu", ev => {
 									ev.preventDefault();
 
-									const contextMenu = new BookmarkContextMenu(client.user, bookmark);
+									const contextMenu = new BookmarkContextMenu(bookmark);
 
 									contextMenu.showAt(ev);
 								})

@@ -34,18 +34,9 @@ use Throwable;
  * 
  * http://jmap.io/spec-core.html#making-an-api-request
  */
-class Router {
-//	public function error($type, $status, $detail) {
-//		$r = http\Response::get();
-//		$r->setStatus($status, $detail);
-//		$r->sendHeaders();
-//		$r->output([
-//			"type" => $type,
-//			"status" => $status,
-//			"detail" => $detail
-//		]);
-//		exit();
-//	}
+class Router
+{
+
 	/**
 	 * @var File
 	 */
@@ -175,6 +166,13 @@ class Router {
 	{
 		$parts = explode('/', $method);
 
+		// The parts are used for the class name, so a "\" could route to any class
+		foreach ($parts as $part) {
+			if (!preg_match('/^[a-z0-9_]+$/i', $part)) {
+				throw new Exception(400, 'Bad request. Invalid method "' . $method . '"');
+			}
+		}
+
 		if (count($parts) == 2) {
 			//eg. "note/query"
 			$entityType = EntityType::findByName($parts[0]);
@@ -183,15 +181,43 @@ class Router {
 			}
 
 			//Very ugly hack
+			/*
 			if($entityType->getName() == "Project") {
 				// JH Added to the ugly hack. Need a bit of JMAP for the old projects as well
-				if(go()->getModule('business', 'projects')) {
+				if (go()->getModule('business', 'projects')) {
 					$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
 				} else {
 					$controllerClass = 'GO\\Projects2\\Controller\\ProjectEntityController';
 				}
+			} elseif ($entityType->getName() == "Account") {
+				$controllerClass = "go\\modules\\community\\email\\controller\\Account";
 			} else {
 				$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
+			}
+			*/
+
+			// Slightly less ugly hack - more and more old style ActiveRecord models need JMAP treatment.
+			switch ($entityType->getName()) {
+				case "Project":
+					if (go()->getModule('business', 'projects')) {
+						$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
+					} else {
+						$controllerClass = 'GO\\Projects2\\Controller\\ProjectEntityController';
+					}
+				break;
+				case "Account":
+					$controllerClass = "go\\modules\\community\\email\\controller\\Account";
+					break;
+				case "Income":
+					$controllerClass = 'GO\\Projects2\\Controller\\IncomeEntityController';
+					break;
+				case "TimeEntry":
+					$controllerClass = 'GO\\Projects2\\Controller\\TimeEntryEntityController';
+					break;
+
+				default:
+					$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
+
 			}
 			$controllerMethod = $parts[1];
 		} else if($parts[0] == "core") {
@@ -208,11 +234,18 @@ class Router {
 			$controllerClass = 'go\\modules\\' . implode('\\', $parts);
 		}
 
-		if (!class_exists($controllerClass)) {
+		// Controllers in a "cli" namespace are for the command line only and are run by the CLI router. Never route to them here.
+		if (stripos('\\' . $controllerClass . '\\', '\\cli\\') !== false) {
 			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
 		}
 
-		if (!method_exists($controllerClass, $controllerMethod)) {
+		// Only JMAP controllers authenticate the user in their constructor
+		if (!class_exists($controllerClass) || !is_subclass_of($controllerClass, \go\core\Controller::class)) {
+			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
+		}
+
+		// Magic methods like __construct are public too
+		if (str_starts_with($controllerMethod, '__') || !method_exists($controllerClass, $controllerMethod)) {
 			throw new Exception(400, 'Bad request. Method "' . $controllerMethod . '" not found in controller "' . $controllerClass . '".');
 		}
 

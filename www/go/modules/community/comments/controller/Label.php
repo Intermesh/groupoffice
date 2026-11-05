@@ -6,6 +6,9 @@ use go\core\jmap\EntityController;
 use go\modules\community\comments\model;
 
 
+/**
+ * @extends EntityController<\go\modules\community\comments\model\Label>
+ */
 class Label extends EntityController {
 	
 	protected function entityClass(): string

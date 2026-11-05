@@ -15,7 +15,7 @@ return array (
   'Code is required' => 'Código é necessário',
   'Invalid code' => 'Código inválido',
   'Enforce two factor authentication for users in a specific group' => 'Forçar autenticação de dois fatores para utilizadores num grupo especifico.',
-  'Block Group-Office usage until setup is done' => 'Parar utilização do {product_name} até que a configuração esteja concluída',
+  'Block GroupOffice usage until setup is done' => 'Parar utilização do {product_name} até que a configuração esteja concluída',
   'Count down' => 'Contagem decrescente',
   'Count down this number of seconds until the user can cancel the setup' => 'Contagem decrescente em segundos, até o utilizador poder voltar a fazer login.',
   'Setup later' => 'Configurar mais tarde',

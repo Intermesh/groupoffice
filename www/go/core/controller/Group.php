@@ -9,6 +9,9 @@ use go\core\jmap\EntityController;
 
 
 
+/**
+ * @extends EntityController<\go\core\model\Group>
+ */
 class Group extends EntityController {
 
 

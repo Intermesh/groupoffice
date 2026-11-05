@@ -2,6 +2,7 @@
 namespace go\core\orm;
 
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use go\core\db\Criteria;
 use go\core\db\Query as OrmQuery;
@@ -18,6 +19,7 @@ use function go;
 trait SearchableTrait {
 
 	public static $updateSearch = true;
+	private static bool $isRebuilding = false;
 
 	/**
 	 * Function to determine if entities have search capabilities
@@ -89,7 +91,7 @@ trait SearchableTrait {
 	public function saveSearch(bool $checkExisting = true): bool
 	{
 
-		if(!static::$updateSearch || !$this->isFetchedComplete()) {
+		if(!static::$updateSearch || (!$this->isFetchedComplete() && !static::$isRebuilding)) {
 			return true;
 		}
 
@@ -98,13 +100,6 @@ trait SearchableTrait {
 				->where('entityTypeId','=', static::entityType()->getId())
 				->andWhere('entityId', '=', $this->id)->single()
 			: false;
-
-		if(!$this->includeInSearch()) {
-			if($search) {
-				Search::delete($search->primaryKeyValues());
-			}
-			return true;
-		}
 
 
 		if(!$search) {
@@ -121,55 +116,52 @@ trait SearchableTrait {
 		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
-		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new DateTime();
+		$search->modifiedAt = $this->getSearchModifiedAt();
 		$search->rebuild = false;
-//		$search->createdAt = $this->createdAt;
-		
-		$keywords = $this->getSearchKeywords();
 
-		if(!isset($keywords)) {
-			$keywords = [$search->name, $search->description];
-		}
+		if($this->includeInSearch()) {
+			$keywords = $this->getSearchKeywords();
 
-//		$keywords = $this->getCommentKeywords($keywords);
-
-		$links = (new Query())
-			->select('description')
-			->distinct()
-			->from('core_link')
-			->where('(toEntityTypeId = :e1 AND toId = :e2)')
-			//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
-			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
-				//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
-		foreach($links->all() as $link) {
-			if(!empty($link['description']) && is_string($link['description'])) {
-				$keywords[] = $link['description'];
+			if (!isset($keywords)) {
+				$keywords = [$search->name, $search->description];
 			}
 
+			$links = (new Query())
+				->select('description')
+				->distinct()
+				->from('core_link')
+				->where('(toEntityTypeId = :e1 AND toId = :e2)')
+				//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+				->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
+			foreach ($links->all() as $link) {
+				if (!empty($link['description']) && is_string($link['description'])) {
+					$keywords[] = $link['description'];
+				}
+
+			}
+
+			if (method_exists($this, 'getCustomFields')) {
+				$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
+			}
+
+			$arr = [];
+			foreach ($keywords as $keyword) {
+				$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
+			}
+
+			$keywords = StringUtil::filterRedundantSearchWords($arr);
+
+			if (!empty($this->id) && !in_array($this->id, $keywords)) {
+				$keywords[] = $this->id;
+			}
 		}
 
-		if (method_exists($this, 'getCustomFields')) {
-			$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
-		}
-
-		$arr = [];
-		foreach($keywords as $keyword) {
-			$arr = array_merge($arr, StringUtil::splitTextKeywords($keyword));
-		}
-
-		$keywords = StringUtil::filterRedundantSearchWords($arr);
-
-		if(!empty($this->id) && !in_array($this->id, $keywords)) {
-			$keywords[] = $this->id;
-		}
-
-		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		if(!$search->internalSave()) {
 			throw new Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
 		}
 
-		if(!$isNew) {
+		if(!$isNew || !$this->includeInSearch()) {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 			$search->change(true);
 		}
@@ -188,18 +180,6 @@ trait SearchableTrait {
 		)->execute();
 
 	}
-
-//	private function getCommentKeywords(array $keywords) : array {
-//		if(Module::isInstalled("community", "comments")) {
-//			$comments = Comment::findForEntity($this, ['text']);
-//			foreach($comments as $comment) {
-//				$plain = strip_tags($comment->text);
-//				$keywords = array_merge($keywords, StringUtil::splitTextKeywords($plain));
-//			}
-//		}
-//
-//		return $keywords;
-//	}
 
 
 	/**
@@ -226,6 +206,11 @@ trait SearchableTrait {
 		return true;
 	}
 
+	/* override to limit the selected field and relations for building the search cache */
+	protected static function neededSearchProperties() {
+		return [];
+	}
+
 
 	/**
 	 *
@@ -235,16 +220,14 @@ trait SearchableTrait {
 	 */
 	private static function queryMissingSearchCache(int $offset = 0): Statement
 	{
-		
 		$limit = 1000;
 
-
-		$query = static::find();
+		$query = static::find(static::neededSearchProperties(), true);
 		/* @var $query OrmQuery */
 		$query
 			->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . static::entityType()->getId(), "LEFT")
 			->andWhere('search.id IS NULL')
-			->orWhere('search.rebuild = true')
+			->orWhere('search.rebuild = 1')
 			->limit($limit)
 			->offset($offset);
 
@@ -265,16 +248,15 @@ trait SearchableTrait {
 		echo "Deleting old values\n";
 
 		$stmt = go()->getDbConnection()->delete('core_search', (new Query)
-			->where('entityTypeId', '=', $cls::entityType()->getId())
-			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
+			->join($cls::getMapping()->getPrimaryTable()->getName(), 'e', 'e.id = t.entityId', 'LEFT')
+			->where('t.entityTypeId = '. $cls::entityType()->getId())
+			->andWhere('e.id', 'IS', null)
 		);
 
 		$stmt->execute();
 
-		go()->getDbConnection()->exec("commit");
-
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
-
+		self::$isRebuilding = true;
 		//In small batches to keep memory low
 		$stmt = static::queryMissingSearchCache();
 		
@@ -302,15 +284,21 @@ trait SearchableTrait {
 				}
 			}
 			echo "\n";
-			go()->getDbConnection()->exec("commit");
 
 			$stmt = static::queryMissingSearchCache($offset);
 		}
 
+	}
 
-		go()->getDbConnection()->exec("commit");
-
-
+	/**
+	 * Returns the modified at date of the entity.
+	 * In some cases you might want to use another date like an invoice date or a calendar event date.
+	 *
+	 * @return DateTimeInterface
+	 */
+	protected function getSearchModifiedAt(): DateTimeInterface
+	{
+		return property_exists($this, 'modifiedAt') ? $this->modifiedAt : new DateTime();
 	}
 
 }

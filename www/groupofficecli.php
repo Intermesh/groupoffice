@@ -35,7 +35,7 @@ require_once($root . 'go/GO.php');
 \GO::init();
 
 if (!isset($args['q']))
-	echo "\nGroup-Office CLI - Copyright Intermesh BV.\n\n";
+	echo "\nGroupOffice CLI - Copyright Intermesh BV.\n\n";
 
 if (PHP_SAPI != 'cli')
 	exit("ERROR: This script must be run on the command line\n\n");

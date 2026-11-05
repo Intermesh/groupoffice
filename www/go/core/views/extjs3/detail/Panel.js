@@ -60,18 +60,25 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			}
 		});
 
+		if(this.items) {
+			this.items.each(item => {
+				if (item.hiddenOnInit === undefined) {
+					item.hiddenOnInit = item.hidden;
+				}
+			})
+		}
+
 		this.on('afterrender', function() {
 
-			this.internalReset();
+			this.hideItems();
 
 			this.body.on("click", this.onBodyClick, this);
 		}, this);
 	},
 
 	onBodyClick : function (e, target) {
-
 		//prevent navigating away.
-		if(target.tagName == "A" && target.attributes.href && target.attributes.href.value && target.attributes.href.value.substring(0,4) == "http") {
+		if(target.tagName == "A" && target.attributes.href && (!target.attributes.target || target.attributes.target.value != "_blank") && target.attributes.href.value && target.attributes.href.value.substring(0,4) == "http") {
 			window.open(target.attributes.href.value);
 			e.preventDefault();
 		}
@@ -109,7 +116,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 		//for(let i = 0,relName; relName = this.relations[i]; i++) {
 		this.relations.forEach(function(relName) {
-			var relation = this.entityStore.entity.findRelation(relName),
+			var relation = window.groupofficeCore.entities.findRelation(this.entityStore.entity,relName),
 				entityStore = go.Db.store(relation.store);
 
 			if(entityStore) {
@@ -135,6 +142,13 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	internalReset: function() {
 		this.data = {};
 		this.currentId = null;
+
+
+
+		this.hideItems();
+	},
+
+	hideItems: function() {
 
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(true);
@@ -286,6 +300,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 			this.add(wrapper);
 			this.comments = new GO.comments.CommentsPanel(this.entityStore.entity.name);
+			this.comments.focusEditorOnload = this.support;
 			wrapper.comp = this.comments;
 		}
 	},

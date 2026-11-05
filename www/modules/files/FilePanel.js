@@ -27,7 +27,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 	editHandler : function(){
 		GO.files.showFilePropertiesDialog(this.model_id+"");
-		
+
 	},
 
 	createTopToolbar: function () {
@@ -107,7 +107,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 			this.launch.defer(200, this);
 		}else {
 			this.data.handler.call(this);
-		}		
+		}
 	},
 
 	reset : function(){
@@ -118,18 +118,66 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 	{
 		GO.files.FilePanel.superclass.setData.call(this, data);
 		this.editButton.setDisabled(data.locked || !this.data.write_permission);
-		
+
 		//custom fields pass path as ID and it will be looked up by the controller. So we must set the actual ID here.
 		//see actionDisplay in FileController
 		this.model_id=this.data.id;
 
 		this.propertiesBtn.setDisabled(!this.data.write_permission);
+
+		if (data.extension === "pdf") {
+			this.renderPdfPreview(data.url);
+		}
+	},
+
+	renderPdfPreview: async function (url) {
+		let webRoot = GO.settings.config.full_url;
+		let canvas = document.getElementById('pdf-preview-canvas');
+		if (!canvas) return;
+
+		url = url.replace(/&amp;/g, '&');
+
+		const renderPdf = function () {
+			window.pdfjsLib.getDocument({url: url}).promise.then(function (pdf) {
+				pdf.getPage(1).then(function (page) {
+					let viewport = page.getViewport({scale: 1});
+					let containerWidth = (canvas.parentNode ? canvas.parentNode.clientWidth : canvas.offsetWidth) - 32;
+					let scale = containerWidth / viewport.width;
+					let scaledViewport = page.getViewport({scale: scale});
+
+					canvas.width = scaledViewport.width;
+					canvas.height = scaledViewport.height;
+
+					page.render({
+						canvasContext: canvas.getContext('2d'),
+						viewport: scaledViewport
+					});
+				});
+			}).catch(function (err) {
+				console.error('PDF preview error:', err);
+			});
+		};
+
+		if (typeof window.pdfjsLib !== 'undefined') {
+			renderPdf();
+		} else {
+			import(webRoot + 'node_modules/pdfjs-dist/build/pdf.mjs').then((pdfjsLib) => {
+				pdfjsLib.GlobalWorkerOptions.workerSrc = webRoot + 'node_modules/pdfjs-dist/build/pdf.worker.mjs';
+				window.pdfjsLib = pdfjsLib;
+
+				renderPdf();
+			});
+		}
+
+		this.on("resize", () => {
+			renderPdf();
+		});
 	},
 
 	initComponent : function(){
 
 		this.on('bodyclick',function(panel,target, e){
-						
+
 			target = Ext.get(target);
 
 			if(target.hasClass("fs-unlock")){
@@ -152,12 +200,12 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					scope:this
 				})
 			}
-			
+
 			if(target.hasClass("fs-deleteDL")){
 
 				const answer = confirm(t("You are going to delete this link, are you sure?", "files"));
 				if(answer){
-				
+
 					GO.request({
 						url:'files/file/submit',
 						params:{
@@ -184,17 +232,20 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					var p = this.getEl();
 					var scrollTo = p.child('.'+scrollToName);
 					scrollTo.dom.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
-				}				
+				}
 			}
-			
-			
+
+
 		}, this);
-		
+
 		this.loadUrl=('files/file/display');
-		
+
 		this.template ='<tpl if="!GO.util.empty(thumbnail_url)">\
 				<figure style="background-image: url({thumbnail_url});" ></figure>\
 					</tpl>' +
+				'<tpl if="values.extension === \'pdf\'">' +
+					'<canvas id="pdf-preview-canvas" style=display:block;width:100%;box-sizing:border-box;padding:1rem;></canvas>' +
+				'</tpl>'+
 
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
 					'<tr>'+
@@ -203,18 +254,18 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					'<tr>'+
 						'<td>'+t("Size")+':</td>'+
 						'<td>{[values.size==\'-\' ? values.size : Ext.util.Format.fileSize(values.size)]}</td>'+
-						
+
 					'</tr>'+
 
 					'<tr>'+
 						'<td>'+t("Created at")+':</td>'+
 						'<td>{ctime}</td>'+
-						
+
 					'</tr>'+
 
 					'<tr>'+
 						'<td>'+t("Modified at")+':</td>'+
-						'<td>{mtime}</td>'+						
+						'<td>{mtime}</td>'+
 					'</tr>'+
 
 					'<tr>'+
@@ -224,12 +275,8 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 							'<tpl if="muser_id">{musername}</tpl>'+
 							'</td>'+
 					'</tr>'+
-					
-					'<tr>'+
-						'<td>URL (Authenticated):</td>'+
-						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
-					'</tr>'+
-										
+
+
 					'<tpl if="!GO.util.empty(locked_user_name)">'+
 						'<tr>'+
             '<td>'+t("Locked by", "files")+':</td>'+
@@ -240,7 +287,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 						'</div></td>'+
 						'</tr>'+
           '</tpl>'+
-					
+
 
           '<tpl if="!GO.util.empty(expire_time)">'+
 						'<tr>'+
@@ -250,7 +297,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
             '<td style="white-space:nowrap">'+t("Link expires after", "files")+':</td>'+
             '<td>{expire_time}</td>'+
 						'</tr>'+
-						
+
 						'<tr>'+
             '<td>'+t("URL", "files")+':</td>'+
             '<td><a href="{download_link}" target="_blank">'+t("Right click to copy", "files")+'</a>'+
@@ -259,19 +306,19 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 						//'</tpl>'+
 						'</td>'+
 						'</tr>'+
-						
+
 						'<tpl if="!GO.util.empty(delete_when_expired)">'+
 							'<tr>'+
 								'<td colspan="2"><span style="color:var(--hue-red);">'+t("File will be automatically deleted when its download link expires", "files")+'</span></td>'+
 							'</tr>'+
 						'</tpl>'+
-						
+
           '</tpl>'+
-					
+
 					'<tpl if="!GO.util.empty(content_expire_date)">'+
 						'<tr>'+
             '<td>'+t("Content expires at", "files")+':</td>'+
-						
+
 						'<tpl if="GO.files.isContentExpired(content_expire_date) == false">'+
 							'<td><span>{content_expire_date}</span></td>'+
 						'</tpl>'+
@@ -284,14 +331,14 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					this.extraTemplateProperties +
 				'</table>';
 
-	
-		
+
+
 		if(go.Modules.isAvailable("legacy", "workflow")) {
 			this.template += GO.workflow.WorkflowTemplate;
 		}
 
 		GO.files.FilePanel.superclass.initComponent.call(this);
-		
+
 		this.add(go.customfields.CustomFields.getDetailPanels("File"));
 	}
 });

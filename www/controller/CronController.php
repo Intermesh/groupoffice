@@ -16,6 +16,9 @@
  * @package GO.core.controller
  */
 
+/**
+ * @deprecated - all relevant cron jobs have been moved to the JMAP framework - Please remove
+ */
 
 namespace GO\Core\Controller;
 
@@ -25,7 +28,6 @@ use Cron\CronExpression;
 use GO\Base\Util\Date;
 use go\core\model\CronJobSchedule;
 use go\core\util\DateTime;
-use function mysql_xdevapi\getSession;
 
 class CronController extends \GO\Base\Controller\AbstractJsonController{
 

@@ -9,7 +9,8 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
 				entityStore: "TaskCategory",
 				sortInfo: {
 					field: "name"
-				}
+				},
+				filters: {role: {role: this.role}},
 			}),
 			menuItems: [
 				{
@@ -17,8 +18,8 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
 					iconCls: 'ic-edit',
 					text: t("Edit"),
 					handler: function() {
-						var dlg = new go.modules.community.tasks.CategoryDialog();
-						dlg.tasklistCombo.store.setFilter("role", {role: this.role});
+						var dlg = new go.modules.community.tasks.CategoryDialog({role: this.role});
+						// dlg.tasklistCombo.store.setFilter("role", {role: this.role});
 						dlg.load(this.moreMenu.record.id).show();
 					},
 					scope: this

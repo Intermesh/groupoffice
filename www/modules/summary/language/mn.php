@@ -15,4 +15,8 @@ return array (
   'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Ямар ч RSS feeds нэмэгдээгүй байна. <br /> Энэ цонхны баруун дээд буланд байгаа тохиргооны товчлуур дээр дарж Feeds оруулна уу.',
   'webfeeds' => 'webfeeds',
   'Summary' => 'Дүгнэлт',
+  "welcomeTitle" => "Group-Office-д тавтай морил!",
+  "welcomeContent" => "<p>Group-Office суулгасанд баярлалаа!</p>
+<p>Эхлэхэд тань туслах холбоос энд байна: {{link}}</p>
+<p>Бид таныг Group-Office-оос таашаал авна гэж найдаж байна!</p>"
 );

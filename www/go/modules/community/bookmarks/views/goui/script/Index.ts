@@ -1,24 +1,60 @@
-import {client, modules} from "@intermesh/groupoffice-core";
-import {router, t} from "@intermesh/goui";
+import {client, JmapDataSource, main, modules} from "@intermesh/groupoffice-core";
+import {BaseEntity, t} from "@intermesh/goui";
 import {Main} from "./Main.js";
+import {BookmarkIFrame} from "./BookmarkIFrame.js";
 
 modules.register({
 	package: "community",
 	name: "bookmarks",
+	panels: {
+		bookmarks: {
+			title: t("Bookmarks"),
+			cmp: Main
+		}
+	},
 	async init() {
-		client.on("authenticated", ( {session}) => {
-			if(!session.capabilities["go:community:bookmarks"]) {
-				// User has no access to this module
+		client.on("authenticated", async ({session}) => {
+			if (!session.capabilities["go:community:bookmarks"]) {
 				return;
 			}
 
-			router.add(/^bookmarks\/(\d+)$/, (bookmarkId) => {
-				modules.openMainPanel("bookmarks")
-			});
+			const ids = (await bookmarkDS.query({
+				filter: {behaveAsModule: true}
+			})).ids;
 
-			modules.addMainPanel("community", "bookmarks", "bookmarks", t("Bookmarks"), () => {
-				return new Main();
-			})
+			if (ids) {
+				const bookmarkModules = await bookmarkDS.get(ids);
+
+				bookmarkModules.list.forEach((b) => {
+					const name = b.name.replace(/\s/g, '-');
+
+					main.addPanel("community", "bookmarks", {
+						id: name,
+						title: name,
+						callback: () => {
+							return new BookmarkIFrame(b);
+						}
+					});
+				});
+			}
+
 		})
-	}
-})
+	},
+	entities: ["Bookmark", "BookmarksCategory"]
+});
+
+export interface Bookmark extends BaseEntity {
+	categoryId: string,
+	createdBy: string,
+	name: string,
+	content: string,
+	description: string
+}
+
+export interface BookmarksCategory extends BaseEntity {
+	createdBy: string,
+	name: string
+}
+
+export const bookmarkDS = new JmapDataSource<Bookmark>("Bookmark");
+export const bookmarksCategoryDS = new JmapDataSource<BookmarksCategory>("BookmarksCategory");

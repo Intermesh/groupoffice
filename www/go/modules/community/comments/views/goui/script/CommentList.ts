@@ -1,271 +1,44 @@
 import {
-	a,
-	avatar, browser, btn,
+	avatar,
+	btn,
 	comp,
 	Component,
+	ComponentEventMap,
 	datasourcestore,
 	DataSourceStore,
-	Format, menu, Notifier, router,
-	t, win
+	Format,
+	menu,
+	Notifier,
+	QuoteStripper,
+	StoreComponent,
+	StoreEventMap,
+	t,
+	Window
 } from "@intermesh/goui";
-import {Image, client, img, jmapds} from "@intermesh/groupoffice-core";
+import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
+import {commentDS, commentLabelDS} from "./Index.js";
 
-export class CommentList extends Component {
-	public store!: DataSourceStore
-	public scroller!: Component
+
+export interface CommentListEventMap extends ComponentEventMap {
+	listready: {}
+}
+
+class CommentList extends Component<CommentListEventMap> implements StoreComponent {
+	public store: DataSourceStore
+	public scroller: Component
+
+	public stripQuotes = false;
 
 	constructor() {
 		super()
 
 		this.store = datasourcestore({
-			dataSource: jmapds("Comment"),
+			dataSource: commentDS,
 			sort: [{property: "date", isAscending: true}],
-			listeners: {
-				load: ( {records}) => {
-					this.items.clear();
-
-					this.scroller = comp({
-						flex: 1,
-						cls: "scroll",
-						style: {maxHeight: (document.body.offsetHeight * 0.7) + "px"}
-					});
-
-					const imgPromises: Promise<any>[] = [];
-
-					let lastDate: string;
-
-					records.forEach((comment) => {
-						let currentDate = Format.date(comment.date);
-
-						if (!lastDate || currentDate !== lastDate) {
-							this.scroller.items.add(comp({
-								tagName: "h5",
-								style: {
-									textAlign: "center",
-									padding: "0.8rem 0"
-								},
-								text: currentDate
-							}))
-
-							lastDate = currentDate;
-						}
-
-						if(!comment.creator) {
-							comment.creator = {
-								name: t("Unknown user")
-							};
-						}
-
-						const avatarCnt = comp({
-								cls: "go-detail-view-avatar",
-								itemId: "avatar-container",
-								listeners: {
-									render: ({target}) => {
-										target.el.onclick = () => {
-											go.modules.community.addressbook.lookUpUserContact(comment.creator.id)
-										}
-									}
-								}
-							},
-							comment.creator.avatarId ?
-								img({
-									cls: "goui-avatar",
-									style: {cursor: "pointer"},
-									blobId: comment.creator.avatarId
-								}) :
-								avatar({
-									style: {cursor: "pointer"},
-									displayName: comment.creator.name
-								})
-						);
-
-						let writtenByUser = (client.user.id == comment.creator.id);
-
-						let commentTitle = t("{author} wrote at {date}")
-							.replace("{author}", comment.creator.name)
-							.replace("{date}", Format.dateTime(comment.createdAt));
-
-						if (comment.createdAt != comment.modifiedAt) {
-							commentTitle += "\n" + t("Edited by {author} at {date}")
-								.replace("{author}", comment.modifier.name)
-								.replace("{date}", Format.dateTime(comment.modifiedAt));
-						}
-
-						if (comment.createdAt != comment.date) {
-							commentTitle += "\n" + t("The date was changed to {date}")
-								.replace("{date}", Format.dateTime(comment.date));
-						}
-
-						const commentComp = comp({
-							flex: 1,
-							cls: "comment-comment",
-							style: {
-								backgroundColor: writtenByUser ? "var(--fg-main-tp)" : "var(--bg-mid)"
-							},
-							title: commentTitle,
-							html: comment.text,
-							listeners: {
-								beforerender: ({target}) => {
-									imgPromises.push(Image.replaceImages(target.el));
-
-									// Enlarge images when clicked in window
-									target.el.addEventListener("click", (e) => {
-										if (e.target && (e.target as HTMLElement).tagName == "IMG") {
-											const img = e.target as HTMLImageElement
-
-											const imageWin = win({
-													width: window.innerWidth - 50,
-													height: window.innerHeight - 50,
-													maximized: false,
-													maximizable: true,
-													modal: true,
-													title: img.alt ?? "Image",
-												},
-												comp({
-													flex: 1,
-													itemId: "img-cont",
-
-													style: {
-														alignItems: "center",
-														justifyContent: "center"
-													},
-													listeners: {
-														beforerender: ({target}) => {
-															const i = img.cloneNode() as HTMLImageElement;
-															i.style.height = "100%";
-															i.style.width = "100%";
-															i.style.objectFit = "contain";
-															target.el.appendChild(i);
-														}
-													}
-												})
-											);
-
-											imageWin.show();
-
-										}
-									});
-								},
-								render: ({target}) => {
-									target.el.addEventListener("contextmenu", ev => {
-										ev.preventDefault();
-
-										const contextMenu = menu({
-												isDropdown: true
-											},
-											btn({
-												icon: "edit",
-												text: t("Edit"),
-												disabled: client.user.isAdmin ? false : !writtenByUser,
-												handler: () => {
-													if (client.user.isAdmin || writtenByUser) {
-														const commentDlg = new CommentDialog();
-														void commentDlg.load(comment.id);
-														commentDlg.show();
-													}
-												}
-											}),
-											btn({
-												icon: "delete",
-												text: t("Delete"),
-												disabled: client.user.isAdmin ? false : !writtenByUser,
-												handler: () => {
-													if (client.user.isAdmin || writtenByUser) {
-														jmapds("Comment").confirmDestroy([comment.id]);
-													}
-												}
-											})
-										)
-
-										contextMenu.showAt(ev);
-									});
-								}
-							}
-						});
-
-						const labels = comp({
-							cls: "hbox"
-						});
-
-						comment.labelEntities.forEach((l: any) => {
-							labels.items.add(
-								comp({
-									tagName: "i",
-									cls: "icon",
-									style: {color: `#${l.color}`, margin: "0"},
-									title: l.name,
-									html: "label"
-								})
-							)
-						});
-
-
-						const attachments = comp({
-							cls: "vbox"
-						});
-
-						comment.attachments.forEach((a: any) => {
-							attachments.items.add(
-								comp({
-										cls: "hbox comment-attachment"
-									},
-									btn({
-										flex: 1,
-										icon: "description",
-										text: a.name,
-										handler: () => {
-											window.open("api/download.php?blob=" + a.blobId + "&inline=1", "_blank");
-										}
-									}),
-									btn({
-										icon: "download",
-										handler: () => {
-											client.downloadBlobId(a.blobId, a.name).catch((error) => {
-												Notifier.error(error)
-											});
-										}
-									})
-								)
-							);
-						});
-
-						commentComp.items.add(labels);
-						commentComp.items.add(attachments);
-
-						const triangle = comp({
-							title: commentTitle,
-							cls: writtenByUser ? "comment-triangle comment-triangle-right" : "comment-triangle comment-triangle-left"
-						})
-
-						const avatarComp = comp({
-								cls: "hbox",
-								width: 70
-							},
-							writtenByUser ? triangle : avatarCnt,
-							writtenByUser ? avatarCnt : triangle,
-						);
-
-						this.scroller.items.add(
-							comp({
-									cls: "hbox",
-									style: {
-										marginBottom: "0.8rem",
-										padding: "0 0.8rem"
-									}
-								},
-								comp({
-									cls: ""
-								}),
-								writtenByUser ? commentComp : avatarComp,
-								writtenByUser ? avatarComp : commentComp,
-							)
-						);
-					});
-
-					this.items.add(this.scroller);
-
-					this.scroller.el.scrollTop = this.scroller.el.scrollHeight;
+			filters: {
+				permissions: {
+					permissionLevel: AclLevel.READ
 				}
 			},
 			queryParams: {
@@ -274,17 +47,321 @@ export class CommentList extends Component {
 			relations: {
 				creator: {
 					path: "createdBy",
-					dataSource: jmapds("Principal")
+					dataSource: principalDS
 				},
 				modifier: {
 					path: "modifiedBy",
-					dataSource: jmapds("Principal")
+					dataSource: principalDS
 				},
 				labelEntities: {
 					path: "labels",
-					dataSource: jmapds("CommentLabel")
+					dataSource: commentLabelDS
 				}
 			}
 		});
+
+
+		this.store.bindComponent(this);
+
+		this.cls = "comments-list";
+
+		this.scroller = comp({
+			flex: 1,
+			cls: "scroll"
+		});
+
+		this.on("render", () => {
+			this.scroller.style = {maxHeight: (document.body.offsetHeight * 0.7) + "px"};
+		});
+
+		this.items.add(this.scroller);
+	}
+
+
+	public onStoreLoadException(ev: StoreEventMap['loadexception']) {
+		void Window.error(ev.reason);
+		this.unmask();
+	}
+
+
+	public onBeforeStoreLoad(ev: StoreEventMap['beforeload']) {
+		this.mask();
+	}
+
+	public onStoreLoad() {
+		const imgPromises: Promise<any>[] = [];
+
+		let lastDate: string;
+
+		const records = this.store.all();
+
+		const cmps: Component[] = []
+
+		records.forEach((comment) => {
+			let currentDate = Format.date(comment.date);
+
+			if (!lastDate || currentDate !== lastDate) {
+				cmps.push(comp({
+					tagName: "h5",
+					style: {
+						textAlign: "center",
+						padding: "0.8rem 0"
+					},
+					text: currentDate
+				}))
+
+				lastDate = currentDate;
+			}
+
+			if (!comment.creator) {
+				comment.creator = {
+					name: t("Unknown user")
+				};
+			}
+
+			const avatarCnt = comp({
+					itemId: "avatar-container",
+					listeners: {
+						render: ({target}) => {
+							target.el.onclick = () => {
+								const parts = comment.creator.id.split(":");
+								if (parts.length == 1) {
+									go.modules.community.addressbook.lookUpUserContact(comment.creator.id)
+								} else {
+									entities.get("Contact").goto(parts[1]);
+								}
+							}
+						}
+					}
+				},
+				comment.creator.avatarId ?
+					img({
+						cls: "goui-avatar",
+						style: {cursor: "pointer"},
+						blobId: comment.creator.avatarId
+					}) :
+					avatar({
+						style: {cursor: "pointer"},
+						displayName: comment.creator.name
+					})
+			);
+
+			let writtenByUser = (client.user.id == comment.creator.id);
+
+
+
+			let commentTitle = t("{author} wrote at {date}")
+				.replace("{author}", comment.creator.name)
+				.replace("{date}", Format.dateTime(comment.createdAt));
+
+			if (comment.createdAt != comment.modifiedAt && comment.modifier) {
+				commentTitle += "\n" + t("Edited by {author} at {date}")
+					.replace("{author}", comment.modifier.name ?? t("Unknown user"))
+					.replace("{date}", Format.dateTime(comment.modifiedAt));
+			}
+
+			if (comment.createdAt != comment.date) {
+				commentTitle += "\n" + t("The date was changed to {date}")
+					.replace("{date}", Format.dateTime(comment.date));
+			}
+
+			let body: string, quote: string = "";
+			if (this.stripQuotes) {
+				const qs = new QuoteStripper(comment.text);
+
+				quote = qs.getQuote();
+
+				body = qs.getBodyWithoutQuote();
+			} else {
+				body = comment.text;
+			}
+
+			const commentComp = comp({
+				flex: 1,
+				cls: "comment-comment normalize",
+				style: {
+					backgroundColor: writtenByUser ? "var(--fg-main-tp)" : "var(--bg-mid)"
+				},
+				title: commentTitle,
+				html: body,
+				listeners: {
+					beforerender: ({target}) => {
+						imgPromises.push(Image.replaceImages(target.el));
+
+						// Enlarge images when clicked in window
+						Image.enableZoom(target.el);
+					},
+					render: ({target}) => {
+
+						this.makeLinksExternal(target.el);
+
+						target.el.addEventListener("contextmenu", ev => {
+							ev.preventDefault();
+
+							const contextMenu = menu({
+									isDropdown: true
+								},
+								btn({
+									icon: "edit",
+									text: t("Edit"),
+									disabled: client.user.isAdmin ? false : !writtenByUser,
+									handler: () => {
+										if (client.user.isAdmin || writtenByUser) {
+											const commentDlg = new CommentDialog();
+											void commentDlg.load(comment.id);
+											commentDlg.show();
+										}
+									}
+								}),
+								btn({
+									icon: "delete",
+									text: t("Delete"),
+									disabled: client.user.isAdmin ? false : !writtenByUser,
+									handler: () => {
+										if (client.user.isAdmin || writtenByUser) {
+											commentDS.confirmDestroy([comment.id]);
+										}
+									}
+								})
+							)
+
+							contextMenu.showAt(ev);
+						});
+					}
+				}
+			});
+
+			if (quote) {
+				commentComp.items.add(
+					btn({
+						cls: "raised",
+						text: t("More"),
+						handler: (btn) => {
+							commentComp.html = comment.text;
+							this.makeLinksExternal(commentComp.el);
+							Image.replaceImages(commentComp.el);
+							btn.remove();
+						}
+					})
+				);
+			}
+
+			if (comment.mailStatus) {
+				const mimeTypeCmp = comp({
+					tagName: "i",
+					cls: "goui icon comment-mail-status "+comment.mailStatus, title: comment.mailStatus
+				})
+				commentComp.items.add(mimeTypeCmp);
+			}
+
+			const labels = comp({
+				cls: "hbox"
+			});
+
+			comment.labelEntities.forEach((l: any) => {
+				labels.items.add(
+					comp({
+						tagName: "i",
+						cls: "icon",
+						style: {color: `#${l.color}`, margin: "0"},
+						title: l.name,
+						html: "label"
+					})
+				)
+			});
+
+
+			const attachments = comp({
+				cls: "vbox"
+			});
+
+			comment.attachments.forEach((a: any) => {
+				attachments.items.add(
+					comp({
+							cls: "hbox comment-attachment"
+						},
+						btn({
+							flex: 1,
+							icon: "description",
+							text: a.name,
+							handler: () => {
+								window.open("api/download.php?blob=" + a.blobId + "&inline=1", "_blank");
+							}
+						}),
+						btn({
+							icon: "download",
+							handler: () => {
+								client.downloadBlobId(a.blobId, a.name).catch((error) => {
+									Notifier.error(error)
+								});
+							}
+						})
+					)
+				);
+			});
+
+			commentComp.items.add(labels);
+			commentComp.items.add(attachments);
+
+			const triangle = comp({
+				title: commentTitle,
+				cls: writtenByUser ? "comment-triangle comment-triangle-right" : "comment-triangle comment-triangle-left"
+			})
+
+			const avatarComp = comp({
+					cls: "hbox",
+					width: 70
+				},
+				writtenByUser ? triangle : avatarCnt,
+				writtenByUser ? avatarCnt : triangle,
+			);
+
+			cmps.push(
+				comp({
+						cls: "hbox",
+						style: {
+							marginBottom: "0.8rem",
+							padding: "0 0.8rem"
+						}
+					},
+					comp({
+						cls: ""
+					}),
+					writtenByUser ? commentComp : avatarComp,
+					writtenByUser ? avatarComp : commentComp,
+				)
+			);
+		});
+
+		this.scroller.items.replace(...cmps);
+
+		Promise.all(imgPromises).then(() => {
+			this.scroller.el.scrollTop = this.scroller.el.scrollHeight;
+			this.unmask();
+			this.fire("listready", {});
+		});
+
+	}
+
+	private makeLinksExternal(el: HTMLElement) {
+		const allLinks = el.querySelectorAll('a');
+
+		allLinks.forEach(link => {
+			const href = link.getAttribute('href');
+			// Skip links without href, mailto:, tel:, etc.
+			if (!href || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+			link.target = "_blank";
+			link.rel = "noopener noreferrer";
+
+		});
+	}
+
+	public onRecordRemove(ev: StoreEventMap<any>['remove']) {
+	}
+
+	public onRecordAdd(ev: any) {
 	}
 }
+
+export default CommentList

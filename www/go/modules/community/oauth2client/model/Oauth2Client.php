@@ -6,20 +6,50 @@ use go\core\exception\NotFound;
 use go\core\http\Exception;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
+use go\core\validate\ErrorCode;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\provider\Azure;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Google;
-use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 final class Oauth2Client extends Entity
 {
 	public ?string $id;
 	public string $name;
 	public ?string $defaultClientId;
-	public string $clientSecret;
+	protected string $clientSecret;
 	public string $clientId;
 	public ?string $projectId;
+
+	/**
+	 * The secret is write only. It's never sent to a client because everybody who can read this entity (the controller
+	 * is accessible without logging in for the login page) could use it to impersonate the application.
+	 */
+	public function getClientSecret(): ?string
+	{
+		return null;
+	}
+
+	/**
+	 * As the secret is never returned, a client can't send it back unchanged. So an empty value keeps the current secret.
+	 */
+	public function setClientSecret(string $secret): void
+	{
+		if ($secret === '' && !$this->isNew()) {
+			return;
+		}
+
+		$this->clientSecret = $secret;
+	}
+
+	protected function internalValidate()
+	{
+		if ($this->isNew() && empty($this->clientSecret)) {
+			$this->setValidationError('clientSecret', ErrorCode::REQUIRED);
+		}
+
+		parent::internalValidate();
+	}
 
 
 	/**
@@ -55,17 +85,6 @@ final class Oauth2Client extends Entity
 		];
 		switch ($defaultClient->name) {
 
-			case 'Keycloak':
-
-				// TODO: Make keycloak configurable
-				// https://medium.com/@buffetbenjamin/keycloak-essentials-openid-connect-c7fa87d3129d
-				// https://github.com/stevenmaguire/oauth2-keycloak
-
-				$params['authServerUrl'] = 'http://host.docker.internal:9081';
-				$params['realm'] = 'myrealm';
-				$params['scopes'] = $scopes ?? ['openid'];
-				return new Keycloak($params);
-
 			case 'Google':
 				// see https://developers.google.com/identity/protocols/oauth2/web-server
 				$params['accessType'] = 'offline';
@@ -85,12 +104,20 @@ final class Oauth2Client extends Entity
 					'openid',
 					'offline_access',
 					'email',
-					'https://outlook.office.com/IMAP.AccessAsUser.All',
-					'https://outlook.office.com/SMTP.Send'
+					'https://outlook.office365.com/IMAP.AccessAsUser.All',
+					'https://outlook.office365.com/SMTP.Send'
 				];
 				$params['defaultEndPointVersion'] = '2.0';
 
-				return new Azure($params);
+				return new Azure($params, [
+					// Use PHP's stream handler instead of libcurl. Microsoft returns an empty 404 for some libcurl/OpenSSL
+					// builds (curl 8.14 + OpenSSL 3.5) while wget and PHP streams work fine. This also avoids the old
+					// HTTP/2 + ALPN 404 bug that curl's CURLOPT_SSL_ENABLE_ALPN workaround targeted, which newer
+					// Guzzle versions no longer allow in the "curl" option.
+					'httpClient' => new \GuzzleHttp\Client([
+						'handler' => \GuzzleHttp\HandlerStack::create(new \GuzzleHttp\Handler\StreamHandler())
+					])
+				]);
 
 			default:
 				throw new NotFound('Default client ' . $defaultClient->name . ' not supported');

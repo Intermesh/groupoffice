@@ -1,0 +1,9 @@
+@use '@intermesh/goui/style/util'  as *;
+@use '@intermesh/goui/style/config' as *;
+
+.goui-toolbar.goui-cardmenu.main-menu {
+	background-color: $colorMain;
+	button.goui-button {
+		color: white;
+	}
+}

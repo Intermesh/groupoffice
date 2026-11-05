@@ -26,7 +26,7 @@ use GO\Projects2\Model\ProjectEntity;
  */
 class TaskList extends AclOwnerEntity
 {
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'showInCalendar'];
 
 	const List = 1;
 	const Board = 2;
@@ -43,7 +43,7 @@ class TaskList extends AclOwnerEntity
 	public ?string $id;
 	public string $name;
 
-	public int $aclId;
+	public ?int $aclId;
 
 	protected int $role = self::List;
 
@@ -51,7 +51,7 @@ class TaskList extends AclOwnerEntity
 	public ?string $description = null;
 
 	public ?int $createdBy;
-	public ?int $ownerId;
+//	public ?int $ownerId;
 
 	protected string $defaultColor;
 
@@ -59,7 +59,8 @@ class TaskList extends AclOwnerEntity
 	public ?int $sortOrder = null;
 	public ?bool $isVisible= null;
 	public ?bool $isSubscribed= null;
-	public ?bool $syncToDevice = true;
+	public ?bool $syncToDevice = null;
+	public ?bool $showInCalendar = null;
 
 	protected $highestItemModSeq;
 
@@ -68,6 +69,7 @@ class TaskList extends AclOwnerEntity
 	public $projectId = null;
 
 	public $groupingId = null;
+
 
 	protected static function defineFilters(): Filters
 	{
@@ -84,7 +86,6 @@ class TaskList extends AclOwnerEntity
 			->add('projectId', function (Criteria $criteria, $value) {
 				$criteria->where(['projectId' => $value]);
 			});
-
 	}
 
 	/** @var string What kind of list: 'list', 'board' */
@@ -144,12 +145,13 @@ class TaskList extends AclOwnerEntity
 				$project = ProjectEntity::findById($this->projectId, ['id', 'acl_id']);
 				$this->aclId = $project->acl_id;
 			}
-		} else if($this->ownerId === go()->getUserId() && !empty($this->color)) {
+		} else if($this->createdBy === go()->getUserId() && !empty($this->color)) {
 			$this->defaultColor = $this->color;
 		}
 		if(empty($this->color)) {
 			$this->color = $this->defaultColor;
 		}
+
 		return parent::internalSave();
 	}
 
@@ -182,6 +184,11 @@ class TaskList extends AclOwnerEntity
 	{
 		return Module::findByName('community', 'tasks')
 			->getUserRights()->mayChangeTasklists;
+	}
+
+	public static function readOnlyProps(): array
+	{
+		return ["modifiedBy", "createdAt", "modifiedAt"];
 	}
 
 	protected static function checkAclJoinEntityTable()

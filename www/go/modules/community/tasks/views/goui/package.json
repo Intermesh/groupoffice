@@ -1,23 +1,31 @@
 {
   "type": "module",
+  "name": "@intermesh/community-tasks",
+  "exports": {
+    ".": {
+      "types": "./script/Index.ts",
+      "default": "./dist/Index.js"
+    }
+  },
+  "description": "GroupOffice Tasks module",
   "devDependencies": {
     "concurrently": "latest",
     "esbuild": "latest",
     "sass": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.*"
   },
-
   "scripts": {
-    "start tasks": "concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"  \"npm run start:dts\"",
-    "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
-    "start:dts": "npx tsc --declaration --emitDeclarationOnly --watch",
+    "start tasks": "concurrently --kill-others \"npm run start:ts\"  \"npm run start:sass\"",
+    "start:ts": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:dts": "npx tsc -b --declaration --emitDeclarationOnly --watch",
     "start:sass": "npx sass --watch style:dist",
-
-    "build": "npm run build:sass && npm run build:ts && npm run build:dts",
-    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build": "npm run build:clean && npm run build:sass && npm run build:ts && npm run build:dts",
+    "build:clean": "rm -rf ./dist/*",
     "build:sass": "npx sass --style=compressed style:dist",
-    "build:dts": "npx tsc --declaration --emitDeclarationOnly",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:dts": "npx tsc -b --declaration --emitDeclarationOnly",
 
-    "test": "npx tsc --noEmit"
+    "test": "npx tsc --noEmit",
+    "prepare": "npm run build"
   }
 }

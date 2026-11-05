@@ -1,25 +1,11 @@
-import {
-	btn,
-	checkbox,
-	comp,
-	Component,
-	EntityID,
-	Notifier,
-	paginator,
-	router,
-	searchbtn,
-	t,
-	tbar,
-	Window
-} from "@intermesh/goui";
-import {authManager, client, jmapds, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
+import {btn, checkbox, comp, Component, EntityID, Notifier, router, searchbtn, t, tbar, Window} from "@intermesh/goui";
+import {authManager, client, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable.js";
 import {DomainDialog} from "./DomainDialog.js";
 import {DomainDetail} from "./DomainDetail.js";
 
-export class MainPanel extends MainThreeColumnPanel {
+export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 
-		protected center!: DomainDetail;
     protected createEast(): Component {
 	    return comp({
 		    width: 260,
@@ -28,17 +14,19 @@ export class MainPanel extends MainThreeColumnPanel {
 		    hidden: true
 	    })
     }
-    protected createCenter(): Component {
+    protected createCenter() {
 	    const detail = new DomainDetail();
 
 	    detail.itemId = "detail";
 	    detail.stateId = "maildomains-detail";
 			detail.flex = 1;
 
-	    detail.toolbar.items.insert(0,this.showCenterButton());
+	    detail.toolbar.items.insert(0,
+				this.showWestButton(),
+				this.openWestButton(),);
 	    return detail;
     }
-    protected createWest(): Component {
+    protected createWest() {
 
 	    this.tbl = new DomainTable();
 			this.tbl.stateId = "maildomains-table";
@@ -55,7 +43,10 @@ export class MainPanel extends MainThreeColumnPanel {
 			    cls: 'vbox active' //for mobile view this is active
 		    },
 
-		    tbar({},
+		    tbar({cls: "table-aligned"},
+
+
+
 					checkbox({
 						type: "switch",
 						label: t("Show inactive"),
@@ -86,7 +77,18 @@ export class MainPanel extends MainThreeColumnPanel {
 					    dlg.show();
 					    dlg.form.value = {userId: this.user!.id, active: 1};
 				    }
-			    })
+			    }),
+
+
+					btn({
+						cls: "small for-medium-device",
+						title: t("Close sidebar"),
+						icon: "close",
+						handler: (button, ev) => {
+							this.activatePanel(this.center);
+						}
+					}),
+					this.closeWestButton(),
 		    ),
 
 		    comp({
@@ -104,6 +106,8 @@ export class MainPanel extends MainThreeColumnPanel {
 
 	constructor() {
 		super("section");
+
+		this.setup(this.createCenter(), this.createWest(), this.createEast());
 
 		this.on("render", async () => {
 			try {

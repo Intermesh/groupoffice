@@ -2,6 +2,8 @@
 namespace GO\Base;
 
 use Faker\Generator;
+use go\core\data\ArrayableInterface;
+use go\core\fs\Folder;
 use go\core\Installer;
 use go\core\orm\EntityType;
 
@@ -34,7 +36,7 @@ use go\core\orm\EntityType;
  * @package GO.base 
  */
 
-class Module extends Observable {
+class Module extends Observable implements ArrayableInterface {
 	
 	const PACKAGE_UNSUPPORTED = '3rd party (Not supported by Intermesh)';
 	
@@ -115,6 +117,16 @@ class Module extends Observable {
 	}
 
 	/**
+	 * Get the folder of this module
+	 *
+	 * @return Folder
+	 */
+	public function getFolder(): Folder
+	{
+		return new Folder($this->path());
+	}
+
+	/**
 	 * Return the localized name
 	 * 
 	 * @return String 
@@ -141,6 +153,10 @@ class Module extends Observable {
 
 	public function getIcon() {
 		return $this->icon();
+	}
+
+	public function getCapabilities(\go\core\model\Module $module): array {
+		return ['go:legacy:'.$module->name => $module->getUserRights()];
 	}
 
 	/**
@@ -226,16 +242,24 @@ class Module extends Observable {
 	public function copyright(){
 		return 'Copyright Intermesh BV';
 	}
-	
+
+	/**
+	 * Get URL to the documentation page
+	 * @return string|null
+	 */
+	public function getDocumentationURL(): ?string {
+		return null;
+	}
+
 	/**
 	 * Return true if this module belongs in the admin menu.
-	 * 
-	 * @return boolean 
+	 *
+	 * @return boolean
 	 */
 	public function adminModule(){
 		return false;
 	}
-	
+
 	/**
 	 * Return true if this module has a GUI
 	 * 
@@ -394,11 +418,6 @@ class Module extends Observable {
 			throw new \Exception("SQL query failed: ".$query."\n\n".$e->getMessage());
 		}
 		go()->rebuildCache(true);
-		//call saveUser for each user
-//		$stmt = Model\User::model()->find(array('ignoreAcl'=>true));		
-//		while($user = $stmt->fetch()){
-//			call_user_func(array(get_class($this),'saveUser'), $user, true);
-//		}
 		
 		$this->registerEntities();
 		
@@ -417,7 +436,7 @@ class Module extends Observable {
 		
 		foreach($records as $ar) {
 			$cls = $ar->getName();
-			if(is_a($cls, Db\ActiveRecord::class, true) && ($cls::model()->hasLinks() || method_exists($cls::model(), 'getCustomFields'))) {
+			if(is_a($cls, Db\ActiveRecord::class, true) && ($cls::model()->doRegisterEntity() || $cls::model()->hasLinks() || method_exists($cls::model(), 'getCustomFields'))) {
 				if(!$cls::entityType()) {
 					return false;
 				}
@@ -456,14 +475,7 @@ class Module extends Observable {
 	public function uninstall() {
 		
 		$oldIgnore = \GO::setIgnoreAclPermissions();
-		
-		
-//		//call deleteUser for each user
-//		$stmt = Model\User::model()->find(array('ignoreAcl'=>true));		
-//		while($user = $stmt->fetch()){
-//			call_user_func(array(get_class($this),'deleteUser'), $user);
-//		}
-		
+
 		//Uninstall cron jobs for this module
 		$cronClasses = $this->findClasses('cron');
 		foreach($cronClasses as $class){
@@ -491,7 +503,6 @@ class Module extends Observable {
 		}
 		
 		// \GO::clearCache();
-		// Observable::cacheListeners();
 		if(!Installer::isInstalling()) {
 			go()->rebuildCache(true);
 		}
@@ -531,9 +542,6 @@ class Module extends Observable {
 	 * @param array $response Array of output lines
 	 */
 	public function buildSearchCache(&$response){		
-		
-		//$response[]  = "Building search cache for ".$this->name()."\n";		
-				
 		$models=$this->getModels();
 
 		foreach($models as $model){
@@ -751,5 +759,37 @@ class Module extends Observable {
 	public function demo(Generator $faker) {
 
 	}
+
+	public function toArray(?array $properties = null): array
+	{
+		$model = \go\core\model\Module::findByName(null, $this->name(), null);
+
+		return array(
+			'id' => "legacy/" . $this->name(),
+			'name'=>$this->name(),
+			'package' => 'legacy',
+			'title' => $this->localizedName(),
+			'author'=>$this->author(),
+			'description'=>$this->description(),
+			'rights'=> array_keys($this->getRights()),
+			"status" => $this->getStatus(),
+
+			'packageTitle'=> $this->package(),
+			'enabled'=> $model && $model->enabled,
+			'available'=> $this->isInstallable(),
+			'installed' => $model != false,
+
+			'model' => $model,
+
+			'documentationUrl' => $this->getDocumentationURL(),
+			'category' => $this->getCategory(),
+		);
+
+	}
+
+	public function getCategory() {
+		return go()->t("Main");
+	}
+
 
 }

@@ -42,7 +42,18 @@ class Contact extends AclItemEntity {
 	
 	use SearchableTrait;
 
-	use PrincipalTrait;
+	use PrincipalTrait {
+		queryMissingPrincipals as originalQueryMissingPrincipals;
+	}
+
+	protected static function queryMissingPrincipals(int $offset = 0): Query
+	{
+		$query = static::originalQueryMissingPrincipals($offset);
+
+		$query->join("addressbook_email_address", "e", "e.contactId = c.id");
+
+		return $query;
+	}
 
 	/**
 	 * 
@@ -76,11 +87,33 @@ class Contact extends AclItemEntity {
 	public ?string $suffixes = '';
 
 	/**
-	 * M for Male, F for Female or null for unknown
+	 * Gender
+	 *
+	 * [null, t("Unknown")],
+	 * ['M', t("Male")],
+	 * ['F', t("Female")],
+	 * ['N', t("Non-binary")],
+	 * ['P', t("Won't say")]
 	 */							
 	public ?string $gender;
 	public ?string $notes;
 	public bool $isOrganization = false;
+
+	public function genderAsText(): string {
+
+		switch($this->gender) {
+			case 'M':
+				return go()->t("Male", "community", "addressbook");
+			case 'F':
+				return go()->t("Female", "community", "addressbook");
+			case 'N':
+				return go()->t("Non-binary", "community", "addressbook");
+			case 'P':
+				return go()->t("Won't say", "community", "addressbook");
+			default:
+				return go()->t("Unknown", "community", "addressbook");
+		}
+	}
 	
 	/**
 	 * The job title
@@ -402,12 +435,6 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('starred', '=', $value);
 
 										})
-										->add("addressBookIds", function(Criteria $criteria, $value) {
-											if(count($value) > 0) {
-												$criteria->andWhere('addressBookId IN (' .  implode(',',$value). ')');
-
-											}
-										})
 
 										->add("groupId", function(Criteria $criteria, $value, Query $query) {
 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
@@ -515,20 +542,6 @@ class Contact extends AclItemEntity {
 										->addDate("lastContactAt", function(Criteria $criteria, $comparator, ?DateTime $value){
 										 	$criteria->where('lastContactAt', $comparator, $value);
 										})
-//
-//										->add("orgFilter", function(Criteria $criteria, $value, Query $query){
-//											if( !$query->isJoined('addressbook_contact', 'orgFilter')) {
-//												$query->join('core_link', 'lOrgFilter', 'c.id = lOrgFilter.fromId and lOrgFilter.fromEntityTypeId = '.self::entityType()->getId() . ' AND lOrgFilter.toEntityTypeId=' . self::entityType()->getId(), 'LEFT');
-//											}
-//
-//											$orgs = Contact::find(['id'])
-//												->selectSingleValue('id')
-//												->where('isOrganization', '=', true)
-//												->filter($value);
-//
-//											$query->where('lOrgFilter.id', 'IN', $orgs);
-//										})
-
 										->addText("orgCity", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if( !$query->isJoined('addressbook_contact', 'org')) {
 												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId() , 'LEFT')
@@ -692,13 +705,12 @@ class Contact extends AclItemEntity {
 										
 	}
 
-	public function historyLog(): bool|array
-	{
-		$log = parent::historyLog();
-
-		unset($log['vcardBlobId']);
-
-		return $log;
+	/**
+	 * List of columns to ignore when determining if modifiedAt or modifiedBy should be set.
+	 * @return array
+	 */
+	protected static function ignorePropertiesForModifiedAt() : array {
+		return ['vcardBlobId', 'uri', 'uid'];
 	}
 
 	public static function sort(Query $query, ArrayObject $sort): Query
@@ -715,6 +727,14 @@ class Contact extends AclItemEntity {
 		if(isset($sort['addressBook'])) {
 			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId', 'INNER');
 			$sort->renameKey('addressBook', 'abSort.name');
+		}
+		if(isset($sort['address'])) {
+			$query->joinIf('addressbook_address', 'abAddressSort', 'abAddressSort.contactId = c.id', 'LEFT');
+			$sort->renameKey('address', 'abAddressSort.address');
+		}
+		if(isset($sort['zipCode'])) {
+			$query->joinIf('addressbook_address', 'abAddressSort', 'abAddressSort.contactId = c.id', 'LEFT');
+			$sort->renameKey('zipCode', 'abAddressSort.zipCode');
 		}
 
 		if(isset($sort['city'])) {
@@ -932,7 +952,7 @@ class Contact extends AclItemEntity {
 	}
 	
 	private $organizationIds;
-	private $setOrganizationIds;
+	protected $setOrganizationIds;
 	
 	public function getOrganizationIds() {
 
@@ -1273,6 +1293,36 @@ class Contact extends AclItemEntity {
 	 */
 	public function findDateByType(string $type, bool $returnAny = true) {
 		return $this->findPropByType("dates", $type, $returnAny);
+	}
+
+	public function hasPhone(string $number): bool
+	{
+		foreach($this->phoneNumbers as $phone) {
+			if($phone->number == $number) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function hasEmail(string $email): bool
+	{
+		foreach($this->emailAddresses as $emailAddress) {
+			if($emailAddress->email == $email) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function hasAddress(string $value): bool
+	{
+		foreach($this->addresses as $address) {
+			if($address->address == $value) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private function findPropByType($propName, $type, $returnAny) {

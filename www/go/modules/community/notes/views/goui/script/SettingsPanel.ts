@@ -1,12 +1,17 @@
-import {Component, containerfield, datasourceform, fieldset, radio, t} from "@intermesh/goui";
+import {AutocompleteChips, Component, containerfield, datasourceform, fieldset, radio, t} from "@intermesh/goui";
 import {notebookcombo} from "./NoteBookCombo";
-import {User, userDS} from "@intermesh/groupoffice-core";
+import {AppSettingsPanel, User, userDS} from "@intermesh/groupoffice-core";
+import {notebookchips} from "./NoteBookChips.js";
 
-export class SettingsPanel extends Component {
+export class SettingsPanel extends AppSettingsPanel {
 	private readonly form;
+	private syncNoteBooksField;
+	private noteBookCombo;
 
 	constructor() {
 		super();
+
+		this.title = t("Notes");
 
 		this.form = datasourceform({
 				dataSource: userDS
@@ -17,7 +22,7 @@ export class SettingsPanel extends Component {
 				containerfield({
 						name: "notesSettings"
 					},
-					notebookcombo({
+					this.noteBookCombo = notebookcombo({
 						name: "defaultNoteBookId",
 						label: t("Default note book")
 					}),
@@ -30,7 +35,25 @@ export class SettingsPanel extends Component {
 							{text: t("Default note book"), value: 0},
 							{text: t("Remember last selected note book"), value: 1}
 						]
+					}),
+
+					radio({
+						name: "defaultType",
+						label: t("Default editor for new notes"),
+						type: "box",
+						value: "html",
+						options: [
+							{text: "HTML", value: "html"},
+							{text: "Markdown", value: "markdown"}
+						]
+					}),
+
+					this.syncNoteBooksField = notebookchips({
+						label: t("Synchronize"),
+						name: "syncNoteBookIds"
 					})
+
+
 				)
 			)
 		)
@@ -38,12 +61,15 @@ export class SettingsPanel extends Component {
 		this.items.add(this.form);
 	}
 
-	onSubmit() {
+	async save() {
 		return this.form.submit();
 	}
 
-	onLoad(user: User) {
+	async load(user: User) {
 		this.form.currentId = user.id;
 		this.form.value = user;
+
+		this.syncNoteBooksField.list.store.setFilter("permissions", {permissionLevelUserId: user.id});
+		this.noteBookCombo.list.store.setFilter("permissions", {permissionLevelUserId: user.id});
 	}
 }

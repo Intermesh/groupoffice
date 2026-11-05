@@ -21,6 +21,7 @@ class Url extends Property {
 	const TYPE_INSTAGRAM = "instagram";
 	const TYPE_TIKTOK = "tiktok";
 
+	public ?int $id;
 	protected int $contactId;
 	public string $type;
 	public string $url;

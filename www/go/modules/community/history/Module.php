@@ -5,17 +5,21 @@ namespace go\modules\community\history;
 
 use Exception;
 use GO\Base\Db\ActiveRecord;
+use GO\Base\Model\Acl;
 use go\core;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\cron\GarbageCollection;
 use go\core\ErrorHandler;
 use go\core\http\Request;
 use go\core\jmap\Entity;
+use go\core\model\Alert;
 use go\core\model\CronJobSchedule;
 use go\core\model\Group;
 use go\core\model\Search;
 use go\core\model\User;
 use go\core\orm\Query;
+use GO\Files\Model\File;
+use GO\Files\Model\Folder;
 use go\modules\community\history\model\LogEntry;
 use go\modules\community\history\model\Settings;
 use GO\Projects2\Model\TimeEntry;
@@ -64,6 +68,17 @@ class Module extends core\Module
 		//hacky but works for old code
 		if(!$record->aclField() && !($record instanceof TimeEntry)) {
 			return;
+		}
+
+		if ($record instanceof File || $record instanceof Folder) {
+			$aclId = $record->findAclId();
+			if(!$aclId) {
+				return;
+			}
+			$aclRecord = Acl::load($aclId);
+			if (!$aclRecord) {
+				return;
+			}
 		}
 
 		$log = new LogEntry();
@@ -158,23 +173,6 @@ class Module extends core\Module
 
 		if($action !== 'delete') {
 			$changes = $entity->historyLog();
-			unset($changes['modifiedAt']);
-			unset($changes['acl']);
-			unset($changes['aclId']);
-			unset($changes['createdBy']);
-			unset($changes['createdAt']);
-			unset($changes['modifiedBy']);
-			unset($changes['permissionLevel']);
-//			unset($changes['filesFolderId']);
-
-			$cfChanges = self::getCustomFieldChanges($entity);
-			if(!empty($cfChanges)) {
-				$changes['customFields'] = $cfChanges;
-			}
-
-			if(empty($changes)) {
-				return;
-			}
 
 			if($action == 'create') {
 				$changes = self::mapForCreate($changes);
@@ -289,15 +287,27 @@ class Module extends core\Module
 	/**
 	 * @throws Exception
 	 */
-	public static function onGarbageCollection() {
+	public static function onGarbageCollection(): void
+	{
+
+
+
 		$days = (int) Module::get()->getSettings()->deleteAfterDays;
 
 		if(!empty($days)) {
+
+			go()->debug("Cleaning up stale history log entries older than " . $days ." days");
+
+
 			LogEntry::delete(
 				LogEntry::find()
 					->removeJoin('core_entity')
 					->where('createdAt', '<', (new core\util\DateTime("-" . $days . " days")))
 			);
+
+			go()->debug("Deleted " . (isset(LogEntry::$lastDeleteStmt) ? LogEntry::$lastDeleteStmt->rowCount() : 0) . " stale LogEntry rows");
+		} else {
+			go()->debug("History log cleanup is disabled");
 		}
 	}
 

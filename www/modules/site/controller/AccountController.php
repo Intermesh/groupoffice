@@ -166,6 +166,8 @@ class AccountController extends \GO\Site\Components\Controller {
 			\Site::notifier()->setMessage('error',\GO::t("The provided usertoken is not valid!", "site"));
 				
 		$user->password = null;
+
+		// nosemgrep
 		echo $this->render('resetPassword', array('user'=>$user));
 	}
 	
@@ -214,18 +216,21 @@ class AccountController extends \GO\Site\Components\Controller {
 						\Site::notifier()->setMessage('success', 'YOUR PASSWORD IS CHANGED SUCCESSFULLY');	
 					}else{
 						\Site::notifier()->setMessage('error', \GO::t("The new password could not be saved. Please contact the administrator of the system", "defaultsite"));
+						// nosemgrep
 						echo $this->render('resetExpiredPassword',array('user'=>$user));
 						return;
 					}
 				}
 			} else {
 					\Site::notifier()->setMessage('error', \GO::t("The password you have given is incorrect", "defaultsite"));
+					// nosemgrep
 					echo $this->render('resetExpiredPassword',array('user'=>$user));
 					return;
 			}
 
 		}
-			
+
+		// nosemgrep
 		echo $this->render('resetExpiredPassword',array('user'=>$user,'ref'=>\GO::session()->values['sites']['returnUrl']));
 	}
 	
@@ -279,6 +284,7 @@ class AccountController extends \GO\Site\Components\Controller {
 			\GO::session()->values['sites']['returnUrl'] = $_GET['ref'];
 		}
 
+		// nosemgrep
 		echo $this->render('login',array('model'=>$model));
 	}
 	

@@ -43,8 +43,11 @@ class BackgroundProcess {
 		$cmd = go()->getEnvironment()->getInstallFolder()->getFile("cli.php") ." "
 			. escapeshellarg($this->cmd);
 
-		foreach($this->params as $key=>$value) {
-			$cmd .= ' --'.$key.'='.escapeshellarg($value);
+		foreach($this->params as $key => $value) {
+			if(!preg_match("/^[a-zA-Z0-9-_]+$/", $key)) {
+				throw new \Exception("Invalid parameter \"$key\"");
+			}
+			$cmd .= ' --' . $key . '=' . escapeshellarg($value);
 		}
 
 		$cmd .= " --userId=" . go()->getUserId();

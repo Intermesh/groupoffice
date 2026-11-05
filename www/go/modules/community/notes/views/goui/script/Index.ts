@@ -1,93 +1,79 @@
-import {AclItemEntity, AclOwnerEntity, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {AclItemEntity, AclOwnerEntity, JmapDataSource, modules, TextType} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {EntityID, t} from "@intermesh/goui";
 import {SettingsPanel} from "./SettingsPanel.js";
 import {NoteDialog} from "./NoteDialog";
 import {NoteDetail} from "./NoteDetail";
 
+export * from "./NoteDialog";
+
 modules.register({
 	package: "community",
 	name: "notes",
-	async init() {
-
-		let notes: Main;
-
-		client.on("authenticated", ( {session}) => {
-			if (!session.capabilities["go:community:notes"]) {
-				// User has no access to this module
-				return;
+	panels: {
+		notes: {
+			cmp: Main,
+			title: t("Notes"),
+			routes: {
+				"^note/(\\d+)$"(noteId) {
+					this.show();
+					if (noteId) {
+						this.showNote(noteId);
+					}
+				}
 			}
-
-			router.add(/^note\/(\d+)$/, (noteId) => {
-				modules.openMainPanel("notes");
-				notes.showNote(noteId);
-			});
-
-			modules.addMainPanel("community", "notes", "notes", "Notes", () => {
-				notes = new Main();
-				return notes;
-			});
-
-			modules.addAccountSettingsPanel("community", "notes", "notes", t("Notes"), "note", () => {
-				return new SettingsPanel();
-			});
-
-		});
+		}
 	},
+	userSettingsPanels: [SettingsPanel],
 	entities: [{
 		name: "Note",
-		filters: [
-			{
-				name: 'text',
+		filters: {
+			text: {
 				type: "string",
 				multiple: false,
 				title: t("Query")
 			},
-			{
-				name: 'name',
+			name: {
 				type: "string",
 				multiple: true,
 				title: t("Name")
 			},
-			{
-				name: 'content',
+			content: {
 				type: "string",
 				multiple: true,
 				title: t("Content")
 			},
-			{
+			link: {
 				title: t("Has links to..."),
-				name: 'link',
 				multiple: false,
-				type: 'go.links.FilterLinkEntityCombo'
+				type: 'link'
 			},
-			{
+			commentedat: {
 				title: t("Commented at"),
-				name: 'commentedat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			modifiedat: {
 				title: t("Modified at"),
-				name: 'modifiedat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			modifiedBy: {
 				title: t("Modified by"),
-				name: 'modifiedBy',
 				multiple: true,
 				type: 'string'
-			}, {
+			},
+			createdat: {
 				title: t("Created at"),
-				name: 'createdat',
 				multiple: false,
 				type: 'date'
-			}, {
+			},
+			createdby: {
 				title: t("Created by"),
-				name: 'createdby',
 				multiple: true,
 				type: 'string'
 			}
-		],
+		},
 		links: [{
 			iconCls: 'entity ic-note yellow',
 			/**
@@ -118,6 +104,7 @@ modules.register({
 export interface Note extends AclItemEntity {
 	name: string,
 	content: string
+	type: TextType
 	noteBookId: EntityID
 }
 

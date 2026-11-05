@@ -2,6 +2,7 @@
 
 namespace go\modules\community\addressbook\model;
 
+use go\core\db\Criteria;
 use go\core\db\DbException;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
@@ -101,5 +102,38 @@ class UserSettings extends Property {
 		return isset($this->userId) ? (User::findById($this->userId, ['sort_name'])->sort_name == 'first_name' ? 'name' : 'lastName') : 'name';
 	}
 
+
+	public function getSyncAddressBookIds() {
+		return AddressBook::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->selectSingleValue('CAST(a.id AS CHAR)')
+			->all();
+	}
+
+	public function setSyncAddressBookIds(array $addressBookIds) {
+
+		$addressbooks = AddressBook::findFor($this->userId)
+			->where('syncToDevice', '=', true)
+			->andWhere('a.id', '!=', $addressBookIds);
+
+		foreach($addressbooks as $addressbook) {
+			$addressbook->syncToDevice = false;
+			$addressbook->save();
+		}
+
+		$addressbooks = AddressBook::findFor($this->userId)
+			->where(
+				(new Criteria())
+				->where('syncToDevice', '=', false)
+				->orWhere('syncToDevice', '=', null)
+			)
+			->andWhere('a.id', '=', $addressBookIds);
+
+		foreach($addressbooks as $addressbook) {
+			$addressbook->syncToDevice = true;
+			$addressbook->save();
+		}
+
+	}
 	
 }

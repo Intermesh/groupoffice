@@ -117,7 +117,7 @@ class Language extends Controller {
 					continue;
 				}
 				
-				$files = $moduleFolder->find(['regex' => "/^.*(\.js|\.ts)$/", "exclude" => '(node_modules|vendor)'] );
+				$files = $moduleFolder->find(['regex' => "/^.*(\.js|\.ts)$/", "exclude" => '(node_modules|vendor)'], false, true );
 				$strings = [];
 				foreach ($files as $file) {
 					$strings = array_merge($strings, $this->getStringsFromJS($file));
@@ -229,6 +229,10 @@ class Language extends Controller {
 			"format" => "text",
 			"alternatives" => 0
 			]);
+
+		if($response['status'] != 200) {
+			throw new \Exception("Error translating string: ".var_export($response['body'], true));
+		}
 
 		return isset($response['body']['translatedText']) ? $response['body']['translatedText'] : "";
 	}

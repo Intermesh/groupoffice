@@ -4,6 +4,7 @@ namespace go\core;
 
 use ErrorException;
 use Exception;
+use go\core\exception\UserSafeException;
 use go\core\util\DateTime;
 use Throwable;
 
@@ -52,12 +53,19 @@ class ErrorHandler {
 	public static function logException(Throwable $e, string|null $context = null): string
 	{
 		$cls = get_class($e);
-		
-		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
+
 
 		if(isset($context)) {
-			$errorString .= ', ' . $context;
+			$errorString = $context . ", ";
+		} else {
+			$errorString = "";
 		}
+
+		$errorString .= "[ref " . self::errorId($e) . "] ";
+		
+		$errorString .= $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
+
+
 
 		if(!Environment::get()->isCli()) {
 			error_log($errorString, 0);
@@ -80,6 +88,34 @@ class ErrorHandler {
 		}
 		
 		return $errorString;
+	}
+
+	/**
+	 * Short reference ID for an exception. It's stable per exception object so the ID shown to the
+	 * user matches the one in the server log.
+	 */
+	public static function errorId(Throwable $e): string
+	{
+		return substr(sha1(spl_object_id($e) . $e->getFile() . $e->getLine() . $e->getMessage() . ($_SERVER['REQUEST_TIME_FLOAT'] ?? '')), 0, 8);
+	}
+
+	/**
+	 * Get the message that may be sent to the client.
+	 *
+	 * In debug mode this includes the class, file and line. Otherwise it's the message of a {@see UserSafeException}
+	 * or a generic message with a reference ID that can be found in the server log.
+	 */
+	public static function clientMessage(Throwable $e): string
+	{
+		if(go()->getDebugger()->enabled) {
+			return get_class($e) . " in " . $e->getFile() . " at line " . $e->getLine() . ': ' . $e->getMessage();
+		}
+
+		if($e instanceof UserSafeException) {
+			return $e->getMessage();
+		}
+
+		return go()->t("An unexpected error occurred. Please contact your administrator.") . " (ref: " . self::errorId($e) . ")";
 	}
 
 	/**
@@ -137,23 +173,31 @@ class ErrorHandler {
 	}
 
   /**
-   * Custom error handler that logs to our own error log
+   * Custom error handler that converts PHP errors into ErrorExceptions.
+   *
+   * Deprecations in third party code in a vendor folder are only logged. We can't fix them and they
+   * should not break GroupOffice when a new PHP version deprecates something.
    *
    * @param int $errno
    * @param string $errstr
    * @param string $errfile
    * @param int $errline
-   * @return void
+   * @return bool true when the error was handled without throwing
    * @throws ErrorException
    */
-	public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline) {
+	public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool {
 
 		// do not use debug here because it will lead to a loop when error is thrown inside App::getConfig()
 		//go()->debug("ErrorHandler:errorHandler called $errno");
 
 		// check if error should be reported according to PHP settings
 		if (!(error_reporting() & $errno)) {
-		  return;
+		  return true;
+		}
+
+		if (($errno === E_DEPRECATED || $errno === E_USER_DEPRECATED) && str_contains($errfile, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR)) {
+			error_log("PHP Deprecated: " . $errstr . " in " . $errfile . " on line " . $errline);
+			return true;
 		}
 
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);

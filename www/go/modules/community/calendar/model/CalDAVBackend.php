@@ -48,7 +48,8 @@ class CalDAVBackend extends AbstractBackend implements
 		$personalCalendarId = $u->calendarPreferences->personalCalendarId;
 
 		$calendars = Calendar::findFor($u->id)
-			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null]);
+			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null])
+			->filter(['permissionLevel' => Acl::LEVEL_READ]);
 
 
 		foreach($calendars as $calendar) {
@@ -142,11 +143,11 @@ class CalDAVBackend extends AbstractBackend implements
 			$values['color'] = substr($values['color'], 1); // remove #
 		}
 		switch($type[0]) {
-			case 'VEVENT': //
+			case 'VEVENT':
 				$prefix = 'c-';
 				$cal = new Calendar();
 				break;
-			case 'VTODO': // task
+			case 'VTODO':
 				$prefix = 't-';
 				$values['ownerId'] = go()->getUserId(); //required
 				$cal = new TaskList();
@@ -177,7 +178,7 @@ class CalDAVBackend extends AbstractBackend implements
 					$cal = Calendar::findById($id);
 					break;
 				case 't':
-					$cal = Tasklist::findById($id);
+					$cal = TaskList::findById($id);
 					break;
 			}
 
@@ -210,12 +211,30 @@ class CalDAVBackend extends AbstractBackend implements
 		go()->debug("CalDAVBackend::deleteCalendar($calendarId)");
 		list($type, $id) = explode('-', $calendarId,2);
 		switch($type) {
-			case 'c': Calendar::delete(['id' => $id]); break;
-			case 't': TaskList::delete(['id' => $id]); break;
+			case 'c':
+
+				$e = Calendar::findById($id, []);
+				if(!$e) {
+					throw new DAV\Exception\NotFound("Calendar not found");
+				}
+
+				// don't delete it but exclude it from sync
+				$e->syncToDevice = 0;
+				$e->save();
+				break;
+			case 't':
+				$e = TaskList::findById($id, []);
+				if(!$e) {
+					throw new DAV\Exception\NotFound("Task list not found");
+				}
+				// don't delete it but exclude it from sync
+				$e->syncToDevice = 0;
+				$e->save();
+				break;
 		}
 	}
 
-	public function getCalendarObjects($calendarId)
+	public function  getCalendarObjects($calendarId)
 	{
 		go()->debug("CalDAVBackend::getCalendarObjects($calendarId)");
 		//id, uri, lastmodified, etag, calendarid, size, componenttype
@@ -345,7 +364,7 @@ class CalDAVBackend extends AbstractBackend implements
 			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
 		} else {
 			$event = new CalendarEvent();
-			$organizerEmail = str_replace('mailto:', '',(string)$vcalendar->VEVENT[0]->{'ORGANIZER'});
+			$organizerEmail = str_replace('mailto:', '',strtolower((string)$vcalendar->VEVENT[0]->{'ORGANIZER'}));
 			$event->isOrigin = true;//go()->getAuthState()->getUser(['email'])->email === $organizerEmail; // if you created this event by yourself.
 			$event->replyTo = $organizerEmail;
 			$event->calendarId = $calendarId;
@@ -672,12 +691,10 @@ class CalDAVBackend extends AbstractBackend implements
 //		go()->debug($data);
 //		go()->debug(")");
 
-		$lastModified = strtotime($object->modifiedAt);
+
 		$obj = [
 			'id' => $object->id,
 			'uri' => $objectUri,
-			'lastmodified' => $lastModified,
-			'etag' => '"' . $lastModified . '"',
 			'calendarid' => $calendarId,
 			'component' => $component,
 		];
@@ -696,6 +713,11 @@ class CalDAVBackend extends AbstractBackend implements
 			$obj['size'] = $blob->size;
 			$obj['calendardata'] = $data;
 		}
+
+		// set these after generating icsBlob() because lastModified may change.
+		$lastModified = $object->modifiedAt->getTimestamp();
+		$obj['lastmodified'] = $lastModified;
+		$obj['etag'] = '"' . $lastModified . '"';
 
 		return $obj;
 	}

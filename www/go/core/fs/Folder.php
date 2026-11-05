@@ -12,46 +12,8 @@ use Throwable;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Folder extends FileSystemObject {
-	
-	
-//	/**
-//	 * Create a new file object. Filesystem file is not created automatically.
-//	 *
-//	 * @param string $relativePath
-//	 * @return File
-//	 */
-//	public function getFolder($relativePath) {		
-//		
-//		$childPath = $this->path . '/' . $relativePath;
-//
-//		$file = new File($childPath);
-//		
-//		if($file->exists()) {
-//			throw new \Exception("File '$relativePath' already exists");
-//		}
-//		
-//		return $file;
-//	}
-//
-//	/**
-//	 * Create a new folder object. Filesystem folder is not created automatically.
-//	 *
-//	 * @param string $relativePath
-//	 * @return Folder
-//	 */
-//	public function getFolder($relativePath) {
-//		$childPath = $this->path . '/' . $relativePath;
-//
-//		$folder = new Folder($childPath);
-//		$folder->createMode = $this->createMode;
-//		
-//		if($folder->exists()) {
-//			throw new \Exception("Folder '$relativePath' already exists");
-//		}
-//		
-//		return $folder;
-//	}
+class Folder extends FileSystemObject
+{
 
 
 	/**
@@ -70,7 +32,12 @@ class Folder extends FileSystemObject {
 	 */
 	public static function tempFolder(): Folder
 	{
-		return go()->getTmpFolder()->getFolder(uniqid(time()));
+		$folder = go()->getTmpFolder()->getFolder(uniqid(time()));
+		while($folder->exists()) {
+			$folder = go()->getTmpFolder()->getFolder(uniqid(time()));
+		}
+		$folder->create();
+		return $folder;
 	}
 
 	/**
@@ -415,7 +382,7 @@ class Folder extends FileSystemObject {
 	 * @return int | null
 	 */
 	public function calculateSize() : ?int {
-		$cmd = 'du -sbL "' . $this->path . '" 2>/dev/null';
+		$cmd = 'du -sbL ' . escapeshellarg($this->path) . ' 2>/dev/null';
 
 		$io = popen($cmd, 'r');
 

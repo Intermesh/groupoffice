@@ -11,30 +11,25 @@ namespace go\core {
 	use go\core\db\Connection;
 	use go\core\db\Database;
 	use go\core\db\DbException;
-	use go\core\db\Table;
 	use go\core\event\EventEmitterTrait;
 	use go\core\event\Listeners;
 	use go\core\fs\Blob;
 	use go\core\fs\Folder;
-	use go\core\jmap\Request;
+	use go\core\http\PostResponseProcessor;
+	use go\core\jmap\Capabilities;
 	use go\core\mail\Mailer;
 	use go\core\model\Group;
 	use go\core\model\Module as ModuleModel;
 	use go\core\orm\Entity;
 	use go\core\orm\EntityType;
 	use go\core\orm\exception\SaveException;
-	use go\core\orm\Property;
 	use go\core\orm\SearchableTrait;
-	use go\core\Settings as CoreSettings;
 	use go\core\util\ArrayObject;
 	use go\core\util\ClassFinder;
 	use go\core\webclient\Extjs3;
 	use go\core\model\User;
 	use go\core\model\Settings;
-	use Faker;
-
 	use InvalidArgumentException;
-	use PDOException;
 	use Throwable;
 	use const GO_CONFIG_FILE;
 
@@ -192,6 +187,13 @@ namespace go\core {
 				'mayChangeGroups',
 				'mayChangeCustomFields'
 			];
+		}
+
+		public function getCapabilities(model\Module $module): array
+		{
+			$capabilities = parent::getCapabilities($module);
+			$capabilities['urn:ietf:params:jmap:core'] = Capabilities::get();
+			return $capabilities;
 		}
 
 		/**
@@ -361,7 +363,7 @@ namespace go\core {
 					}
 				} else
 				{
-					$usage = (int) GO::config()->get_setting('file_storage_usage', 0 ,0);
+					$usage = go()->getSettings()->fileStorageUsage;
 					$this->storageFreeSpace = $quota - $usage;
 				}
 			}
@@ -439,13 +441,8 @@ namespace go\core {
 				return [];
 			}
 
-			try {
-				require($configFile);
-			} catch(Throwable $e) {
-				ErrorHandler::log("Failed to require config file: " . $configFile);
-				throw $e;
-			}
-			
+			require($configFile);
+
 			if(!isset($config)) {
 				$config = [];
 			}
@@ -470,6 +467,9 @@ namespace go\core {
 			//defaults
 			$config = new ArrayObject([
 				"frameAncestors" => "",
+				// IP addresses or CIDR ranges of reverse proxies / load balancers that set "X-Forwarded-For"
+				"trustedProxies" => [],
+				"wopiAllowInternal" => false, // Allow WOPI service URLs that resolve to private/loopback addresses
 				"theme" => "Paper",
 				"allow_themes" => true,
 				"file_storage_path" => '/var/lib/groupoffice',
@@ -504,10 +504,6 @@ namespace go\core {
 				{
 					$config['cache'] = cache\Disk::class;
 				}
-			}
-
-			if(Request::get()->getHeader('X-Debug') == "1") {
-				$config['debug'] = true;
 			}
 
 			if(!isset($config['debug_log'])) {
@@ -745,6 +741,8 @@ namespace go\core {
 		public function __destruct() {
 
 			try {
+				PostResponseProcessor::get()->runTasks();
+
 				EntityType::push();
 
 				if ($this->rebuildCacheOnDestruct) {
@@ -814,8 +812,6 @@ namespace go\core {
 		 */
 		public function setAuthState(AuthState $authState): App
 		{
-
-
 			$this->authState = $authState;
 			
 			return $this;
@@ -824,7 +820,7 @@ namespace go\core {
 		/**
 		 * Get the authentication handler
 		 * 
-		 * @return AuthState
+		 * @return ?AuthState
 		 */
 		public function getAuthState(): ?AuthState
 		{
@@ -849,9 +845,9 @@ namespace go\core {
 		 * ```
 		 * go()->getAuthState()->getUser();
 		 * ```
-		 * @return int
+		 * @return ?string
 		 */
-		public function getUserId(): ?int
+		public function getUserId(): ?string
 		{
 			if ($this->getAuthState() instanceof AuthState) {
 				return $this->authState->getUserId();
@@ -923,15 +919,22 @@ namespace go\core {
 				//hack for wopi subdomain
 				$domain = str_replace('.wopi.', '.', $domain);
 
-				$workingFile = '/etc/groupoffice/multi_instance/' . $domain . '/' . $name;
+				$root = '/etc/groupoffice/multi_instance/';
+
+				// make sure HTTP_HOST is not doing path traversal
 				try {
-					if (file_exists($workingFile)) {
-						return $workingFile;
-					}
-				}
-				catch(Exception $e) {
+					$workingFile = realpath($root . $domain . '/' . $name);
+				}  catch(Exception $e) {
 					//ignore open_basedir error
 				}
+				if($workingFile) {
+					if (!str_starts_with($workingFile, $root)) {
+						throw new Exception("Invalid config file location: " . $workingFile . ' => ' . $root);
+					}
+
+					return $workingFile;
+				}
+
 			}
 			
 			$workingFile = dirname(__DIR__, 2) . '/' . $name;
@@ -981,12 +984,23 @@ namespace go\core {
 				
 
 			} else {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');
+				if(!$file->exists()) {
+					$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name . '/icon.svg');
+				}
 			}
 
 			if(!$file->exists()) {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-app-icon.svg');
+				$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
+			} else {
+				$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.png"']);
 			}
+
+		}
+
+		public function downloadModuleImg($package, $name) {
+			$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/community/calendar/calendar.png');
 			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
 		}
 
@@ -1037,9 +1051,6 @@ namespace go\core {
 				for ($i = 0; $i < 10; $i++) {
 					echo ".";
 					$user = new User();
-//				$blob = Blob::fromTmp(new File($faker->image(null, 640, 480, 'people')));
-//				$blob->save();
-//				$user->avatarId = $blob->id;
 					$user->username = $faker->username;
 					$user->displayName = $faker->name;
 					$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
@@ -1100,6 +1111,43 @@ namespace go\core {
 
 			parent::checkAcls();
 		}
+
+
+		/**
+		 * Start session
+		 *
+		 * @return void
+		 */
+		public function sessionStart() {
+
+			//without cookie_httponly the cookie can be accessed by malicious scripts
+			//injected to the site and its value can be stolen. Any information stored in
+			//session tokens may be stolen and used later for identity theft or
+			//user impersonation.
+			ini_set("session.cookie_httponly",1);
+
+			//Avoid session id in url's to prevent session hijacking.
+			ini_set('session.use_only_cookies',1);
+
+			session_set_cookie_params([
+				'httponly' => true,
+				'samesite' => 'Lax'
+			]);
+
+			ini_set('session.cookie_secure', \go\core\http\Request::get()->isHttps());
+
+			session_name('groupoffice');
+
+			// prevents altering headers. This caused a security issue where the expires header would be different on lost
+			// password requests when a valid email address was used.
+			session_cache_limiter("");
+			header('Cache-Control: no-cache, no-store, must-revalidate');
+			header('Pragma: no-cache');
+			header('Expires: 01-07-2003 12:00:00 GMT');
+			session_start();
+		}
+
+
 	}
 
 

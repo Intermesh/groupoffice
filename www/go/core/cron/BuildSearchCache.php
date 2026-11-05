@@ -31,7 +31,7 @@ use Throwable;
  */
 class BuildSearchCache extends CronJob {
 
-	public function run(CronJobSchedule $schedule)
+	public function run(CronJobSchedule $schedule): void
 	{
 		$schedule->enabled = false;
 		if(!$schedule->save()) {

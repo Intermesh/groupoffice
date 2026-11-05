@@ -2,6 +2,7 @@
 
 namespace GO\Dav\Locks;
 
+use go\core\ErrorHandler;
 use GO\Dav\Fs\File;
 use Sabre\DAV\Exception\NotFound;
 use Sabre\DAV\Locks\LockInfo;
@@ -26,11 +27,11 @@ class LocksBackend extends \Sabre\DAV\Locks\Backend\PDO
 		$locks = parent::getLocks($uri, $returnChildLocks);
 		try {
 			$file = $this->server->tree->getNodeForPath($uri);
-			if (!$this->isLocking && $file instanceof File) {
+			if ($file instanceof File) {
 
 				$fileModel = $file->getFile();
 				$exists = false;
-				if ($fileModel->lock_id) {
+				if ($fileModel->isLocked(true)) {
 					foreach ($locks as $lock) {
 						if ($lock->token == $fileModel->lock_id) {
 							$exists = true;
@@ -39,11 +40,11 @@ class LocksBackend extends \Sabre\DAV\Locks\Backend\PDO
 					}
 
 					if (!$exists) {
-						go()->debug("Adding lock from GO " . $fileModel->lock_id);
+//						go()->debug("Adding lock from GO " . $fileModel->lock_id);
 						$lockInfo = new LockInfo();
 						$lockInfo->token = $fileModel->lock_id;
 						$lockInfo->owner = "go-" . $fileModel->locked_user_id;
-						$lockInfo->timeout = 30 * 60;
+						$lockInfo->timeout = $fileModel->lock_expires_at - time();
 						$lockInfo->created = time();
 						$lockInfo->uri = $uri;
 
@@ -53,8 +54,10 @@ class LocksBackend extends \Sabre\DAV\Locks\Backend\PDO
 			}
 		} catch (NotFound $e) {
 			//ignore
-
+			ErrorHandler::logException($e);
 		}
+
+//		go()->debug($locks);
 
 		return $locks;
 

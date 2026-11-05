@@ -24,9 +24,11 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 			}
 		});
 
-		this.store.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
-			.setFilter('isOrganisation', {isOrganization: false})
+		this.store.setFilter('isOrganisation', {isOrganization: false})
 			.setFilter('birthday', {birthday: 'now..30 days'});
+		if (go.User.birthdayPortletAddressBooks && go.User.birthdayPortletAddressBooks.length > 0) {
+			this.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
+		}
 
 		this.paging = false;
 		this.autoExpandColumn = 'birthday-portlet-name-col';
@@ -57,15 +59,13 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 				sortable: false,
 				dataIndex: "birthday",
 				renderer: function(v, meta, record) {
-
-					var bday = "";
+					let bdate = "";
 					record.data.dates.forEach(function(date) {
-						if(date.type == "birthday") {
-							bday = date.date;
+						if(date.type === "birthday") {
+							bdate = date.date;
 						}
 					});
-
-					return go.util.Format.date(bday);
+					return go.util.Format.date(bdate);
 				}
 			}, {
 				header: t("Age"),
@@ -73,7 +73,17 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 				sortable: false,
 				width: 100,
 				renderer: function(v, meta, record) {
-					return v + 1;
+					let bdate = "";
+					record.data.dates.forEach(function(date) {
+						if(date.type === "birthday") {
+							bdate = date.date;
+						}
+					});
+					const today = new Date(), bdt = new Date(bdate);
+					if(today.getUTCDate() !== bdt.getUTCDate() || today.getUTCMonth() !== bdt.getUTCMonth()) {
+						v++
+					}
+					return v;
 				}
 			}];
 
@@ -102,6 +112,11 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 		go.modules.community.addressbook.BirthdaysPortlet.superclass.afterRender.call(this);
 
 		this.store.load();
+	},
+
+	getBirthDate: function(record) {
+
+		return bdate;
 	}
 });
 
@@ -122,7 +137,9 @@ GO.mainLayout.onReady(function () {
 						listeners: {
 							hide: function () {
 								setTimeout(function() {
-									birthdaysGrid.store.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
+									if (go.User.birthdayPortletAddressBooks && go.User.birthdayPortletAddressBooks.length > 0) {
+										birthdaysGrid.store.setFilter('addressBookId', {addressBookId: go.User.birthdayPortletAddressBooks})
+									}
 									birthdaysGrid.store.reload();
 								})
 							},

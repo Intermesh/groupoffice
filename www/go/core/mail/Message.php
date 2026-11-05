@@ -8,6 +8,7 @@ use GO\Base\Mail\EmailRecipients;
 use GO\Base\Mail\MimeDecode;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\http\PostResponseProcessor;
 use go\core\http\Request;
 use go\core\util\DateTime;
 
@@ -573,6 +574,19 @@ class Message {
 	public function send() : void
 	{
 		$this->getMailer()->send($this);
+	}
+
+
+	/**
+	 * Send the message after the response has been sent and the client connection has been closed.
+	 *
+	 * @param callable|null $onSuccess Called on success with message as parameter
+	 * @param callable|null $onError Called on error with message and exception as parameter
+   * @see PostResponseProcessor
+	 */
+	public function sendAfterResponse(callable|null $onSuccess = null, callable|null $onError = null) : void
+	{
+		$this->getMailer()->sendAfterResponse($this, $onSuccess, $onError);
 	}
 
 	/**

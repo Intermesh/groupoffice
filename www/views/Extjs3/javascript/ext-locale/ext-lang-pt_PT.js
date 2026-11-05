@@ -18,7 +18,7 @@ at http://www.sencha.com/contact.
 
 Build date: 2013-04-03 15:07:25
 */
-ï»¿/**
+/**
  * Portuguese/Portugal (pt_PT) Translation
  * by Nuno Franco da Costa - francodacosta.com
  * translated from ext-lang-en.js
@@ -115,7 +115,7 @@ if(Ext.DatePicker){
   Ext.apply(Ext.DatePicker.prototype, {
     todayText         : "Hoje",
     minText           : "A data &eacute; anterior ao m&iacute;nimo definido",
-    maxText           : "A data &eacute; posterior ao máximo definido",
+    maxText           : "A data &eacute; posterior ao mï¿½ximo definido",
     disabledDaysText  : "",
     disabledDatesText : "",
     monthNames        : Date.monthNames,
@@ -123,7 +123,7 @@ if(Ext.DatePicker){
     nextText          : 'M&ecirc;s Seguinte (Control+Right)',
     prevText          : 'M&ecirc;s Anterior (Control+Left)',
     monthYearText     : 'Escolha um m&ecirc;s (Control+Up/Down ava&ccedil;ar/recuar anos)',
-    todayTip          : "{0} (barra de espaço)",
+    todayTip          : "{0} (barra de espaï¿½o)",
     format            : "y/m/d",
     okText            : "*OK*",
     cancelText        : "Cancelar",

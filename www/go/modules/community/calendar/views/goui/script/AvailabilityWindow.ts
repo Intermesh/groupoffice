@@ -213,7 +213,7 @@ export class AvailabilityWindow extends Window<AvailabilityWindowEventMap> {
 			const data = Object.assign({}, item.data, modified);
 			this.evTime = {
 				start: new DateTime(data.start),
-				end: new DateTime(data.end)};
+				end: data.end ? new DateTime(data.end) : item.end};
 			this.principalIds = Object.keys(data.participants!);
 			this.setDate(new DateTime(data.start));
 			this.setEvent();

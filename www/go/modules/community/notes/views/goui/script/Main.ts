@@ -1,38 +1,52 @@
 import {
 	btn,
 	Button,
-	checkbox,
 	checkboxselectcolumn,
 	column,
 	comp,
+	Component,
 	EntityID,
-	h3,
+	h4,
 	hr,
 	menu,
+	menucolumn,
 	mstbar,
 	router,
 	searchbtn,
+	selectallcheckboxfield,
 	t,
 	tbar,
 	Toolbar
 } from "@intermesh/goui";
-import {AclLevel, client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {
+	AclLevel,
+	client,
+	entities,
+	Export,
+	filterpanel, Import,
+	jmapds,
+	MainThreeColumnPanel,
+	TableTitle,
+	tabletitle
+} from "@intermesh/groupoffice-core";
 import {notebookgrid, NoteBookGrid} from "./NoteBookGrid";
 import {NoteBookDialog} from "./NoteBookDialog";
 import {NoteGrid} from "./NoteGrid";
 import {NoteDetail} from "./NoteDetail";
 import {NoteDialog} from "./NoteDialog";
-import {NoteBook, noteBookDS, noteDS} from "./Index.js";
+import {noteBookDS} from "./Index.js";
 
-export class Main extends MainThreeColumnPanel {
+export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail> {
 	private noteBookGrid!: NoteBookGrid;
 	private noteGrid!: NoteGrid;
 	private noteGridToolbar!: Toolbar;
-	protected east!: NoteDetail;
 	private addButton!: Button;
+	private tblTitle!: TableTitle;
 
 	constructor() {
 		super("notes");
+
+		this.setup(this.createCenter(), this.createWest(), this.createEast());
 
 		this.on("render", async () => {
 			void this.noteBookGrid.store.load();
@@ -40,24 +54,101 @@ export class Main extends MainThreeColumnPanel {
 	}
 
 	protected createWest() {
-		return comp({
-				cls: "vbox",
-				width: 300
-			},
-			tbar({
-					cls: "border-bottom"
-				},
-				checkbox({
-					listeners: {
-						change: ({newValue}) => {
-							const rs = this.noteBookGrid.rowSelection!
-							newValue ? rs.selectAll() : rs.clear();
+		this.noteBookGrid = notebookgrid({
+			headers: false,
+			stateId: "notes-noteBookGrid",
+			cls: "no-row-lines",
+			rowSelectionConfig: {
+				multiSelect: true,
+				listeners: {
+					selectionchange: ({selected}) => {
+
+						const noteBookIds = selected.map((row) => row.record.id),
+							title = selected.map(r => r.record.name);
+
+						this.tblTitle.title = title.join(", ");
+
+						this.noteGrid.store.setFilter("notebook", {
+							noteBookId: noteBookIds
+						});
+
+						void this.noteGrid.store.load();
+
+						this.addButton.disabled = !noteBookIds[0];
+
+						if (client.user.notesSettings.rememberLastItems) {
+							void jmapds("User").update(client.user.id, {
+								notesSettings: {
+									lastNoteBookIds: noteBookIds
+								}
+							})
 						}
 					}
+				}
+			},
+			columns: [
+				checkboxselectcolumn(),
+				column({
+					header: t("Name"),
+					id: "name",
+					sortable: true,
+					resizable: false
 				}),
-				h3(t("Notebooks")),
+
+				menucolumn({
+						menu: menu({
+								listeners: {
+									show: ({target}) => {
+										const record = this.noteBookGrid.store.get(target.dataSet.rowIndex)!;
+
+										target.findChild("edit")!.disabled = record.permissionLevel < AclLevel.MANAGE;
+										target.findChild("delete")!.disabled = !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE;
+
+									}
+								}
+							},
+							btn({
+								itemId: "edit",
+								icon: "edit",
+								text: t("Edit"),
+								handler: (btn) => {
+									const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
+
+									const dlg = new NoteBookDialog();
+									void dlg.load(record.id);
+									dlg.show();
+
+								}
+							}),
+
+							btn({
+								itemId: "delete",
+								icon: "delete",
+								text: t("Delete"),
+								handler: (btn) => {
+									const record = this.noteBookGrid.store.get(btn.parent!.dataSet.rowIndex)!
+									void noteBookDS.confirmDestroy([record.id]);
+								}
+							})
+						)
+					}
+				),
+
+
+			]
+		});
+
+		return comp({
+				cls: "scroll",
+				width: 300,
+			},
+			tbar({cls: "table-aligned compact"},
+				selectallcheckboxfield({list: this.noteBookGrid}),
+
+				h4(t("Notebooks")),
 				"->",
 				searchbtn({
+					cls: "small",
 					listeners: {
 						input: ({text}) => {
 							this.noteBookGrid.store.setFilter("search", {text});
@@ -66,90 +157,20 @@ export class Main extends MainThreeColumnPanel {
 					}
 				}),
 				btn({
+					cls: "small",
 					icon: "add",
 					handler: () => {
 						const dlg = new NoteBookDialog();
 						dlg.show();
 					}
 				}),
-				this.showCenterButton()
+				this.hideWestButton(),
+				this.closeWestButton()
 			),
 			comp({
-				flex: 1,
-				cls: "scroll"
-			}, this.noteBookGrid = notebookgrid({
-				headers: false,
-				fitParent: true,
-				cls: "no-row-lines",
-				rowSelectionConfig: {
-					multiSelect: true,
-					listeners: {
-						selectionchange: ({selected}) => {
-
-							const noteBookIds = selected.map((row) => row.record.id);
-
-							this.noteGrid.store.setFilter("notebook", {
-								noteBookId: noteBookIds
-							});
-
-							void this.noteGrid.store.load();
-
-							this.addButton.disabled = !noteBookIds[0];
-
-							if (client.user.notesSettings.rememberLastItems) {
-								void jmapds("User").update(client.user.id, {
-									notesSettings: {
-										lastNoteBookIds: noteBookIds
-									}
-								})
-							}
-						}
-					}
-				},
-				columns: [
-					checkboxselectcolumn(),
-					column({
-						header: t("Name"),
-						id: "name",
-						sortable: true,
-						resizable: false
-					}),
-					column({
-						width: 48,
-						id: "btn",
-						renderer: (columnValue: any, record: NoteBook, td, table, rowIndex) => {
-							return btn({
-								icon: "more_vert",
-								menu: menu({},
-									btn({
-										disabled: record.permissionLevel < AclLevel.MANAGE,
-										icon: "edit",
-										text: t("Edit"),
-										handler: () => {
-											const record = table.store.get(rowIndex)!;
-
-											const dlg = new NoteBookDialog();
-											void dlg.load(record.id);
-											dlg.show();
-
-										}
-									}),
-
-									btn({
-										disabled: !go.Modules.get("community", 'notes').userRights.mayChangeNoteBooks || record.permissionLevel < AclLevel.MANAGE,
-										icon: "delete",
-										text: t("Delete"),
-										handler: () => {
-											const record = table.store.get(rowIndex)!;
-											void noteBookDS.confirmDestroy([record.id]);
-										}
-									})
-								)
-							})
-						}
-					})
-				]
-			})),
+					flex: 1
+				}, this.noteBookGrid
+			),
 			filterpanel({
 				flex: 1,
 				store: this.noteGrid.store,
@@ -160,9 +181,7 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createCenter() {
 		this.noteGrid = new NoteGrid();
-
-		this.noteGrid.title = "Notes";
-
+		this.noteGrid.stateId = "notes-noteGrid";
 		this.noteGrid.rowSelectionConfig = {
 			multiSelect: true,
 			listeners: {
@@ -172,37 +191,44 @@ export class Main extends MainThreeColumnPanel {
 					if (noteIds[0]) {
 						router.goto("note/" + noteIds[0]);
 					}
-
-					noteIds.length > 1 ? this.noteGridToolbar.hide() : this.noteGridToolbar.show();
 				}
 			}
 		};
 
 		this.addButton = btn({
 			cls: "filled primary",
-			text: "Add",
+			title: t("Add"),
 			icon: "add",
 			disabled: true,
 			handler: () => {
 				const dlg = new NoteDialog();
-
 				const noteBookId = this.noteBookGrid.rowSelection!.getSelected()[0].record.id;
-
 				dlg.form.value = {
 					noteBookId: noteBookId
 				};
 				dlg.show();
+				dlg.form.on("save", ({data, isNew}) => {
+					if (isNew) {
+						entities.get("Note")!.goto(data.id);
+					}
+				})
 			}
 		});
 
 		return comp({
-				cls: "vbox bg-lowest",
-				flex: 1
+				cls: "vbox bg-lowest"
 			},
 			this.noteGridToolbar = tbar({
-					cls: "bg-mid border-bottom"
+					cls: "bg-mid border-bottom table-aligned"
 				},
 				this.showWestButton(),
+				this.openWestButton(),
+
+				this.tblTitle = tabletitle({
+					store: this.noteGrid.store,
+					countEntityText: t("notes")
+				}),
+
 				"->",
 				searchbtn({
 					listeners: {
@@ -216,11 +242,13 @@ export class Main extends MainThreeColumnPanel {
 				btn({
 					icon: "more_vert",
 					menu: menu({},
+						this.noteGrid.getVisibleColumnButton(),
+						'-',
 						btn({
 							icon: "cloud_upload",
 							text: t("Import"),
 							handler: () => {
-								go.util.importFile(
+								Import.fromFile(
 									'Note',
 									'.csv, .xlsx, .json',
 									{},
@@ -237,7 +265,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "unknown_document",
 									text: t("Microsoft Excel"),
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"xlsx");
@@ -247,7 +275,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "csv",
 									text: "Comma Seperated Values",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"csv");
@@ -257,7 +285,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "html",
 									text: t("Web page") + " (HTML)",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"html");
@@ -267,7 +295,7 @@ export class Main extends MainThreeColumnPanel {
 									icon: "text_snippet",
 									text: "JSON",
 									handler: () => {
-										go.util.exportToFile(
+										Export.toFile(
 											'Note',
 											this.noteGrid.store.queryParams,
 											"json");
@@ -276,22 +304,22 @@ export class Main extends MainThreeColumnPanel {
 							)
 						})
 					)
-				})
+				}),
+				mstbar({
+						table: this.noteGrid
+					},
+					"->",
+					btn({
+						icon: "delete",
+						title: t("Delete"),
+						handler: (btn) => {
+							this.noteGrid!.delete();
+							btn.parent!.hide();
+						}
+					})
+				)
 			),
-			mstbar({
-					cls: "border-bottom",
-					table: this.noteGrid
-				},
-				"->",
-				btn({
-					icon: "delete",
-					handler: async () => {
-						const noteIds = this.noteGrid!.rowSelection!.getSelected().map((row) => row.record.id);
 
-						await noteDS.confirmDestroy(noteIds);
-					}
-				})
-			),
 			comp({
 					cls: "scroll bg-lowest",
 					flex: 1
@@ -303,7 +331,7 @@ export class Main extends MainThreeColumnPanel {
 
 	protected createEast() {
 		const detail = new NoteDetail();
-		detail.toolbar.items.insert(0, this.showCenterButton());
+		detail.toolbar.items.insert(0, this.hideEastButton(), this.closeEastButton());
 		return detail;
 	}
 

@@ -18,6 +18,8 @@ use go\modules\community\calendar\Module;
 /**
  * CalendarEvent controller.
  * NOTE: The extra get and set parameter in the docblocks are according to RFC and might not (yet) be implemented
+ *
+ * @extends EntityController<\go\modules\community\calendar\model\CalendarEvent>
  */
 class CalendarEvent extends EntityController {
 	
@@ -87,27 +89,6 @@ class CalendarEvent extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
-	/**
-	 * Parse an iCalendar blobId to an CalendarEvent object
-	 * @param $params [ blobId ]
-	 * @return void
-	 */
-	public function parse($params) {
-
-	}
-
-	private function b64UrlEncode(string $data) : string{
-		return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
-	}
-
-	public function generateJWT(array $params) : array {
-		$s = Module::get()->getSettings();
-		return [
-			'success' => true,
-			'jwt' => $s->createJwtToken($params['room'])
-		];
-	}
-
 
 	public function loadICS( array $params) :array
 	{
@@ -121,7 +102,11 @@ class CalendarEvent extends EntityController {
 		}
 
 		$event = new model\CalendarEvent();
-		$event->calendarId = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->defaultCalendarId;
+		$personalCalendar = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId;
+		if(!empty($personalCalendar)) {
+			$event->calendarId = $personalCalendar;
+		}
+
 		//$event = model\ICalendarHelper::fromICal($data, $event);
 		$event = ICalendarHelper::parseVObject($data, $event);
 		return ['success' => true, 'data' => $event];
@@ -133,8 +118,8 @@ class CalendarEvent extends EntityController {
 	 * @throws \Exception
 	 */
 	public function import($params) {
-
-		return model\CalendarEvent::import(
+		set_time_limit(0);
+		return model\ICalendarHelper::import(
 			$params['blobIds'],
 			$params['calendarId'],
 			!empty($params['ignoreUid']) ? 'new':'check'

@@ -178,14 +178,16 @@ CREATE TABLE `core_module` (
   `name` varchar(100) NOT NULL DEFAULT '',
   `package` varchar(100) DEFAULT NULL,
   `version` int(11) NOT NULL,
-  `sort_order` int(11) NOT NULL DEFAULT 0,
-  `admin_menu` tinyint(1) NOT NULL DEFAULT 0,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `modifiedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
   `deletedAt` datetime DEFAULT NULL,
   shadowAclId int null
 ) ENGINE=InnoDB;
+
+
+
+
 
 CREATE TABLE `core_search` (
   `id` int(11) NOT NULL,
@@ -880,7 +882,7 @@ create table core_email_template
     `key`    varchar(20) collate ascii_bin              null,
     language varchar(20) collate ascii_bin default 'en' not null,
     name     varchar(190)                               not null,
-    subject  varchar(190)                               null,
+    subject  varchar(255)                               null,
     body     mediumtext                                 not null,
     constraint core_email_template_ibfk_2
         foreign key (moduleId) references core_module (id)
@@ -1018,40 +1020,22 @@ ALTER TABLE `core_oauth_access_token`
   ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;
 
+--
+-- Refresh tokens of the OAuth2 / OpenID Connect server. A refresh token is only valid while it's in this table so
+-- it can be revoked and is replaced every time it's used.
+--
+CREATE TABLE `core_oauth_refresh_token` (
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `clientId` int(11) NOT NULL,
+  PRIMARY KEY (`identifier`),
+  KEY `userIdentifier` (`userIdentifier`),
+  KEY `clientId` (`clientId`),
+  CONSTRAINT `core_oauth_refresh_token_core_user` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `core_oauth_refresh_token_core_oauth_client` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-CREATE TABLE `core_alert` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `entityTypeId` INT NOT NULL,
-  `entityId` INT NOT NULL,
-  createdBy varchar(60) null,
-  `userId` INT NOT NULL,
-  `triggerAt` DATETIME NOT NULL,
-  `staleAt` DATETIME NULL,
-    tag varchar(50) null,
-  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
-  `data` text null,
-  sendMail boolean default false not null,
-  PRIMARY KEY (`id`),
-  INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
-  INDEX `fk_alert_user_idx` (`userId` ASC),
-  CONSTRAINT `fk_alert_entityType`
-    FOREIGN KEY (`entityTypeId`)
-    REFERENCES `core_entity` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_alert_user`
-    FOREIGN KEY (`userId`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE cascade
-    ON UPDATE NO ACTION),
-    constraint core_alert_core_principal_id_fk
-                             foreign key (createdBy) references core_principal (id)
-                                 on delete set null
-    ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
-    on core_alert (entityTypeId, entityId, tag, userId);
 
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,
@@ -1251,6 +1235,7 @@ CREATE TABLE `core_principal`(
 	`entityId` INT UNSIGNED NOT NULL,
 	`aclId` INT NOT NULL,
 	PRIMARY KEY (`id`),
+	UNIQUE INDEX `entityId` (`entityTypeId` ASC, `entityId` ASC),
 	INDEX `index_core_entity_id` ( `entityTypeId` ),
 	INDEX `index_core_blob_id` ( `avatarId` ),
 	CONSTRAINT `fk_core_principal_core_acl1`
@@ -1265,3 +1250,89 @@ CREATE TABLE `core_principal`(
 		ON DELETE Restrict
 		ON UPDATE No Action
 ) ENGINE = InnoDB;
+
+
+
+
+CREATE TABLE `core_alert`
+(
+    `id`           INT                   NOT NULL AUTO_INCREMENT,
+    `entityTypeId` INT                   NOT NULL,
+    `entityId`     INT                   NOT NULL,
+    createdBy      varchar(60) null,
+    `userId`       INT                   NOT NULL,
+    `triggerAt`    DATETIME              NOT NULL,
+    `staleAt`      DATETIME NULL,
+    tag            varchar(50) null,
+    `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+    `data`         text null,
+    sendMail       boolean default false not null,
+    isSent         boolean default false not null,
+    PRIMARY KEY (`id`),
+    INDEX          `dk_alert_entityType_idx` (`entityTypeId` ASC),
+    INDEX          `fk_alert_user_idx` (`userId` ASC),
+    CONSTRAINT `fk_alert_entityType`
+        FOREIGN KEY (`entityTypeId`)
+            REFERENCES `core_entity` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_alert_user`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE cascade
+            ON UPDATE NO ACTION,
+    constraint core_alert_core_principal_id_fk
+        foreign key (createdBy) references core_principal (id)
+            on delete set null
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_unicode_ci;
+
+create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+    on core_alert (entityTypeId, entityId, tag, userId);
+
+
+create table core_module_user
+(
+    userId   int          not null,
+    moduleId int          not null,
+    modSeq int unsigned,
+    pinned   int unsigned null comment 'Pinned sort order, NULL if not pinned',
+    primary key (userId, moduleId),
+    constraint core_module_user_core_module_id_fk
+        foreign key (moduleId) references core_module (id)
+            on delete cascade,
+    constraint core_module_user_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on delete cascade
+);
+
+CREATE TABLE `core_app_password`
+(
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userId`       INT(11)      NOT NULL,
+    `label`        VARCHAR(150) NOT NULL,
+    `passwordHash` VARCHAR(255) NOT NULL,
+    `createdAt`    DATETIME     NOT NULL,
+    `lastUsedAt`   DATE         NULL,
+    `lastUsedIp`   VARCHAR(45)  NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `core_app_password_core_user`
+        FOREIGN KEY (`userId`)
+            REFERENCES `core_user` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);
+
+CREATE TABLE `core_app_password_scope`
+(
+    `id`            INT UNSIGNED                                    NOT NULL AUTO_INCREMENT,
+    `appPasswordId` INT UNSIGNED                                    NOT NULL,
+    `protocol`      ENUM ('dav', 'caldav', 'carddav', 'activesync') NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `appPasswordId_protocol` (`appPasswordId`, `protocol`),
+    CONSTRAINT `core_app_password_core_app_password_scope`
+        FOREIGN KEY (`appPasswordId`)
+            REFERENCES `core_app_password` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+);

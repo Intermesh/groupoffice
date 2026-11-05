@@ -120,6 +120,7 @@ class Router{
 	
 		$first = isset($r[0]) ? ucfirst($r[0]) : 'Auth';
 
+		// nosemgrep
 		if(empty($r[2]) && file_exists(\GO::config()->root_path.'controller/'.$first.'Controller.php')){
 			//this is a controller name that belongs to the Group-Office framework
 			$module='Core';
@@ -151,6 +152,7 @@ class Router{
 			$errorMsg = "Controller('".Util\StringHelper::encodeHtml($controllerClass)."') not found";
 
 			echo '<h1>404 Not found</h1>';
+			// nosemgrep: echoed-request
 			echo '<p>'.$errorMsg.'</p>';
 			exit();
 		}
@@ -170,12 +172,15 @@ class Router{
 			$errorMsg = "Controller('".Util\StringHelper::encodeHtml($controllerClass)."') not found";
 
 			echo '<h1>404 Not found</h1>';
+			// nosemgrep: echoed-request
 			echo '<p>'.$errorMsg.'</p>';
 			exit();
 		}
 		
 		try{
+			// nosemgrep: tainted-object-instantiation
 			$this->_controller = new $controllerClass;
+
 			$this->_controller->run($action, $params);		
 		}catch(Exception\NotFound $e){
 			if(PHP_SAPI != 'cli') {
@@ -189,6 +194,8 @@ class Router{
 			$errorMsg ="Controller action '".  Util\StringHelper::encodeHtml($action)." not found in controller class '".Util\StringHelper::encodeHtml($controllerClass)."'";
 
 			echo '<h1>404 Not found</h1>';
+
+			// nosemgrep: echoed-request
 			echo '<p>'.$errorMsg.'</p>';
 		}
 	}

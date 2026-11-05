@@ -119,6 +119,13 @@ class Group extends AclOwnerEntity {
 						$query->join('core_acl_group', 'ag_sort', 'ag_sort.groupId = g.id AND ag_sort.aclId = ' . (int) $aclId, 'LEFT');
 						$query->orderBy(array_merge([new Expression('ISNULL(ag_sort.groupId) ASC')], $query->getOrderBy()));
 						$query->groupBy(['g.id']);
+					})
+					->add('inModulePermissions',function (Criteria $criteria, $value, Query $query) {
+
+						//this filter doesn't actually filter but sorts the selected members on top
+						$query->join('core_permission', 'permission_sort', 'permission_sort.groupId = g.id AND permission_sort.moduleId = ' . (int) $value, 'LEFT');
+						$query->orderBy(array_merge([new Expression('ISNULL(permission_sort.groupId) ASC')], $query->getOrderBy()));
+						$query->groupBy(['g.id']);
 					});
 						
 	}
@@ -163,20 +170,26 @@ class Group extends AclOwnerEntity {
 
 	public static function check()
 	{
+
+		$id = 1;
+		foreach (["Admins", "Everyone", "Internal"] as $groupName) {
+			$group = Group::findById($id);
+			if(!$group) {
+				$group = new Group();
+				$group->id = $id;
+				$group->name = go()->t($groupName);
+				if (!$group->save()) {
+					throw new Exception("Could not create group: " . $group->getValidationErrorsAsString());
+				}
+			}
+
+			$id++;
+		}
+
 		//make sure all users are in group everyone
 		go()->getDbConnection()->exec("INSERT IGNORE INTO core_user_group (SELECT " . self::ID_EVERYONE .", id from core_user)");
 
-		//share groups with themselves
-//		$stmt = go()->getDbConnection()
-//			->insertIgnore(
-//				'core_acl_group',
-//				go()->getDbConnection()->select('aclId, id, "' . Acl::LEVEL_READ .'"')->from("core_group"),
-//				['aclId', 'groupId', 'level']
-//			);
-//
-//		$stmt->execute();
-
-		return parent::check();
+		parent::check();
 	}
 
 	protected function internalSave(): bool

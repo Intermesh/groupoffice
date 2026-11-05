@@ -44,12 +44,6 @@ $GO_SCRIPTS_JS .= 'GO.email.sievePortValue=';
 		$GO_SCRIPTS_JS .= 'true;';
 }
 
-$font_size = \GO::config()->get_setting('email_font_size', \GO::user()->id);
-if(empty($font_size))
-	$GO_SCRIPTS_JS .= 'GO.email.fontSize="14px";';
-else
-	$GO_SCRIPTS_JS .= 'GO.email.fontSize="'.$font_size.'";';
-
 $GO_SCRIPTS_JS .= 'GO.email.permissionLevels={delegated:15};';
 
 if(isset($_GET['mail_to']))

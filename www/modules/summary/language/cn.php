@@ -20,4 +20,8 @@ return array (
   'Rss Feeds' => 'RSS订阅',
   'webfeeds' => '网络推荐',
   'Summary' => '汇总',
+  "welcomeTitle" => "欢迎使用Group-Office！",
+  "welcomeContent" => "<p>感谢您安装Group-Office！</p>
+<p>这里有一个链接可以帮助您入门：{{link}}</p>
+<p>我们希望您喜欢Group-Office！</p>"
 );

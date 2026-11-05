@@ -14,6 +14,9 @@ use go\core\util\ArrayObject;
 use go\modules\business\license\model\License;
 
 
+/**
+ * @extends EntityController<\go\core\model\Module>
+ */
 class Module extends EntityController {
 	
 	/**
@@ -78,11 +81,17 @@ class Module extends EntityController {
 
 	public function installLicensed(): array
 	{
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
 		License::installModules();
 
 		return ['success' => true];
 	}
-	
+
+
+
 	public function install($params) {
 
 		if(!go()->getAuthState()->isAdmin()) {

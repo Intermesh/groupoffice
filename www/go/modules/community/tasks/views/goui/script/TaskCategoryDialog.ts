@@ -42,7 +42,7 @@ export class TaskCategoryDialog extends FormWindow {
 					checkbox({
 						label: t("Global category"),
 						listeners: {
-							change: ({newValue}) => {
+							change: ({newValue, oldValue}) => {
 								this.ownerHiddenField!.value = newValue ? null : client.user.id;
 								this.tasklistCombo.disabled = newValue;
 							}

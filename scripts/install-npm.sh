@@ -1,17 +1,24 @@
 #!/bin/bash
-# This script builds SASS, installs composer packages and build's the GOUI modules
+# This script installs the NPM packages, which builds the GOUI modules with their "prepare" script, and builds SASS
+#
+# Usage: install-npm.sh [www dir]
+#
+#   www dir  Directory to build in. Defaults to www of this checkout.
 
 set -e
 
-SASS="sass --no-source-map"
+
+SASS="npx sass --update --no-source-map --style=compressed"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
 DIR="$(pwd)";
 
-cd "$DIR/www"
+echo Installing NPM packages
+cd "${1:-$DIR/www}"
+#npm up
+npm ci --prefer-offline --audit=false --progress=false --fund=false
 
-echo "Building SASS"
-
+echo "Building Extjs3 SASS"
 for line in $(find views/Extjs3 go/modules modules \( -name style.scss -o -name style-mobile.scss -o -name htmleditor.scss \) -not -path '*/goui/*' | sort -r );
 do
   replace1=${line/src\/style.scss/style.css};
@@ -21,41 +28,4 @@ do
 	$SASS $line $replace3;
 done
 
-function buildGOUI() {
-  echo BUILDING node modules inside "$1"...
-  cd $DIR;
-  for line in $(find $1 -name package.json -not -path '*/node_modules/*');
-  do
-    local NODE_DIR="$(dirname "${line}")";
-    echo "BUILD:" $NODE_DIR;
-    cd $NODE_DIR;
-    #rm -rf node_modules
-    npm ci;
-    npm run build;
-    cd $DIR;
-
-  done
-
-  echo "DONE";
-}
-
-echo "Building GOUI shared libs"
-cd $DIR;
-cd ./www/views/goui/goui
-#rm -rf node_modules
-npm ci
-
-cd ../groupoffice-core
-#rm -rf node_modules
-npm ci
-
-cd ..
-#rm -rf node_modules
-npm ci
-npm run build
-
-cd $DIR;
-echo "DONE";
-
-buildGOUI "./www/go/modules"
-buildGOUI "./www/promodules"
+echo "Done"

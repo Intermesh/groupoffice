@@ -15,7 +15,11 @@
 		addButtonText: t("Add online url"),
 		addButtonIconCls: 'ic-home',
 		itemCfg: {
-			items: [{
+			items: [
+				{
+					xtype: "hidden",
+					name: "id" //for keeping records
+				},{
 				anchor: "100%",
 				layout: "form",
 				xtype: "container",

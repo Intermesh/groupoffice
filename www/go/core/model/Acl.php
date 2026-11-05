@@ -48,9 +48,9 @@ class Acl extends Entity {
 	
 	/**
 	 * The user that owns the ACL
-	 * @var int
+	 * @var ?int
 	 */
-	public int $ownedBy;
+	public ?int $ownedBy;
 	
 	/**
 	 * Modification time
@@ -92,19 +92,22 @@ class Acl extends Entity {
 		if(!isset($this->ownedBy)) {
 			$this->ownedBy = User::ID_SUPER_ADMIN;
 		}
-		
+		if(!$this->isNew() && $this->isModified('ownedBy') && !$this->hasPermissionLevel(Acl::LEVEL_MANAGE)) {
+			throw new Forbidden("You (".go()->getUserId().") are not allowed to change ownership");
+		}
+
 		if($this->ownedBy != User::ID_SUPER_ADMIN) {
 
 			$groupId = Group::findPersonalGroupID($this->ownedBy);
-			if($groupId) {
+			if ($groupId) {
 				$ownerLevel = $this->hasGroup($groupId);
 				if ($ownerLevel < self::LEVEL_MANAGE) {
 					$this->removeGroup($groupId);
 					$this->addGroup($groupId, self::LEVEL_MANAGE);
 				}
 			}
-		}		
-		
+		}
+
 		if(!parent::internalSave()) {
 			return false;
 		}

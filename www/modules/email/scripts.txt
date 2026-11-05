@@ -10,7 +10,6 @@ modules/email/AccountsGrid.js
 modules/email/MessagesGrid.js
 modules/email/AccountsTree.js
 modules/email/UnknownRecipientsDialog.js
-modules/email/AddressbookDialog.js
 modules/email/SelectAccount.js
 modules/email/EmailComposer.js
 modules/email/AddressContextMenu.js
@@ -48,5 +47,6 @@ modules/email/TemplatesGrid.js
 modules/email/EmailTemplateDialog.js
 modules/email/TemplateCombo.js
 modules/email/MessageContextMenu.js
+modules/email/TemplatesSettingsDialog.js
 
 

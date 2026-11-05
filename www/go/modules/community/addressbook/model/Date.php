@@ -20,6 +20,8 @@ class Date extends Property {
 
 	const TYPE_ACTION = 'action';
 
+	public ?int $id;
+
 	protected int $contactId;
 
 	public ?string $type = self::TYPE_BIRTHDAY;

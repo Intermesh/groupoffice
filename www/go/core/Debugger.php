@@ -14,8 +14,6 @@ use go\core\util\DateTime;
  * Debugger class. All entries are stored and the view can render them eventually.
  * The JSON view returns them all.
  * 
- * The client can enable by sending an HTTP header X-Debug=1 (Use CTRL + F7 in webclient)
- * 
  * Example:
  * 
  * ````````````````````````````````````````````````````````````````````````````
@@ -68,6 +66,13 @@ class Debugger {
 	 * @var string Full path on FS
 	 */
 	public $logPath;
+
+
+	/**
+	 * When enabled the ellapsed time since the start of the process will be logged too
+	 * @var bool
+	 */
+	public bool $logTimers = false;
 
 	private $logFp;
 	/**
@@ -134,6 +139,14 @@ class Debugger {
 		$this->currentGroup .= ", Peak memory usage: " . number_format(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB';			
 
 		$this->entries[] = ['groupEnd', null];
+	}
+
+	/**
+	 * Output current memory usage in MB
+	 * @return void
+	 */
+	public function debugMemoryUsage() : void {
+		$this->log("Memory used: ". number_format(memory_get_usage() / (1024 * 1024), 2) .'MB');
 	}
 
 	/**
@@ -268,6 +281,10 @@ class Debugger {
 			$line .= '[' . $cls .':'. $lineNo.']';
 		}
 
+		if($this->logTimers) {
+			$line .= '['.$this->getTimeStamp().'ms]';
+		}
+
 		$line .=  ' ';
 
 		if(strstr($print, "\n")) {
@@ -281,7 +298,7 @@ class Debugger {
 		}
 
 		 if($this->output) {
-		 	echo getmypid() . " " .$line;
+			 echo $line;
 		 }
 
 		if(is_resource($this->logFp)) {
@@ -301,6 +318,41 @@ class Debugger {
 		$this->debug((int) ($this->getTimeStamp()) . "ms ". $message);
 	}
 
+	private array $timers = [];
+
+
+	/**
+	 * Start timer to measure duration of an operation
+	 *
+	 * @param string $name
+	 * @return void
+	 */
+	public function timerStart(string $name) : void {
+		if(!$this->enabled) {
+			return;
+		}
+
+		$this->timers[$name] = microtime(true);
+	}
+
+	/**
+	 * End and print timer duration for an operation
+	 * First call timerStart()
+	 *
+	 * This function also calls timerStart so you can run it multiple times for more measurements
+	 *
+	 * @param string $name
+	 * @return void
+	 */
+	public function timerEnd(string $name) : void {
+		if(!$this->enabled) {
+			return;
+		}
+
+		$this->debug("TIMER: '". $name ."' took " . (microtime(true) * 1000) - ($this->timers[$name] * 1000) . " ms");
+		$this->timerStart($name);
+	}
+
 	/**
 	 * Get the elapsed time since the start of the request in milliseconds
 	 * 
@@ -310,8 +362,15 @@ class Debugger {
 		if(!$this->enabled) {
 			return 0;
 		}
-		return ($this->getMicroTime() * 1000) - ($_SERVER["REQUEST_TIME_FLOAT"] * 1000);
+		return number_format(($this->getMicroTime() * 1000) - ($this->timeStampTimer ?? $_SERVER["REQUEST_TIME_FLOAT"]) * 1000, 2, ".", "");
 	}
+
+	public function startTimeStampTimer(): void
+	{
+		$this->timeStampTimer = $this->getMicroTime();
+	}
+
+	private float|null $timeStampTimer = null;
 
 	public function debugCalledFrom($limit = 10) {
 		if(!$this->enabled) {
@@ -348,8 +407,29 @@ class Debugger {
 	}
 	
 	/**
+	 * Whether the entries may be sent to the browser of the current request.
+	 *
+	 * They contain queries, parameters and stack traces. Endpoints that anybody can call, like api/page.php, must
+	 * not show them to anonymous users. Only to administrators, and only when debugging is enabled.
+	 */
+	public function mayOutputToClient(): bool
+	{
+		if(!$this->enabled) {
+			return false;
+		}
+
+		try {
+			$state = new jmap\State();
+			return $state->isAuthenticated() && $state->isAdmin();
+		} catch (\Throwable $e) {
+			// used while handling errors: never fail here
+			return false;
+		}
+	}
+
+	/**
 	 * Get the debugger entries
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getEntries(): array

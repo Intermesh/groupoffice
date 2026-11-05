@@ -1,0 +1,38 @@
+<?php
+require_once(dirname(__DIR__, 2) . '/vendor/autoload.php');
+use go\core\App;
+use go\core\http\Response;
+use go\core\model\Module;
+
+App::get();
+
+$mods = Module::find()->where(['enabled' => true]);
+
+$baseUrl = \go\core\http\Request::get()->getPath(). '/';
+
+$response = [
+	'title' => go()->getSettings()->title,
+	'modules' => []
+];
+
+foreach($mods as $mod) {
+	$gouiScript = $mod->module()->getFolder()->getFile("views/goui/dist/Index.js");
+
+	$r = [
+		'name' => $mod->name,
+		'package' => $mod->package,
+//		'folder' => (string)$gouiScript
+	];
+
+	if($gouiScript->exists()) {
+		// @intermesh/addressbook-main is revolved via an importmap
+		$r['entry'] =  "@intermesh/" . ($mod->package ?? "legacy"). "-" . $mod->name; //$baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder());
+	}
+	$response['modules'][] = $r;
+}
+
+$response['languages'] = go()->getLanguage()->getLanguages();
+
+$response['settings'] = go()->getSettings()->toArray(\go\core\model\Settings::CLIENT_SETTINGS);
+
+Response::get()->output($response);

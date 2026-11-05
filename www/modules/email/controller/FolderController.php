@@ -36,22 +36,22 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		
 		return $response;
 	}
-	
-	protected function actionSubscribe($params){
+
+	protected function actionSubscribe(array $params)
+	{
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-			$response = array();
-			
-			
-			$rawMail = json_decode($params["mailboxs"]);
-			if(is_array($rawMail)) {
-				$mailboxs = $rawMail;
-			} else {
-				$mailboxs = array($rawMail);
-			}
-	
+		$response = array();
+
+		$rawMail = json_decode($params["mailboxs"]);
+		if (is_array($rawMail)) {
+			$mailboxs = $rawMail;
+		} else {
+			$mailboxs = array($rawMail);
+		}
+
 		foreach ($mailboxs as $mailboxName) {
-			
-			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$mailboxName));
+
+			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $mailboxName));
 			$mailbox->subscribe();
 			
 //			$response['success'] = $mailbox->subscribe();
@@ -63,45 +63,47 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 //			}
 			$response['success'] = true;
 		}
-		
-		if(!$response['success'])
-			$response['feedback']="Failed to subscribe to ".$params['mailbox'];
-//		return $response;
-		
+
+		if (!$response['success']) {
+			$response['feedback'] = "Failed to subscribe to " . $params['mailbox'];
+		}
+
 		echo $this->render('json', array('success' => true));
 	}
-	
-	protected function actionUnsubscribe($params){
+
+	protected function actionUnsubscribe(array $params): array
+	{
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
-				
+
 		$response = array();
 		$rawMail = json_decode($params["mailboxs"]);
-		
-			if(is_array($rawMail)) {
-				$mailboxs = $rawMail;
-			} else {
-				$mailboxs = array($rawMail);
-			}
-			
+
+		if (is_array($rawMail)) {
+			$mailboxs = $rawMail;
+		} else {
+			$mailboxs = array($rawMail);
+		}
+
 		foreach ($mailboxs as $mailboxName) {
-			
-			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$mailboxName));
-			
-			
-			if(!$mailbox->unsubscribe()) {
+			$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $mailboxName));
+			if (!$mailbox->unsubscribe()) {
 				$response['success'] = false;
 				break;
 			}
 			$response['success'] = true;
 		}
-		
-		if(!$response['success'])
-			$response['feedback']="Failed to unsubscribe from ".$params['mailbox'];
-		
+
+		if (!$response['success']) {
+			$response['feedback'] = "Failed to unsubscribe from " . $params['mailbox'];
+		}
+
 		return $response;
 	}
 	
 	protected function actionDelete($params){
+
+		\GO::session()->closeWriting();
+
 		$msg = '';
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 
@@ -149,6 +151,8 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 
 
 	protected function actionTruncate($params){
+		\GO::session()->closeWriting();
+
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $params["mailbox"]));
@@ -178,6 +182,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionMove($params){
+		\GO::session()->closeWriting();
 		
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 				
@@ -238,6 +243,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	
 	
 	protected function actionAclStore($params) {
+		\GO::session()->closeWriting();
 		
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 		$imap = $account->openImapConnection($params['mailbox']);
@@ -305,6 +311,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionLoad($params) {
+		\GO::session()->closeWriting();
 		$response = array( 'success'=>true, 'data'=>array() );
 		
 		$mailboxPath = $params['mailboxPath'];
@@ -322,6 +329,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionSubmit($params) {
+		\GO::session()->closeWriting();
 		$response = array( 'success' => true, 'id' => $params['accountId'] );
 		
 		$mailboxPath = $params['mailboxPath'];

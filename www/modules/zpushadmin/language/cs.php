@@ -35,4 +35,6 @@ return array (
   'Model' => 'Model',
   'Imei' => 'IMEI',
   'SMS' => 'SMS',
+  'Resync' => 'Synchronizovat',
+  'ActiveSync' => 'ActiveSync',
 );
