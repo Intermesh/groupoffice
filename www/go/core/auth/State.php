@@ -47,13 +47,15 @@ abstract class State {
 	 * @throws Exception
 	 */
 	public function getClassRights($cls) : stdClass {
-		if(!isset(self::$classRights[$cls])) {
+		// Per user because the auth state can change during a request. For example when running as another user.
+		$userId = (int) $this->getUserId();
+		if(!isset(self::$classRights[$userId][$cls])) {
 			$mod = Module::findByClass($cls, ['id', 'name', 'package']);
-			self::$classRights[$cls]= $mod->getUserRights();
+			self::$classRights[$userId][$cls] = $mod->getUserRights();
 		}
 
 
-		return self::$classRights[$cls];
+		return self::$classRights[$userId][$cls];
 	}
 
 	/**
