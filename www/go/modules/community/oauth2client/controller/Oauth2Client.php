@@ -189,7 +189,9 @@ final class Oauth2Client extends EntityController
 			throw new Exception(500, "Unable to save token");
 		}
 
-		$this->auth($account->id);
+		// The user was logged in by this request, but the auth state doesn't know that yet. So don't use auth() that
+		// checks the permissions. The user owns this account.
+		$this->redirectToProvider($acct);
 //		header("Location: " . go()->getSettings()->URL);
 
 	}
@@ -197,6 +199,12 @@ final class Oauth2Client extends EntityController
 
 	private function callbackEmailAccount() {
 		$accountId = $_SESSION['accountId'];
+
+		$acct = Account::findById($accountId);
+		if(!$acct || !$acct->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+
 		$provider = $this->getProvider($accountId);
 
 		// Try to get an access token (using the authorization code grant)
@@ -270,13 +278,26 @@ final class Oauth2Client extends EntityController
 	 */
 	public function auth(int $accountId)
 	{
-		$_SESSION['accountId'] = $accountId;
-
-		$provider = false;
 		$acct = Account::findById($accountId);
-		if(!$acct->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+		if(!$acct || !$acct->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			throw new Forbidden();
 		}
+
+		$this->redirectToProvider($acct);
+	}
+
+	/**
+	 * Redirect to the OAuth2 provider to authorize the account. The callback stores the token in this account.
+	 *
+	 * @param Account $acct
+	 * @throws Exception
+	 */
+	private function redirectToProvider(Account $acct): void
+	{
+		// Only set after the permission check because the callback saves the token in this account
+		$_SESSION['accountId'] = $acct->id;
+
+		$provider = false;
 		if ($acctSettings = $acct->oauth2_account) {
 			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
 
