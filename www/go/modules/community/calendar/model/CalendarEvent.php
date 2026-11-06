@@ -815,6 +815,30 @@ class CalendarEvent extends AclItemEntity {
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
 
+	/**
+	 * Private events of others only show the time
+	 *
+	 * @return bool
+	 */
+	public function showAsPrivate(): bool
+	{
+		return $this->isPrivate() && !$this->currentUserIsOwner();
+	}
+
+	/**
+	 * Clear the details that others may not see of a private event. Use when the event is shown in another way than
+	 * toArray(), like in the print reports. Don't save it afterwards.
+	 */
+	public function hidePrivateDetails(): void
+	{
+		if($this->showAsPrivate()) {
+			$this->title = '';
+			$this->description = '';
+			$this->location = '';
+			$this->categoryIds = [];
+		}
+	}
+
 	public function toArray(array|null $properties = null): array
 	{
 		if(!($this->start instanceof DateTimeInterface)) {
@@ -824,8 +848,7 @@ class CalendarEvent extends AclItemEntity {
 		$this->start->isLocal = true;
 
 		$arr =  parent::toArray($properties);
-		$showAsPrivate = $this->isPrivate() && !$this->currentUserIsOwner();
-		if($showAsPrivate) {
+		if($this->showAsPrivate()) {
 			$arr['title'] = '';
 			$arr['description'] = '';
 			$arr['location'] = '';

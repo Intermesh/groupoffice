@@ -10,7 +10,10 @@ class ReminderController extends \GO\Base\Controller\AbstractController {
 		
 		foreach($reminderIds as $id){
 			$r=\GO\Base\Model\Reminder::model()->findByPk($id);
-			$r->setForUser(\GO::user()->id, time()+$params['snooze_time']);
+			// Only the user's own reminders. Otherwise the user would be added to the reminder of someone else.
+			if($r && $r->hasUser(\GO::user()->id)) {
+				$r->setForUser(\GO::user()->id, time()+$params['snooze_time']);
+			}
 		}
 		$response['success']=true;
 		

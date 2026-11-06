@@ -39,6 +39,23 @@ class Label extends ActiveRecord
         return 'em_labels';
     }
 
+    public function relations()
+    {
+        return array(
+            'account' => array('type' => self::BELONGS_TO, 'model' => 'GO\Email\Model\Account', 'field' => 'account_id')
+        );
+    }
+
+    /**
+     * Labels are protected by the permissions of their e-mail account
+     *
+     * @return string
+     */
+    public function aclField()
+    {
+        return 'account.acl_id';
+    }
+
     /**
      * Get count of account labels
      *
@@ -114,7 +131,8 @@ class Label extends ActiveRecord
             $label->flag = '$label' . $i;
             $label->color = $colors[$i];
             $label->default = true;
-            $label->save();
+            // Defaults for an account that was just saved. Also when the user isn't known yet, like on an OpenID login.
+            $label->save(true);
         }
 
         return true;

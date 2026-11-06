@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\controller;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\util\StringUtil;
 use go\core\util\UUID;
@@ -118,6 +119,11 @@ class CalendarEvent extends EntityController {
 	 * @throws \Exception
 	 */
 	public function import($params) {
+		$calendar = model\Calendar::findById($params['calendarId']);
+		if(!$calendar || !$calendar->hasPermissionLevel(Acl::LEVEL_CREATE)) {
+			throw new Forbidden("You don't have permission to add events to this calendar");
+		}
+
 		set_time_limit(0);
 		return model\ICalendarHelper::import(
 			$params['blobIds'],
