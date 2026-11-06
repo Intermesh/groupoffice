@@ -17,23 +17,19 @@ class Json extends AbstractConverter {
 	protected $data;
 	protected $record;
 
+	/**
+	 * Number of entities written to the export. Entities that failed to export are skipped.
+	 */
+	private int $written = 0;
 
 	protected function exportEntity(Entity $entity): void
 	{
-				
-		if($this->index == 0) {
-			fputs($this->fp, "[\n");
-		}
-		$properties = $entity->toArray();
-		$string = GoJSON::encode($properties, JSON_PRETTY_PRINT);
-		fputs($this->fp, $string);
-
-		if($this->index == $this->getEntitiesQuery()->getIterator()->rowCount() - 1) {
-		  fputs($this->fp, "\n]\n");
-		} else
-		{
+		$string = GoJSON::encode($entity->toArray(), JSON_PRETTY_PRINT);
+		if($this->written > 0) {
 			fputs($this->fp, "\n,\n");
 		}
+		fputs($this->fp, $string);
+		$this->written++;
 	}
 
 	public function getFileExtension(): string
@@ -53,14 +49,28 @@ class Json extends AbstractConverter {
 	protected function initImport(File $file): void
 	{
 		$this->data = GoJSON::decode($file->getContents(), true);
+		if(!is_array($this->data) || !array_is_list($this->data)) {
+			throw new \InvalidArgumentException("Invalid JSON import file. It must contain an array of entities.");
+		}
 		$this->total = count($this->data);
 	}
 
+	/**
+	 * The id and ACL are not imported. The file may come from another installation where the id's and groups in the
+	 * ACL refer to something else. Imported entities get a new id and the default ACL owned by the importing user. An
+	 * ACL can be set for all records with the 'values' import parameter.
+	 */
 	protected function nextImportRecord(): bool
 	{
-		$this->record =  array_shift($this->data);
-		unset($this->record['id']);
-		return $this->record != false;
+		if(empty($this->data)) {
+			return false;
+		}
+		$this->record = array_shift($this->data);
+		// An item that is not an object fails in importEntity() and is reported as an error
+		if(is_array($this->record)) {
+			unset($this->record['id'], $this->record['acl']);
+		}
+		return true;
 	}
 
 	protected function importEntity()
@@ -85,10 +95,15 @@ class Json extends AbstractConverter {
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
+		$this->written = 0;
+		fputs($this->fp, "[\n");
 	}
 
 	protected function finishExport(): Blob
 	{
+		fputs($this->fp, "\n]\n");
+		fclose($this->fp);
+
 		$cls = $this->entityClass;
 		$blob = Blob::fromTmp($this->tempFile);
 		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
