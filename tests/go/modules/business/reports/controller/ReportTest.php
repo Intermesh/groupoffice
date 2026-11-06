@@ -245,4 +245,41 @@ class ReportTest extends TestCase
 		}
 		$this->assertSame([null, null, null, null], array_map(fn($f) => $f->layoutPosition, $this->reload()->fields));
 	}
+
+	public static function readMethodProvider(): array
+	{
+		return [
+			'loadTemplates' => ['loadTemplates', ['entityIds' => []]],
+			'sortedIds' => ['sortedIds', ['field' => 'template_0_3']],
+			'export' => ['export', ['extension' => 'csv']],
+			'summary' => ['summary', []],
+		];
+	}
+
+	/**
+	 * Template columns can show data of other entities (e.g. hours of employees), so reading report data requires
+	 * read permission on the report.
+	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('readMethodProvider')]
+	public function testReadingDataRequiresReadPermission(string $method, array $params): void
+	{
+		$outsider = $this->newUser();
+		try {
+			$this->actAs($outsider->id);
+			try {
+				(new Report())->$method(array_merge(['id' => $this->report->id], $params));
+				$this->fail("A user without read permission on the report could call Report/" . $method);
+			} catch (Exception $e) {
+				$this->assertSame(403, $e->getCode());
+			}
+
+			// with read permission it works
+			$this->actAs($this->reader->id);
+			$result = (new Report())->loadTemplates(['id' => $this->report->id, 'entityIds' => []])->getArray();
+			$this->assertTrue($result['success']);
+		} finally {
+			$this->actAs(User::ID_SUPER_ADMIN);
+			User::delete(['id' => $outsider->id]);
+		}
+	}
 }
