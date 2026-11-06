@@ -851,30 +851,40 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	
 	
-	public function actionPasteUpload($model_id, $model_name, $filename, $filetype){
-		
-		$site = $this->getRequestedModel($model_name)->findByPk($model_id);
-		
-		
-		$type = explode('/', $filetype);
-		$extension=$type[1];
-		
-		
-		$_FILES['pastedFile']['name']=$filename.'.'.$extension;
-		
-		$file = $site->filesFolder->addUploadedFile($_FILES["pastedFile"]);	
-			
-		
-		$response = new \GO\Base\Data\JsonResponse(array(
-				'success'=>true,
-				'file_id'=>$file->id,
-				'path'=>substr($file->path,strlen($site->filesFolder->path)+1)
-		));
-		
-		echo $response;
-		
-		
-	}
+//	public function actionPasteUpload($model_id, $model_name, $filename, $filetype){
+//
+//		$site = $this->getRequestedModel($model_name)->findByPk($model_id);
+//		if(!$site) {
+//			throw new \GO\Base\Exception\NotFound();
+//		}
+//
+//		// Check before the file is moved into the folder
+//		$folder = $site->filesFolder;
+//		if(!$folder || !$folder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+//			throw new \GO\Base\Exception\AccessDenied();
+//		}
+//		if(!isset($_FILES['pastedFile']['tmp_name']) || !is_uploaded_file($_FILES['pastedFile']['tmp_name'])) {
+//			throw new \Exception("No file was uploaded");
+//		}
+//
+//		// The name and type come from the client. Strip path characters so the file stays in the folder.
+//		$type = explode('/', $filetype);
+//		$extension = \GO\Base\Fs\File::stripInvalidChars($type[1] ?? '');
+//		$_FILES['pastedFile']['name'] = \GO\Base\Fs\File::stripInvalidChars($filename) . '.' . $extension;
+//
+//		$file = $folder->addUploadedFile($_FILES["pastedFile"]);
+//
+//
+//		$response = new \GO\Base\Data\JsonResponse(array(
+//				'success'=>true,
+//				'file_id'=>$file->id,
+//				'path'=>substr($file->path,strlen($site->filesFolder->path)+1)
+//		));
+//
+//		echo $response;
+//
+//
+//	}
 	
 	/**
 	 * Create an url to the given model with the given id.
