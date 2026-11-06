@@ -2,6 +2,12 @@
 - Files: Security: Check read permission when reading file meta data
 - Calendar: Security: Check write permissions before reloading an external calendar
 - File: Security: Check write permission in replace() method before overwriting data on disk
+- Email: Security: Check write permission when saving file to folder. Only read permission was checked.
+- Files: Security: Check read permission when reading file meta data
+- Calendar: Security: Check write permissions before reloading an external calendar
+- File: Security: Check write permission in replace() method before overwriting data on disk
+- Forms: Security: Missing ACL check on download spreadsheet.
+- Email: Security: Stored XSS fixed
 
 26-10-2026: 25.0.115
 - API keys: mask access token in the history log
