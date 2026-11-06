@@ -22,9 +22,18 @@ class Json extends AbstractConverter {
 	 */
 	private int $written = 0;
 
+	/**
+	 * The properties of an entity in the export. Override to leave out properties that only make sense on this system or
+	 * to add related data.
+	 */
+	protected function entityToArray(Entity $entity): array
+	{
+		return $entity->toArray();
+	}
+
 	protected function exportEntity(Entity $entity): void
 	{
-		$string = GoJSON::encode($entity->toArray(), JSON_PRETTY_PRINT);
+		$string = GoJSON::encode($this->entityToArray($entity), JSON_PRETTY_PRINT);
 		if($this->written > 0) {
 			fputs($this->fp, "\n,\n");
 		}
