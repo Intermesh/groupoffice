@@ -34,8 +34,16 @@ class MaintenanceController extends AbstractController {
 		return array('upgrade','checkdatabase','servermanagerreport','test','downloadfromshop', 'removeduplicates','buildsearchcache', "buildprincipals");
 	}
 	
-	//don't check token in this controller
-	protected function checkSecurityToken(){}
+	/**
+	 * Maintenance is for administrators and the CLI only
+	 *
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function requireAdmin(): void {
+		if(!$this->isCli() && (!GO::user() || !GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
 	
 	protected function init() {
 		GO::$disableModelCache=true; //for less memory usage
@@ -45,11 +53,13 @@ class MaintenanceController extends AbstractController {
 	}
 	
 	public function actionTestCache($params){
+		$this->requireAdmin();
 		
 		GO::cache()->set('test','test');
 	}
 	
 	protected function actionCollectGarbage() {
+		$this->requireAdmin();
 		$cg = new \go\core\fs\GarbageCollector;
 		$cg->execute();
 	}
@@ -59,6 +69,7 @@ class MaintenanceController extends AbstractController {
 //	}
 	
 	protected function actionGetNewAcl($params){
+		$this->requireAdmin();
 
     if(!empty($params['source_acl_id'])) {
       $sourceAcl = \GO\Base\Model\Acl::model()->findByPk($params['source_acl_id']);
@@ -78,6 +89,7 @@ class MaintenanceController extends AbstractController {
 	}
 	
 	protected function actionCopyAcl($params){
+		$this->requireAdmin();
 		$acl = \GO\Base\Model\Acl::model()->findByPk($params['id']);
 		$copy = $acl->duplicate();
 		$acl->copyPermissions($copy);
@@ -529,6 +541,10 @@ class MaintenanceController extends AbstractController {
 	}
 	
 	protected function actionResetState($params){
+		// Users may reset their own state. Only admins may reset it for others.
+		if(intval($params['user_id']) !== intval(GO::user()->id)) {
+			$this->requireAdmin();
+		}
 		
 		GO::getDbConnection()->query("DELETE FROM go_state WHERE name!='summary-active-portlets' AND user_id=".intval($params['user_id']));
 
@@ -571,6 +587,7 @@ class MaintenanceController extends AbstractController {
 
 
 	protected function actionConvertToInnoDB(){
+		$this->requireAdmin();
 		GO::getDbConnection()->query("SET sql_mode = '';");
 		
 		$stmt = GO::getDbConnection()->query("SHOW TABLES");
@@ -594,6 +611,7 @@ class MaintenanceController extends AbstractController {
 		
 		
 	protected function actionCheckVersion(){
+		$this->requireAdmin();
 		$rssUrl = "https://sourceforge.net/api/file/index/project-id/76359/mtime/desc/limit/20/rss";
 		
 		$httpClient = new  \GO\Base\Util\HttpClient();

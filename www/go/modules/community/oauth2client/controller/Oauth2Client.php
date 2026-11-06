@@ -118,6 +118,10 @@ final class Oauth2Client extends EntityController
 	}
 
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {
+		// The user is found by the e-mail address. Don't trust an address the provider didn't verify.
+		if(isset($response['email_verified']) && !filter_var($response['email_verified'], FILTER_VALIDATE_BOOLEAN)) {
+			throw new Exception(403, "The e-mail address is not verified by the OAuth2 provider");
+		}
 		$user = User::findOrCreateByUsername($response['email'], $response['email'], $response['name']);
 
 		//register as oauth user

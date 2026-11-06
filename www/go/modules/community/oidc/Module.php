@@ -60,6 +60,11 @@ class Module extends \go\core\Module
 			throw new \Exception("Could not get e-mail from openid provider");
 		}
 
+		// The user is found by the e-mail address. Don't trust an address the provider didn't verify.
+		if(isset($info['email_verified']) && !filter_var($info['email_verified'], FILTER_VALIDATE_BOOLEAN)) {
+			throw new \Exception("The e-mail address is not verified by the openid provider");
+		}
+
 		go()->getSettings()->allowRegistration = true;
 
 		$user = User::findOrCreateByUsername($info['email'], $info['email'], $info['name']);

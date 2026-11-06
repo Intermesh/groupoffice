@@ -110,6 +110,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	 * @param integer $id id of the user to recalculate used space for
 	 */
 	protected function actionRecalculateDiskUsage($id=false) {
+		// Maintenance for administrators
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		
 		\GO::session()->closeWriting();
 		
@@ -130,6 +134,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	}
 	
 	protected function actionCorrectQuotaUser() {
+		// Maintenance for administrators
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		$time_start = microtime(true); 
 		$count = 0;
 		

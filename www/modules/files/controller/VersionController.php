@@ -38,6 +38,11 @@ class VersionController extends \GO\Base\Controller\AbstractModelController {
 	 * Will find all versioning files and put the filesize in the database
 	 */
 	protected function actionRecalculate() {
+		// Maintenance for administrators
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		$fp = FindParams::newInstance()->ignoreAcl();
 		$stmt = Version::model()->find($fp);
 		
@@ -45,7 +50,7 @@ class VersionController extends \GO\Base\Controller\AbstractModelController {
 		while($version = $stmt->fetch()) {
 			$path = \GO::config()->file_storage_path.$version->path;
 			if(file_exists($path)) {
-				$pdo_statement = \GO::getDbConnection()->query('UPDATE '.Version::model()->tableName(). ' SET `size_bytes` = '.filesize($path).';');
+				$pdo_statement = \GO::getDbConnection()->query('UPDATE '.Version::model()->tableName(). ' SET `size_bytes` = '.(int) filesize($path).' WHERE id = '.(int) $version->id.';');
 				if($pdo_statement->execute()) {
 					$success++;
 				} else
@@ -55,7 +60,11 @@ class VersionController extends \GO\Base\Controller\AbstractModelController {
 		echo $success.' Done<br> '.$failed. ' Failed';
 	}
 	
-	protected function getStoreParams($params) {		
+	protected function getStoreParams($params) {
+		// The store ignores the ACL. findByPk checks read permission on the file.
+		if(!\GO\Files\Model\File::model()->findByPk($params['file_id'] ?? 0)) {
+			throw new \GO\Base\Exception\NotFound();
+		}
 		$findParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
 		$findParams->getCriteria()->addCondition('file_id', $params['file_id']);		
 		

@@ -13,6 +13,7 @@ use go\core\orm;
 use go\core\util\DateTime;
 
 use go\core\webclient\Extjs3;
+use InvalidArgumentException;
 use PDO;
 use ReflectionException;
 use function GO;
@@ -376,10 +377,33 @@ class Blob extends orm\Entity {
 	}
 
 	/**
+	 * Check if the value has the format of a blob ID, a SHA-1 hash in lowercase hex.
+	 *
+	 * @param mixed $id
+	 * @return bool
+	 */
+	public static function isValidId(mixed $id): bool
+	{
+		return is_string($id) && preg_match('/^[a-f0-9]{40}\z/', $id) === 1;
+	}
+
+	/**
+	 * Get the path of a blob in the data folder.
+	 *
+	 * Blob IDs are SHA-1 hashes. Other values are refused because callers may pass IDs from the client and something
+	 * like "../../etc/passwd" would point outside the blob folder.
+	 *
+	 * @param string $id
+	 * @return string
+	 * @throws InvalidArgumentException When the ID is not a SHA-1 hash
 	 * @throws Exception
 	 */
-	static function buildPath($id): string
+	static function buildPath(string $id): string
 	{
+		if (!self::isValidId($id)) {
+			throw new InvalidArgumentException("Invalid blob ID");
+		}
+
 		$dir = substr($id,0,2) . DIRECTORY_SEPARATOR .substr($id,2,2). DIRECTORY_SEPARATOR;
 		return go()->getDataFolder()->getPath() . DIRECTORY_SEPARATOR . 'data'. DIRECTORY_SEPARATOR . $dir . $id;
 	}

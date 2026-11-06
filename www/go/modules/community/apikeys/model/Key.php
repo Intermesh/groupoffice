@@ -8,6 +8,20 @@ use go\core\orm\Query;
 use go\core\util\DateTime;
 
 class Key extends Entity {
+
+	/**
+	 * Only for managers of the module. API keys contain the access tokens.
+	 *
+	 * @return int
+	 */
+	protected function internalGetPermissionLevel(): int
+	{
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+
+		return \go\modules\community\apikeys\Module::get()->getModel()->getUserRights()->mayManage ? \go\core\model\Acl::LEVEL_MANAGE : 0;
+	}
 	public ?string $id;
 	public ?string $name;
 	public ?string $accessToken;

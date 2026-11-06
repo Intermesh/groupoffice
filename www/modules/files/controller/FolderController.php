@@ -88,6 +88,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 	public function actionRemoveEmpty() {
+		// Maintenance for administrators. Deletes the empty folders of all users.
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		\GO\Base\Fs\File::setAllowDeletes(false);
 		GO::session()->runAsRoot();
