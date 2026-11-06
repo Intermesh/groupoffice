@@ -134,11 +134,28 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		return true;
 	}
 
+	/**
+	 * Only users with manage permission on the ACL may change the level of a group. The ACL and group can't be changed.
+	 *
+	 * The manage permission is not taken from $params because those come from the client in this action.
+	 *
+	 * @throws \GO\Base\Exception\AccessDenied
+	 * @throws \GO\Base\Exception\NotFound
+	 */
 	protected function beforeUpdateRecord($params, &$record, $linkModel)
 	{
-		if(!$params['currentUserHasManagePermission']) {
+		$currentPermissionLevel = \GO\Base\Model\Acl::getUserPermissionLevel($params['model_id'], \GO::user()->id);
+		if(!\GO\Base\Model\Acl::hasPermission($currentPermissionLevel, \GO\Base\Model\Acl::MANAGE_PERMISSION)) {
 			throw new \GO\Base\Exception\AccessDenied();
 		}
+
+		if(!$linkModel) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		$record = array_intersect_key($record, ['level' => true]);
+
+		return true;
 	}
 
 	protected function beforeDelete(array $params) {

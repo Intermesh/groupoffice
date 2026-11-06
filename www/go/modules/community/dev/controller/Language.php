@@ -30,6 +30,9 @@ class Language extends Controller {
 
 	public function __construct()
 	{
+		// Authenticates the user
+		parent::__construct();
+
 		//for checking arrays() in english translation
 		$this->en = new LangModel();
 		$this->en->initExport();
