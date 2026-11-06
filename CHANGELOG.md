@@ -2,6 +2,12 @@
 - Email: Security: Check write permission when saving file to folder. Only read permission was checked.
 - Files: Security: Check read permission when reading file meta data
 - File: Security: Check write permission in replace() method before overwriting data on disk
+- Email: Security: Check write permission when saving file to folder. Only read permission was checked.
+- Files: Security: Check read permission when reading file meta data
+- Calendar: Security: Check write permissions before reloading an external calendar
+- File: Security: Check write permission in replace() method before overwriting data on disk
+- Forms: Security: Missing ACL check on download spreadsheet.
+- Email: Security: Stored XSS fixed
 
 03-11-2026: 6.8.180
 - Files: Fixed security issue where logged in user could read any contact name
