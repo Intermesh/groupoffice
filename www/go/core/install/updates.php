@@ -1893,14 +1893,14 @@ WHERE NOT EXISTS (SELECT 1 FROM core_principal p WHERE CAST(p.id AS BINARY) = CA
 
 
 // 26.1
-$updates['202610271542'][] = "alter table core_module
+$updates['202611061200'][] = "alter table core_module
     drop column sort_order;";
 
-$updates['202610271542'][] = "alter table core_module
+$updates['202611061200'][] = "alter table core_module
     drop column admin_menu;";
 
 
-$updates['202610271542'][] = "create table if not exists core_module_user
+$updates['202611061200'][] = "create table if not exists core_module_user
 (
 	userId   int          not null,
     moduleId int          not null,
@@ -1914,7 +1914,7 @@ $updates['202610271542'][] = "create table if not exists core_module_user
             on delete cascade
 );";
 
-$updates['202610271542'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
+$updates['202611061200'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
 
-$updates['202610191331'][] = "alter table core_alert
+$updates['202611061200'][] = "alter table core_alert
     add isSent boolean default false not null;";
