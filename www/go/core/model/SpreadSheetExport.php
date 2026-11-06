@@ -29,8 +29,29 @@ class SpreadSheetExport extends Entity
 		return true;
 	}
 
+	/**
+	 * Saved exports belong to a user. Others may use them but not change them.
+	 *
+	 * @return int
+	 */
 	protected function internalGetPermissionLevel(): int
 	{
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+		if(go()->getAuthState()->isAdmin()) {
+			return Acl::LEVEL_MANAGE;
+		}
+		// When creating, the user must be the current user. Also when the user is changed.
+		$userIds = [$this->userId ?? null];
+		if(!$this->isNew() && $this->isModified('userId')) {
+			$userIds[] = $this->getOldValue('userId');
+		}
+		foreach($userIds as $userId) {
+			if($userId != go()->getAuthState()->getUserId()) {
+				return $this->isNew() || $this->isModified('userId') ? 0 : Acl::LEVEL_READ;
+			}
+		}
 		return Acl::LEVEL_MANAGE;
 	}
 

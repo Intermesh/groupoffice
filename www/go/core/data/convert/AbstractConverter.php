@@ -350,7 +350,8 @@ abstract class AbstractConverter {
 					EntityType::push();
 
 					$this->notifyCount(true, $response['count'], count($response['errors']));
-				} catch (Exception $e) {
+				} catch (Throwable $e) {
+					// Also catch errors (e.g. a TypeError from invalid data) so one bad item doesn't end the import
 					ErrorHandler::logException($e);
 					$response['errors'][] = "Item " . $this->index . ": " . $e->getMessage();
 				}
@@ -365,6 +366,9 @@ abstract class AbstractConverter {
 		}catch(\Throwable $e) {
 
 			ErrorHandler::logException($e, "Failed to import file");
+
+			$response['success'] = false;
+			$response['errors'][] = $e->getMessage();
 
 			$this->notifyError(true, $e->getMessage());
 		}

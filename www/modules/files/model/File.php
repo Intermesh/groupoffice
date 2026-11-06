@@ -685,6 +685,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		if($this->isLocked())
 			throw new \GO\Files\Exception\FileLocked();
+
+		if(!$this->hasPermissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
 //		for safety allow replace action
 		if(!$this->isNew)
 			$this->log("update");
@@ -710,9 +714,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		}
 		$fsFile->setDefaultPermissions();
 
-		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
-		$this->save();
+
+		// permissions already checked above
+		$this->save(true);
 		
 		$this->fireEvent('replace', array($this, $isUploadedFile));
 		

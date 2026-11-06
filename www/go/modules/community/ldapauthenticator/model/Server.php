@@ -20,6 +20,20 @@ use go\core\validate\ErrorCode;
 class Server extends Entity
 {
 
+	/**
+	 * Only for managers of the module. The server settings contain the password of the LDAP account.
+	 *
+	 * @return int
+	 */
+	protected function internalGetPermissionLevel(): int
+	{
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+
+		return \go\modules\community\ldapauthenticator\Module::get()->getModel()->getUserRights()->mayManage ? \go\core\model\Acl::LEVEL_MANAGE : 0;
+	}
+
 	public ?string $id;
 	public ?string $hostname;
 	public int $port = 389;

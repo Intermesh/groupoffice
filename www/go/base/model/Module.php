@@ -2,6 +2,7 @@
 namespace GO\Base\Model;
 
 use GO;
+use go\core\model\Permission;
 use go\core\model\User;
 use go\modules\business\license\exception\LicenseException;
 
@@ -66,10 +67,8 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		}
 		$moduleId = $this->id;
 
-		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
-
-		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
-		if($rights === false) {
+		$rights = Permission::findUserRights($moduleId, $userId);
+		if($rights === null) {
 			return 0;
 		}
 		if($rights & 1) { // we only have mayManage for old modules
@@ -91,15 +90,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 
 	private function userRights($userId) {
-		$r = go()->getDbConnection()->selectSingleValue("MAX(rights)")
-			->from("core_permission")
-			->where('moduleId', '=', $this->id)
-			->where("groupId", "IN",
-				go()->getDbConnection()
-					->select("groupId")
-					->from("core_user_group")
-					->where(['userId' => $userId])
-			)->single();
+		$r = Permission::findUserRights($this->id, $userId);
 
 		if($r === null) {
 			$rights = ["mayRead" => false];
@@ -108,8 +99,6 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			}
 			return (object) $rights;
 		}
-
-		$r = decbin($r);
 
 		$rights = ["mayRead" => true];
 

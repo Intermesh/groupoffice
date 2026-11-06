@@ -34,11 +34,24 @@ class User extends EntityController {
 			if($entity->isModified('groups')) {
 				return false;
 			}
+			// Changing an administrator could be used to take over the account. For example by changing the recovery e-mail.
+			if($entity instanceof model\User && $entity->isAdmin()) {
+				return false;
+			}
+			// Modules may refuse changes to their properties
+			if(self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity) === false) {
+				return false;
+			}
 			// Level is not used for users. When user management is enabled only check read permissions
 			return $entity->hasPermissionLevel(model\Acl::LEVEL_READ);
 		}
 		// A user cannot change their own groups!
 		if($entity->isModified('groups')) {
+			return false;
+		}
+
+		// These are managed by admins and user managers
+		if($entity->isModified(model\User::MANAGER_PROPERTIES)) {
 			return false;
 		}
 		

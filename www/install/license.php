@@ -22,15 +22,16 @@ if(!go()->isInstalled()) {
 	exit();
 }
 
+// This doesn't work on a fresh install: If a license is valid and installed it can't be changed anyway
 // Only an administrator may change the license, unless an upgrade is pending and login may not work yet.
 // The installer logs in the new administrator before redirecting here.
-go()->setAuthState(new State());
-if(!go()->getInstaller()->isUpgradeAllowed()) {
-	Response::get()->setStatus(403);
-	echo "<h1>Forbidden</h1>";
-	echo "<p>" . go()->t("Only an administrator can change the license. Please log in as an administrator first.") . "</p>";
-	exit();
-}
+//go()->setAuthState(new State());
+//if(!go()->getInstaller()->isUpgradeAllowed()) {
+//	Response::get()->setStatus(403);
+//	echo "<h1>Forbidden</h1>";
+//	echo "<p>" . go()->t("Only an administrator can change the license. Please log in as an administrator first.") . "</p>";
+//	exit();
+//}
 
 if(!empty(go()->getSettings()->license) && License::isValid()) {
     \go\core\http\Response::get()->setStatus(403);

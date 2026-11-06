@@ -590,6 +590,10 @@ abstract class EntityController extends Controller {
 	 * we must also return those in the client or it won't sync them because the chage occurred in the same modseq.
 	 */
 	private function trackSaves() {
+		// Discard saves tracked outside this set request (e.g. by an earlier set in the same process) so they don't leak into the response
+		static::$createdEntitities = [];
+		static::$updatedEntitities = [];
+
 		$cls = $this->entityClass();
 		$cls::on(Entity::EVENT_SAVE, static::class, 'onEntitySave');		
 	}
@@ -798,9 +802,12 @@ abstract class EntityController extends Controller {
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		if($ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity)) {
+		$ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity);
+
+		if(isset($ret)) {
 			return $ret;
 		}
+
 		return ($entity->hasPermissionLevel(Acl::LEVEL_WRITE) || $this->onlyUserPropsModified($entity)) && $this->checkAclChange($entity);
 	}
 

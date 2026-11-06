@@ -22,6 +22,33 @@ class Permission extends Property {
 		return parent::defineMapping()->addTable("core_permission");
 	}
 
+	/**
+	 * Get the rights bitmask a user has for a module, combined over all groups of the user.
+	 *
+	 * A permission record grants read access, its bits grant the extra module rights.
+	 *
+	 * @param int $moduleId
+	 * @param int $userId
+	 * @return int|null null if none of the user's groups has a permission record for the module, 0 for read access only
+	 */
+	public static function findUserRights(int $moduleId, int $userId): ?int
+	{
+		// BIT_OR() returns 0 on an empty set. Group so that no permission record returns no row and single() returns null.
+		$rights = go()->getDbConnection()->selectSingleValue("BIT_OR(rights)")
+			->from("core_permission")
+			->where('moduleId', '=', $moduleId)
+			->where("groupId", "IN",
+				go()->getDbConnection()
+					->select("groupId")
+					->from("core_user_group")
+					->where(['userId' => $userId])
+			)
+			->groupBy(['moduleId'])
+			->single();
+
+		return $rights === null ? null : (int) $rights;
+	}
+
 	public function hasRight($name){
 		$types = $this->owner->module()->getRights();
 		return !!($this->rights & $types[$name]);

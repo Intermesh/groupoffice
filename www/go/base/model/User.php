@@ -306,13 +306,22 @@ class User extends \GO\Base\Db\ActiveRecord {
 		$attr = parent::getAttributes($outputType);
 		$attr['name']=$this->getName();
 
-		// Unset these 2 fields so they are not returned by default
-		$attr['password'] = null;
-		$attr['digest'] = null;
+		$attr['recoveryHash'] = $attr['recoveryEmail'] = $attr['recoverySendAt'] = null;
 
 		return $attr;
 	}
-	
+
+	/**
+	 * Recovery data must never be sent to the client. Saving uses the internal attributes so it's not affected.
+	 */
+	public function getAttribute($attributeName, $outputType = 'raw')
+	{
+		if (in_array($attributeName, ['recoveryHash', 'recoveryEmail', 'recoverySendAt'])) {
+			return null;
+		}
+		return parent::getAttribute($attributeName, $outputType);
+	}
+
 	public function attributeLabels() {
 		$labels = parent::attributeLabels();
 		$labels['passwordConfirm']=GO::t("Password confirmation");

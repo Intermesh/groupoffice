@@ -165,8 +165,12 @@ class Oauth2ClientTest extends TestCase
 		$get = $this->anonymousApiCall('Oauth2Client/get', ['ids' => [$client->id]]);
 		$json = json_encode($get);
 
-		// make sure the read really worked, otherwise the assertion below proves nothing
-		$this->assertStringContainsString('anonymous-visible-name', $json, $json);
+		// Anonymous users may not read the clients at all. Check that the request reached Oauth2Client/get, otherwise
+		// the assertions below prove nothing.
+		$this->assertSame('Oauth2Client/get', $get[0], $json);
+		$this->assertContains((string) $client->id, array_map('strval', $get[1]['notFound'] ?? []), $json);
+		$this->assertEmpty($get[1]['list'] ?? null, $json);
+		$this->assertStringNotContainsString('anonymous-visible-name', $json);
 		$this->assertStringNotContainsString(self::SECRET, $json);
 
 		$query = $this->anonymousApiCall('Oauth2Client/query', []);

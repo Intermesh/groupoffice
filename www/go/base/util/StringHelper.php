@@ -812,7 +812,8 @@ class StringHelper {
 		// Remove namespaced elements (we do not need them)
 		$data = preg_replace('#</*\w+:\w[^>]*+>#i', '', $data);
 
-		return $data;
+		// The regular expressions above can be fooled, eg. by <svg/onload=...>. Parse the HTML to remove what's left.
+		return \go\core\util\StringUtil::removeActiveContent($data);
 	}
 	
 	/**

@@ -5,6 +5,8 @@ use DateTimeZone;
 use go\core\db\Query;
 use go\core\model\User;
 use go\core\util\DateTime;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class BlobTest extends TestCase
@@ -132,5 +134,55 @@ class BlobTest extends TestCase
 
 		// deprecated alias
 		$this->assertEquals([$id1, $id2, $id3], Blob::parseFromHtml($html));
+	}
+
+	public static function invalidIdProvider(): array
+	{
+		return [
+			'path traversal' => ['../../../../../../etc/passwd'],
+			'traversal with hash length' => ['../../../../../../../../../../etc/passwd'],
+			'absolute path' => ['/etc/passwd'],
+			'too short' => ['abc123'],
+			'too long' => [str_repeat('a', 41)],
+			'uppercase' => [strtoupper(sha1('blob'))],
+			'not hex' => [str_repeat('g', 40)],
+			'empty' => [''],
+			'trailing newline' => [sha1('blob') . "\n"],
+		];
+	}
+
+	/**
+	 * Blob IDs may come from the client, so buildPath() must not return a path outside the blob folder
+	 */
+	#[DataProvider('invalidIdProvider')]
+	public function testBuildPathRefusesInvalidId(string $id)
+	{
+		$this->assertFalse(Blob::isValidId($id));
+
+		$this->expectException(InvalidArgumentException::class);
+		Blob::buildPath($id);
+	}
+
+	public function testBuildPathOfValidId()
+	{
+		$id = sha1('blob');
+		$this->assertTrue(Blob::isValidId($id));
+
+		$path = Blob::buildPath($id);
+		$this->assertStringEndsWith(DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . substr($id, 0, 2) . DIRECTORY_SEPARATOR . substr($id, 2, 2) . DIRECTORY_SEPARATOR . $id, $path);
+	}
+
+	public function testSavedBlobHasValidId()
+	{
+		$blob = Blob::fromString("valid id test " . uniqid());
+		$blob->type = 'text/plain';
+		$blob->name = 'test.txt';
+		$blob->staleAt = new DateTime("-10 min", new DateTimeZone('UTC'));
+		$this->assertTrue($blob->save());
+
+		$this->assertTrue(Blob::isValidId($blob->id));
+		$this->assertFileExists($blob->path());
+
+		Blob::delete(['id' => $blob->id]);
 	}
 }

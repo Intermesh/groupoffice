@@ -62,8 +62,14 @@ class Calendar extends EntityController {
 
 	public function reload($params) {
 		$cal = model\Calendar::findById($params['calendarId']);
-		if($cal)
+		if($cal) {
+
+			if(!$cal->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+				throw new Forbidden("You do not have permission to read this calendar");
+			}
+
 			return $cal->importWebcal();
+		}
 		return ['success' => false];
 	}
 

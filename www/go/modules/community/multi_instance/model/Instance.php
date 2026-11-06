@@ -24,6 +24,20 @@ use GO;
 use GO\Base\Module as BaseModule;
 
 class Instance extends Entity {
+
+	/**
+	 * Only for managers of the module. Managers can log in to the instances as administrator.
+	 *
+	 * @return int
+	 */
+	protected function internalGetPermissionLevel(): int
+	{
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+
+		return \go\modules\community\multi_instance\Module::get()->getModel()->getUserRights()->mayManage ? \go\core\model\Acl::LEVEL_MANAGE : 0;
+	}
 	
 	public ?string $id;
 	public string $hostname;

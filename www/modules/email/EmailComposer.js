@@ -949,15 +949,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		} else {
 			//keep attachments when switching from text <> html
 			this.reset();
-			
-			//save the mail to a file location
-			if(config.saveToPath){
-				this.sendParams.save_to_path=config.saveToPath;
-				this.sendButton.hide();
-			}else
-			{
-				this.sendButton.show();
-			}
 
 			this.initFrom(config);
 
@@ -1287,9 +1278,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				this.stopAutoSave();
 			
 			var sendUrl = this.sendURL;
-			if(this.sendParams.save_to_path)
-				sendUrl = GO.url("email/message/saveToFile");
-			else if(draft || autoSave)
+			if(draft || autoSave)
 				sendUrl = GO.url("email/message/save");
 			
 			const newLinks = this.createLinkButton.getNewLinks();

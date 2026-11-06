@@ -25,6 +25,10 @@ class Instance extends EntityController {
 	public function login($params) {
 		
 		$instance = model\Instance::findById($params['id']);
+		// Logs in as administrator of the instance
+		if(!$instance || !$instance->hasPermissionLevel(\go\core\model\Acl::LEVEL_MANAGE)) {
+			throw new \go\core\exception\Forbidden();
+		}
 		
 		$accessToken = $instance->createAccessToken();
 		

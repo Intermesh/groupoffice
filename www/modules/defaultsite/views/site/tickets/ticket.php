@@ -14,23 +14,23 @@
 		<table class="table-contactinformation">
 			<tr>
 				<td><?php echo \GO::t("First Name", "defaultsite"); ?></td>
-				<td><?php echo $ticket->first_name; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->first_name), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 			<tr>
 				<td><?php echo \GO::t("Middle Name", "defaultsite"); ?></td>
-				<td><?php echo $ticket->middle_name; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->middle_name), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 			<tr>
 				<td><?php echo \GO::t("Last Name", "defaultsite"); ?></td>
-				<td><?php echo $ticket->last_name; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->last_name), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 			<tr>
 				<td><?php echo \GO::t("Email", "defaultsite"); ?></td>
-				<td><?php echo $ticket->email; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->email), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 			<tr>
 				<td><?php echo \GO::t("Phone", "defaultsite"); ?></td>
-				<td><?php echo $ticket->phone; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->phone), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 		</table>
 		-->
@@ -39,11 +39,11 @@
 		<table class="table-ticketinformation">
 			<tr>
 				<td><?php echo \GO::t("Subject", "defaultsite"); ?></td>
-				<td><?php echo $ticket->subject; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->subject), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 			<tr>
 				<td><?php echo \GO::t("Type", "defaultsite"); ?></td>
-				<td><?php echo $ticket->type->name; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->type->name), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 			<tr>
 				<td><?php echo \GO::t("Status", "defaultsite"); ?></td>
@@ -51,10 +51,10 @@
 					<?php if(!$ticket->isNew && !$ticket->isClosed()): ?>
 						<form method="POST">
 							<input type="hidden" value="close" name="close" />
-							<?php echo $ticket->status_id?$ticket->getStatusName():\GO::t("Open", "defaultsite"); ?> [<input title="<?php echo \GO::t("Close this ticket. You cannot respond to this ticket anymore when you have closed it.", "defaultsite"); ?>" type="submit" id="close-ticket-button"  class="" value="<?php echo \GO::t("Close", "defaultsite"); ?>" />]
+							<?php echo htmlspecialchars((string) ($ticket->status_id?$ticket->getStatusName():\GO::t("Open", "defaultsite")), ENT_QUOTES, 'UTF-8'); ?> [<input title="<?php echo \GO::t("Close this ticket. You cannot respond to this ticket anymore when you have closed it.", "defaultsite"); ?>" type="submit" id="close-ticket-button"  class="" value="<?php echo \GO::t("Close", "defaultsite"); ?>" />]
 						</form>
 					<?php else: ?>
-						<?php echo $ticket->status_id?$ticket->getStatusName():\GO::t("Open", "defaultsite"); ?>
+						<?php echo htmlspecialchars((string) ($ticket->status_id?$ticket->getStatusName():\GO::t("Open", "defaultsite")), ENT_QUOTES, 'UTF-8'); ?>
 					<?php  endif; ?>
 				</td>
 			</tr>
@@ -68,7 +68,7 @@
 			</tr>
 			<tr>
 				<td><?php echo \GO::t("Agent", "defaultsite"); ?></td>
-				<td><?php echo $ticket->agent?$ticket->agent->name:''; ?></td>
+				<td><?php echo htmlspecialchars((string) ($ticket->agent?$ticket->agent->name:''), ENT_QUOTES, 'UTF-8'); ?></td>
 			</tr>
 			
 <!--			
@@ -89,20 +89,20 @@
 			<?php foreach($messages as $i => $message): ?>
 			<tr class="<?php echo($i%2)?'even':'odd'; ?>">
 				<td>
-					<span class="ticketmessage-name"><?php echo $message->posterName; ?></span><span class="ticketmessage-time"><?php echo $message->getAttribute("ctime","formatted"); ?></span>
+					<span class="ticketmessage-name"><?php echo htmlspecialchars((string) ($message->posterName), ENT_QUOTES, 'UTF-8'); ?></span><span class="ticketmessage-time"><?php echo $message->getAttribute("ctime","formatted"); ?></span>
 					<p class="ticketmessage-message"><?php echo $message->getAttribute("content","html"); ?></p>
 
 					<?php if (!empty($message->attachments)): ?>
 						<span class="ticketmessage-files"><?php echo \GO::t("Files", "defaultsite"); ?>:</span>
 							<?php foreach ($message->getFiles() as $file => $obj): ?>
 								<a target="_blank" href="<?php echo \Site::urlManager()->createUrl('tickets/site/downloadAttachment',array('file'=>$obj->id,'ticket_number'=>$ticket->ticket_number,'ticket_verifier'=>$ticket->ticket_verifier)); ?>">
-									<?php echo $file; ?>
+									<?php echo htmlspecialchars((string) ($file), ENT_QUOTES, 'UTF-8'); ?>
 								</a>
 							<?php endforeach; ?>
 					<?php endif; ?>
 
 				<?php if($message->has_status): ?>
-					<p><strong>Status</strong>: <?php echo \GO\Tickets\Model\Status::getName($message->status_id); ?></p>
+					<p><strong>Status</strong>: <?php echo htmlspecialchars((string) \GO\Tickets\Model\Status::getName($message->status_id), ENT_QUOTES, 'UTF-8'); ?></p>
 				<?php endif; ?>
 				</td>
 			</tr>

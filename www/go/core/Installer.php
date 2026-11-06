@@ -190,6 +190,13 @@ class Installer {
 		Group::check();
 		GoCoreModule::check();
 
+		// The principal of the admin could not be saved before the core entities were registered. Alerts and other
+		// records that reference the creator need it.
+		$admin->savePrincipal = true;
+		if(!$admin->savePrincipal()) {
+			throw new Exception("Failed to create the principal of the admin user");
+		}
+
 		$tempAuthState = new TemporaryState();
 		$tempAuthState->setUserId(1);
 		go()->setAuthState($tempAuthState);
@@ -525,6 +532,7 @@ class Installer {
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		GO::session()->runAsRoot();
+		$oldIgnoreAcl = GO::$ignoreAclPermissions;
 		GO::$ignoreAclPermissions = true;
 
 		go()->disableEvents();
@@ -612,6 +620,7 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
+		GO::$ignoreAclPermissions = $oldIgnoreAcl;
 
 		// old framework messes it up somewhere
 		date_default_timezone_set("UTC");

@@ -9,6 +9,7 @@ use go\core\exception\Forbidden;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\http\Response;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
 use GO\Files\Model\File;
@@ -109,6 +110,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	 * @param integer $id id of the user to recalculate used space for
 	 */
 	protected function actionRecalculateDiskUsage($id=false) {
+		// Maintenance for administrators
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		
 		\GO::session()->closeWriting();
 		
@@ -129,6 +134,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	}
 	
 	protected function actionCorrectQuotaUser() {
+		// Maintenance for administrators
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		$time_start = microtime(true); 
 		$count = 0;
 		
@@ -427,6 +436,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 		if(!$file){
 			throw new \Exception("File not found");
+		}
+
+		if($file->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new AccessDenied();
 		}
 		
 		$response = [

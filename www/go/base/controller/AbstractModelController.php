@@ -1109,10 +1109,23 @@ class AbstractModelController extends AbstractController {
 
 		$model = $this->getRequestedModel($params['model_name']);
 		$targetModel = $model->findByPk($params['target_model_id']);
+		$delete = !empty($params['delete_merge_models']);
 
+		// Merging moves links, files and comments before the merged models are deleted, so check all permissions first
+		if(!$targetModel || !$targetModel->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+		$models = [];
 		foreach($mergeModels as $id){
 			$mergeModel = $model->findByPk($id);
-			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), !empty($params['delete_merge_models']));			
+			if(!$mergeModel || !$mergeModel->checkPermissionLevel($delete ? \GO\Base\Model\Acl::DELETE_PERMISSION : \GO\Base\Model\Acl::WRITE_PERMISSION)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+			$models[] = $mergeModel;
+		}
+
+		foreach($models as $mergeModel){
+			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), $delete);
 		}
 		
 		return array('success'=>true);
