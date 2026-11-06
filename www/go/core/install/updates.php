@@ -1889,4 +1889,4 @@ SELECT u.id, u.displayName, u.email, 'individual', u.username, u.timezone, e.id,
 FROM core_user u
 INNER JOIN core_group g ON g.isUserGroupFor = u.id
 INNER JOIN core_entity e ON e.name = 'User' AND e.moduleId = (SELECT id FROM core_module WHERE name = 'core' AND package = 'core')
-WHERE NOT EXISTS (SELECT 1 FROM core_principal p WHERE p.id = CAST(u.id AS CHAR) OR (p.entityTypeId = e.id AND p.entityId = u.id));";
+WHERE NOT EXISTS (SELECT 1 FROM core_principal p WHERE CAST(p.id AS BINARY) = CAST(u.id AS BINARY) OR (p.entityTypeId = e.id AND p.entityId = u.id));";
