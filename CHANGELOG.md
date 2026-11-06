@@ -11,6 +11,7 @@
 - Calendar: Security: Check write permissions before reloading an external calendar
 - File: Security: Check write permission in replace() method before overwriting data on disk
 - Forms: Security: Missing ACL check on download spreadsheet.
+- Email: Security: Stored XSS fixed
 
 02-11-2026: 26.0.57
 - Calendar: Deleting an invitation from your calendar now declines it instead of removing it, so opening the invitation again does not add it back in. Declined invitations can still be deleted when "Show events that you have declined" is on.
