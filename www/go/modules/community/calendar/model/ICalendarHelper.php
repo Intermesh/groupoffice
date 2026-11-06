@@ -13,6 +13,7 @@ use Generator;
 use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
+use go\core\exception\NotFound;
 use go\core\fs\Blob;
 use go\core\model\Principal;
 use go\core\util\DateTime;
@@ -345,7 +346,12 @@ class ICalendarHelper {
 	static function calendarEventFromFile(string $blobId, array|null $values = null): Generator
 	{
 		$groups = []; // uid => [vevent strings]
-		foreach(self::veventSplitter(Blob::buildPath($blobId)) as $uid => $vevent) {
+		// Find the blob so the ID can't be used to read another file
+		$blob = Blob::findById($blobId);
+		if(!$blob) {
+			throw new NotFound("Blob not found");
+		}
+		foreach(self::veventSplitter($blob->getFile()->getPath()) as $uid => $vevent) {
 			$groups[$uid][] = $vevent;
 		}
 

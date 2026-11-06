@@ -52,6 +52,40 @@ class CalendarController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	}
 
 	/**
+	 * The visible calendars are per user. Always use the current user, not the one from the client.
+	 */
+	protected function actionSelectedStore($params) {
+		$params['model_id'] = \GO::user()->id;
+		return parent::actionSelectedStore($params);
+	}
+
+	protected function actionSelectNewStore($params) {
+		$params['model_id'] = \GO::user()->id;
+		return parent::actionSelectNewStore($params);
+	}
+
+	public function actionUpdateRecord($params) {
+		$params['model_id'] = \GO::user()->id;
+		return parent::actionUpdateRecord($params);
+	}
+
+	/**
+	 * Only calendars the user may read can be added
+	 *
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	protected function beforeAdd(array $params) {
+		$ids = json_decode($params['add'] ?? '[]', true);
+		foreach((array) $ids as $id) {
+			// findByPk checks read permission
+			if(!\GO\Summary\Model\CalendarActiveRecord::model()->findByPk($id)) {
+				throw new \GO\Base\Exception\NotFound();
+			}
+		}
+		return parent::beforeAdd($params);
+	}
+
+	/**
 	 * Get the data for the grid that shows all the tasks from the selected calendars.
 	 *
 	 * @param Array $params
@@ -74,7 +108,9 @@ class CalendarController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		$todayend->setTime(23,59,59);
 
 		$activeCalendars = [];
-		$activeCalendarStmt = go()->getDbConnection()->select('id,name')->from('calendar_calendar', 'cal')->join('su_visible_calendars', 'pt', 'pt.calendar_id = cal.id AND pt.user_id = '. \GO::user()->id);
+		$activeCalendarStmt = go()->getDbConnection()->select('calendar_calendar.id,calendar_calendar.name')->from('calendar_calendar', 'calendar_calendar')->join('su_visible_calendars', 'pt', 'pt.calendar_id = calendar_calendar.id AND pt.user_id = '. \GO::user()->id);
+		// Calendars the user may no longer read are skipped
+		\go\core\model\Acl::applyToQuery($activeCalendarStmt, 'calendar_calendar.aclId');
 		foreach($activeCalendarStmt as $calendar) {
 			$activeCalendars[$calendar['id']] = $calendar['name'];
 		}
