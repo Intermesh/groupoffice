@@ -501,6 +501,7 @@ class Installer {
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		GO::session()->runAsRoot();
+		$oldIgnoreAcl = GO::$ignoreAclPermissions;
 		GO::$ignoreAclPermissions = true;
 
 		go()->disableEvents();
@@ -591,6 +592,7 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
+		GO::$ignoreAclPermissions = $oldIgnoreAcl;
 
 		// old framework messes it up somewhere
 		date_default_timezone_set("UTC");
