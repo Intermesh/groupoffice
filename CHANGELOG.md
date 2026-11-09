@@ -1,3 +1,4 @@
+- Calendar: remove scheduling objects as it was causing loops in caldav with thunderbird
 - Email: Logging in via IMAP/ActiveSync no longer records unchanged passwords in the account history, and the SMTP password is now masked in the history instead of storing its encrypted value
 - Calendar: an invitation from an organizer outside Group-Office that was accepted in a CalDAV client (for example Thunderbird) was treated as the attendee's own event: a cancellation from the organizer was ignored and the attendee could change it for the other local attendees. Updates from the organizer are still applied.
 - Calendar: CalDAV clients could not create a new calendar without a component set or a task list; the server reported success but nothing was created
