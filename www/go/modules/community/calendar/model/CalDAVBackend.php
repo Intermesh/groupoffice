@@ -43,17 +43,30 @@ class CalDAVBackend extends AbstractBackend implements
 
 		$username = basename($principalUri);
 		$u = User::find(['id', 'calendarPreferences'])->where(['username'=>$username])->single();
+		if(!$u) {
+			throw new DAV\Exception\NotFound("Principal $principalUri not found");
+		}
 
 		// We want to sort the personal calendar on top for caldav scheduling as it takes the first one for invites
 		// See schedule-default-calendar-URL handling in  Sabre\CalDAV\Schedule\Plugin line 222
-		$personalCalendarId = $u->calendarPreferences->personalCalendarId;
+		$personalCalendarId = $u->calendarPreferences->personalCalendarId ?? null;
 
+		// The calendars of the principal, not of the logged in user
 		$calendars = Calendar::findFor($u->id)
-			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null])
-			->filter(['permissionLevel' => Acl::LEVEL_READ]);
+			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null]);
+		Calendar::applyAclToQuery($calendars, Acl::LEVEL_READ, $u->id);
 
+		// Another user's calendars are only requested by Sabre for the free / busy information of that user. Use the same
+		// rules as BusyPeriod::fetch(): only the calendars of that user and only when the logged in user may see their
+		// free / busy information.
+		$forOtherUser = $u->id != go()->getUserId();
+		if($forOtherUser) {
+			$calendars->andWhere('calendar_calendar.ownerId', '=', [$u->id, null]);
+			Calendar::applyAclToQuery($calendars, Calendar::LEVEL_FREEBUSY);
+		}
 
 		foreach($calendars as $calendar) {
+			$level = Acl::getUserPermissionLevel($calendar->findAclId(), $u->id);
 
 			$uri = 'c-'.$calendar->id;
 			$record = [
@@ -77,9 +90,9 @@ class CalDAVBackend extends AbstractBackend implements
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$calendar->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
 				// 1 = owner, 2 = readonly, 3 = readwrite: Unused as we don't have the sharing plugin enabled
-				'share-access' => $calendar->getOwnerId() == $u->id ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
+				'share-access' => $calendar->getOwnerId() == $u->id ? 1 : (($level >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
 				// Sabre grants the principal write access unless the calendar is read-only
-				'{http://sabredav.org/ns}read-only' => $calendar->getPermissionLevel() < Acl::LEVEL_WRITE || !empty($calendar->webcalUri),
+				'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_WRITE || !empty($calendar->webcalUri),
 			];
 
 			if($calendar->id == $personalCalendarId) {
@@ -88,9 +101,15 @@ class CalDAVBackend extends AbstractBackend implements
 				$result[] = $record;
 			}
 		}
-		$tasklists = TaskList::find()->where(['isSubscribed'=>1,'syncToDevice'=>1, 'role'=>1])
-			->filter(["permissionLevel" => Acl::LEVEL_READ]);
+		if($forOtherUser) {
+			// Task lists have no free / busy information
+			return $result;
+		}
+
+		$tasklists = TaskList::findFor($u->id)->where(['isSubscribed'=>1,'syncToDevice'=>1, 'role'=>1]);
+		TaskList::applyAclToQuery($tasklists, Acl::LEVEL_READ, $u->id);
 		foreach($tasklists as $tasklist) {
+			$level = Acl::getUserPermissionLevel($tasklist->findAclId(), $u->id);
 
 			$uri = 't-'.$tasklist->id;
 			$result[] = [
@@ -114,8 +133,8 @@ class CalDAVBackend extends AbstractBackend implements
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$tasklist->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
 				// 1 = owner, 2 = readonly, 3 = readwrite
-				'share-access' => $tasklist->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($tasklist->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2),
-				'{http://sabredav.org/ns}read-only' => $tasklist->getPermissionLevel() < Acl::LEVEL_WRITE,
+				'share-access' => $level == Acl::LEVEL_MANAGE ? 1 : ($level >= Acl::LEVEL_WRITE ? 3 : 2),
+				'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_WRITE,
 			];
 		}
 
@@ -177,13 +196,13 @@ class CalDAVBackend extends AbstractBackend implements
 		$supportedProperties[] = '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp';
 
 		$propPatch->handle($supportedProperties, function ($mutations) use ($id, $type) {
-			switch($type) {
-				case 'c':
-					$cal = Calendar::findById($id);
-					break;
-				case 't':
-					$cal = TaskList::findById($id);
-					break;
+			$cal = match($type) {
+				'c' => Calendar::findById($id),
+				't' => TaskList::findById($id),
+				default => null
+			};
+			if(!$cal) {
+				return array_fill_keys(array_keys($mutations), 404);
 			}
 
 			$newValues = [];
@@ -204,7 +223,11 @@ class CalDAVBackend extends AbstractBackend implements
 			}
 
 			$cal->setValues($newValues);
-			$cal->save();
+			if(!$cal->save()) {
+				// Sabre responds with 403 for every property
+				go()->log("Could not update calendar $type-$id: " . $cal->getValidationErrorsAsString());
+				return false;
+			}
 
 			return true;
 		});
@@ -489,8 +512,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 				break;
 			default:
-				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
-				return false;
+				throw new DAV\Exception\NotFound("Calendar $calendarId not found");
 		}
 		if(!$object->save()) {
 			throw new SaveException($object);
@@ -521,8 +543,7 @@ class CalDAVBackend extends AbstractBackend implements
 		$object = $type==='c' ? CalendarEvent::find()->where(['uri'=>$objectUri, 'calendarId'=>$id])->single() :
 			Task::find()->where(['task.tasklistId' => $id, 'task.uid' => $uid])->single();
 		if(!$object){
-			go()->log("Object $objectUri not found in calendar $calendarId");
-			return false;
+			throw new DAV\Exception\NotFound("Object $objectUri not found in calendar $calendarId");
 		}
 		if(!$object->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			throw new DAV\Exception\Forbidden("Permission denied");
@@ -547,8 +568,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 
 		if(!$object->save()) {
-			go()->log("Failed to update event at ".$objectUri);
-			return false;
+			throw new SaveException($object);
 		}
 
 		if(!$mayChange) {

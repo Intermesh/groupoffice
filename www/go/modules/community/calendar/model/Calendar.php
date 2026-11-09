@@ -33,6 +33,11 @@ class Calendar extends AclOwnerEntity {
 		queryMissingPrincipals as protected traitMissingPrincipals;
 	}
 
+	/**
+	 * Permission level to see the free / busy information of a calendar. Below Acl::LEVEL_READ.
+	 */
+	const LEVEL_FREEBUSY = 5;
+
 	/* Include In Availability */
 	const All = 'all';
 	const Attending = 'attending';

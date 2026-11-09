@@ -58,6 +58,7 @@ class CalDAVBackendPermissionTest extends TestCase
 		$this->actAs($this->users['owner']->id);
 		$this->shared = new Calendar();
 		$this->shared->name = 'CalDAV permission test';
+		$this->shared->setOwnerId($this->users['owner']->id);
 		$this->shared->setAcl([
 			$this->users['reader']->getPersonalGroup()->id => Acl::LEVEL_READ,
 			$this->users['writer']->getPersonalGroup()->id => Acl::LEVEL_WRITE,
@@ -389,5 +390,90 @@ class CalDAVBackendPermissionTest extends TestCase
 			"DTSTAMP:20261001T100000Z\r\nSUMMARY:Task\r\nEND:VTODO\r\nEND:VCALENDAR\r\n";
 		$this->assertSame(403, $this->put('reader', 't-' . $this->tasklist->id, $uid . '.ics', $vtodo));
 		$this->assertSame(0, (int) go()->getDbConnection()->selectSingleValue('count(*)')->from('tasks_task')->where(['uid' => $uid])->single());
+	}
+
+	/**
+	 * @return array calendar records by calendar id
+	 */
+	private function calendarsOf(string $userKey): array
+	{
+		$records = [];
+		foreach ((new CalDAVBackend())->getCalendarsForUser('principals/' . $this->users[$userKey]->username) as $record) {
+			$records[$record['id']] = $record;
+		}
+		return $records;
+	}
+
+	public function testCalendarListUsesPermissionsOfThePrincipal(): void
+	{
+		$this->actAs($this->users['reader']->id);
+		$calendars = $this->calendarsOf('reader');
+
+		$personal = 'c-' . Calendar::fetchPersonal($this->users['reader']->id);
+		$this->assertArrayHasKey($personal, $calendars);
+		$this->assertFalse($calendars[$personal]['{http://sabredav.org/ns}read-only']);
+		$this->assertArrayHasKey('c-' . $this->shared->id, $calendars);
+		$this->assertTrue($calendars['c-' . $this->shared->id]['{http://sabredav.org/ns}read-only']);
+	}
+
+	/**
+	 * Sabre lists the calendars of another user for free / busy. Only the calendars of that user may be used, not the
+	 * calendars shared with them, even when the logged in user can read those.
+	 */
+	public function testCalendarListOfAnotherUserOnlyHasTheirCalendars(): void
+	{
+		$this->actAs($this->users['owner']->id);
+		$calendars = $this->calendarsOf('reader');
+
+		$this->assertArrayNotHasKey('c-' . $this->shared->id, $calendars, 'The reader subscribed to the shared calendar, but it is not theirs');
+		foreach ($calendars as $record) {
+			$this->assertStringStartsWith('c-', $record['id'], 'Task lists have no free / busy information');
+		}
+	}
+
+	public function testCalendarListOfAnotherUserRequiresFreeBusyPermission(): void
+	{
+		// The outsider can't see the shared calendar of the owner
+		$this->actAs($this->users['outsider']->id);
+		$this->assertArrayNotHasKey('c-' . $this->shared->id, $this->calendarsOf('owner'));
+
+		// Free / busy permission is enough, like for the availability in the web interface
+		$this->actAs($this->users['owner']->id);
+		$calendar = Calendar::findById($this->shared->id);
+		$calendar->setAcl([$this->users['outsider']->getPersonalGroup()->id => Calendar::LEVEL_FREEBUSY]);
+		$this->assertTrue($calendar->save(), json_encode($calendar->getValidationErrors()));
+
+		$this->actAs($this->users['outsider']->id);
+		$this->assertArrayHasKey('c-' . $this->shared->id, $this->calendarsOf('owner'));
+	}
+
+	public function testUnknownPrincipal(): void
+	{
+		$this->expectException(DAV\Exception\NotFound::class);
+		(new CalDAVBackend())->getCalendarsForUser('principals/' . uniqid('nobody'));
+	}
+
+	public function testUpdateOfMissingObjectFails(): void
+	{
+		$this->actAs($this->users['owner']->id);
+		$this->expectException(DAV\Exception\NotFound::class);
+		(new CalDAVBackend())->updateCalendarObject('c-' . $this->shared->id, uniqid('missing') . '.ics', $this->ics(uniqid('davperm'), 'Missing'));
+	}
+
+	public function testCalendarUpdateReportsFailures(): void
+	{
+		$this->actAs($this->users['owner']->id);
+		$backend = new CalDAVBackend();
+
+		$propPatch = new DAV\PropPatch(['{DAV:}displayname' => str_repeat('x', 200)]);
+		$backend->updateCalendar('c-' . $this->shared->id, $propPatch);
+		$propPatch->commit();
+		$this->assertSame(403, $propPatch->getResult()['{DAV:}displayname'], 'The name is too long');
+		$this->assertSame('CalDAV permission test', Calendar::findById($this->shared->id)->name);
+
+		$propPatch = new DAV\PropPatch(['{DAV:}displayname' => 'Renamed']);
+		$backend->updateCalendar('c-999999999', $propPatch);
+		$propPatch->commit();
+		$this->assertSame(404, $propPatch->getResult()['{DAV:}displayname']);
 	}
 }
