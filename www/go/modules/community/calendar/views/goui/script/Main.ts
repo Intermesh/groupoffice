@@ -19,7 +19,7 @@ import {WeekView} from "./WeekView.js";
 import {adapter, CalendarEvent, calendarStore, categoryStore, t, ValidTimeSpan, viewStore} from "./Index.js";
 import {YearView} from "./YearView.js";
 import {SplitView} from "./SplitView.js";
-import {client, filterpanel, JmapDataSource, jmapds, modules, principalDS, userDS} from "@intermesh/groupoffice-core";
+import {client, filterpanel, JmapDataSource, jmapds, modules, principalDS, RecurrenceField, userDS} from "@intermesh/groupoffice-core";
 import {CalendarView} from "./CalendarView.js";
 import {CategoryWindow} from "./CategoryWindow.js";
 import {ResourcesWindow} from "./ResourcesWindow.js";
@@ -238,8 +238,9 @@ export class Main extends Component {
 									};
 								return [
 									comp({cls:'pad'},
-										comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner'))+'</small>' }),
-										h3({html: item.start.format('D j M')+' '+t('at')+' '+Format.time(item.start)}),
+										comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title.htmlEncode()+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner')).htmlEncode()+'</small>' }),
+										h3({text: item.compactDate}),
+										comp({tagName: 'small', hidden: !item.isRecurring, text: item.isRecurring ? RecurrenceField.toText(r.recurrenceRule, item.start) : ''}),
 									comp({cls:'group'},
 										btn({itemId: 'accepted', text:t('Accept'), handler:b=>press(b,'accepted')}),
 										btn({itemId: 'tentative', text:t('Maybe'), handler:b=>press(b,'tentative')}),

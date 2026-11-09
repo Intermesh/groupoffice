@@ -623,6 +623,30 @@ export class CalendarItem {
 		}
 	}
 
+	/**
+	 * Compact date span in the user's date and time format, e.g. "Wed, 04-11-2026, 08:15 - 10:00"
+	 */
+	get compactDate(): string {
+		const withTime = !this.data.showWithoutTime,
+			end = this.end.clone(),
+			weekday = new Intl.DateTimeFormat(navigator.language, {weekday: 'short'}),
+			day = (d: DateTime) => weekday.format(d.date).replace(/\.$/, '') + ', ' + d.format(Format.dateFormat),
+			time = (d: DateTime) => withTime ? ', ' + Format.time(d, true) : '';
+
+		if(!withTime) {
+			// the end of an event without time is exclusive
+			end.addSeconds(-1);
+		}
+
+		let str = day(this.start) + time(this.start);
+		if(this.start.format('Ymd') !== end.format('Ymd')) {
+			str += ' - ' + day(end) + time(end);
+		} else if(withTime) {
+			str += ' - ' + Format.time(end, true);
+		}
+		return str;
+	}
+
 	private humanReadableDate() {
 		const start = this.start;
 		const end = this.end.clone();
