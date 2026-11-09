@@ -1890,3 +1890,10 @@ FROM core_user u
 INNER JOIN core_group g ON g.isUserGroupFor = u.id
 INNER JOIN core_entity e ON e.name = 'User' AND e.moduleId = (SELECT id FROM core_module WHERE name = 'core' AND package = 'core')
 WHERE NOT EXISTS (SELECT 1 FROM core_principal p WHERE CAST(p.id AS BINARY) = CAST(u.id AS BINARY) OR (p.entityTypeId = e.id AND p.entityId = u.id));";
+
+
+$updates['202611091340'][] = "ALTER TABLE core_change
+  ADD INDEX aclId_entityTypeId_modSeq (aclId, entityTypeId, modSeq, entityId, destroyed);";
+
+$updates['202611091340'][] = "ALTER TABLE core_change_user
+  ADD INDEX userId_entityTypeId_modSeq (userId, entityTypeId, modSeq, entityId)";
