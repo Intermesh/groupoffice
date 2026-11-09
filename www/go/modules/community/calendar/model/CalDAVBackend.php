@@ -692,31 +692,14 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		go()->debug("CalDAVBackend::getSchedulingObject($principalUri, $objectUri)");
 
-		$stmt = go()->getDbConnection()->getPDO()
-			->prepare('SELECT uri, calendardata, lastmodified, etag, size FROM calendar_schedule_object WHERE principaluri = ? AND uri = ?');
-		$stmt->execute([$principalUri, $objectUri]);
-		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-		if (!$row) {
-			return null;
-		}
-
-		return [
-			'uri' => $row['uri'],
-			'calendardata' => $row['calendardata'],
-			'lastmodified' => $row['lastmodified'],
-			'etag' => '"'.$row['etag'].'"',
-			'size' => (int) $row['size'],
-		];
+		// Scheduling inbox is not used. Group-Office handles iTIP itself.
+		return null;
 	}
 
 	/**
 	 * Returns all scheduling objects for the inbox collection.
 	 *
-	 * These objects should be returned as an array. Every item in the array
-	 * should follow the same structure as returned from getSchedulingObject.
-	 *
-	 * The main difference is that 'calendardata' is optional.
+	 * No-op: the scheduling inbox is not used.
 	 *
 	 * @param string $principalUri
 	 *
@@ -724,28 +707,15 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getSchedulingObjects($principalUri)
 	{
-
 		go()->debug("CalDAVBackend::getSchedulingObjects($principalUri)");
 
-		$stmt = go()->getDbConnection()->getPDO()->prepare('SELECT id, calendardata, uri, lastmodified, etag, size FROM calendar_schedule_object WHERE principaluri = ?');
-		$stmt->execute([$principalUri]);
-
-		$result = [];
-		foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-			$result[] = [
-				'calendardata' => $row['calendardata'],
-				'uri' => $row['uri'],
-				'lastmodified' => $row['lastmodified'],
-				'etag' => '"'.$row['etag'].'"',
-				'size' => (int) $row['size'],
-			];
-		}
-
-		return $result;
+		return [];
 	}
 
 	/**
 	 * Deletes a scheduling object.
+	 *
+	 * No-op: the scheduling inbox is not used.
 	 *
 	 * @param string $principalUri
 	 * @param string $objectUri
@@ -753,13 +723,12 @@ class CalDAVBackend extends AbstractBackend implements
 	public function deleteSchedulingObject($principalUri, $objectUri)
 	{
 		go()->debug("CalDAVBackend::deleteSchedulingObject($principalUri, $objectUri)");
-
-		$stmt = go()->getDbConnection()->getPDO()->prepare('DELETE FROM calendar_schedule_object WHERE principaluri = ? AND uri = ?');
-		$stmt->execute([$principalUri, $objectUri]);
 	}
 
 	/**
 	 * Creates a new scheduling object. This should land in a users' inbox.
+	 *
+	 * No-op: the scheduling inbox is not used.
 	 *
 	 * @param string          $principalUri
 	 * @param string          $objectUri
@@ -767,16 +736,7 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function createSchedulingObject($principalUri, $objectUri, $objectData)
 	{
-
 		go()->debug("CalDAVBackend::createSchedulingObject($principalUri, $objectUri, ...)");
-
-		$stmt = go()->getDbConnection()->getPDO()->prepare('INSERT INTO calendar_schedule_object (principaluri, calendardata, uri, lastmodified, etag, size) VALUES (?, ?, ?, ?, ?, ?)');
-
-		if (is_resource($objectData)) {
-			$objectData = stream_get_contents($objectData);
-		}
-
-		$stmt->execute([$principalUri, $objectData, $objectUri, time(), md5($objectData), strlen($objectData)]);
 	}
 
 	/**

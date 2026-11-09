@@ -533,3 +533,5 @@ $updates['202611091200'][] = "UPDATE calendar_calendar_event cce
 	SET cce.uri = e.uri;";
 
 $updates['202611091200'][] = "ALTER TABLE `calendar_event` DROP COLUMN `uri`;";
+
+$updates['202611091200'][] = "delete from calendar_schedule_object;";
