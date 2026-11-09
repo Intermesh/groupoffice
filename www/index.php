@@ -1,4 +1,13 @@
 <?php
+
+// Block Apple's exchange accounts that will create a massive amount of requests on the server if we don't stop it here
+$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+if (str_starts_with($ua, 'AppleExchangeWebServices')) {
+    http_response_code(404);
+    exit;
+}
+
 require_once('vendor/autoload.php');
 use go\core\App;
 
