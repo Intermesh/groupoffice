@@ -1,4 +1,5 @@
 
+- Email: Security: a logged-in user with read-only access to a shared email account could run any IMAP command on that account, for example to delete messages or folders, by putting a line break in the message search query. No configuration changes are needed.
 - Files: Security: any logged in user could upload a file to any path the web server can write to, outside their own folder and outside file_storage_path, by putting "../" in the file name or sub folder name of an upload. If a directory served by the web server was writable, this could be used to run arbitrary PHP code on the server.
 - Core: Security: language overrides are no longer loaded. These were PHP files in the admin's home folder (<file_storage_path>/users/admin/language/<package>/<module>/<lang>.php) that the server executed, so anyone who could write to that folder, for example through a share or WebDAV, could run code on the server. If you used them to change texts, those changes are no longer applied and the files can be deleted.
 - Calendar: sort same-time events more consistently when start time is the same
