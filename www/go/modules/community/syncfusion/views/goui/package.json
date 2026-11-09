@@ -1,0 +1,23 @@
+{
+  "type": "module",
+  "name": "@intermesh/community-syncfusion",
+  "devDependencies": {
+    "concurrently": "latest",
+    "esbuild": "latest",
+    "sass": "latest",
+    "typescript": "5.9.x"
+  },
+
+  "scripts": {
+    "start": "npm run build:clean && concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
+    "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
+    "start:sass": "npx sass --watch style:dist",
+
+    "build": "npm run build:clean && npm run build:sass && npm run build:ts",
+    "build:clean": "rm -rf ./dist/*",
+    "build:ts": "node ../../../../../../views/goui/esbuild-module.mjs",
+    "build:sass": "npx sass --style=compressed --no-source-map style:dist",
+
+    "test": "npx tsc --noEmit"
+  }
+}
