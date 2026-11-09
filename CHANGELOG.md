@@ -7,7 +7,6 @@
 - Calendar: Security: over CalDAV a user with read-only access to a shared calendar or task list could add, change and delete its events and tasks and rename the calendar. Read-only calendars are now read-only in CalDAV clients. No configuration changes are needed.
 - Calendar: Security: over CalDAV a user who knew the UID of an event (it's in every invitation e-mail) could add that event to their own calendar and change it for everyone, also without access to it. Attendees could change the title, time and participants of an invitation from their CalDAV client. Now only the organizer or users with write access can change an event; attendees can only change their own participation status, reminders and free/busy setting. No configuration changes are needed.
 - Calendar: CalDAV no longer delivers invitations to the schedule inbox of local users. Invitations still appear in the attendee's calendar and are sent by e-mail.
-
 - Email: Security: a logged-in user with read-only access to a shared email account could run any IMAP command on that account, for example to delete messages or folders, by putting a line break in the message search query. No configuration changes are needed.
 - Files: Security: any logged in user could upload a file to any path the web server can write to, outside their own folder and outside file_storage_path, by putting "../" in the file name or sub folder name of an upload. If a directory served by the web server was writable, this could be used to run arbitrary PHP code on the server.
 - Core: Security: language overrides are no longer loaded. These were PHP files in the admin's home folder (<file_storage_path>/users/admin/language/<package>/<module>/<lang>.php) that the server executed, so anyone who could write to that folder, for example through a share or WebDAV, could run code on the server. If you used them to change texts, those changes are no longer applied and the files can be deleted.
@@ -15,6 +14,7 @@
 - Calendar: the invitations panel now shows the date in the user's date and time format, including the year, end time and recurrence of a series
 - Calendar: Security: the title of an invitation was shown as HTML in the invitations panel, so the sender of an invitation could inject HTML or script into the recipient's Group-Office. No configuration changes are needed.
 - Calendar: invitations from an organizer who can't see the invited user (who added them as a contact) did not show in the invitations panel
+- projects2: Fixed permissions error on adding expenses, budgets and income
 
 06-11-2026: 26.0.58
 - Core: On installations created since March 2024 the admin user had no principal, so actions of the admin that create an alert, such as an import or export, failed with a database error. The installer now creates it and the upgrade adds it where it's missing.
