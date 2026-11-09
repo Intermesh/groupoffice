@@ -1,4 +1,5 @@
 - Fixed: Security: Expired access tokens are re-validated instead of rejected
+- Files: Security: any logged in user could upload a file to any path the web server can write to, outside their own folder and outside file_storage_path, by putting "../" in the file name or sub folder name of an upload. If a directory served by the web server was writable, this could be used to run arbitrary PHP code on the server.
 
 03-11-2026: 6.8.181
 - Email: Security: a logged in user with access to the e-mail module could write an e-mail message to any path in the data directory (file_storage_path, usually /var/lib/groupoffice), overwriting files of other users. This came from an old, unused "save to file" function in the e-mail composer, which has been removed. No configuration changes are needed.
