@@ -204,6 +204,8 @@ try {
 				if ($token && $token->isAuthenticated()) {
 					$auth->assertUserIdMayLogin($token->userId);
 					$token->refresh();
+				} else {
+					$token = null;
 				}
 			} else if(isset($data['rememberMeToken'])) {
 				// Process remember me persistent cookie. This is not used by the browser. The browser verifies the remember me token in index.php with a cookie.
