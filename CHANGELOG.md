@@ -1,3 +1,4 @@
+- Core: Block user agent AppleExchangeWebServices with 404 as macos users who attempted to setup GroupOffice as an Exchange server hammered on the server with lots of requests
 - Calendar: Security: CalDAV free/busy requests could include busy times of calendars that the requesting user may not see, and other users' calendar lists were filtered with the wrong user's permissions. Free/busy now uses the same rules as the availability in the web interface. No configuration changes are needed.
 - Calendar: CalDAV clients now get an error instead of a success response when saving an event, task or calendar fails
 - Calendar: Security: over CalDAV a user with read-only access to a shared calendar or task list could add, change and delete its events and tasks and rename the calendar. Read-only calendars are now read-only in CalDAV clients. No configuration changes are needed.
