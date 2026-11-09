@@ -1,3 +1,4 @@
+- Calendar: an invitation from an organizer outside Group-Office that was accepted in a CalDAV client (for example Thunderbird) was treated as the attendee's own event: a cancellation from the organizer was ignored and the attendee could change it for the other local attendees. Updates from the organizer are still applied.
 - Calendar: CalDAV clients could not create a new calendar without a component set or a task list; the server reported success but nothing was created
 - Calendar: when an event was in more than one calendar, a CalDAV client of one user could change the file name of the event for the others, so their clients could no longer find it. Every calendar now keeps its own name for the event.
 - Core: Block user agent AppleExchangeWebServices with 404 as macos users who attempted to setup GroupOffice as an Exchange server hammered on the server with lots of requests
