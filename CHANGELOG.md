@@ -1,3 +1,4 @@
+09-11-2026: 6.8.182
 - Fixed: Security: Expired access tokens are re-validated instead of rejected
 - Files: Security: any logged in user could upload a file to any path the web server can write to, outside their own folder and outside file_storage_path, by putting "../" in the file name or sub folder name of an upload. If a directory served by the web server was writable, this could be used to run arbitrary PHP code on the server.
 - Email: Security: a logged-in user with read-only access to a shared email account could run any IMAP command on that account, for example to delete messages or folders, by putting a line break in the message search query. No configuration changes are needed.
