@@ -138,7 +138,6 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
 	  `recurrenceId` VARCHAR(24) DEFAULT NULL,
 		`etag` VARCHAR(100) NULL,
-		`uri` VARCHAR(512) NULL,
 	  `replyTo` VARCHAR(100),
 	  `requestStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`eventId`),
@@ -161,8 +160,10 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
      `eventId` INT UNSIGNED NOT NULL,
      `calendarId` INT UNSIGNED NOT NULL,
+     `uri` VARCHAR(512) NULL,
      PRIMARY KEY (`id`),
     INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
+    INDEX `calendar_calendar_event_uri_idx` (`calendarId` ASC, `uri`(191) ASC),
 		 UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC),
     CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
     FOREIGN KEY (`eventId`)

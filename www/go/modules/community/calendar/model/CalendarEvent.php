@@ -66,7 +66,7 @@ class CalendarEvent extends AclItemEntity {
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag', 'eventId', 'recurrenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'veventBlobId'];
 
@@ -205,7 +205,8 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	protected $etag;
 	/**
-	 * @var string with CalDAV server the `uri` from the client needs to be persistent
+	 * @var string with CalDAV server the `uri` from the client needs to be persistent. It's per calendar because every
+	 * client uses its own name for its copy of the event.
 	 */
 	protected $uri;
 
@@ -266,7 +267,7 @@ class CalendarEvent extends AclItemEntity {
 
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()
-			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
+			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId', 'uri'])
 			->addQuery((new Query())->select("ownerId")->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId'))
 			->addTable('calendar_event', "eventdata", ['cce.eventId' => 'eventId'], self::EventProperties)
 			->addUserTable('calendar_event_user', 'eventuser', ['cce.eventId' => 'eventId'],self::UserProperties)
@@ -557,7 +558,18 @@ class CalendarEvent extends AclItemEntity {
 			$this->uri = $uri;
 		}
 
-		return $this->uri ?? strtr($this->uid, '+/=', '-_.') . '.ics';
+		return $this->uri ?? self::defaultUri($this->uid);
+	}
+
+	/**
+	 * The CalDAV uri of an event in a calendar when no client gave it a name
+	 *
+	 * @param string $uid
+	 * @return string
+	 */
+	public static function defaultUri(string $uid): string
+	{
+		return strtr($uid, '+/=', '-_.') . '.ics';
 	}
 
 	public function etag($v = null) {
@@ -621,7 +633,7 @@ class CalendarEvent extends AclItemEntity {
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
-			$this->uri = strtr($this->uid, '+/=', '-_.') . '.ics';
+			$this->uri = self::defaultUri($this->uid);
 		}
 
 		$this->checkScheduleFor();
@@ -873,7 +885,7 @@ class CalendarEvent extends AclItemEntity {
 			$calendarId = $isNew ? self::participantCalendarId($pid, $participant) : null;
 			if($calendarId) {
 				go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
-					['calendarId'=>$calendarId, 'eventId'=>$this->eventId]
+					['calendarId'=>$calendarId, 'eventId'=>$this->eventId, 'uri' => self::defaultUri($this->uid)]
 				])->execute();
 			}
 		}

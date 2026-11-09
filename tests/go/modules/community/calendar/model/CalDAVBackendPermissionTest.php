@@ -29,6 +29,8 @@ class CalDAVBackendPermissionTest extends TestCase
 	private array $users = [];
 	private ?Calendar $shared = null;
 	private ?TaskList $tasklist = null;
+	/** @var string[] calendar and task list ids made over CalDAV, like "c-1" */
+	private array $created = [];
 	/** @var array|null [calendar id, acl] */
 	private ?array $restoreAcl = null;
 	private array $eventIds = [];
@@ -82,6 +84,10 @@ class CalDAVBackendPermissionTest extends TestCase
 		}
 		if ($this->tasklist) {
 			TaskList::delete(['id' => $this->tasklist->id]);
+		}
+		foreach ($this->created as $collectionId) {
+			[$type, $id] = explode('-', $collectionId, 2);
+			$type === 'c' ? Calendar::delete(['id' => $id]) : TaskList::delete(['id' => $id]);
 		}
 		if ($this->restoreAcl) {
 			$calendar = Calendar::findById($this->restoreAcl[0]);
@@ -153,9 +159,19 @@ class CalDAVBackendPermissionTest extends TestCase
 	 */
 	private function request(string $userKey, string $method, int|string $calendarId, string $file = '', ?string $body = null, array $headers = [], ?Response &$response = null): int
 	{
-		$server = $this->server($userKey);
 		$collection = str_starts_with((string) $calendarId, 't-') ? $calendarId : 'c-' . $calendarId;
-		$url = '/dav/calendars/' . $this->users[$userKey]->username . '/' . $collection . '/' . $file;
+		return $this->requestPath($userKey, $method, $collection . '/' . $file, $body, $headers, $response);
+	}
+
+	/**
+	 * Send a request as the given user to a path in their calendar home
+	 *
+	 * @return int HTTP status
+	 */
+	private function requestPath(string $userKey, string $method, string $path, ?string $body = null, array $headers = [], ?Response &$response = null): int
+	{
+		$server = $this->server($userKey);
+		$url = '/dav/calendars/' . $this->users[$userKey]->username . '/' . $path;
 		$request = new Request($method, $url, $headers, $body);
 		$request->setBaseUrl('/dav/'); // done by Server::start()
 		$response = new Response();
@@ -475,5 +491,78 @@ class CalDAVBackendPermissionTest extends TestCase
 		$backend->updateCalendar('c-999999999', $propPatch);
 		$propPatch->commit();
 		$this->assertSame(404, $propPatch->getResult()['{DAV:}displayname']);
+	}
+
+	/**
+	 * Make a calendar with MKCALENDAR
+	 *
+	 * @param string|null $components component set, for example '<C:comp name="VTODO"/>'. Null to leave it out.
+	 * @return int HTTP status
+	 */
+	private function mkcalendar(string $userKey, string $name, ?string $components): int
+	{
+		$body = '<?xml version="1.0"?><C:mkcalendar xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav"><D:set><D:prop>' .
+			'<D:displayname>' . $name . '</D:displayname>' .
+			($components === null ? '' : '<C:supported-calendar-component-set>' . $components . '</C:supported-calendar-component-set>') .
+			'</D:prop></D:set></C:mkcalendar>';
+		return $this->requestPath($userKey, 'MKCALENDAR', uniqid('new') . '/', $body, ['Content-Type' => 'application/xml']);
+	}
+
+	/**
+	 * @return string|null the id of the calendar or task list of the user with this name, like "c-1"
+	 */
+	private function collectionByName(string $userKey, string $name): ?string
+	{
+		$this->actAs($this->users[$userKey]->id);
+		foreach ($this->calendarsOf($userKey) as $record) {
+			if ($record['{DAV:}displayname'] === $name) {
+				$this->created[] = $record['id'];
+				return $record['id'];
+			}
+		}
+		return null;
+	}
+
+	public function testMakeCalendarWithoutComponentSet(): void
+	{
+		$name = uniqid('Made over CalDAV ');
+		$this->assertSame(201, $this->mkcalendar('reader', $name, null));
+
+		$id = $this->collectionByName('reader', $name);
+		$this->assertNotNull($id, 'The new calendar must be listed for the user that made it');
+		$this->assertStringStartsWith('c-', $id);
+	}
+
+	public function testMakeTaskList(): void
+	{
+		$name = uniqid('Made over CalDAV ');
+		$this->assertSame(201, $this->mkcalendar('reader', $name, '<C:comp name="VTODO"/>'));
+
+		$id = $this->collectionByName('reader', $name);
+		$this->assertNotNull($id, 'The new task list must be listed for the user that made it');
+		$this->assertStringStartsWith('t-', $id);
+	}
+
+	public function testMakeCalendarWithUnsupportedComponents(): void
+	{
+		$name = uniqid('Made over CalDAV ');
+		$this->assertSame(400, $this->mkcalendar('reader', $name, '<C:comp name="VJOURNAL"/>'));
+		$this->assertNull($this->collectionByName('reader', $name));
+	}
+
+	/**
+	 * An event is stored once for all calendars it's in, but every client uses its own name for its copy.
+	 */
+	public function testEveryCalendarKeepsItsOwnUri(): void
+	{
+		$event = $this->createEvent('owner', $this->shared->id);
+		$ownerFile = $event->uri();
+		$calendarId = (int) Calendar::fetchPersonal($this->users['reader']->id);
+
+		$this->assertSame(201, $this->put('reader', $calendarId, 'my-copy.ics', $this->ics($event->uid, 'Original')));
+
+		$this->assertSame(200, $this->request('owner', 'GET', $this->shared->id, $ownerFile));
+		$this->assertSame(200, $this->request('reader', 'GET', $calendarId, 'my-copy.ics'));
+		$this->assertSame(404, $this->request('reader', 'GET', $calendarId, $ownerFile));
 	}
 }

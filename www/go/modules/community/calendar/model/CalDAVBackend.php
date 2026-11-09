@@ -145,18 +145,19 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		go()->debug("CalDAVBackend::createCalendar($principalUri, $calendarUri)");
 		$sccs = '{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set';
-		$type = 'VEVENT';
+		$components = ['VEVENT'];
 		if (isset($properties[$sccs])) {
 			if (!($properties[$sccs] instanceof CalDAV\Xml\Property\SupportedCalendarComponentSet)) {
 				throw new DAV\Exception('The '.$sccs.' property must be of type: \Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet');
 			}
-			$type = $properties[$sccs]->getValue();
+			$components = $properties[$sccs]->getValue();
 		}
 		$transp = '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp';
 
 		$ownerId = isset($properties[$transp]) && $properties[$transp]->getValue() === 'transparent' ? null : go()->getUserId();
 
-		$values = ['ownerId' => $ownerId];
+		// Make it show up for the user that created it
+		$values = ['ownerId' => $ownerId, 'name' => $calendarUri, 'isSubscribed' => true, 'syncToDevice' => true];
 		foreach ($this->propertyMap as $xmlName => $dbName) {
 			if (isset($properties[$xmlName])) {
 				$values[$dbName] = $properties[$xmlName];
@@ -165,18 +166,17 @@ class CalDAVBackend extends AbstractBackend implements
 		if(isset($values['color'])) {
 			$values['color'] = substr($values['color'], 1); // remove #
 		}
-		switch($type[0]) {
-			case 'VEVENT':
-				$prefix = 'c-';
-				$cal = new Calendar();
-				break;
-			case 'VTODO':
-				$prefix = 't-';
-				$values['ownerId'] = go()->getUserId(); //required
-				$cal = new TaskList();
-				break;
-			default: // combined?
-				return false;
+		if(in_array('VEVENT', $components)) {
+			// A collection for events and tasks becomes a calendar. GroupOffice keeps tasks in task lists.
+			$prefix = 'c-';
+			$cal = new Calendar();
+		} else if(in_array('VTODO', $components)) {
+			$prefix = 't-';
+			unset($values['ownerId']);
+			$values['createdBy'] = go()->getUserId();
+			$cal = new TaskList();
+		} else {
+			throw new DAV\Exception\BadRequest('Only calendars with VEVENT or VTODO components are supported');
 		}
 
 		$cal->setValues($values);
@@ -317,7 +317,7 @@ class CalDAVBackend extends AbstractBackend implements
 			switch ($type) {
 				case 'c': // calendar
 					$component = 'vevent';
-					$query = CalendarEvent::find()->filter(['hideSecret' => 1, 'inCalendars' => $id])->where(['eventdata.uri' => $chunk]);
+					$query = CalendarEvent::find()->filter(['hideSecret' => 1, 'inCalendars' => $id])->where(['cce.uri' => $chunk]);
 					break;
 				case 't': // tasklist
 					$component = 'vtodo';
@@ -346,7 +346,7 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': // calendar
 				$component = 'vevent';
-				$q = CalendarEvent::find()->filter(['hideSecret'=>1, 'inCalendars' => $id])->where([ 'eventdata.uri'=>$objectUri]);
+				$q = CalendarEvent::find()->filter(['hideSecret'=>1, 'inCalendars' => $id])->where(['cce.uri'=>$objectUri]);
 				$object = $q->single();
 				break;
 			case 't': // tasklist
@@ -410,7 +410,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 			// add it to the current receivers default calendar
 			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
-				['calendarId'=>$calendarId, 'eventId'=>$eventId]
+				['calendarId'=>$calendarId, 'eventId'=>$eventId, 'uri' => CalendarEvent::defaultUri($uid)]
 			])->execute();
 			if(!$added) {
 				go()->debug('Could not add event to '.$calendarId);
@@ -540,7 +540,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 		//$extraData = $this->getDenormalizedData($calendarData);
 		/** @var CalendarEvent $object */
-		$object = $type==='c' ? CalendarEvent::find()->where(['uri'=>$objectUri, 'calendarId'=>$id])->single() :
+		$object = $type==='c' ? CalendarEvent::find()->where(['cce.uri'=>$objectUri, 'calendarId'=>$id])->single() :
 			Task::find()->where(['task.tasklistId' => $id, 'task.uid' => $uid])->single();
 		if(!$object){
 			throw new DAV\Exception\NotFound("Object $objectUri not found in calendar $calendarId");
@@ -593,8 +593,7 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c' :
 				$query->from('calendar_calendar_event','cce')
-					->join('calendar_event', 'ev', 'ev.eventId = cce.eventId')
-					->where(['calendarId' => $id, 'ev.uri'=> $objectUri]);
+					->where(['calendarId' => $id, 'cce.uri'=> $objectUri]);
 				self::checkCollectionPermission($type, $id, Acl::LEVEL_DELETE);
 				CalendarEvent::delete($query);
 				break;
