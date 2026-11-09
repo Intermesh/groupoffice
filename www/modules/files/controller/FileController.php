@@ -429,7 +429,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			throw new \Exception("File not found");
 		}
 
-		if($file->hasPermissionLevel(Acl::LEVEL_READ)) {
+		if(!$file->hasPermissionLevel(Acl::LEVEL_READ)) {
 			throw new AccessDenied();
 		}
 		
