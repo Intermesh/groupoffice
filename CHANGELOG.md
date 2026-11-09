@@ -15,6 +15,8 @@
 - Calendar: Security: the title of an invitation was shown as HTML in the invitations panel, so the sender of an invitation could inject HTML or script into the recipient's Group-Office. No configuration changes are needed.
 - Calendar: invitations from an organizer who can't see the invited user (who added them as a contact) did not show in the invitations panel
 - projects2: Fixed permissions error on adding expenses, budgets and income
+- Core: in case of AclOwnerEntity, only allow destroying entities if user has manage permissions
+- Tasks / Support: disable delete button if user has no manage permissions for task / support list.
 
 06-11-2026: 26.0.58
 - Core: On installations created since March 2024 the admin user had no principal, so actions of the admin that create an alert, such as an import or export, failed with a database error. The installer now creates it and the upgrade adds it where it's missing.

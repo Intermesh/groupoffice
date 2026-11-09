@@ -896,9 +896,19 @@ abstract class EntityController extends Controller {
 			$result['updated'][$id] = empty($diff) ? null : $diff;
 		}
 	}
-	
+
+	/**
+	 * Joachim says: only with manage permissions you can fully destroy an AclOWnerEntity
+	 * Item entities still depend on the DELETE permission.
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 */
 	protected function canDestroy(Entity $entity): bool
 	{
+		if (is_a($entity, AclOwnerEntity::class)) {
+			return $entity->hasPermissionLevel(Acl::LEVEL_MANAGE);
+		}
 		return $entity->hasPermissionLevel(Acl::LEVEL_DELETE);
 	}
 
