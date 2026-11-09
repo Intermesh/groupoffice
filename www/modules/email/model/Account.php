@@ -175,7 +175,12 @@ class Account extends \GO\Base\Db\ActiveRecord
 	 * @throws GO\Base\Mail\Exception\MailboxNotFound
 	 */
 	protected function beforeSave() {
-		if($this->isModified('password')){	
+		// Setting the same plain text password again (e.g. on every IMAP / ActiveSync login) should not
+		// re-encrypt it. That would register a modification and log ciphertext in the history.
+		$this->resetUnchangedPassword('password');
+		$this->resetUnchangedPassword('smtp_password');
+
+		if($this->isModified('password')){
 			$encrypted = \GO\Base\Util\Crypt::encrypt($this->password);
 			if($encrypted){
 				$this->password = $encrypted;
@@ -221,11 +226,35 @@ class Account extends \GO\Base\Db\ActiveRecord
 			$mod['password'] = ['***', '***'];
 		}
 
-		if(isset($mod['smtpPassword'])) {
-			$mod['smtpPassword'] = ['***', '***'];
+		if(isset($mod['smtp_password'])) {
+			$mod['smtp_password'] = ['***', '***'];
 		}
 
 		return $mod;
+	}
+
+	/**
+	 * Clear the modification of an encrypted password attribute when the new plain text value equals the
+	 * stored one.
+	 *
+	 * @param string $attributeName "password" or "smtp_password"
+	 */
+	private function resetUnchangedPassword(string $attributeName): void
+	{
+		if($this->getIsNew() || !$this->isModified($attributeName)) {
+			return;
+		}
+
+		$old = $this->getOldAttributeValue($attributeName);
+		$new = $this->$attributeName;
+		// Only for encrypted old values, so legacy plain text passwords still get encrypted on save.
+		if(empty($old) || !is_string($old) || !str_starts_with($old, '{GOCRYPT') || !is_string($new) || $new === '') {
+			return;
+		}
+
+		if(hash_equals(\go\core\util\Crypt::decrypt($old), $new)) {
+			$this->resetAttribute($attributeName);
+		}
 	}
 
 
