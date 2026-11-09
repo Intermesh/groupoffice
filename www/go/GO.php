@@ -438,17 +438,6 @@ class GO{
 				$path = strtolower(implode('/', $arr));
 				$location =$path.'/'.$file;
 				$filePath = dirname(dirname(__FILE__)) . '/'.$location;
-			} else if(substr($className,0,4)=='GOFS'){
-						
-				$arr = explode('\\', $className);
-				
-				array_shift($arr);
-				
-				$file = array_pop($arr).'.php';
-				$path = strtolower(implode('/', $arr));
-				$location =$path.'/'.$file;
-				$filePath = \GO::config()->file_storage_path.'php/'.$location;	
-				
 			} else {
 				$forGO = substr($className,0,3)=='GO\\';
 
