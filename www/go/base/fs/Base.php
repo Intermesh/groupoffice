@@ -360,6 +360,10 @@ abstract class Base{
 	 * @return boolean 
 	 */
 	public function rename($name){
+		if(!\go\core\fs\FileSystemObject::isValidName((string) $name)) {
+			throw new \InvalidArgumentException("Invalid file name");
+		}
+
 		$oldPath = $this->path;
 		$newPath = dirname($this->path).'/'.$name;
 		

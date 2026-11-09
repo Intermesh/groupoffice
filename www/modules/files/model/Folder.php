@@ -311,6 +311,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$this->_checkParentId();
 
+		// The name is appended to the parent path on disk, so it must not contain a path separator or be "..".
+		if(($this->getIsNew() || $this->isModified('name')) && !\go\core\fs\FileSystemObject::isValidName((string) $this->name)) {
+			$this->setValidationError('name', \GO::t("Invalid file or folder name", "files"));
+		}
+
 		if($this->parent_id==0 && $this->acl_id==0){
 			//top level folders are readonly to everyone.
 			$this->readonly=1;

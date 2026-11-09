@@ -388,6 +388,10 @@ class File extends Base{
 			}
 		}
 		
+		if(!\go\core\fs\FileSystemObject::isValidName($newFileName)) {
+			throw new \InvalidArgumentException("Invalid file name");
+		}
+
 		$newPath = $destination->path().'/'.$newFileName;
 		
 		if($appendNumberToNameIfDestinationExists){
@@ -470,6 +474,10 @@ class File extends Base{
 		if(!$newFileName)
 			$newFileName=$this->name();
 			
+		if(!\go\core\fs\FileSystemObject::isValidName($newFileName)) {
+			throw new \InvalidArgumentException("Invalid file name");
+		}
+
 		$newPath = $destinationFolder->path().'/'.$newFileName;
 		\GO::debug('copy: '.$this->path.' > '.$newPath);
 		
