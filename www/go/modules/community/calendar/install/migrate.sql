@@ -398,11 +398,10 @@ ALTER TABLE `calendar_calendar_custom_fields`
 	ADD CONSTRAINT `calendar_calendar_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `calendar_calendar` (`id`) ON DELETE CASCADE;
 
 -- missing: (fields, show_not_as_busy)
-INSERT INTO calendar_resource_group
+INSERT IGNORE INTO calendar_resource_group
 	(id, name,description, defaultOwnerId, createdBy) SELECT
-   id, name, '',ga.user_id, g.user_id FROM cal_groups g JOIN cal_group_admins ga ON ga.group_id = g.id
-   WHERE g.id != 1
-GROUP by g.id;
+   id, name, '',coalesce(ga.user_id, 1), coalesce(ga.user_id, 1) FROM cal_groups g left JOIN cal_group_admins ga ON ga.group_id = g.id
+   WHERE g.id != 1 GROUP by g.id;
 
 -- concat 18  random hex colors and select 1 with calendar.id % 18 * hexlength if null
 INSERT INTO calendar_calendar
