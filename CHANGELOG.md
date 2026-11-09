@@ -1,3 +1,5 @@
+- Calendar: CalDAV clients could not create a new calendar without a component set or a task list; the server reported success but nothing was created
+- Calendar: when an event was in more than one calendar, a CalDAV client of one user could change the file name of the event for the others, so their clients could no longer find it. Every calendar now keeps its own name for the event.
 - Core: Block user agent AppleExchangeWebServices with 404 as macos users who attempted to setup GroupOffice as an Exchange server hammered on the server with lots of requests
 - Calendar: Security: CalDAV free/busy requests could include busy times of calendars that the requesting user may not see, and other users' calendar lists were filtered with the wrong user's permissions. Free/busy now uses the same rules as the availability in the web interface. No configuration changes are needed.
 - Calendar: CalDAV clients now get an error instead of a success response when saving an event, task or calendar fails
