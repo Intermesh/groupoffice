@@ -1559,7 +1559,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					if(isset($blob->subfolder)) {
 						while($fname = array_shift($blob->subfolder)){
 
-							$fname = StringUtil::normalize($fname);
+							// Client input: never allow path separators or "..".
+							$fname = StringUtil::normalize(FileSystemObject::stripInvalidChars((string) $fname));
 
 							if($f = $destinationFolder->hasFolder($fname)) {
 								$destinationFolder = $f;
@@ -1568,7 +1569,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 							}
 						}
 					}
-					$filename = $blob->name;
+					// Client input: never allow path separators or "..".
+					$filename = FileSystemObject::stripInvalidChars((string) $blob->name);
 
 				}
 

@@ -1,3 +1,6 @@
+
+- Files: Security: any logged in user could upload a file to any path the web server can write to, outside their own folder and outside file_storage_path, by putting "../" in the file name or sub folder name of an upload. If a directory served by the web server was writable, this could be used to run arbitrary PHP code on the server. 
+
 06-11-2026: 26.0.58
 - Core: On installations created since March 2024 the admin user had no principal, so actions of the admin that create an alert, such as an import or export, failed with a database error. The installer now creates it and the upgrade adds it where it's missing.
 - Core: JSON export created an invalid file because the closing bracket was missing, and a JSON or CSV import could stop at an invalid item while reporting success. Invalid items are now reported as errors and the rest is imported. Imported items no longer get the permissions stored in the JSON file, because those group IDs can point to other groups on the importing system; they get the default permissions with the importing user as owner.

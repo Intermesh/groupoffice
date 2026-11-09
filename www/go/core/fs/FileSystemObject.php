@@ -284,6 +284,19 @@ abstract class FileSystemObject {
 	}
 
 	/**
+	 * Check if a string is a single file or folder name that is safe to append to a directory path.
+	 *
+	 * Rejects empty names, "." and "..", and names containing "/" or a NUL byte, because
+	 * those would point outside the directory. Other characters are allowed so existing names keep working.
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function isValidName(string $name) : bool {
+		return $name !== '' && $name !== '.' && $name !== '..' && strpbrk($name, "/\0") === false;
+	}
+
+	/**
 	 * Check if this folder is a symbolic link
 	 *
 	 * @return bool Returns the canonicalized absolute pathname on success. The resulting path will have no symbolic link, /./ or /../ components. Trailing delimiters, such as \ and /, are also removed.

@@ -315,6 +315,14 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		}
 	}
 
+	public function validate() {
+		// The name is appended to the folder path on disk, so it must not contain a path separator or be "..".
+		if(($this->getIsNew() || $this->isModified('name')) && !\go\core\fs\FileSystemObject::isValidName((string) $this->name)) {
+			$this->setValidationError('name', \GO::t("Invalid file or folder name", "files"));
+		}
+		return parent::validate();
+	}
+
 	protected function beforeSave() {
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
