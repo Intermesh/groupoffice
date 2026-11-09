@@ -354,12 +354,19 @@ class CalendarEvent extends AclItemEntity {
 				$crit->where('firstOccurrence', '<', $value);
 			})->add('inbox', function(Criteria $crit, $value, Query $query) {
 				// value must be true
-				$query->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
-				$crit->where('p.id', '=', go()->getUserId())
-					->andWhere('p.rolesMask & 1 = 0') // !isOwner
-					->andWhere('p.participationStatus', '=', 'needs-action')
+				// The participant is found by user id or by e-mail. The id is not the user id when the organizer could not
+				// see the user and picked another principal like "Contact:1".
+				$query->join('core_user', 'invitee', 'invitee.id = cal.ownerId');
+				$crit->where('cal.ownerId', '=', go()->getUserId())
 					->andWhere('eventdata.status', '=', 'confirmed')
-					->andWhere('eventdata.start', '>=', new DateTime());
+					->andWhere('eventdata.start', '>=', new DateTime())
+					->andWhereExists(go()->getDbConnection()
+						->select('p.id')
+						->from('calendar_participant', 'p')
+						->where('p.eventId = eventdata.eventId')
+						->andWhere('(p.id = cal.ownerId OR p.email COLLATE utf8mb4_unicode_ci = invitee.email)')
+						->andWhere('p.rolesMask & 1 = 0') // !isOwner
+						->andWhere('p.participationStatus', '=', 'needs-action'));
 			})->add('hideSecret', function(Criteria $criteria, $value, $query) {
 				$query->andWhere((new Criteria())
 					->where('privacy', '!=', 'secret')
