@@ -7,6 +7,7 @@ use go\core\auth\TemporaryState;
 use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\model\Acl;
+use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
@@ -382,7 +383,7 @@ class CalDAVBackend extends AbstractBackend implements
 
 		$existingEvent = CalendarEvent::find()->where(['uid'=>$uid, 'calendarId' => $calendarId])->single();
 		if($existingEvent){
-			$mayChange = $existingEvent->mayChangeEventData();
+			$mayChange = self::mayChange($existingEvent, $vcalendar);
 			return $existingEvent;
 		}
 
@@ -402,7 +403,7 @@ class CalDAVBackend extends AbstractBackend implements
 			}
 			$mayChange = false;
 			foreach($readable as $instance) {
-				if($instance->mayChangeEventData()) {
+				if(self::mayChange($instance, $vcalendar)) {
 					$mayChange = true;
 					break;
 				}
@@ -420,11 +421,73 @@ class CalDAVBackend extends AbstractBackend implements
 			$mayChange = true;
 			$event = new CalendarEvent();
 			$organizerEmail = str_replace('mailto:', '',strtolower((string)$vevent->{'ORGANIZER'}));
-			$event->isOrigin = true;//go()->getAuthState()->getUser(['email'])->email === $organizerEmail; // if you created this event by yourself.
+			$event->isOrigin = !self::isExternalInvitation($vevent, $calendarId);
 			$event->replyTo = $organizerEmail;
 			$event->calendarId = $calendarId;
 		}
 		return $event;
+	}
+
+	/**
+	 * Whether the client data may change the event itself and not only the user's participation status, alerts and
+	 * free / busy status.
+	 *
+	 * An invitation from an organizer outside GroupOffice (isOrigin is false) changes only by iTip. When the user reads
+	 * their mail in the CalDAV client, the client applies the organizer's update and sends it to us. The organizer
+	 * raises the SEQUENCE for such an update, a change by the attendee doesn't.
+	 *
+	 * @param CalendarEvent $event
+	 * @param VObject\Component\VCalendar $vcalendar
+	 * @return bool
+	 */
+	private static function mayChange(CalendarEvent $event, VObject\Component\VCalendar $vcalendar): bool
+	{
+		if($event->mayChangeEventData()) {
+			return true;
+		}
+		if($event->isOrigin || !$event->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			return false;
+		}
+		foreach($vcalendar->select('VEVENT') as $vevent) {
+			if(!isset($vevent->{'RECURRENCE-ID'})) {
+				return isset($vevent->SEQUENCE) && (int) $vevent->SEQUENCE->getValue() > $event->sequence;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Whether a new event is an invitation from an organizer outside GroupOffice, for example when an attendee accepts
+	 * an e-mail invitation in their CalDAV client. Such an event is not created by this system (isOrigin is false), so
+	 * only the organizer can change it and their cancellation is processed.
+	 *
+	 * Only true when the organizer is not a local user or resource and the owner of the calendar is an attendee, so a
+	 * user who organizes with an address that GroupOffice doesn't know keeps their event.
+	 *
+	 * @param VObject\Component $vevent
+	 * @param int|string $calendarId
+	 * @return bool
+	 */
+	private static function isExternalInvitation(VObject\Component $vevent, int|string $calendarId): bool
+	{
+		$organizer = $vevent->select('ORGANIZER');
+		if(empty($organizer)) {
+			return false;
+		}
+		$organizerEmail = strtolower(str_ireplace('mailto:', '', (string)$organizer[0]));
+		if($organizerEmail === '' || !empty(Principal::findIdsByEmail($organizerEmail))) {
+			return false;
+		}
+
+		// The same user as CalendarEvent::calendarParticipant()
+		$ownerId = Calendar::findById($calendarId, ['ownerId'])?->getOwnerId() ?? go()->getUserId();
+		$aliases = User::findEmailAliases($ownerId);
+		foreach($vevent->select('ATTENDEE') as $attendee) {
+			if(in_array(strtolower(str_ireplace('mailto:', '', (string)$attendee)), $aliases)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -551,9 +614,10 @@ class CalDAVBackend extends AbstractBackend implements
 		$mayChange = true;
 		switch($type) {
 			case 'c':
-				if(!$object->mayChangeEventData()) {
+				$vCalendar = VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
+				if(!self::mayChange($object, $vCalendar)) {
 					$mayChange = false;
-					self::applyUserData($object, VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES));
+					self::applyUserData($object, $vCalendar);
 					break;
 				}
 				$object = ICalendarHelper::parseVObject($calendarData, $object);

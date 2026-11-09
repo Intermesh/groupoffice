@@ -565,4 +565,75 @@ class CalDAVBackendPermissionTest extends TestCase
 		$this->assertSame(200, $this->request('reader', 'GET', $calendarId, 'my-copy.ics'));
 		$this->assertSame(404, $this->request('reader', 'GET', $calendarId, $ownerFile));
 	}
+
+	private function invitationIcs(string $uid, string $title, int $sequence, string $partStat, bool $withAttendee = true): string
+	{
+		$reader = $this->users['reader']->email;
+		return "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Test//EN\r\nBEGIN:VEVENT\r\n" .
+			"UID:$uid\r\nSEQUENCE:$sequence\r\nDTSTAMP:20261001T100000Z\r\n" .
+			"DTSTART:20271001T100000Z\r\nDTEND:20271001T110000Z\r\nSUMMARY:$title\r\n" .
+			"ORGANIZER;CN=External:mailto:organizer@external.example\r\n" .
+			"ATTENDEE;CN=External;PARTSTAT=ACCEPTED;ROLE=CHAIR:mailto:organizer@external.example\r\n" .
+			($withAttendee ? "ATTENDEE;CN=Reader;PARTSTAT=$partStat;ROLE=REQ-PARTICIPANT:mailto:$reader\r\n" : '') .
+			"END:VEVENT\r\nEND:VCALENDAR\r\n";
+	}
+
+	/**
+	 * @return array|null the calendar_event row of the event with this UID
+	 */
+	private function eventRow(string $uid): ?array
+	{
+		$eventIds = $this->eventIdsByUid($uid);
+		$this->eventIds = array_merge($this->eventIds, $eventIds);
+		if (empty($eventIds)) {
+			return null;
+		}
+		return go()->getDbConnection()->select('title, isOrigin, replyTo, sequence')->from('calendar_event')
+			->where(['eventId' => $eventIds[0]])->fetchMode(\PDO::FETCH_ASSOC)->single() ?: null;
+	}
+
+	public function testExternalInvitationIsNotOrigin(): void
+	{
+		$uid = uniqid('davperm');
+		$calendarId = (int) Calendar::fetchPersonal($this->users['reader']->id);
+
+		$this->assertSame(201, $this->put('reader', $calendarId, $uid . '.ics', $this->invitationIcs($uid, 'Invitation', 0, 'NEEDS-ACTION')));
+
+		$row = $this->eventRow($uid);
+		$this->assertSame(0, (int) $row['isOrigin'], 'The organizer is outside GroupOffice');
+		$this->assertSame('organizer@external.example', $row['replyTo']);
+	}
+
+	/**
+	 * A user that organizes with an address GroupOffice doesn't know must be able to change their event
+	 */
+	public function testEventOfUnknownOrganizerWithoutTheUserAsAttendeeIsOrigin(): void
+	{
+		$uid = uniqid('davperm');
+		$calendarId = (int) Calendar::fetchPersonal($this->users['reader']->id);
+
+		$this->assertSame(201, $this->put('reader', $calendarId, $uid . '.ics', $this->invitationIcs($uid, 'Own event', 0, 'NEEDS-ACTION', false)));
+
+		$this->assertSame(1, (int) $this->eventRow($uid)['isOrigin']);
+	}
+
+	public function testExternalInvitationOnlyChangesByOrganizerUpdate(): void
+	{
+		$uid = uniqid('davperm');
+		$calendarId = (int) Calendar::fetchPersonal($this->users['reader']->id);
+		$this->assertSame(201, $this->put('reader', $calendarId, $uid . '.ics', $this->invitationIcs($uid, 'Invitation', 0, 'NEEDS-ACTION')));
+
+		// The attendee accepts and changes the title
+		$this->assertSame(204, $this->put('reader', $calendarId, $uid . '.ics', $this->invitationIcs($uid, 'Changed by attendee', 0, 'ACCEPTED')));
+		$this->assertSame('Invitation', $this->eventRow($uid)['title']);
+		$status = go()->getDbConnection()->selectSingleValue('participationStatus')->from('calendar_participant')
+			->where(['eventId' => $this->eventIdsByUid($uid)[0], 'email' => $this->users['reader']->email])->single();
+		$this->assertSame(Participant::Accepted, $status);
+
+		// The client applies an update of the organizer
+		$this->assertSame(204, $this->put('reader', $calendarId, $uid . '.ics', $this->invitationIcs($uid, 'Moved by organizer', 1, 'ACCEPTED')));
+		$row = $this->eventRow($uid);
+		$this->assertSame('Moved by organizer', $row['title']);
+		$this->assertSame(1, (int) $row['sequence']);
+	}
 }
