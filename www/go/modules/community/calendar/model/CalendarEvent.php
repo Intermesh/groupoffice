@@ -1013,6 +1013,30 @@ class CalendarEvent extends AclItemEntity {
 	private $calendarParticipant = null;
 
 	/**
+	 * Whether the current user may change the event itself and not only their own participation status and per-user
+	 * properties. These are the same rules internalSave() enforces for JMAP clients.
+	 *
+	 * @return bool
+	 */
+	public function mayChangeEventData(): bool
+	{
+		if(!$this->isOrigin || !$this->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			return false;
+		}
+		$participant = $this->calendarParticipant();
+		return !$participant || $participant->isOwner() || $this->ownerId === null;
+	}
+
+	/**
+	 * Remove the stored iCalendar data of every user that has this event, so it's generated again on the next request.
+	 * Use this when shared data changed that resetICalBlob() does not see, like the participants.
+	 */
+	public function resetICalBlobsOfAllUsers(): void
+	{
+		go()->getDbConnection()->update('calendar_event_user', ['veventBlobId' => null], ['eventId' => $this->eventId])->execute();
+	}
+
+	/**
 	 * The participant in the event that owns the calendar this event is in
 	 * @return false|Participant
 	 */
