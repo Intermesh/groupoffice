@@ -107,6 +107,8 @@ class Module extends Entity {
 		if(!parent::internalSave()) {
 			return false;
 		}
+		$this->saveEntities();
+
 		go()->getCache()->set('module-' . $this->package.'/'.$this->name, $this);
 
 		if ($this->enabled && $settings = $this->getSettings()) {
@@ -630,20 +632,53 @@ class Module extends Entity {
 	}
 
 	/**
-	 * @throws SaveException
+	 * Entity settings set by setEntities() that are applied on save
+	 *
+	 * @var array|null
+	 */
+	private $pendingEntities;
+
+	/**
+	 * Set entity settings like the default ACL. They are stored when the module is saved.
+	 *
+	 * @param array $entities eg. ['AddressBook' => ['defaultAcl' => [Group::ID_INTERNAL => Acl::LEVEL_READ]]]
 	 */
 	public function setEntities($entities) {
+		$this->pendingEntities = array_replace($this->pendingEntities ?? [], $entities);
+	}
+
+	/**
+	 * @throws SaveException
+	 * @throws Exception
+	 */
+	private function saveEntities(): void
+	{
+		if(!isset($this->pendingEntities)) {
+			return;
+		}
+
 		$current = $this->getEntities();
 
-		foreach($entities as $name => $e) {
-			if(isset($e['defaultAcl'])) {
-				$current[$name]->setDefaultAcl($e['defaultAcl']);
+		foreach($this->pendingEntities as $name => $e) {
+			if(!isset($e['defaultAcl'])) {
+				continue;
+			}
+			if(!isset($current[$name])) {
+				throw new Exception("Entity '" . $name . "' doesn't belong to module " . $this->name);
+			}
+			if(!$current[$name]->setDefaultAcl($e['defaultAcl'])) {
+				throw new Exception("Could not save the default ACL of " . $name);
 			}
 		}
+
+		$this->pendingEntities = null;
 	}
 	
 	public function setSettings($value) {
-		$this->getSettings()->setValues($value);
+		// A JSON pointer patch like "settings/defaultGroups" changes the settings object itself and sets it back here
+		if($value !== $this->getSettings()) {
+			$this->getSettings()->setValues($value);
+		}
 		$this->change(true);
 	}
 
