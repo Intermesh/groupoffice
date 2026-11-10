@@ -619,7 +619,7 @@ class GO{
 		
 		$user = isset(\GO::session()->values['username']) ? \GO::session()->values['username'] : 'notloggedin';
 		$agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'unknown';
-		$ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
+		$ip = \go\core\http\Request::get()->getRemoteIpAddress() ?? 'unknown';
 		
 		$errorMsg .= "\nUser: ".$user." Agent: ".$agent." IP: ".$ip."\n";
 		

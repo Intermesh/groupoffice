@@ -209,7 +209,7 @@ class Session extends Observable{
 		$this->fireEvent('logout', array($old_session));
 		
 		if($username != self::USERNAME_NOTLOGGEDIN) {
-			\GO::infolog("LOGOUT for user: \"".$username."\" from IP: ".$_SERVER['REMOTE_ADDR']);
+			\GO::infolog("LOGOUT for user: \"".$username."\" from IP: ".(\go\core\http\Request::get()->getRemoteIpAddress() ?? 'unknown'));
 		}
 	}
 	
@@ -314,10 +314,7 @@ class Session extends Observable{
 		$str = "LOGIN ";		
 		$str .= $success ? "SUCCESS" : "FAILED" ;		
 		$str .= " for user: \"" . $username . "\" from IP: ";
-		if(isset($_SERVER['REMOTE_ADDR']))
-			$str .= $_SERVER['REMOTE_ADDR'];
-		else
-			$str .= 'unknown';
+		$str .= \go\core\http\Request::get()->getRemoteIpAddress() ?? 'unknown';
 		\GO::infolog($str);
 		\GO::debug($str);
 		
