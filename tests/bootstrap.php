@@ -40,8 +40,9 @@ try {
 	$c = new core\util\ArrayObject(go()->getConfig());
 	$c->mergeRecursive($config);
 	go()->setConfig($c->getArray());
-	\GO::config()->file_storage_path = $config['file_storage_path'];
-	\GO::config()->tmpdir = $config['tmpdir'];
+	// The legacy config always ends these with a slash, and legacy code appends paths to them
+	\GO::config()->file_storage_path = rtrim($config['file_storage_path'], '/') . '/';
+	\GO::config()->tmpdir = rtrim($config['tmpdir'], '/') . '/';
 
 	// Install new if db doesn't exist otherwise use existing
 	if(!isset($installDb)) {

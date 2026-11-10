@@ -102,6 +102,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController {
 			$path .= '.'.$template->extension;
 
 		$fsFile = new \GO\Base\Fs\File($path);
+		$fsFile->checkFileStoragePath();
 
 		// Never overwrite an existing file. Replacing would bypass the WRITE permission check on the existing file.
 		if($fsFile->exists() || $folder->hasFile($fsFile->name())) {
