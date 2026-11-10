@@ -53,6 +53,17 @@ class Module extends EntityController {
 		return $entity->getUserRights()->mayManage ?? go()->getAuthState()->isAdmin();
 	}
 
+	/**
+	 * Module settings and default ACL's are shared objects, so refuse before the client's changes are applied to them.
+	 *
+	 * @param model\Module $entity
+	 * @throws \Exception
+	 */
+	protected function canUpdateBeforePatch(Entity $entity, array $properties): bool
+	{
+		return $this->canUpdate($entity);
+	}
+
 	protected function canCreate(Entity $entity): bool
 	{
 		if($entity->name == "core" && $entity->package == "core") {
