@@ -437,4 +437,5 @@ If you did not request a new password please delete this mail.',
   'The database is already up to date. Only an administrator can run the upgrade again. Please log in as an administrator first.' => 'The database is already up to date. Only an administrator can run the upgrade again. Please log in as an administrator first.',
   'GroupOffice is already installed. Change the config file on the server instead.' => 'GroupOffice is already installed. Change the config file on the server instead.',
   'Only an administrator can change the license. Please log in as an administrator first.' => 'Only an administrator can change the license. Please log in as an administrator first.',
+  'Only administrators may add users to groups other than the default groups' => 'Only administrators may add users to groups other than the default groups',
 );
