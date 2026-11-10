@@ -63,6 +63,34 @@ class SavedMessage extends ComposerMessage
 	}
 
 	/**
+	 * Reads a MIME file that the client asked for and creates a SavedMessage model from it.
+	 *
+	 * A file in the file storage must be a file in the files module that the current user may read. A temporary file is
+	 * always in the current user's own temporary folder, because \GO::config()->tmpdir is that folder.
+	 *
+	 * Use {@see createFromMimeFile()} for paths that don't come from the client.
+	 *
+	 * @param mixed $path Relative path from file_storage_path or tmpdir where the MIME file is stored
+	 * @param bool $isTempFile Indicates if path it relative from tmpdir or file_storage_path
+	 * @param bool $preserveHtmlStyle
+	 * @return SavedMessage|null
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function createFromReadableMimeFile($path, bool $isTempFile = false, bool $preserveHtmlStyle = true): ?SavedMessage
+	{
+		if(!$isTempFile) {
+			if(!\GO::modules()->isInstalled('files')) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+			$path = \GO\Files\Model\File::model()->findReadableByPath($path)->path;
+		} else if(!is_string($path)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $this->createFromMimeFile($path, $isTempFile, $preserveHtmlStyle);
+	}
+
+	/**
 	 * Reads MIME data and creates a SavedMessage model from it.
 	 * @param string $mimeData The MIME data string.
 	 * @param bool $preserveHtmlStyle

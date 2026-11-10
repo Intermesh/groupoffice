@@ -923,7 +923,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$message->createTempFilesForAttachments();
 			$response['sendParams']['draft_uid'] = $message->uid;
 		} else {
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($params['path']);
+			$message = \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($params['path']);
 		}
 		$response['data'] = $message->toOutputArray($params['content_type'] == 'html', true,false,false);
 
@@ -960,7 +960,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		} else {
 			$account=false;
-			$message =  \GO\Email\Model\SavedMessage::model()->createFromMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
+			$message =  \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
 		}
 
 		return $this->_messageToReplyResponse($params, $message, $account);
@@ -1202,7 +1202,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account = Account::model()->findByPk($params['account_id']);
 			$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 		} else {
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
+			$message = \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
 		}
 
 		return $this->_messageToForwardResponse($params, $message);
@@ -1741,7 +1741,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		
 		if(!empty($filepath)) {
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($filepath);
+			$message = \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($filepath);
 		} else {
 			// Search message from imap
 			$account = Account::model()->findByPk($account_id);
