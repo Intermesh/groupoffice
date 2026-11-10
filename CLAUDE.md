@@ -29,9 +29,11 @@ The app runs in Docker (the docker-groupoffice-development checkout, service `gr
 
 ## Commits and changelog
 
-- Don't commit until the user has reviewed the changes, even when a commit was asked for earlier. Finish the work, show what changed and wait for explicit approval to commit.
+- Commit each feature or fix in separate commits.
 - Commit messages are short and start with a type or module: `Fixed: ...`, `Core: ...`, `Files: ...`. Reference the issue number when there is one (`#1593`).
-- User-visible changes get a line in `CHANGELOG.md`, in a separate commit. Unreleased entries go at the top of the file, above the newest version header, as `- Module: description #issue`. Security fixes are written so that a user understands the impact and any config they need to change.
+- User-visible changes get a line in `CHANGELOG.md`. Unreleased entries go at the top of the file, above the newest version header, as `- Module: description #issue`. Security fixes are written so that a user understands the impact and any config they need to change.
+  Never commit CHANGELOG.md. This will be reviewed manually and committed by hand.
+- Never push to origin.
 
 ## Database changes
 
