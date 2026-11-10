@@ -743,6 +743,27 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	}
 
 	/**
+	 * Find a file by a path that comes from the client and check that the current user may read it.
+	 *
+	 * A file that doesn't exist and a file the user may not read give the same exception, so it can't be used to find out
+	 * which files exist.
+	 *
+	 * @param mixed $relpath Relative path from \GO::config()->file_storage_path
+	 * @return File
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function findReadableByPath($relpath): File
+	{
+		$file = is_string($relpath) && $relpath !== '' ? $this->findByPath($relpath) : false;
+
+		if (!$file || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $file;
+	}
+
+	/**
 	 * Check if the file is an image.
 	 *
 	 * @return boolean
