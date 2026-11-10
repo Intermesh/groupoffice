@@ -284,6 +284,8 @@ class MaintenanceController extends AbstractController {
 			throw new \GO\Base\Exception\AccessDenied();
 		}
 
+		// Admin or CLI only maintenance job on the data of all users. ACL checks stay off until the request ends.
+		// nosemgrep: go-acl-bypass-not-restored
 		GO::setIgnoreAclPermissions(true);
 		GO::session()->runAsRoot();
 
@@ -367,6 +369,8 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();		 
 		
+		// Admin or CLI only maintenance job on the data of all users. ACL checks stay off until the request ends.
+		// nosemgrep: go-acl-bypass-not-restored
 		GO::setIgnoreAclPermissions(true);
 		GO::session()->runAsRoot();	
 		
@@ -525,6 +529,8 @@ class MaintenanceController extends AbstractController {
 		
 		GO::session()->closeWriting();
 		
+		// Admin or CLI only maintenance job on the data of all users. ACL checks stay off until the request ends.
+		// nosemgrep: go-acl-bypass-not-restored
 		GO::setIgnoreAclPermissions(true);
 		
 		if(!$this->isCli())			
@@ -559,6 +565,8 @@ class MaintenanceController extends AbstractController {
 
 		GO::session()->closeWriting();
 
+		// Admin or CLI only maintenance job on the data of all users. ACL checks stay off until the request ends.
+		// nosemgrep: go-acl-bypass-not-restored
 		GO::setIgnoreAclPermissions(true);
 
 		if(!$this->isCli())
