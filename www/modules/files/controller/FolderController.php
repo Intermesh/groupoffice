@@ -6,6 +6,7 @@ namespace GO\Files\Controller;
 use Exception;
 use GO;
 use GO\Base\Db\FindCriteria;
+use go\core\fs\FileSystemObject;
 use GO\Base\Exception\AccessDenied;
 use go\core\db\DbException;
 use go\core\exception\Forbidden;
