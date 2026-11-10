@@ -82,6 +82,7 @@ class Bookmark extends EntityController {
 			try{
 				$c = new Client();
 				$c->globalRangeOnly = true;
+				$c->maxResponseSize = 5 * 1024 * 1024;
 				$c->setOption(CURLOPT_CONNECTTIMEOUT, 2);
 				$c->setOption(CURLOPT_TIMEOUT, 5);
 				$c->setOption(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);

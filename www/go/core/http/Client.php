@@ -42,6 +42,18 @@ class Client
 	public bool $globalRangeOnly = false;
 
 	/**
+	 * Maximum number of redirects that are followed when {@see $globalRangeOnly} is true.
+	 *
+	 * Curl can't check the address of every redirect, so the client follows them itself in that case.
+	 */
+	public int $maxRedirects = 5;
+
+	/**
+	 * Abort the request when the response body is larger than this number of bytes. Null for no limit.
+	 */
+	public ?int $maxResponseSize = null;
+
+	/**
 	 * @return false|CurlHandle
 	 * @noinspection PhpMissingReturnTypeInspection
 	 */
@@ -103,14 +115,33 @@ class Client
 	 */
 	private function initRequest($path) : void
 	{
-		$url = $this->baseUri . $path;
+		$this->lastHeaders = [];
+		$this->prepareUrl($this->baseUri . $path);
+	}
 
+	/**
+	 * Set the URL and options for one request. Called again for every redirect.
+	 *
+	 * @throws Forbidden
+	 */
+	private function prepareUrl(string $url) : void
+	{
 		$resolve = $this->checkUri($url);
 		if($resolve !== false) {
 			$this->setOption(CURLOPT_RESOLVE, [$resolve]);
+			// curl doesn't check redirect targets, so they're followed in exec()
+			$this->setOption(CURLOPT_FOLLOWLOCATION, false);
 		}
 
-		$this->lastHeaders = [];
+		if(isset($this->maxResponseSize)) {
+			$max = $this->maxResponseSize;
+			$this->setOption(CURLOPT_NOPROGRESS, false)
+				->setOption(CURLOPT_XFERINFOFUNCTION, function ($curl, $downloadSize, $downloaded) use ($max) {
+					// a non-zero return value aborts the transfer
+					return ($downloadSize > $max || $downloaded > $max) ? 1 : 0;
+				});
+		}
+
 		$this->setOption(CURLOPT_URL, $url)
 			->setOption(CURLOPT_RETURNTRANSFER, true)
 			->setOption(CURLOPT_HEADERFUNCTION, function ($curl, $header) {
@@ -123,6 +154,43 @@ class Client
 		$headers = $this->getHeadersForCurl();
 		if (!empty($headers)) {
 			$this->setOption(CURLOPT_HTTPHEADER, $headers);
+		}
+	}
+
+	/**
+	 * Run the prepared request.
+	 *
+	 * When {@see $globalRangeOnly} is true, redirects are followed here and every new location is checked like the first
+	 * URL. Otherwise curl follows them.
+	 *
+	 * @param callable|null $onRedirect Called after preparing the request for a redirect location, for example to empty an output file
+	 * @return string|bool The body or true when the body is written to a file
+	 * @throws CoreException
+	 */
+	private function exec(?callable $onRedirect = null): string|bool
+	{
+		$redirects = 0;
+		while(true) {
+			$body = curl_exec($this->getCurl());
+
+			if(!$this->globalRangeOnly || curl_errno($this->getCurl())) {
+				return $body;
+			}
+
+			$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
+			$location = curl_getinfo($this->getCurl(), CURLINFO_REDIRECT_URL);
+			if($status < 300 || $status >= 400 || empty($location)) {
+				return $body;
+			}
+
+			if(++$redirects > $this->maxRedirects) {
+				throw new CoreException("Too many redirects");
+			}
+
+			$this->prepareUrl($location);
+			if(isset($onRedirect)) {
+				$onRedirect();
+			}
 		}
 	}
 
@@ -145,31 +213,51 @@ class Client
 
 		$parsed = parse_url($uri);
 
-		if(empty($parsed['host'])) {
+		if(empty($parsed['host']) || !in_array(strtolower($parsed['scheme'] ?? ''), ['http', 'https'])) {
 			throw new Forbidden("Invalid URI: " . $uri);
 		}
 
 		// check if the IP
-		$ips = $this->resolveHost($parsed['host']);
+		$ips = $this->resolveHost(trim($parsed['host'], '[]'));
 		if(empty($ips)) {
 			throw new Forbidden("Can't resolve host for URI: " . $uri);
 		}
 		$firstIP = $ips[0];
 		foreach($ips as $ip) {
-			$retVal = filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]);
-
-			if ($retVal === false) {
+			if (!$this->isAllowedAddress($ip)) {
 				throw new Forbidden("Invalid URI: " . $uri);
 			}
 		}
 
-		$port = $parsed['port'] ?? ($parsed['scheme'] === 'https' ? 443 : 80);
+		$port = $parsed['port'] ?? (strtolower($parsed['scheme']) === 'https' ? 443 : 80);
 
 		return $parsed['host'] . ":" . $port. ":" . $firstIP;
 	}
 
 
-	private function resolveHost(string $host): array {
+	/**
+	 * Check if requests to this IP address are allowed when {@see $globalRangeOnly} is true.
+	 *
+	 * Private, loopback, link-local (like cloud metadata services) and reserved addresses are refused.
+	 *
+	 * @param string $ip
+	 * @return bool
+	 */
+	protected function isAllowedAddress(string $ip): bool
+	{
+		return filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]) !== false;
+	}
+
+	/**
+	 * Get the IP addresses of a host name
+	 *
+	 * @param string $host
+	 * @return string[]
+	 */
+	protected function resolveHost(string $host): array {
+		if(filter_var($host, FILTER_VALIDATE_IP)) {
+			return [$host];
+		}
 		$records = dns_get_record($host, DNS_A + DNS_AAAA);
 		if ($records === false) {
 			return [];
@@ -194,7 +282,7 @@ class Client
 
 		$this->setOption(CURLOPT_POST, false);
 
-		$body = curl_exec($this->getCurl());
+		$body = $this->exec();
 
 		$error = curl_error($this->getCurl());
 		if (!empty($error)) {
@@ -316,8 +404,16 @@ class Client
 		$this->initRequest($url);
 		$this->setOption(CURLOPT_FILE, $fp);
 
-		curl_exec($this->getCurl());
-		fclose($fp);
+		try {
+			// Don't keep the body of a redirect response in the file
+			$this->exec(function () use ($fp) {
+				ftruncate($fp, 0);
+				rewind($fp);
+				$this->setOption(CURLOPT_FILE, $fp);
+			});
+		} finally {
+			fclose($fp);
+		}
 
 		$error = curl_error($this->getCurl());
 		if (!empty($error)) {
