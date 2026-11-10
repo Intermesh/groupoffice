@@ -20,16 +20,26 @@ class RouterTest extends TestCase
 
 	private function callRouter(string $method, array $params = []): array
 	{
+		[$output, $responses] = $this->callRouterMulti([[$method, $params, 'c1']]);
+		return [$output, end($responses)];
+	}
+
+	/**
+	 * Run several method calls in one request
+	 *
+	 * @return array [output, responses of these calls]
+	 */
+	private function callRouterMulti(array $calls): array
+	{
 		// not logged in, like an anonymous web request
 		unset($_COOKIE['accessToken']);
 		go()->setAuthState(new State());
 
 		ob_start();
-		(new Router())->run([[$method, $params, 'c1']], false);
+		(new Router())->run($calls, false);
 		$output = ob_get_clean();
 
-		$data = Response::get()->getData();
-		return [$output, end($data)];
+		return [$output, array_slice(Response::get()->getData(), -count($calls))];
 	}
 
 	public static function cliMethods(): array
@@ -87,5 +97,51 @@ class RouterTest extends TestCase
 
 		$this->assertSame('error', $response[0]);
 		$this->assertStringContainsString('Unauthorized', $response[1]['message']);
+	}
+
+	public static function switchUserMethods(): array
+	{
+		return [
+			['community/test/SwitchUser/whoAmI'],
+			['community/test/SwitchUser/fail'],
+		];
+	}
+
+	/**
+	 * A controller that authenticates with its own token, like WOPI, must not authenticate the next methods
+	 */
+	#[DataProvider('switchUserMethods')]
+	public function testMethodCannotChangeUserForNextMethods(string $method)
+	{
+		[, $responses] = $this->callRouterMulti([
+			[$method, [], 'c1'],
+			['User/get', ['ids' => [1]], 'c2']
+		]);
+
+		$this->assertSame('error', $responses[1][0]);
+		$this->assertStringContainsString('Unauthorized', $responses[1][1]['message']);
+		$this->assertFalse(go()->getAuthState()->isAuthenticated());
+	}
+
+	public function testMethodCannotChangeLegacySessionUser()
+	{
+		$hadSession = isset($_SESSION['GO_SESSION']);
+		$hadUserId = $hadSession && array_key_exists('user_id', $_SESSION['GO_SESSION']);
+		$userId = $_SESSION['GO_SESSION']['user_id'] ?? null;
+		unset($_SESSION['GO_SESSION']['user_id']);
+
+		try {
+			[, $responses] = $this->callRouterMulti([['community/test/SwitchUser/whoAmI', [], 'c1']]);
+
+			// The method itself ran as the switched user
+			$this->assertEquals(1, $responses[0][1]['legacyUserId']);
+			$this->assertArrayNotHasKey('user_id', $_SESSION['GO_SESSION']);
+		} finally {
+			if ($hadUserId) {
+				$_SESSION['GO_SESSION']['user_id'] = $userId;
+			} else if(!$hadSession) {
+				unset($_SESSION['GO_SESSION']);
+			}
+		}
 	}
 }
