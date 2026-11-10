@@ -102,8 +102,12 @@ class Wopi extends Controller
   {
     $file = $this->findFile($fileId);
 
-		if($file->fsFile->isLink())
+		// also refuses a link in one of the parent folders
+		try {
+			$file->fsFile->checkFileStoragePath();
+		} catch (\GO\Base\Exception\AccessDenied $e) {
 			throw new Forbidden("Symlinks are forbidden");
+		}
 
     if(!$file->checkPermissionLevel(Acl::LEVEL_READ)) {
       throw new Forbidden();

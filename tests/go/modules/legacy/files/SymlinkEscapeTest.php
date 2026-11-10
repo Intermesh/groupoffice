@@ -340,6 +340,38 @@ class SymlinkEscapeTest extends TestCase
 		}
 	}
 
+	public function testWebDavDoesNotFollowLinks(): void
+	{
+		if (!\GO::modules()->isInstalled('dav')) {
+			$this->markTestSkipped('The dav module is required');
+		}
+		[, $file] = $this->registeredLinkedFolder();
+		// added without a sync, which would remove the linked folder from the database
+		file_put_contents($this->homeFolder->fsFolder->path() . '/normal.txt', 'normal');
+		$this->homeFolder->addFile('normal.txt');
+
+		$home = new \GO\Dav\Fs\Directory($this->homeFolder->path);
+
+		$names = array_map(fn($node) => $node->getName(), $home->getChildren());
+		$this->assertContains('normal.txt', $names, 'the other items are still listed');
+		$this->assertNotContains('linked', $names);
+
+		try {
+			$home->getChild('linked');
+			$this->fail('WebDAV returned a linked folder');
+		} catch (\Sabre\DAV\Exception\NotFound $e) {
+			$this->assertTrue(true);
+		}
+
+		$davFile = new \GO\Dav\Fs\File($file->path);
+		try {
+			$davFile->get();
+			$this->fail('WebDAV read a file through a link');
+		} catch (\Sabre\DAV\Exception\Forbidden $e) {
+			$this->assertOutsideUntouched();
+		}
+	}
+
 	public function testSyncRemovesRegisteredLinks(): void
 	{
 		[$folder, $file] = $this->registeredLinkedFolder();
