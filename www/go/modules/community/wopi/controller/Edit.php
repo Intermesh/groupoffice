@@ -3,6 +3,7 @@ namespace go\modules\community\wopi\controller;
 
 use go\core\Controller;
 use go\core\exception\Forbidden;
+use go\core\exception\NotFound;
 use go\core\model\Acl;
 use go\modules\community\wopi\model;
 use GO\Files\Model\File;
@@ -28,9 +29,12 @@ class Edit extends Controller
 	  	throw new Forbidden();
 	  }
 
-    $token = model\Token::get($serviceId, go()->getUserId());
-
 	  $file = File::model()->findByPk($fileId);
+	  if(!$file) {
+		  throw new NotFound("File not found");
+	  }
+
+    $token = model\Token::get((int) $serviceId, go()->getUserId(), (int) $file->id);
 
     $actions = $this->findActions($serviceId, $file);
 

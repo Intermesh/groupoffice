@@ -29,3 +29,8 @@ $updates['202601151128'][] = "UPDATE fs_filehandlers
 SET cls = 'go\\\\modules\\\\community\\\\wopi\\\\filehandler\\\\Collabora' where cls = 'go\\\\modules\\\\business\\\\wopi\\\\filehandler\\\\Collabora';";
 $updates['202601151128'][] = "UPDATE fs_filehandlers
 SET cls = 'go\\\\modules\\\\community\\\\wopi\\\\filehandler\\\\Office365' where cls = 'go\\\\modules\\\\business\\\\wopi\\\\filehandler\\\\Office365';";
+
+// WOPI tokens are bound to one file. Existing tokens were valid for all files of the user, so they are removed.
+$updates['202611101200'][] = "DELETE FROM wopi_token;";
+$updates['202611101200'][] = "ALTER TABLE `wopi_token` ADD `fileId` int(11) NOT NULL AFTER `userId`;";
+$updates['202611101200'][] = "ALTER TABLE `wopi_token` ADD CONSTRAINT `wopi_token_fileId_fk` FOREIGN KEY (`fileId`) REFERENCES `fs_files` (`id`) ON DELETE CASCADE;";
