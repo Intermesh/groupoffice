@@ -57,7 +57,7 @@ class UserTest extends TestCase
 		$core->save();
 
 		Group::delete(['id' => $this->managerGroup->id]);
-		UserModel::delete(['id' => [$this->manager->id, $this->user->id, $this->otherUser->id, $this->admin->id]]);
+		UserModel::delete(['id' => array_merge([$this->manager->id, $this->user->id, $this->otherUser->id, $this->admin->id], $this->createdIds)]);
 
 		go()->setAuthState($this->authState);
 	}
@@ -191,6 +191,97 @@ class UserTest extends TestCase
 		foreach($acl as $aclGroupId => $level) {
 			$this->assertEquals($level, $stored[$aclGroupId] ?? null);
 		}
+	}
+
+	private function create(int $actingUserId, array $properties): array
+	{
+		$name = uniqid('ctrlnew');
+		$properties = array_merge([
+			'username' => $name,
+			'displayName' => $name,
+			'email' => $name . '@example.com',
+			'password' => 'Pa55word!!xyz'
+		], $properties);
+
+		$this->actAs($actingUserId);
+		$result = (new User())->set(['create' => ['new' => $properties]])->getArray();
+
+		if(isset($result['created']['new'])) {
+			$this->createdIds[] = $result['created']['new']['id'];
+		}
+		return $result;
+	}
+
+	private array $createdIds = [];
+
+	public static function privilegedGroups(): array
+	{
+		return [
+			'admins' => [[Group::ID_EVERYONE, Group::ID_ADMINS]],
+			'admins only' => [[Group::ID_ADMINS]],
+		];
+	}
+
+	#[DataProvider('privilegedGroups')]
+	public function testUserManagerMayNotCreateUserInOtherGroups(array $groups)
+	{
+		$result = $this->create($this->manager->id, ['groups' => $groups]);
+
+		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
+		$this->assertSame('forbidden', $result['notCreated']['new']->type ?? null);
+	}
+
+	public function testUserManagerMayNotCreateUserInManagerGroup()
+	{
+		// Even a group the manager is in may grant more than the default groups
+		$result = $this->create($this->manager->id, ['groups' => [Group::ID_EVERYONE, $this->managerGroup->id]]);
+
+		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
+	}
+
+	public function testUserManagerMayCreateUserInDefaultGroups()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$defaultGroups = \go\core\model\Settings::get()->getDefaultGroups();
+
+		$result = $this->create($this->manager->id, ['groups' => array_merge([Group::ID_EVERYONE], $defaultGroups)]);
+
+		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
+		$user = UserModel::findById($result['created']['new']['id']);
+		$this->assertFalse($user->isAdmin());
+	}
+
+	public function testUserManagerMayCreateUserWithoutGroups()
+	{
+		$result = $this->create($this->manager->id, []);
+
+		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
+	}
+
+	public function testUserManagerMayNotAddAdminGroupOnSaveOutsideController()
+	{
+		// Other paths, like imports, save the model without the controller's canCreate()
+		$this->actAs($this->manager->id);
+		$name = uniqid('ctrlmodel');
+		$user = new UserModel();
+		$user->setValues([
+			'username' => $name,
+			'displayName' => $name,
+			'email' => $name . '@example.com',
+			'password' => 'Pa55word!!xyz',
+			'groups' => [Group::ID_EVERYONE, Group::ID_ADMINS]
+		]);
+
+		$this->assertFalse($user->save());
+		$this->assertArrayHasKey('groups', $user->getValidationErrors());
+	}
+
+	public function testAdminMayCreateAnAdministrator()
+	{
+		$result = $this->create(UserModel::ID_SUPER_ADMIN, ['groups' => [Group::ID_EVERYONE, Group::ID_ADMINS]]);
+
+		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
+		$this->assertTrue(UserModel::findById($result['created']['new']['id'])->isAdmin());
 	}
 
 	public function testAdminMayChangeAnAdministrator()
