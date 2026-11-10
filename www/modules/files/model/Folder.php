@@ -653,6 +653,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$folder = $this->findSingle($findParams);
 				if (!$folder) {
 					if (!$autoCreate) {
+						// restore it, otherwise permissions are ignored for the rest of the request
+						\GO::$ignoreAclPermissions=$oldIgnoreAcl;
 						if($returnLastFound) {
 							return $lastFolder;
 						} else{
@@ -665,6 +667,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
 					if(!$folder->save(true)){
+						\GO::$ignoreAclPermissions=$oldIgnoreAcl;
 						throw new Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
 					}
 				}elseif(!empty($autoCreateAttributes))
