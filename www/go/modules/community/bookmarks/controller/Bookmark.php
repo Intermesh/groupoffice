@@ -1,10 +1,13 @@
 <?php
 namespace go\modules\community\bookmarks\controller;
 
+use go\core\ErrorHandler;
+use go\core\http\Client;
 use go\core\jmap\EntityController;
 use go\modules\community\bookmarks\model;
 use go\core\fs\Blob;
 use go\core\util\StringUtil;
+use Throwable;
 
 /**
  * The controller for the Bookmark entity
@@ -12,7 +15,8 @@ use go\core\util\StringUtil;
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
- */ 
+ * @extends EntityController<\go\modules\community\bookmarks\model\Bookmark>
+ */
 class Bookmark extends EntityController {
 	
 	/**
@@ -76,20 +80,24 @@ class Bookmark extends EntityController {
 				
 		if (function_exists('curl_init')) {
 			try{
-				$c = new \GO\Base\Util\HttpClient();
-				$c->setCurlOption(CURLOPT_CONNECTTIMEOUT, 2);
-				$c->setCurlOption(CURLOPT_TIMEOUT, 5);
-				$c->setCurlOption(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);			
+				$c = new Client();
+				$c->globalRangeOnly = true;
+				$c->maxResponseSize = 5 * 1024 * 1024;
+				$c->setOption(CURLOPT_CONNECTTIMEOUT, 2);
+				$c->setOption(CURLOPT_TIMEOUT, 5);
+				$c->setOption(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
 
-				$html = $c->request($params['url']);
+				$r = $c->get($params['url']);
 
-				if(!empty($c->lastHeaders['location'])) {
-					$params['url'] = $c->lastHeaders['location'];
+				if(!empty($r['headers']['location'])) {
+					$params['url'] = $r['headers']['location'];
 				}
 
-				go()->debug($c->lastHeaders);
+				go()->debug($response);
 
 				//go_debug($html);
+
+				$html = $r['body'];
 
 				$html = str_replace("\r", '', $html);
 				$html = str_replace("\n", ' ', $html);
@@ -99,14 +107,16 @@ class Bookmark extends EntityController {
 				preg_match('/<head>(.*)<\/head>/i', $html, $match);
 				if (isset($match[1])) {
 					$html = $match[1];
-					//go_debug($html);
 
-                    preg_match('/charset=([^"\'>]*)/i', $c->getContentType(), $match);
-					if (isset($match[1])) {
+					if(isset($r['header']['content-type'])) {
+						preg_match('/charset=([^"\'>]*)/i', $r['header']['content-type'], $match);
 
-						$charset = strtolower(trim($match[1]));
-						if ($charset != 'utf-8')
-							$html = \GO\Base\Util\StringHelper::to_utf8($html, $charset);
+						if (isset($match[1])) {
+
+							$charset = strtolower(trim($match[1]));
+							if ($charset != 'utf-8')
+								$html = StringUtil::cleanUtf8($html, $charset);
+						}
 					}
 
 					preg_match_all('/<meta[^>]*>/i', $html, $matches);
@@ -129,27 +139,31 @@ class Bookmark extends EntityController {
 					$response['title'] = $match ? preg_replace('/\s+/', ' ', trim($match[1])) : '';
 				}
 			}
-			catch(\Exception $e){
-				
+			catch(Throwable $e){
+				ErrorHandler::logException($e, "Failed to fetch description for " . $params['url'] );
 			}
 
 			try{
-				$contents = $c->request("https://www.google.com/s2/favicons?domain=" . $params['url']);
+				$r = $c->get("https://www.google.com/s2/favicons?domain=" . $params['url']);
+
+				$contents = $r['body'];
 				
-				if (!empty($contents) && $c->getHttpCode()!=404) {
+				if (!empty($contents) && $r['status'] != 404) {
 					$filename = str_replace('.', '_', preg_replace('/^https?:\/\//', '', $params['url'])) . '.ico';
 					$filename = rtrim(str_replace('/', '_', $filename), '_ ');
 					$blob = Blob::fromString($contents);
 					$blob->name = $filename;
 					$blob->type = "image/x-icon";
-					if(!$blob->save()) {
-						$errors = $blob->getValidationErrors();
+					if($blob->save()) {
+//						$errors = $blob->getValidationErrors();
+						$response['logo'] = $blob->id;
 					}
-					$response['logo'] = $blob->id;
+
 				}
 			}
-			catch(\Exception $e){
+			catch(Throwable $e){
 				$response['logo'] = '';
+				ErrorHandler::logException($e, "Failed to logo description for " . $params['url'] );
 			}
 		}
 
