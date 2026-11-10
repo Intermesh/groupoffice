@@ -1637,6 +1637,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);		
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$folder->path.'/'.$params['filename']);
+		$file->checkFileStoragePath();
 
 		if(empty($params['tmp_file'])){
 			$account = Account::model()->findByPk($params['account_id']);
@@ -1768,6 +1769,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					$fileName = $file->name();
 				}
 				
+				// don't write through a link to a file elsewhere on the server
+				$fsFolder->createChild($fileName ?? $att->name)->checkFileStoragePath();
+
 				if(!$att->saveToFile($fsFolder,$fileName)){
 					$response['success'] = false;
 				}

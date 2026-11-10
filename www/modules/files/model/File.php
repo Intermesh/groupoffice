@@ -255,6 +255,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 	protected function beforeDelete() {
 
+		// Never delete a file elsewhere on the server through a link
+		if(!File::$deleteInDatabaseOnly) {
+			$this->fsFile->checkFileStoragePath();
+		}
+
 		//blocked database check. We check this in the controller now.
 		if($this->isLocked() && !\GO::user()->isAdmin())
 			throw new \Exception(\GO::t("File is locked", "files").': '.$this->path);
@@ -308,6 +313,12 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	}
 
 	protected function beforeSave() {
+
+		// Never write, rename or move through a link to a file elsewhere on the server
+		$this->fsFile->checkFileStoragePath();
+		if(!$this->isNew && ($this->isModified('name') || $this->isModified('folder_id'))) {
+			$this->_getOldFsFile()->checkFileStoragePath();
+		}
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
 		$this->checkNormalization();
@@ -643,6 +654,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		if($appendNumberToNameIfExists)
 			$copy->appendNumberToNameIfExists();
 
+		$this->fsFile->checkFileStoragePath();
+		$copy->fsFile->checkFileStoragePath();
 		$this->fsFile->copy($copy->fsFile->parent(), $copy->name);
 
 		$copy->save(true);
@@ -683,6 +696,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		for safety allow replace action
 		if(!$this->isNew)
 			$this->log("update");
+
+		$this->fsFile->checkFileStoragePath();
 		$this->saveVersion();
 
 		if(!$fsFile->move($this->folder->fsFolder,$this->name, $isUploadedFile)){		
@@ -705,6 +720,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		if(!File::checkQuota(strlen($data)))
 //			throw new \GO\Base\Exception\InsufficientDiskSpace();
 
+		$this->fsFile->checkFileStoragePath();
 		$this->fsFile->putContents($data);
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();

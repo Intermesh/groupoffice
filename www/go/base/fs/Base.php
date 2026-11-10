@@ -352,6 +352,25 @@ abstract class Base{
 	public function isLink(){
 		return is_link($this->path);
 	}
+
+	/**
+	 * Throw an exception if this path is not inside the file storage path or if a part of it below the file storage path
+	 * is a symbolic link.
+	 *
+	 * Call it before reading, writing or deleting a path in the file storage, so a link can't make it reach files
+	 * elsewhere on the server.
+	 *
+	 * @see \go\core\fs\FileSystemObject::isInsideWithoutLinks()
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function checkFileStoragePath(): void
+	{
+		$fso = new \go\core\fs\File($this->path);
+		if(!$fso->isInsideWithoutLinks(new \go\core\fs\Folder(\GO::config()->file_storage_path))) {
+			\GO::debug("Path is outside the file storage or contains a symbolic link: " . $this->path);
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
 	
 	/**
 	 * Rename a file or folder
