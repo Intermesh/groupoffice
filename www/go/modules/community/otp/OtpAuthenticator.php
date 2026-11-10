@@ -30,7 +30,7 @@ class OtpAuthenticator extends SecondaryAuthenticator
 			return false;
 		}
 
-		$expiresAt = $otp->expiresAt;
+		$expiresAt = $otp->getExpiresAt();
 
 		if ($expiresAt && new DateTime($expiresAt) < new DateTime()) {
 			$this->setValidationError('otp_code', ErrorCode::NOT_FOUND);

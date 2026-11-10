@@ -31,7 +31,11 @@ class OtpAuthenticator extends Property
 
 	private ?string $verify = null;
 	public static bool $requestSecret = false;
-	public ?DateTimeInterface $expiresAt = null;
+	/**
+	 * Set for temporary secrets only, by the server (see expireAt()). Not writable through the API, because an expiry date
+	 * disables the authenticator.
+	 */
+	protected ?DateTimeInterface $expiresAt = null;
 
 	protected int $codeLength = 6;
 
@@ -92,13 +96,14 @@ class OtpAuthenticator extends Property
 			}
 		}
 
-		// Temporary secrets need not be validated against currently verified password
-		if (!empty($this->expiresAt)) {
+		// New temporary secrets (e.g. from LDAP) need not be validated against currently verified password
+		if ($this->isNew() && !empty($this->expiresAt)) {
 			parent::internalValidate();
 			return;
 		}
 
-		if ($this->isModified("secret")) {
+		// An expiry date disables the authenticator, so changing it needs the password just like changing the secret
+		if ($this->isModified("secret") || (!$this->isNew() && $this->isModified("expiresAt"))) {
 			if ((!go()->getAuthState() || !go()->getAuthState()->isAdmin()) && !$this->owner->isPasswordVerified()) {
 				$this->owner->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
 				throw new Forbidden();
@@ -163,6 +168,27 @@ class OtpAuthenticator extends Property
 	public function getIsEnabled(): bool
 	{
 		return $this->verified;
+	}
+
+	/**
+	 * Get the expiry date of a temporary secret
+	 *
+	 * @return DateTimeInterface|null null when the secret doesn't expire
+	 */
+	public function getExpiresAt(): ?DateTimeInterface
+	{
+		return $this->expiresAt;
+	}
+
+	/**
+	 * Make this a temporary secret that expires at the given date. For server side use only, e.g. LDAP.
+	 *
+	 * @param DateTimeInterface $expiresAt
+	 * @return void
+	 */
+	public function expireAt(DateTimeInterface $expiresAt): void
+	{
+		$this->expiresAt = $expiresAt;
 	}
 
 	/**
