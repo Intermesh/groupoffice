@@ -312,6 +312,9 @@ class SymlinkEscapeTest extends TestCase
 
 		// The outside file is writable, but its folder isn't
 		chmod($this->outside, 0555);
+		if (!is_dir(\GO::config()->tmpdir)) {
+			mkdir(\GO::config()->tmpdir, 0777, true);
+		}
 		file_put_contents(\GO::config()->tmpdir . 'attachment.txt', 'attacker content');
 
 		try {
