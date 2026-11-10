@@ -1,0 +1,556 @@
+# Group-Office specific Semgrep rules.
+#
+# These cover bug classes that were fixed in Group-Office before (see the "Security:" lines in CHANGELOG.md),
+# so they don't come back. Run them with scripts/semgrep.sh or:
+#
+#   semgrep scan --config scripts/semgrep/groupoffice.yml www
+#
+# When a finding has been checked and is safe, mark it with a "// nosemgrep: <rule-id>" comment on that line and
+# say why.
+
+rules:
+
+  # ---------------------------------------------------------------------------------------------------------------
+  # Client IP address
+  # ---------------------------------------------------------------------------------------------------------------
+
+  - id: go-client-ip-from-forwarded-header
+    languages: [php]
+    severity: ERROR
+    message: >-
+      X-Forwarded-For, X-Real-IP and Client-IP are set by the client and can be spoofed. Use
+      go()->getRequest()->getRemoteIpAddress(), which only trusts these headers from the configured
+      "trustedProxies".
+    metadata:
+      category: security
+      cwe: "CWE-348: Use of Less Trusted Source"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+    patterns:
+      - pattern-either:
+          - pattern: $_SERVER[$H]
+          - pattern: getenv($H)
+          - pattern: $R->getHeader($H)
+      - metavariable-regex:
+          metavariable: $H
+          regex: (?i)^["'](HTTP_)?(X[-_]FORWARDED[-_]FOR|X[-_]REAL[-_]IP|CLIENT[-_]IP|FORWARDED)["']$
+      - pattern-not-inside: |
+          function getRemoteIpAddress(...) { ... }
+
+  - id: go-client-ip-from-remote-addr
+    languages: [php]
+    severity: WARNING
+    message: >-
+      Use go()->getRequest()->getRemoteIpAddress() for the client IP. $_SERVER['REMOTE_ADDR'] is the address of the
+      proxy when Group-Office runs behind one.
+    metadata:
+      category: security
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+    patterns:
+      - pattern: $_SERVER['REMOTE_ADDR']
+      - pattern-not-inside: |
+          function getRemoteIpAddress(...) { ... }
+
+  # ---------------------------------------------------------------------------------------------------------------
+  # Code execution
+  # ---------------------------------------------------------------------------------------------------------------
+
+  - id: go-eval
+    languages: [php]
+    severity: ERROR
+    message: >-
+      eval() runs its argument as PHP code. Group-Office ran site content and file contents as code before. Don't use
+      eval(); parse the input or call a fixed function instead.
+    metadata:
+      category: security
+      cwe: "CWE-95: Eval Injection"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+        # Known legacy formats that are evaluated on purpose. Only admins define them.
+        - "go/base/data/Column.php"
+        - "go/base/controller/AbstractJsonController.php"
+        - "go/base/controller/AbstractModelController.php"
+        - "go/core/customfield/FunctionField.php"
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: create_function(...)
+
+  - id: go-include-from-data-folder
+    languages: [php]
+    severity: ERROR
+    mode: taint
+    message: >-
+      A PHP file in the data folder (file_storage_path or tmpdir) is included. Users can write files there, for
+      example through the files module or WebDAV, so this can run their code on the server.
+    metadata:
+      category: security
+      cwe: "CWE-98: PHP Remote File Inclusion"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+    pattern-sources:
+      - pattern: go()->getDataFolder()
+      - pattern: go()->getTmpFolder()
+      - pattern: $C->file_storage_path
+      - pattern: $C->tmpdir
+      - pattern: $C['file_storage_path']
+      - pattern: $C['tmpdir']
+      - pattern: \GO::config()->getTempFolder(...)
+    pattern-sinks:
+      - pattern: include $X
+      - pattern: include_once $X
+      - pattern: require $X
+      - pattern: require_once $X
+
+  - id: go-unserialize-objects
+    languages: [php]
+    severity: WARNING
+    message: >-
+      unserialize() can create objects of any class, which can lead to code execution when the data comes from users.
+      Use json_decode() or pass ['allowed_classes' => false].
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+        # Cache files are written by Group-Office itself and contain ORM objects.
+        - "go/core/cache/Disk.php"
+    patterns:
+      - pattern: unserialize(...)
+      - pattern-not: "unserialize($X, ['allowed_classes' => false])"
+      - pattern-not: "unserialize($X, array('allowed_classes' => false))"
+
+  # ---------------------------------------------------------------------------------------------------------------
+  # Client input reaching dangerous places
+  #
+  # Sources are request data: superglobals, the Request object and the $params argument of (JMAP and legacy)
+  # controller methods.
+  # ---------------------------------------------------------------------------------------------------------------
+
+  - id: go-sql-from-request
+    languages: [php]
+    severity: ERROR
+    mode: taint
+    message: >-
+      Client input is put in an SQL string. Pass values as parameters instead: where('column', '=', $value) or
+      where(['column' => $value]). Column names from the client must be checked against a fixed list.
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+        # Only run from the command line. The JMAP router refuses controllers in a "cli" namespace.
+        - "**/cli/**"
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+      - pattern: $_FILES
+      - pattern: $R->getQueryParams()
+      - pattern: $R->getQueryParam(...)
+      - pattern: $R->getBody()
+      - pattern: $R->getRawBody()
+      - pattern: file_get_contents('php://input')
+      - patterns:
+          - pattern-inside: |
+              class $CTRL extends $BASE { ... }
+          - metavariable-regex:
+              metavariable: $BASE
+              regex: Controller$
+          - pattern-inside: |
+              function $F(..., $params, ...) { ... }
+          - pattern: $params
+    pattern-sanitizers:
+      - pattern: (int) $X
+      - pattern: (float) $X
+      - pattern: (bool) $X
+      - pattern: intval(...)
+      - pattern: floatval(...)
+      - pattern: $DB->quote(...)
+      - pattern: count(...)
+      - pattern: isset(...)
+      - pattern: empty(...)
+      # Records looked up in the database, such as EntityType::findByName($params['entity']).
+      - patterns:
+          - pattern: $C::$FIND(...)
+          - metavariable-regex:
+              metavariable: $FIND
+              regex: ^find
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $Q->where($SQL, ...)
+              - pattern: $Q->andWhere($SQL, ...)
+              - pattern: $Q->orWhere($SQL, ...)
+              - pattern: $Q->having($SQL, ...)
+              - pattern: $Q->select($SQL, ...)
+              - pattern: $Q->join($T, $A, $SQL, ...)
+              - pattern: $Q->addRawCondition($SQL, ...)
+              - pattern: $DB->query($SQL)
+              - pattern: $DB->exec($SQL)
+              - pattern: $DB->prepare($SQL, ...)
+          # Arrays are column => value pairs and the values are bound as parameters.
+          - pattern-not: $Q->$M([...], ...)
+          - focus-metavariable: $SQL
+
+  - id: go-class-from-request
+    languages: [php]
+    severity: ERROR
+    mode: taint
+    message: >-
+      A class, function or method name from the client is called or instantiated. Group-Office ran constructors and
+      classes that were not API controllers or exports this way before. Check the name against a fixed list, or with
+      is_a($name, Expected::class, true) and throw when it doesn't match.
+    metadata:
+      category: security
+      cwe: "CWE-470: Unsafe Reflection"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+        # Only run from the command line. The JMAP router refuses controllers in a "cli" namespace.
+        - "**/cli/**"
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+      - pattern: $_FILES
+      - pattern: $R->getQueryParams()
+      - pattern: $R->getQueryParam(...)
+      - pattern: $R->getBody()
+      - pattern: $R->getRawBody()
+      - pattern: file_get_contents('php://input')
+      - patterns:
+          - pattern-inside: |
+              class $CTRL extends $BASE { ... }
+          - metavariable-regex:
+              metavariable: $BASE
+              regex: Controller$
+          - pattern-inside: |
+              function $F(..., $params, ...) { ... }
+          - pattern: $params
+    pattern-sanitizers:
+      # Records looked up in the database, such as EntityType::findByName($params['entity']), are known classes.
+      - patterns:
+          - pattern: $C::$FIND(...)
+          - metavariable-regex:
+              metavariable: $FIND
+              regex: ^find
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: new $NAME(...)
+              - pattern: $NAME(...)
+              - pattern: new \ReflectionClass($NAME)
+              - pattern: new \ReflectionMethod($NAME, ...)
+          # Only names in variables, not fixed class, function and method names.
+          - metavariable-regex:
+              metavariable: $NAME
+              regex: ^\{?\$\w+(\[[^\]]*\])*\}?$
+          - focus-metavariable: $NAME
+      - patterns:
+          - pattern-either:
+              - pattern: $NAME::$M(...)
+              - pattern: $NAME::$P
+          - metavariable-regex:
+              metavariable: $NAME
+              regex: ^\{?\$\w+(\[[^\]]*\])*\}?$
+          # Semgrep matches "$obj->method()" with "::" patterns too. Calls on objects are fine.
+          - pattern-not-regex: \$\w+(\[[^\]]*\])*\s*->
+          - focus-metavariable: $NAME
+      # Method name in a variable: $obj->$method(). focus-metavariable doesn't work on the method name position.
+      - patterns:
+          - pattern-inside: $O->$NAME(...)
+          - pattern: $NAME
+          - metavariable-regex:
+              metavariable: $NAME
+              regex: ^\{?\$\w+(\[[^\]]*\])*\}?$
+      - patterns:
+          - pattern-either:
+              - pattern: call_user_func($NAME, ...)
+              - pattern: call_user_func_array($NAME, ...)
+          - focus-metavariable: $NAME
+
+  - id: go-shell-from-request
+    languages: [php]
+    severity: ERROR
+    mode: taint
+    message: >-
+      Client input is used in a shell command. Wrap every argument in escapeshellarg(), and put "--" before file names
+      so a name starting with "-" isn't read as an option.
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+        # Only run from the command line. The JMAP router refuses controllers in a "cli" namespace.
+        - "**/cli/**"
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+      - pattern: $_FILES
+      - pattern: $R->getQueryParams()
+      - pattern: $R->getQueryParam(...)
+      - pattern: $R->getBody()
+      - pattern: $R->getRawBody()
+      - pattern: file_get_contents('php://input')
+      - patterns:
+          - pattern-inside: |
+              class $CTRL extends $BASE { ... }
+          - metavariable-regex:
+              metavariable: $BASE
+              regex: Controller$
+          - pattern-inside: |
+              function $F(..., $params, ...) { ... }
+          - pattern: $params
+    pattern-sanitizers:
+      - pattern: escapeshellarg(...)
+      - pattern: escapeshellcmd(...)
+      - pattern: (int) $X
+      - pattern: intval(...)
+    pattern-sinks:
+      - pattern: exec(...)
+      - pattern: shell_exec(...)
+      - pattern: system(...)
+      - pattern: passthru(...)
+      - pattern: popen(...)
+      - pattern: proc_open(...)
+
+  - id: go-path-from-request
+    languages: [php]
+    severity: WARNING
+    mode: taint
+    message: >-
+      Client input is used in a file system path. A name with "../" or an absolute path can read or write files
+      outside the intended folder. Use basename() or File::stripInvalidChars() for names, and check that the
+      resulting path is inside the expected folder.
+    metadata:
+      category: security
+      cwe: "CWE-22: Path Traversal"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+        # Only run from the command line. The JMAP router refuses controllers in a "cli" namespace.
+        - "**/cli/**"
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+      - pattern: $_FILES
+      - pattern: $R->getQueryParams()
+      - pattern: $R->getQueryParam(...)
+      - pattern: $R->getBody()
+      - pattern: $R->getRawBody()
+      - pattern: file_get_contents('php://input')
+      - patterns:
+          - pattern-inside: |
+              class $CTRL extends $BASE { ... }
+          - metavariable-regex:
+              metavariable: $BASE
+              regex: Controller$
+          - pattern-inside: |
+              function $F(..., $params, ...) { ... }
+          - pattern: $params
+    pattern-sanitizers:
+      - pattern: basename(...)
+      - pattern: $F::stripInvalidChars(...)
+      # Set by PHP, not by the client.
+      - pattern: $_FILES[$A]['tmp_name']
+      - pattern: $_FILES[$A]['tmp_name'][$B]
+      - pattern: (int) $X
+      - pattern: intval(...)
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: fopen($PATH, ...)
+              - pattern: file_get_contents($PATH, ...)
+              - pattern: file_put_contents($PATH, ...)
+              - pattern: readfile($PATH, ...)
+              - pattern: unlink($PATH, ...)
+              - pattern: rename($PATH, ...)
+              - pattern: rename($S, $PATH, ...)
+              - pattern: copy($PATH, ...)
+              - pattern: copy($S, $PATH, ...)
+              - pattern: mkdir($PATH, ...)
+              - pattern: rmdir($PATH, ...)
+              - pattern: move_uploaded_file($S, $PATH)
+              - pattern: include $PATH
+              - pattern: require $PATH
+              - pattern: include_once $PATH
+              - pattern: require_once $PATH
+              - pattern: new \go\core\fs\File($PATH, ...)
+              - pattern: new \go\core\fs\Folder($PATH, ...)
+              - pattern: new \GO\Base\Fs\File($PATH, ...)
+              - pattern: new \GO\Base\Fs\Folder($PATH, ...)
+              - pattern: $DIR->getFile($PATH)
+              - pattern: $DIR->getFolder($PATH)
+          - pattern-not: file_get_contents('php://input')
+          - focus-metavariable: $PATH
+
+  - id: go-imap-command-from-request
+    languages: [php]
+    severity: ERROR
+    mode: taint
+    message: >-
+      Client input is put in an IMAP command. A CR or LF in the value starts a new command on the IMAP connection.
+      Quote the value as an IMAP string or literal and reject CR/LF.
+    metadata:
+      category: security
+      cwe: "CWE-93: CRLF Injection"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+        # Only run from the command line. The JMAP router refuses controllers in a "cli" namespace.
+        - "**/cli/**"
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+      - pattern: $_FILES
+      - pattern: $R->getQueryParams()
+      - pattern: $R->getQueryParam(...)
+      - pattern: $R->getBody()
+      - pattern: $R->getRawBody()
+      - pattern: file_get_contents('php://input')
+      - patterns:
+          - pattern-inside: |
+              class $CTRL extends $BASE { ... }
+          - metavariable-regex:
+              metavariable: $BASE
+              regex: Controller$
+          - pattern-inside: |
+              function $F(..., $params, ...) { ... }
+          - pattern: $params
+    pattern-sanitizers:
+      - pattern: (int) $X
+      - pattern: (float) $X
+      - pattern: (bool) $X
+      - pattern: intval(...)
+      - pattern: floatval(...)
+      - pattern: $DB->quote(...)
+      - pattern: count(...)
+      - pattern: isset(...)
+      - pattern: empty(...)
+    pattern-sinks:
+      - pattern: $IMAP->send_command(...)
+      - pattern: $IMAP->sendCommand(...)
+
+  # ---------------------------------------------------------------------------------------------------------------
+  # Permission checks
+  # ---------------------------------------------------------------------------------------------------------------
+
+  - id: go-exception-not-thrown
+    languages: [php]
+    severity: ERROR
+    message: >-
+      An exception is created but not thrown, so the check above it never stops anything. Add "throw".
+    metadata:
+      category: security
+      cwe: "CWE-285: Improper Authorization"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+    patterns:
+      - pattern: new $E(...);
+      - pattern-not-inside: throw $T;
+      - pattern-not-inside: return $T;
+      - pattern-not-inside: $V = $T;
+      - metavariable-regex:
+          metavariable: $E
+          regex: (Exception|Forbidden|NotFound|AccessDenied|Unauthorized|SecurityException|InvalidArguments)$
+
+  - id: go-acl-bypass-not-restored
+    languages: [php]
+    severity: ERROR
+    message: >-
+      ACL checks are switched off and not switched back on in this function, so everything that runs after it in the
+      same request skips permission checks. Store the old value and restore it, preferably in a finally block:
+      $old = GO::setIgnoreAclPermissions(true); try { ... } finally { GO::setIgnoreAclPermissions($old); }
+    metadata:
+      category: security
+      cwe: "CWE-285: Improper Authorization"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/activesync/**"
+        - "**/z-push/**"
+        - "**/Z-Push/**"
+    patterns:
+      # The class is matched with a regex: matching "GO::" by name gives different results between runs.
+      - pattern-either:
+          - pattern: $C::$ignoreAclPermissions = true;
+          - pattern: $C::setIgnoreAclPermissions();
+          - pattern: $C::setIgnoreAclPermissions(true);
+          - pattern: $OLD = $C::setIgnoreAclPermissions();
+          - pattern: $OLD = $C::setIgnoreAclPermissions(true);
+      - metavariable-regex:
+          metavariable: $C
+          regex: ^\\?GO$
+      - pattern-not-inside: |
+          $C::$ignoreAclPermissions = true;
+          ...
+          $C::$ignoreAclPermissions = $RESTORE;
+      - pattern-not-inside: |
+          $OLD = $C::setIgnoreAclPermissions(...);
+          ...
+          $C::setIgnoreAclPermissions($OLD);
+      # The setter itself.
+      - pattern-not-inside: |
+          function setIgnoreAclPermissions(...) { ... }

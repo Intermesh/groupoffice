@@ -29,6 +29,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController {
 
 		if (isset($_FILES['attachments']['tmp_name'][0]) && is_uploaded_file($_FILES['attachments']['tmp_name'][0])) {
 			$file = new \GO\Base\Fs\File($_FILES['attachments']['tmp_name'][0]);
+			// Only used to get the extension of the uploaded file name, the file isn't accessed
+			// nosemgrep: go-path-from-request
 			$fileWithName = new \GO\Base\Fs\File($_FILES['attachments']['name'][0]);
 			$model->content = $file->contents();
 			$model->extension = $fileWithName->extension();

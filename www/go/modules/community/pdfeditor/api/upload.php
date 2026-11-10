@@ -33,6 +33,8 @@ try {
 		throw new \GO\Base\Exception\NotFound("File not found with ID: " . $fileId);
 	}
 
+	// tmp_name is set by PHP, not by the client
+	// nosemgrep: go-path-from-request
 	$uploadedFile = new \GO\Base\Fs\File($pdf['tmp_name']);
 
 	if (!$existingFile->replace($uploadedFile, true)) {

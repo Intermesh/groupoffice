@@ -123,6 +123,8 @@ class auth_plugin_authgroupoffice extends DokuWiki_Auth_Plugin
 								}
 
                 if (file_exists($fname)) {
+                    // $fname is checked to be inside the session save path above
+                    // nosemgrep: go-path-from-request
                     $data = file_get_contents($fname);
                     $data = $this->_unserializesession($data);
 

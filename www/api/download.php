@@ -114,6 +114,8 @@ try {
 			exit();
 		}
 
+		// package and module are checked to be identifiers above, so this can only be a module class
+		// nosemgrep: go-class-from-request
 		$c = $ctrlCls::get();
 	}
 
@@ -125,7 +127,7 @@ try {
 		Response::get()->sendHeaders();
 	}
 
-	// nosemgrep: tainted-callable
+	// nosemgrep: tainted-callable, go-class-from-request
 	call_user_func_array([$c, $method], $parts);
 } catch(Exception $e) {
 	//require(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/themes/Paper/pageHeader.php');

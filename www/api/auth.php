@@ -313,9 +313,13 @@ try {
 			foreach ($testedAuthenticators as $authenticator) {
 				$errors = $authenticator->getValidationErrors();
 				if (!empty($errors)) {
+					// $authenticator is an authenticator object, not a class name from the client
+					// nosemgrep: go-class-from-request
 					$validationErrors[$authenticator::id()] = $errors;
+				// nosemgrep: go-class-from-request
 				} else if (in_array($authenticator::id(), $authenticators)) {
 					//no validation errors set but failed. Return a default error
+					// nosemgrep: go-class-from-request
 					$validationErrors[$authenticator::id()] = [$authenticator::id() . ' ' . go()->t('failed')];
 				}
 			}
