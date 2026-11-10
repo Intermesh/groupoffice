@@ -84,20 +84,43 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController {
 		
 		$template = \GO\Files\Model\Template::model()->findByPk($params['template_id']);
 		
+		if(!$template) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
 		$folder = \GO\Files\Model\Folder::model()->findByPk($params['folder_id']);
-		
+		if(!$folder) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		if(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		$path = \GO::config()->file_storage_path.$folder->path.'/'.$filename;
 		if(!empty($template->extension))
 			$path .= '.'.$template->extension;
-		
+
 		$fsFile = new \GO\Base\Fs\File($path);
-		$fsFile->putContents($template->content);
-		
-		$fileModel = \GO\Files\Model\File::importFromFilesystem($fsFile);
-		if(!$fileModel)
-		{
-			throw new Exception("Could not create file");
+
+		// Never overwrite an existing file. Replacing would bypass the WRITE permission check on the existing file.
+		if($fsFile->exists() || $folder->hasFile($fsFile->name())) {
+			throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $fsFile->stripFileStoragePath()));
 		}
+
+		if(!\GO\Files\Model\File::checkQuota(strlen($template->content))) {
+			throw new \GO\Base\Exception\InsufficientDiskspace();
+		}
+
+		$fsFile->putContents($template->content);
+
+		try {
+			$fileModel = $folder->addFile($fsFile->name());
+		} catch(\Throwable $e) {
+			$fsFile->delete();
+			throw $e;
+		}
+
 		return array('id'=>$fileModel->id, 'success'=>true);
 	}
 
