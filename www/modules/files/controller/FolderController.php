@@ -1604,6 +1604,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$workingFolder = Folder::model()->findByPk($params['working_folder_id']);
 		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
 		$archiveFile = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$destinationFolder->path . '/' . $params['archive_name'] . '.zip');
+		$archiveFile->checkFileStoragePath();
 
 		if(!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)){
 			throw new AccessDenied();
@@ -1628,7 +1629,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			}
 
 			$path = \GO::config()->file_storage_path.$sources[$i];			
-			$sourceObjects[]=\GO\Base\Fs\Base::createFromPath($path);
+			$sourceObject = \GO\Base\Fs\Base::createFromPath($path);
+			$sourceObject->checkFileStoragePath();
+			$sourceObjects[] = $sourceObject;
 		}
 
 		if(\GO\Base\Fs\Zip::create($archiveFile, $workingFolder->fsFolder, $sourceObjects)){
@@ -1746,9 +1749,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			throw new \GO\Base\Exception\AccessDenied("No permission to write in the target folder.");
 		}
 
-		$workingPath = \GO::config()->file_storage_path.$workingFolder->path;
-		chdir($workingPath);
-
+		$workingFsFolder = $workingFolder->fsFolder;
+		$workingFsFolder->checkFileStoragePath();
 
 		if(!is_array($sources)) {
 			throw new \Exception("Invalid request");
@@ -1764,68 +1766,148 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			if(!$fileModel->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 				throw new \GO\Base\Exception\AccessDenied();
 			}
+			$fileModel->fsFile->checkFileStoragePath();
 			$files[] = $fileModel->fsFile;
 		}
 
 		foreach ($files as $file) {
-			switch(strtolower($file->extension())) {
-				case 'zip':					
-					
-					$folder = \GO\Base\Fs\Folder::tempFolder(uniqid());
-					
-					if(class_exists("\ZipArchive")){
-						$zip = new \ZipArchive;
-						$zip->open($file->path());
-						$zip->extractTo($folder->path());									
-						$this->_convertZipEncoding($folder);
-					}else
-					{
-						chdir($folder->path());					
-						$cmd = \GO::config()->cmd_unzip.' -n '.escapeshellarg($file->path());
-						exec($cmd, $output, $ret);
-						if($ret!=0)
-						{
-							throw new \Exception("Could not decompress\n".implode("\n",$output));
-						}
-					}
-					
-					$items = $folder->ls();
-					
-					foreach($items as $item){
-						$item->move(new \GO\Base\Fs\Folder($workingPath));
-					}
-					
-					$folder->delete();
-					
-					break;
-				case 'gz':
-				case 'tgz':
-					$cmd = \GO::config()->cmd_tar.' zxf '.escapeshellarg($file->path());
-					exec($cmd, $output, $ret);
-
-					if($ret!=0)
-					{
-						throw new \Exception("Could not decompress\n".implode("\n",$output));
-					}
-					break;
-
-				case 'tar':
-					$cmd = \GO::config()->cmd_tar.' xf '.escapeshellarg($file->path());
-					
-					exec($cmd, $output, $ret);
-
-					if($ret!=0)
-					{
-						throw new \Exception("Could not decompress\n".implode("\n",$output));
-					}
-					break;
+			// Extract in a staging folder so links and other special files in the archive never end up in the file storage
+			$stagingFolder = \GO\Base\Fs\Folder::tempFolder(uniqid('decompress'));
+			try {
+				$this->extractArchive($file, $stagingFolder);
+				$this->removeUnsafeItems($stagingFolder);
+				if(strtolower($file->extension()) == 'zip') {
+					$this->_convertZipEncoding($stagingFolder);
+				}
+				$this->importExtracted($stagingFolder, $workingFsFolder);
+			} finally {
+				// deleting a link removes the link only, not what it points to
+				$stagingFolder->delete();
 			}
 		}
-		
+
 		$workingFolder->syncFilesystem(true);
 
 		return array('success'=>true);
 
+	}
+
+	/**
+	 * Extract an archive into an empty folder
+	 *
+	 * @throws \Exception
+	 */
+	private function extractArchive(\GO\Base\Fs\File $file, \GO\Base\Fs\Folder $destination): void
+	{
+		switch(strtolower($file->extension())) {
+			case 'zip':
+				if(class_exists("\ZipArchive")){
+					$zip = new \ZipArchive;
+					if($zip->open($file->path()) !== true) {
+						throw new \Exception("Could not decompress");
+					}
+					$zip->extractTo($destination->path());
+					$zip->close();
+				} else {
+					$cmd = \GO::config()->cmd_unzip.' -n '.escapeshellarg($file->path()).' -d '.escapeshellarg($destination->path());
+					exec($cmd, $output, $ret);
+					if($ret!=0) {
+						throw new \Exception("Could not decompress\n".implode("\n",$output));
+					}
+				}
+				break;
+
+			case 'gz':
+			case 'tgz':
+			case 'tar':
+				$flags = strtolower($file->extension()) == 'tar' ? '' : 'z';
+
+				// Refuse archives with anything else than files and folders, like (hard) links or devices. A hard link
+				// through a link extracted earlier would share its data with a file outside the archive.
+				exec(\GO::config()->cmd_tar.' -t'.$flags.'vf '.escapeshellarg($file->path()), $output, $ret);
+				if($ret!=0) {
+					throw new \Exception("Could not decompress\n".implode("\n",$output));
+				}
+				foreach($output as $line) {
+					if($line !== '' && $line[0] !== '-' && $line[0] !== 'd') {
+						throw new \Exception(\GO::t("The archive contains links or other special files and can't be decompressed", "files"));
+					}
+				}
+
+				$output = [];
+				$cmd = \GO::config()->cmd_tar.' -x'.$flags.'f '.escapeshellarg($file->path()).' --no-same-owner --no-same-permissions -C '.escapeshellarg($destination->path());
+				exec($cmd, $output, $ret);
+				if($ret!=0) {
+					throw new \Exception("Could not decompress\n".implode("\n",$output));
+				}
+				break;
+
+			default:
+				throw new \Exception("Unsupported archive type");
+		}
+	}
+
+	/**
+	 * Remove symbolic links and everything that isn't a regular file or folder from an extracted archive
+	 *
+	 * @throws \Exception when a file has more than one hard link, because writing it would change another file too
+	 */
+	private function removeUnsafeItems(\GO\Base\Fs\Folder $folder): void
+	{
+		$dir = @opendir($folder->path());
+		if(!$dir) {
+			return;
+		}
+		while(false !== ($name = readdir($dir))) {
+			if($name === '.' || $name === '..') {
+				continue;
+			}
+			$path = $folder->path() . '/' . $name;
+			// check for links first, because is_dir() and is_file() follow them
+			if(is_link($path)) {
+				unlink($path);
+			} else if(is_dir($path)) {
+				$this->removeUnsafeItems(new \GO\Base\Fs\Folder($path));
+			} else if(!is_file($path)) {
+				unlink($path);
+			} else if(stat($path)['nlink'] > 1) {
+				closedir($dir);
+				throw new \Exception(\GO::t("The archive contains links or other special files and can't be decompressed", "files"));
+			}
+		}
+		closedir($dir);
+	}
+
+	/**
+	 * Move the extracted files and folders into the destination, merging with folders that already exist.
+	 *
+	 * Hidden files are skipped like the file storage does.
+	 *
+	 * @throws \GO\Base\Exception\AccessDenied when an existing item in the destination is a link
+	 */
+	private function importExtracted(\GO\Base\Fs\Folder $source, \GO\Base\Fs\Folder $destination): void
+	{
+		foreach($source->ls() as $item) {
+			$target = $destination->path() . '/' . $item->name();
+			if(is_link($target)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+
+			if($item->isFolder()) {
+				$targetFolder = new \GO\Base\Fs\Folder($target);
+				if(!$targetFolder->exists()) {
+					$targetFolder->create();
+				} else if(!is_dir($target)) {
+					continue;
+				}
+				$this->importExtracted($item, $targetFolder);
+			} else {
+				if(is_dir($target)) {
+					continue;
+				}
+				$item->move($destination);
+			}
+		}
 	}
 	
 	private function _convertZipEncoding(\GO\Base\Fs\Folder $folder, $charset='CP850'){

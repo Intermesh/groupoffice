@@ -379,12 +379,23 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	protected function beforeDelete()
 	{
+		// Never delete files elsewhere on the server through a link
+		if(!Folder::$deleteInDatabaseOnly) {
+			$this->fsFolder->checkFileStoragePath();
+		}
+
 		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->fsFolder->path()));
 
 		return parent::beforeDelete();
 	}
 
 	protected function beforeSave() {
+
+		// Never create, rename or move through a link to a folder elsewhere on the server
+		$this->fsFolder->checkFileStoragePath();
+		if(!$this->isNew && ($this->isModified('name') || $this->isModified('parent_id')) && $this->_getOldFsFolder()) {
+			$this->_getOldFsFolder()->checkFileStoragePath();
+		}
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
 		$this->checkNormalization();
@@ -889,6 +900,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$items = $this->fsFolder->ls();
 
 			foreach ($items as $item) {
+				// Links can point anywhere on the server, so they are never added to the file storage
+				if ($item->isLink()) {
+					\GO::debug("syncFilesystem skips symbolic link " . $item->path());
+					continue;
+				}
 				if ($item->isFile()) {
 					$file = $this->hasFile($item->name());
 					if (!$file) {
@@ -931,14 +947,14 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$stmt= $this->folders();
 		while($folder = $stmt->fetch()){
-				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile()) {
+				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile() || $folder->fsFolder->isLink()) {
 					$folder->delete(true);
 				}
 		}
 
 		$stmt= $this->files();
 		while($file = $stmt->fetch()){
-				if(!$file->fsFile->exists() || $file->fsFile->isFolder()) {
+				if(!$file->fsFile->exists() || $file->fsFile->isFolder() || $file->fsFile->isLink()) {
 					$file->delete(true);
 				}
 		}
@@ -1174,6 +1190,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @return boolean
 	 */
 	public function copy($destinationFolder, $newName=false){
+
+		$this->fsFolder->checkFileStoragePath();
 
 		if(\GO::config()->debug)
 			\GO::debug("Copy folder ".$this->path." to ".$destinationFolder->path);
@@ -1575,6 +1593,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function moveToTrash(): void
 	{
+		$this->fsFolder->checkFileStoragePath();
+
 		$trashFolder = Folder::model()->findByPath('trash');
 		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
 
