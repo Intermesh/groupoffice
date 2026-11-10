@@ -10,6 +10,7 @@ use GO\Base\Exception\AccessDenied;
 use go\core\db\DbException;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
+use go\core\fs\FileSystemObject;
 use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\model\Alert as CoreAlert;
