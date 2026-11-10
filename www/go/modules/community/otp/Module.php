@@ -85,7 +85,7 @@ class Module extends core\Module
 	public static function onUserAuthenticated(User $user): bool
 	{
 		$o = $user->otp;
-		if ($o && $o->expiresAt) {
+		if ($o && $o->getExpiresAt()) {
 			$user->otp = null;
 			$user->save();
 		}

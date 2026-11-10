@@ -135,7 +135,7 @@ class Authenticator extends PrimaryAuthenticator
 				$dt = new DateTime();
 				$dt->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
 				$dt->add(new DateInterval('PT10M'));
-				$o->expiresAt = $dt;
+				$o->expireAt($dt);
 				$o->userId = $user->id;
 				$user->otp = $o;
 			} else {
