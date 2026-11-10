@@ -1,3 +1,4 @@
+- Files: fix file upload
 09-11-2026: 25.0.116
 - Calendar: Fixed missing resource groups after migrating. Groups without admins weren't migrated
 - Email: Security: a logged-in user with read-only access to a shared email account could run any IMAP command on that account, for example to delete messages or folders, by putting a line break in the message search query. No configuration changes are needed.
