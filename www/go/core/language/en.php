@@ -419,4 +419,5 @@ If you did not request a new password please delete this mail.',
     'sql' => 'SQL database export',
     'xmind' => 'XMind file',
   ),
+  'Only administrators may add users to groups other than the default groups' => 'Only administrators may add users to groups other than the default groups',
 );

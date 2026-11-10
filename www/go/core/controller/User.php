@@ -62,7 +62,11 @@ class User extends EntityController {
 
 	protected function canCreate(Entity $entity): bool
 	{
-		return $this->rights->mayChangeUsers;
+		if(!$this->rights->mayChangeUsers) {
+			return false;
+		}
+		// User managers may not create administrators or put users in other privileged groups
+		return !($entity instanceof model\User) || $entity->currentUserMayAssignGroups();
 	}
 	
 	/**
