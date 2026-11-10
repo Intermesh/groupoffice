@@ -1803,13 +1803,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		// Check all archives first, so nothing is extracted when one of them may not be read
 		$files = [];
 		foreach($sources as $filePath) {
-			$fileModel = is_string($filePath) ? \GO\Files\Model\File::model()->findByPath($filePath) : false;
-			if(!$fileModel) {
-				throw new \GO\Base\Exception\NotFound();
-			}
-			if(!$fileModel->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
-				throw new \GO\Base\Exception\AccessDenied();
-			}
+			$fileModel = \GO\Files\Model\File::model()->findReadableByPath($filePath);
 			$fileModel->fsFile->checkFileStoragePath();
 			$files[] = $fileModel->fsFile;
 		}

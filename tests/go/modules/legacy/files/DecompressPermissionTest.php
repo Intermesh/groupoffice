@@ -5,7 +5,6 @@ namespace go\modules\legacy\files;
 use go\core\auth\TemporaryState;
 use go\core\model\User;
 use GO\Base\Exception\AccessDenied;
-use GO\Base\Exception\NotFound;
 use GO\Files\Controller\FolderController;
 use GO\Files\Model\Folder;
 use PHPUnit\Framework\TestCase;
@@ -110,11 +109,11 @@ class DecompressPermissionTest extends TestCase
 		}
 	}
 
-	public function testUnknownArchiveIsRejected(): void
+	public function testUnknownArchiveGivesSameErrorAsUnreadableArchive(): void
 	{
 		$this->actAs($this->other->id);
 
-		$this->expectException(NotFound::class);
+		$this->expectException(AccessDenied::class);
 		$this->decompress($this->otherFolder, [$this->ownerFolder->path . '/not-in-database.zip']);
 	}
 
