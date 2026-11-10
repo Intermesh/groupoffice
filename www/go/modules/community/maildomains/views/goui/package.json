@@ -8,7 +8,7 @@
     "typescript": "5.9.x"
   },
   "scripts": {
-    "start": "npm run build:clean && concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
+    "start maildomains": "npm run build:clean && concurrently --kill-others \"npm run start:esbuild\"  \"npm run start:sass\"",
     "start:esbuild": "node ../../../../../../views/goui/esbuild-module.mjs watch",
     "start:sass": "npx sass --watch style:dist",
 

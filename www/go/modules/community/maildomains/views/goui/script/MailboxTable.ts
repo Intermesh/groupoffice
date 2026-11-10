@@ -6,9 +6,6 @@ export class MailboxTable extends Table<DataSourceStore> {
 	constructor() {
 		const store = datasourcestore({
 			dataSource: jmapds("MailBox"),
-			queryParams: {
-				limit: 50
-			},
 			sort: [{property: "username", isAscending: true}]
 		});
 		const columns = [
@@ -137,5 +134,7 @@ export class MailboxTable extends Table<DataSourceStore> {
 		this.rowSelectionConfig =  {
 			multiSelect: true
 		};
+		this.scrollLoad = true;
+
 	}
 }

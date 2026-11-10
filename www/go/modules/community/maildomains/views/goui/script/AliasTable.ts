@@ -7,9 +7,6 @@ export class AliasTable extends Table<DataSourceStore> {
 	constructor() {
 		const store = datasourcestore({
 			dataSource: jmapds("MailAlias"),
-			queryParams: {
-				limit: 50
-			},
 			sort: [{property: "address", isAscending: true}]
 		});
 
@@ -104,5 +101,6 @@ export class AliasTable extends Table<DataSourceStore> {
 		this.rowSelectionConfig =  {
 			multiSelect: true
 		};
+		this.scrollLoad = true;
 	}
 }

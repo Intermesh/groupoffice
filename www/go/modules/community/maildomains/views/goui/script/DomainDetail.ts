@@ -213,7 +213,8 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 		this.mailboxTable = mailboxTable;
 
 		return comp({
-				cls: "card scroll fit"
+				cls: "card vbox",
+				style: {maxHeight: "50rem"}
 			},
 
 			tbar({cls: "border-bottom"},
@@ -256,7 +257,8 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 				)
 
 
-			), mailboxTable
+			),
+			comp({cls: "scroll", flex: 1},mailboxTable)
 		);
 
 
@@ -296,7 +298,8 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 		this.aliasTable = aliasTable;
 
 		return comp({
-				cls: "card scroll fit"
+				cls: "card vbox",
+				style: {maxHeight: "50rem"}
 			},
 			tbar({cls: "border-bottom"},
 				h3(t("Aliases")),
@@ -336,10 +339,9 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						}
 					})
 				)
+			),
 
-
-
-			), aliasTable
+			comp({cls: "scroll", flex: 1}, aliasTable)
 		);
 	}
 
