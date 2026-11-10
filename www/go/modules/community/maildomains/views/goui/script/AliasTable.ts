@@ -1,5 +1,5 @@
 import {btn, column, DataSourceStore, datasourcestore, datecolumn, hr, menu, t, Table} from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {jmapds, principalDS} from "@intermesh/groupoffice-core";
 import {AliasDialog} from "./AliasDialog";
 
 export class AliasTable extends Table<DataSourceStore> {
@@ -7,7 +7,11 @@ export class AliasTable extends Table<DataSourceStore> {
 	constructor() {
 		const store = datasourcestore({
 			dataSource: jmapds("MailAlias"),
-			sort: [{property: "address", isAscending: true}]
+			sort: [{property: "address", isAscending: true}],
+			relations: {
+				creator: {path: "createdBy", dataSource: principalDS},
+				modifier: {path: "createdBy", dataSource: principalDS}
+			}
 		});
 
 		const columns = [
@@ -45,13 +49,30 @@ export class AliasTable extends Table<DataSourceStore> {
 			datecolumn({
 				header: t("Created at"),
 				id: "createdAt",
-				width: 120
+				hidden: true,
+				sortable: true
+			}),
+
+			column({
+				header: t("Created by"),
+				id: "creator/name",
+				hidden: true,
+				sortable: true,
+				resizable: true
 			}),
 			datecolumn({
 				header: t("Modified at"),
 				id: "modifiedAt",
-				width: 120
+				hidden: true,
+				sortable: true
 			}),
+			column({
+				header: t("Modified by"),
+				id: "modifier/name",
+				hidden: true,
+				resizable: true
+			}),
+
 			column({
 				header: t("Active"),
 				id: "active",
@@ -102,5 +123,7 @@ export class AliasTable extends Table<DataSourceStore> {
 			multiSelect: true
 		};
 		this.scrollLoad = true;
+
+		this.stateId = "maildomains-alias-table";
 	}
 }
