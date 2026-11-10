@@ -603,8 +603,17 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		if(isset($params['addFileStorageFiles'])){
 			$files = json_decode($params['addFileStorageFiles'],true);
-			foreach($files as $filepath)
-				GO::session()->values['files']['uploadqueue'][]=GO::config()->file_storage_path.$filepath;
+			if(!is_array($files) || !GO::modules()->isInstalled('files')) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+			// Check all paths first so the queue is not changed when one of them may not be read
+			$paths = [];
+			foreach($files as $filepath) {
+				$paths[] = \GO\Files\Model\File::model()->findReadableByPath($filepath)->fsFile->path();
+			}
+			foreach($paths as $path) {
+				GO::session()->values['files']['uploadqueue'][] = $path;
+			}
 		}
 		
 		$response['results']=array();
