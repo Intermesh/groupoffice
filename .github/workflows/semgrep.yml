@@ -1,0 +1,25 @@
+# Runs the GroupOffice Semgrep rules (scripts/semgrep/groupoffice.yml) and their tests on every push and pull request.
+# Make "Semgrep" a required check in the branch protection settings to block merging pull requests with findings.
+name: Semgrep
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-latest
+    # Pinned to the version the rules were tested with
+    container: semgrep/semgrep:1.184.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test the rules
+        run: semgrep --test --metrics=off scripts/semgrep
+
+      # One job: with parallel jobs Semgrep 1.157 missed some go-acl-bypass-not-restored findings at random. 1.184 looks
+      # fixed, but one job only takes about 15 seconds.
+      - name: Scan
+        run: semgrep scan -j 1 --error --metrics=off --config scripts/semgrep/groupoffice.yml www
