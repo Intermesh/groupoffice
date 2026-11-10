@@ -550,20 +550,7 @@ class ICalendarHelper {
 				if(!empty($names))
 					$event->categoryIdsByName($names);
 			}
-			if(isset($vevent->VALARM)) {
-				$event->alerts = [];
-				foreach ($vevent->VALARM as $valarm) {
-					$a = (new Alert($event))->setValues([
-						'action' => (string)$valarm->ACTION,
-						'trigger' => ('DATE-TIME' === (string) $valarm->TRIGGER['VALUE']) ?
-							['when' => $valarm->TRIGGER->getDateTime()] : // non-relative trigger
-							['offset' => (string)$valarm->TRIGGER, 'relativeTo' => 'start']
-					]);
-					if(isset($valarm->ACKNOWLEDGED))
-						$a->acknowledged = $valarm->ACKNOWLEDGED->getDateTime();
-					$event->alerts[] = $a;
-				}
-			}
+			self::parseAlerts($vevent, $event);
 		}
 		//Attach exceptions found in VCALENDAR
 		foreach($exceptions as $props) {
@@ -602,6 +589,45 @@ class ICalendarHelper {
 		}
 
 		return $blob;
+	}
+
+	/**
+	 * Replace the alerts of the event with the VALARM components of the VEVENT. Alerts are per user. When the VEVENT has
+	 * no VALARM, the alerts are left as they are.
+	 *
+	 * @param VEvent $vevent
+	 * @param CalendarEvent $event
+	 */
+	static function parseAlerts(VEvent $vevent, CalendarEvent $event): void
+	{
+		if(!isset($vevent->VALARM)) {
+			return;
+		}
+		$event->alerts = [];
+		foreach ($vevent->VALARM as $valarm) {
+			$a = (new Alert($event))->setValues([
+				'action' => (string)$valarm->ACTION,
+				'trigger' => ('DATE-TIME' === (string) $valarm->TRIGGER['VALUE']) ?
+					['when' => $valarm->TRIGGER->getDateTime()] : // non-relative trigger
+					['offset' => (string)$valarm->TRIGGER, 'relativeTo' => 'start']
+			]);
+			if(isset($valarm->ACKNOWLEDGED))
+				$a->acknowledged = $valarm->ACKNOWLEDGED->getDateTime();
+			$event->alerts[] = $a;
+		}
+	}
+
+	/**
+	 * The free / busy status from the TRANSP property of a VEVENT. Busy when it's not transparent.
+	 *
+	 * @param VEvent $vevent
+	 * @return string
+	 */
+	static function parseFreeBusyStatus(VEvent $vevent): string
+	{
+		$transp = $vevent->select('TRANSP');
+		return !empty($transp) && strtoupper((string)$transp[0]) === 'TRANSPARENT' ?
+			CalendarEvent::FREEBUSY_FREE : CalendarEvent::FREEBUSY_BUSY;
 	}
 
 	static private function parseAttendee($vattendee) {
@@ -662,8 +688,7 @@ class ICalendarHelper {
 		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
 		if(!empty($vevent->COLOR)) $props->color = (string)$vevent->COLOR;
 		if(isset($vevent->TRANSP)) {
-			$props->freeBusyStatus = strtoupper((string)$vevent->TRANSP) === 'TRANSPARENT' ?
-				CalendarEvent::FREEBUSY_FREE : CalendarEvent::FREEBUSY_BUSY;
+			$props->freeBusyStatus = self::parseFreeBusyStatus($vevent);
 		}
 		if(!empty($vevent->DURATION)) {
 			$props->duration = (string)$vevent->DURATION;

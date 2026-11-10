@@ -213,7 +213,8 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 		this.mailboxTable = mailboxTable;
 
 		return comp({
-				cls: "card scroll fit"
+				cls: "card vbox",
+				style: {maxHeight: "50rem"}
 			},
 
 			tbar({cls: "border-bottom"},
@@ -235,6 +236,11 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 						await this.openMailboxDlg();
 					}
 				}),
+				mailboxTable.getVisibleColumnButton({
+					text: "",
+					title: t("View columns")
+				}),
+
 
 				mstbar({table: mailboxTable},
 					"->",
@@ -256,7 +262,8 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 				)
 
 
-			), mailboxTable
+			),
+			comp({cls: "scroll", flex: 1},mailboxTable)
 		);
 
 
@@ -296,7 +303,8 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 		this.aliasTable = aliasTable;
 
 		return comp({
-				cls: "card scroll fit"
+				cls: "card vbox",
+				style: {maxHeight: "50rem"}
 			},
 			tbar({cls: "border-bottom"},
 				h3(t("Aliases")),
@@ -318,28 +326,32 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 					}
 				}),
 
-				mstbar({table: aliasTable},
-					"->",
-					btn({
-						icon: "delete",
-						handler: async (btn) => {
+				aliasTable.getVisibleColumnButton({
+					text: "",
+					title: t("View columns")
+				}),
 
-							const ids = aliasTable.rowSelection!.getSelected().map(row => row.record.id);
+						mstbar({table: aliasTable},
+							"->",
+							btn({
+								icon: "delete",
+								handler: async (btn) => {
 
-							const result = await jmapds("Alias")
-								.confirmDestroy(ids);
+									const ids = aliasTable.rowSelection!.getSelected().map(row => row.record.id);
 
-							if(result != false) {
-								btn.parent!.hide();
-							}
+									const result = await jmapds("Alias")
+										.confirmDestroy(ids);
 
-						}
-					})
-				)
+									if(result != false) {
+										btn.parent!.hide();
+									}
 
+								}
+							})
+						)
+					),
 
-
-			), aliasTable
+			comp({cls: "scroll", flex: 1}, aliasTable)
 		);
 	}
 

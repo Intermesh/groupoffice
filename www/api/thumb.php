@@ -61,6 +61,8 @@ if ($zc) {
 	$cacheFilename .= '_zc';
 }
 
+// The name is built from the blob ID and integer sizes
+// nosemgrep: go-path-from-request
 $cacheFile = $cacheDir->getFile($cacheFilename);
 
 if ($cacheFile->exists()) {

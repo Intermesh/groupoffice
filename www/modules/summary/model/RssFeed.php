@@ -42,6 +42,7 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 	{
 		$client = new Client();
 		$client->globalRangeOnly = true;
+		$client->maxResponseSize = 10 * 1024 * 1024;
 		$response = $client->get($this->url);
 
 		if (!$response['body'] || !self::isRSS($response['body'])) {

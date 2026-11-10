@@ -443,7 +443,7 @@ class Scheduler {
 		if(!empty($eventCalendars['eventId'])) {
 			// add it to the current receivers personal calendar
 			go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
-				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
+				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId'], 'uri' => CalendarEvent::defaultUri($uid)]
 			])->execute();
 			// if added then
 			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());

@@ -11,3 +11,6 @@ $updates['202403281030'][] = function() {
 
 
 $updates['202510171328'][] = "UPDATE community_maildomains_mailbox SET maildir = SUBSTRING(maildir, 1, LENGTH(maildir) - 1), homedir = SUBSTRING(homedir, 1, LENGTH(homedir) - 1)";
+
+
+$updates['202611101507'][] = "update community_maildomains_alias set active=1 where active >1;";

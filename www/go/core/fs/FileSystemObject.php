@@ -284,6 +284,19 @@ abstract class FileSystemObject {
 	}
 
 	/**
+	 * Check if a string is a single file or folder name that is safe to append to a directory path.
+	 *
+	 * Rejects empty names, "." and "..", and names containing "/" or a NUL byte, because
+	 * those would point outside the directory. Other characters are allowed so existing names keep working.
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function isValidName(string $name) : bool {
+		return $name !== '' && $name !== '.' && $name !== '..' && strpbrk($name, "/\0") === false;
+	}
+
+	/**
 	 * Check if this folder is a symbolic link
 	 *
 	 * @return bool Returns the canonicalized absolute pathname on success. The resulting path will have no symbolic link, /./ or /../ components. Trailing delimiters, such as \ and /, are also removed.
@@ -354,6 +367,47 @@ abstract class FileSystemObject {
 		return strpos($this->getPath(), $parent->getPath() . '/') === 0;
 	}
 	
+	/**
+	 * Check if this file or folder is inside the given folder and no part of its path below that folder is a symbolic link.
+	 *
+	 * The given folder itself may be a link. Parts of the path that don't exist yet are fine, so it can be used before
+	 * creating a file. Use it before reading, writing or deleting a path that must stay inside the folder, because a
+	 * link can point anywhere on the server.
+	 *
+	 * @param Folder $root
+	 * @return bool
+	 */
+	public function isInsideWithoutLinks(Folder $root): bool
+	{
+		$rootPath = rtrim($root->getPath(), '/');
+		$path = $this->getPath();
+		if (strpos($path, $rootPath . '/') !== 0) {
+			return false;
+		}
+
+		// is_link() results are cached and links may just have been created
+		clearstatcache();
+
+		$current = $rootPath;
+		foreach (explode('/', substr($path, strlen($rootPath) + 1)) as $part) {
+			if ($part === '') {
+				continue;
+			}
+			if ($part === '.' || $part === '..') {
+				return false;
+			}
+			$current .= '/' . $part;
+			if (is_link($current)) {
+				return false;
+			}
+			if (!file_exists($current)) {
+				// nothing below this exists, so it can't contain links either
+				return true;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * Check if this is in the temp folder
 	 * 

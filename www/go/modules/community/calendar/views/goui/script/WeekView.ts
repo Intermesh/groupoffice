@@ -365,10 +365,30 @@ export class WeekView extends CalendarView {
 	}
 
 	/**
-	 * Never ever touch this function. You have been warned.
+	 * Must match the min-height of `dl dd > div` in style.scss (dp(24) = 2.4rem)
+	 */
+	private readonly MIN_EVENT_HEIGHT_REM = 2.4;
+
+	/**
+	 * The number of minutes the minimum event height covers at the current grid size (zoom)
+	 */
+	private minEventMinutes(): number {
+		const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16,
+			hourPx = window.innerHeight * (client.user.calendarPreferences.weekViewGridSize ?? 8) / 100;
+		if(!hourPx) {
+			return 0;
+		}
+		return Math.ceil(this.MIN_EVENT_HEIGHT_REM * remPx / (hourPx / 60));
+	}
+
+	/**
+	 * Calculates how overlapping events must be drawn.
+	 * Short events are drawn with a minimum height, so collisions are checked on the drawn end instead of the real end.
 	 */
 	protected calculateOverlap(events: CalendarDayItem[], dayStart: DateTime) {
 		//events.sort((a,b) => Math.sign(+a.start.date - +b.start.date));
+		const minMinutes = this.minEventMinutes(),
+			visEnd = (e: CalendarDayItem) => Math.max(e.endM, e.startM + minMinutes);
 		let highestEnd = 0,
 			blockStart = 0,
 			blockLanes = 1;
@@ -377,13 +397,14 @@ export class WeekView extends CalendarView {
 			a.startM =  a.start.format('Ymd') < dayStart.format('Ymd') ? 0 : a.start.getMinuteOfDay();
 			a.endM = a.end.format('Ymd') > dayStart.format('Ymd') ? 1440 : a.end.getMinuteOfDay();
 			a.pos = 0;
+			const aEnd = visEnd(a);
 			if(a.startM >= highestEnd) { // end collision block
 				blockStart = i
 				blockLanes = 1;
 			}
 			for(let j = blockStart; j < i; j++) {
 				const b = events[j]; // already positioned item
-				if(a.endM > b.startM && a.startM < b.endM && a.pos === b.pos) { // collides
+				if(aEnd > b.startM && a.startM < visEnd(b) && a.pos === b.pos) { // collides
 					a.pos++;
 					blockLanes = Math.max(blockLanes, a.pos+1);
 					j = blockStart-1; // restart from blockstart
@@ -391,7 +412,7 @@ export class WeekView extends CalendarView {
 				b.lanes = blockLanes;
 			}
 			a.lanes = blockLanes;
-			highestEnd = Math.max(highestEnd,a.endM);
+			highestEnd = Math.max(highestEnd, aEnd);
 		}
 	}
 

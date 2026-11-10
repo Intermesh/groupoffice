@@ -149,16 +149,11 @@ class AccountController extends \GO\Site\Components\Controller {
 		if(!$user)
 			throw new \Exception(\GO::t("No user found with the given email address!", "site"));
 
-		if(isset($_GET['usertoken']) && $_GET['usertoken'] == $user->getSecurityToken())
+		if($this->isValidResetToken($user, $_GET['usertoken'] ?? null))
 		{
 			if (\GO\Base\Util\Http::isPostRequest())
 			{
-				$user->password = $_POST['User']['password'];
-				$user->passwordConfirm = $_POST['User']['passwordConfirm'];
-
-				\GO::$ignoreAclPermissions = true; 
-				
-				if($user->validate() && $user->save())
+				if($this->saveResetPassword($user, $_POST['User']['password'], $_POST['User']['passwordConfirm']))
 					\Site::notifier()->setMessage('success',\GO::t("Your password is successfully reset.", "site"));
 			}
 		}
@@ -171,6 +166,40 @@ class AccountController extends \GO\Site\Components\Controller {
 		echo $this->render('resetPassword', array('user'=>$user));
 	}
 	
+	/**
+	 * Check the token from the password reset mail
+	 *
+	 * Compared in constant time and as strings: with "==" PHP compares numeric looking strings such as "0e123" as numbers.
+	 */
+	private function isValidResetToken(\GO\Base\Model\User $user, mixed $token): bool
+	{
+		return is_string($token) && hash_equals($user->getSecurityToken(), $token);
+	}
+
+	/**
+	 * Save the new password of a user who has a valid reset token
+	 *
+	 * The visitor is a guest who may not save users, so ACL checks are switched off for this save only.
+	 */
+	private function saveResetPassword(\GO\Base\Model\User $user, $password, $passwordConfirm): bool
+	{
+		// The legacy user model doesn't compare these since the password moved to the new framework
+		if(!is_string($password) || $password !== $passwordConfirm) {
+			$user->setValidationError('passwordConfirm', \GO::t("The passwords didn't match"));
+			return false;
+		}
+
+		$user->password = $password;
+		$user->passwordConfirm = $passwordConfirm;
+
+		$oldIgnore = \GO::setIgnoreAclPermissions();
+		try {
+			return $user->validate() && $user->save();
+		} finally {
+			\GO::setIgnoreAclPermissions($oldIgnore);
+		}
+	}
+
 	public function actionResetExpiredPassword($params){
 		
 		$user = \GO\Base\Model\User::model()->findSingleByAttribute('username',$params['username']);

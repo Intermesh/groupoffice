@@ -63,6 +63,66 @@ class SavedMessage extends ComposerMessage
 	}
 
 	/**
+	 * Reads a MIME file that the client asked for and creates a SavedMessage model from it.
+	 *
+	 * A file in the file storage must be either a file in the files module or a linked e-mail (savemailas module, stored
+	 * in file_storage_path/email) that the current user may read. A temporary file is always in the current user's own
+	 * temporary folder, because \GO::config()->tmpdir is that folder.
+	 *
+	 * Use {@see createFromMimeFile()} for paths that don't come from the client.
+	 *
+	 * @param mixed $path Relative path from file_storage_path or tmpdir where the MIME file is stored
+	 * @param bool $isTempFile Indicates if path it relative from tmpdir or file_storage_path
+	 * @param bool $preserveHtmlStyle
+	 * @return SavedMessage|null
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function createFromReadableMimeFile($path, bool $isTempFile = false, bool $preserveHtmlStyle = true): ?SavedMessage
+	{
+		if(!is_string($path) || $path === '') {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		if(!$isTempFile) {
+			$path = $this->findReadableMimeFilePath($path);
+			(new \GO\Base\Fs\File(\GO::config()->file_storage_path . $path))->checkFileStoragePath();
+		}
+
+		return $this->createFromMimeFile($path, $isTempFile, $preserveHtmlStyle);
+	}
+
+	/**
+	 * Get the path of a MIME file in the file storage that the current user may read
+	 *
+	 * @param string $path Relative path from file_storage_path
+	 * @return string The path of the file or linked e-mail, relative from file_storage_path
+	 * @throws \GO\Base\Exception\AccessDenied Also when the file doesn't exist, so it can't be used to find files
+	 */
+	private function findReadableMimeFilePath(string $path): string
+	{
+		if(\GO::modules()->isInstalled('files')) {
+			try {
+				return \GO\Files\Model\File::model()->findReadableByPath($path)->path;
+			} catch(\GO\Base\Exception\AccessDenied $e) {
+				// may be a linked e-mail
+			}
+		}
+
+		// The same message can be linked more than once with different permissions. findByAttribute() ignores them, so
+		// check every link.
+		if(\GO::modules()->isInstalled('savemailas')) {
+			$linkedEmails = \GO\Savemailas\Model\LinkedEmail::model()->findByAttribute('path', $path);
+			foreach($linkedEmails as $linkedEmail) {
+				if($linkedEmail->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+					return $linkedEmail->path;
+				}
+			}
+		}
+
+		throw new \GO\Base\Exception\AccessDenied();
+	}
+
+	/**
 	 * Reads MIME data and creates a SavedMessage model from it.
 	 * @param string $mimeData The MIME data string.
 	 * @param bool $preserveHtmlStyle

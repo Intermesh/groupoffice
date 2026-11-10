@@ -204,6 +204,8 @@ try {
 				if ($token && $token->isAuthenticated()) {
 					$auth->assertUserIdMayLogin($token->userId);
 					$token->refresh();
+				} else {
+					$token = null;
 				}
 			} else if(isset($data['rememberMeToken'])) {
 				// Process remember me persistent cookie. This is not used by the browser. The browser verifies the remember me token in index.php with a cookie.
@@ -311,9 +313,13 @@ try {
 			foreach ($testedAuthenticators as $authenticator) {
 				$errors = $authenticator->getValidationErrors();
 				if (!empty($errors)) {
+					// $authenticator is an authenticator object, not a class name from the client
+					// nosemgrep: go-class-from-request
 					$validationErrors[$authenticator::id()] = $errors;
+				// nosemgrep: go-class-from-request
 				} else if (in_array($authenticator::id(), $authenticators)) {
 					//no validation errors set but failed. Return a default error
+					// nosemgrep: go-class-from-request
 					$validationErrors[$authenticator::id()] = [$authenticator::id() . ' ' . go()->t('failed')];
 				}
 			}

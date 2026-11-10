@@ -12,6 +12,7 @@
 #   --branch      Branch of groupoffice, promodules and business to build. (default: develop)
 #   --test        Run tests and build the packages, but don't publish anything.
 #   --skip-tests  Skip the unit tests. Only for emergencies.
+#   --skip-docker Skip building of docker images (own laptops are way faster)
 #
 # Requirements on the build server:
 #   git, composer (any PHP version, platform requirements are ignored), npm, debuild, reprepro, gpg, gh (logged in with
@@ -58,6 +59,7 @@ fi
 
 TEST=false
 SKIP_TESTS=false
+SKIP_DOCKER=false
 
 for arg in "$@"; do
 	case "$arg" in
@@ -65,6 +67,7 @@ for arg in "$@"; do
 		--branch=*) BRANCH="${arg#*=}" ;;
 		--test) TEST=true ;;
 		--skip-tests) SKIP_TESTS=true ;;
+    --skip-docker) SKIP_DOCKER=true ;;
 		*) echo "Unknown argument: $arg" >&2; exit 1 ;;
 	esac
 done
@@ -508,6 +511,8 @@ fi
 github_release
 add_to_debian_repository
 send_tar_to_sourceforge
-push_docker_image
+if [[ "$SKIP_DOCKER" == false ]]; then
+  push_docker_image
+fi
 
 log "Released GroupOffice $VERSION"

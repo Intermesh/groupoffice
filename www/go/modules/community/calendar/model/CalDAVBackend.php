@@ -7,9 +7,11 @@ use go\core\auth\TemporaryState;
 use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\model\Acl;
+use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
+use go\core\util\DateTime;
 use go\modules\community\tasks\convert\VCalendar;
 use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\TaskList;
@@ -42,17 +44,30 @@ class CalDAVBackend extends AbstractBackend implements
 
 		$username = basename($principalUri);
 		$u = User::find(['id', 'calendarPreferences'])->where(['username'=>$username])->single();
+		if(!$u) {
+			throw new DAV\Exception\NotFound("Principal $principalUri not found");
+		}
 
 		// We want to sort the personal calendar on top for caldav scheduling as it takes the first one for invites
 		// See schedule-default-calendar-URL handling in  Sabre\CalDAV\Schedule\Plugin line 222
-		$personalCalendarId = $u->calendarPreferences->personalCalendarId;
+		$personalCalendarId = $u->calendarPreferences->personalCalendarId ?? null;
 
+		// The calendars of the principal, not of the logged in user
 		$calendars = Calendar::findFor($u->id)
-			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null])
-			->filter(['permissionLevel' => Acl::LEVEL_READ]);
+			->where(['isSubscribed'=>1,'syncToDevice'=>1, 'groupId'=>null]);
+		Calendar::applyAclToQuery($calendars, Acl::LEVEL_READ, $u->id);
 
+		// Another user's calendars are only requested by Sabre for the free / busy information of that user. Use the same
+		// rules as BusyPeriod::fetch(): only the calendars of that user and only when the logged in user may see their
+		// free / busy information.
+		$forOtherUser = $u->id != go()->getUserId();
+		if($forOtherUser) {
+			$calendars->andWhere('calendar_calendar.ownerId', '=', [$u->id, null]);
+			Calendar::applyAclToQuery($calendars, Calendar::LEVEL_FREEBUSY);
+		}
 
 		foreach($calendars as $calendar) {
+			$level = Acl::getUserPermissionLevel($calendar->findAclId(), $u->id);
 
 			$uri = 'c-'.$calendar->id;
 			$record = [
@@ -76,7 +91,9 @@ class CalDAVBackend extends AbstractBackend implements
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$calendar->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
 				// 1 = owner, 2 = readonly, 3 = readwrite: Unused as we don't have the sharing plugin enabled
-				'share-access' => $calendar->getOwnerId() == $u->id ? 1 : (($calendar->getPermissionLevel() >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
+				'share-access' => $calendar->getOwnerId() == $u->id ? 1 : (($level >= Acl::LEVEL_WRITE && empty($calendar->webcalUri)) ? 3 : 2),
+				// Sabre grants the principal write access unless the calendar is read-only
+				'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_WRITE || !empty($calendar->webcalUri),
 			];
 
 			if($calendar->id == $personalCalendarId) {
@@ -85,9 +102,15 @@ class CalDAVBackend extends AbstractBackend implements
 				$result[] = $record;
 			}
 		}
-		$tasklists = TaskList::find()->where(['isSubscribed'=>1,'syncToDevice'=>1, 'role'=>1])
-			->filter(["permissionLevel" => Acl::LEVEL_READ]);
+		if($forOtherUser) {
+			// Task lists have no free / busy information
+			return $result;
+		}
+
+		$tasklists = TaskList::findFor($u->id)->where(['isSubscribed'=>1,'syncToDevice'=>1, 'role'=>1]);
+		TaskList::applyAclToQuery($tasklists, Acl::LEVEL_READ, $u->id);
 		foreach($tasklists as $tasklist) {
+			$level = Acl::getUserPermissionLevel($tasklist->findAclId(), $u->id);
 
 			$uri = 't-'.$tasklist->id;
 			$result[] = [
@@ -111,7 +134,8 @@ class CalDAVBackend extends AbstractBackend implements
 				'{http://sabredav.org/ns}sync-token' => self::VERSION.'-'.$tasklist->highestItemModSeq(),
 				'share-resource-uri' => '/ns/share/'.$uri,
 				// 1 = owner, 2 = readonly, 3 = readwrite
-				'share-access' => $tasklist->getPermissionLevel() == Acl::LEVEL_MANAGE ? 1 : ($tasklist->getPermissionLevel() >= Acl::LEVEL_WRITE ? 3 : 2),
+				'share-access' => $level == Acl::LEVEL_MANAGE ? 1 : ($level >= Acl::LEVEL_WRITE ? 3 : 2),
+				'{http://sabredav.org/ns}read-only' => $level < Acl::LEVEL_WRITE,
 			];
 		}
 
@@ -122,18 +146,19 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		go()->debug("CalDAVBackend::createCalendar($principalUri, $calendarUri)");
 		$sccs = '{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set';
-		$type = 'VEVENT';
+		$components = ['VEVENT'];
 		if (isset($properties[$sccs])) {
 			if (!($properties[$sccs] instanceof CalDAV\Xml\Property\SupportedCalendarComponentSet)) {
 				throw new DAV\Exception('The '.$sccs.' property must be of type: \Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet');
 			}
-			$type = $properties[$sccs]->getValue();
+			$components = $properties[$sccs]->getValue();
 		}
 		$transp = '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp';
 
 		$ownerId = isset($properties[$transp]) && $properties[$transp]->getValue() === 'transparent' ? null : go()->getUserId();
 
-		$values = ['ownerId' => $ownerId];
+		// Make it show up for the user that created it
+		$values = ['ownerId' => $ownerId, 'name' => $calendarUri, 'isSubscribed' => true, 'syncToDevice' => true];
 		foreach ($this->propertyMap as $xmlName => $dbName) {
 			if (isset($properties[$xmlName])) {
 				$values[$dbName] = $properties[$xmlName];
@@ -142,18 +167,17 @@ class CalDAVBackend extends AbstractBackend implements
 		if(isset($values['color'])) {
 			$values['color'] = substr($values['color'], 1); // remove #
 		}
-		switch($type[0]) {
-			case 'VEVENT':
-				$prefix = 'c-';
-				$cal = new Calendar();
-				break;
-			case 'VTODO':
-				$prefix = 't-';
-				$values['ownerId'] = go()->getUserId(); //required
-				$cal = new TaskList();
-				break;
-			default: // combined?
-				return false;
+		if(in_array('VEVENT', $components)) {
+			// A collection for events and tasks becomes a calendar. GroupOffice keeps tasks in task lists.
+			$prefix = 'c-';
+			$cal = new Calendar();
+		} else if(in_array('VTODO', $components)) {
+			$prefix = 't-';
+			unset($values['ownerId']);
+			$values['createdBy'] = go()->getUserId();
+			$cal = new TaskList();
+		} else {
+			throw new DAV\Exception\BadRequest('Only calendars with VEVENT or VTODO components are supported');
 		}
 
 		$cal->setValues($values);
@@ -173,13 +197,13 @@ class CalDAVBackend extends AbstractBackend implements
 		$supportedProperties[] = '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp';
 
 		$propPatch->handle($supportedProperties, function ($mutations) use ($id, $type) {
-			switch($type) {
-				case 'c':
-					$cal = Calendar::findById($id);
-					break;
-				case 't':
-					$cal = TaskList::findById($id);
-					break;
+			$cal = match($type) {
+				'c' => Calendar::findById($id),
+				't' => TaskList::findById($id),
+				default => null
+			};
+			if(!$cal) {
+				return array_fill_keys(array_keys($mutations), 404);
 			}
 
 			$newValues = [];
@@ -200,7 +224,11 @@ class CalDAVBackend extends AbstractBackend implements
 			}
 
 			$cal->setValues($newValues);
-			$cal->save();
+			if(!$cal->save()) {
+				// Sabre responds with 403 for every property
+				go()->log("Could not update calendar $type-$id: " . $cal->getValidationErrorsAsString());
+				return false;
+			}
 
 			return true;
 		});
@@ -290,7 +318,7 @@ class CalDAVBackend extends AbstractBackend implements
 			switch ($type) {
 				case 'c': // calendar
 					$component = 'vevent';
-					$query = CalendarEvent::find()->filter(['hideSecret' => 1, 'inCalendars' => $id])->where(['eventdata.uri' => $chunk]);
+					$query = CalendarEvent::find()->filter(['hideSecret' => 1, 'inCalendars' => $id])->where(['cce.uri' => $chunk]);
 					break;
 				case 't': // tasklist
 					$component = 'vtodo';
@@ -319,7 +347,7 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c': // calendar
 				$component = 'vevent';
-				$q = CalendarEvent::find()->filter(['hideSecret'=>1, 'inCalendars' => $id])->where([ 'eventdata.uri'=>$objectUri]);
+				$q = CalendarEvent::find()->filter(['hideSecret'=>1, 'inCalendars' => $id])->where(['cce.uri'=>$objectUri]);
 				$object = $q->single();
 				break;
 			case 't': // tasklist
@@ -339,37 +367,179 @@ class CalDAVBackend extends AbstractBackend implements
 		return $this->toCalendarObject($object, $calendarId, $objectUri, $component);
 	}
 
-	private static function eventByVEvent($vcalendar, $calendarId) {
-		$vevent = $vcalendar->VEVENT[0];
+	/**
+	 * Find the event a client writes to the calendar by UID. When the event is already in another calendar, it's added
+	 * to this calendar too, because GroupOffice stores an event once for all calendars it's in.
+	 *
+	 * @param VObject\Component\VCalendar $vcalendar
+	 * @param int|string $calendarId
+	 * @param bool $mayChange Set to false when the user may only change their own participation status
+	 * @return CalendarEvent
+	 * @throws DAV\Exception\Forbidden When the event exists, but the user can't read it
+	 */
+	private static function eventByVEvent(VObject\Component\VCalendar $vcalendar, int|string $calendarId, bool &$mayChange): CalendarEvent {
+		$vevent = $vcalendar->select('VEVENT')[0];
 		$uid = (string)$vevent->uid;
 
 		$existingEvent = CalendarEvent::find()->where(['uid'=>$uid, 'calendarId' => $calendarId])->single();
 		if($existingEvent){
+			$mayChange = self::mayChange($existingEvent, $vcalendar);
 			return $existingEvent;
 		}
 
-		$eventCalendars = go()->getDbConnection()->select(['t.eventId, GROUP_CONCAT(calendarId) as calendarIds'])
-			->from('calendar_event', 't')
-			->join('calendar_calendar_event', 'c', 'c.eventId = t.eventId', 'LEFT')
+		$eventId = go()->getDbConnection()->selectSingleValue('eventId')
+			->from('calendar_event')
 			->where(['uid'=>$uid, 'recurrenceId' => null])->single();
 
-		if(!empty($eventCalendars['eventId'])) {
+		if(!empty($eventId)) {
+			// Knowing the UID is not enough. The user must be able to read the event in one of its calendars and only
+			// changes it when allowed there.
+			$readable = CalendarEvent::find()
+				->where(['cce.eventId' => $eventId])
+				->filter(['permissionLevel' => Acl::LEVEL_READ])
+				->all();
+			if(empty($readable)) {
+				throw new DAV\Exception\Forbidden("Event with UID $uid already exists");
+			}
+			$mayChange = false;
+			foreach($readable as $instance) {
+				if(self::mayChange($instance, $vcalendar)) {
+					$mayChange = true;
+					break;
+				}
+			}
+
 			// add it to the current receivers default calendar
 			$added = go()->getDbConnection()->insert('calendar_calendar_event', [
-				['calendarId'=>$calendarId, 'eventId'=>$eventCalendars['eventId']]
+				['calendarId'=>$calendarId, 'eventId'=>$eventId, 'uri' => CalendarEvent::defaultUri($uid)]
 			])->execute();
 			if(!$added) {
 				go()->debug('Could not add event to '.$calendarId);
 			}
 			$event = CalendarEvent::findById(go()->getDbConnection()->getPDO()->lastInsertId());
 		} else {
+			$mayChange = true;
 			$event = new CalendarEvent();
-			$organizerEmail = str_replace('mailto:', '',strtolower((string)$vcalendar->VEVENT[0]->{'ORGANIZER'}));
-			$event->isOrigin = true;//go()->getAuthState()->getUser(['email'])->email === $organizerEmail; // if you created this event by yourself.
+			$organizerEmail = str_replace('mailto:', '',strtolower((string)$vevent->{'ORGANIZER'}));
+			$event->isOrigin = !self::isExternalInvitation($vevent, $calendarId);
 			$event->replyTo = $organizerEmail;
 			$event->calendarId = $calendarId;
 		}
 		return $event;
+	}
+
+	/**
+	 * Whether the client data may change the event itself and not only the user's participation status, alerts and
+	 * free / busy status.
+	 *
+	 * An invitation from an organizer outside GroupOffice (isOrigin is false) changes only by iTip. When the user reads
+	 * their mail in the CalDAV client, the client applies the organizer's update and sends it to us. The organizer
+	 * raises the SEQUENCE for such an update, a change by the attendee doesn't.
+	 *
+	 * @param CalendarEvent $event
+	 * @param VObject\Component\VCalendar $vcalendar
+	 * @return bool
+	 */
+	private static function mayChange(CalendarEvent $event, VObject\Component\VCalendar $vcalendar): bool
+	{
+		if($event->mayChangeEventData()) {
+			return true;
+		}
+		if($event->isOrigin || !$event->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			return false;
+		}
+		foreach($vcalendar->select('VEVENT') as $vevent) {
+			if(!isset($vevent->{'RECURRENCE-ID'})) {
+				return isset($vevent->SEQUENCE) && (int) $vevent->SEQUENCE->getValue() > $event->sequence;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Whether a new event is an invitation from an organizer outside GroupOffice, for example when an attendee accepts
+	 * an e-mail invitation in their CalDAV client. Such an event is not created by this system (isOrigin is false), so
+	 * only the organizer can change it and their cancellation is processed.
+	 *
+	 * Only true when the organizer is not a local user or resource and the owner of the calendar is an attendee, so a
+	 * user who organizes with an address that GroupOffice doesn't know keeps their event.
+	 *
+	 * @param VObject\Component $vevent
+	 * @param int|string $calendarId
+	 * @return bool
+	 */
+	private static function isExternalInvitation(VObject\Component $vevent, int|string $calendarId): bool
+	{
+		$organizer = $vevent->select('ORGANIZER');
+		if(empty($organizer)) {
+			return false;
+		}
+		$organizerEmail = strtolower(str_ireplace('mailto:', '', (string)$organizer[0]));
+		if($organizerEmail === '' || !empty(Principal::findIdsByEmail($organizerEmail))) {
+			return false;
+		}
+
+		// The same user as CalendarEvent::calendarParticipant()
+		$ownerId = Calendar::findById($calendarId, ['ownerId'])?->getOwnerId() ?? go()->getUserId();
+		$aliases = User::findEmailAliases($ownerId);
+		foreach($vevent->select('ATTENDEE') as $attendee) {
+			if(in_array(strtolower(str_ireplace('mailto:', '', (string)$attendee)), $aliases)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Take only what belongs to the user from the client data: the participation status of the calendar owner, the
+	 * alerts and the free / busy status. Used when the user may not change the event itself, for example an attendee
+	 * accepting an invitation.
+	 *
+	 * @param CalendarEvent $event
+	 * @param VObject\Component\VCalendar $vcalendar
+	 */
+	private static function applyUserData(CalendarEvent $event, VObject\Component\VCalendar $vcalendar): void
+	{
+		$participant = $event->calendarParticipant();
+		$valid = [Participant::NeedsAction, Participant::Tentative, Participant::Accepted, Participant::Declined];
+		foreach($vcalendar->select('VEVENT') as $vevent) {
+			if(isset($vevent->{'RECURRENCE-ID'})) {
+				continue;
+			}
+			ICalendarHelper::parseAlerts($vevent, $event);
+			if(isset($vevent->TRANSP)) {
+				$event->freeBusyStatus = ICalendarHelper::parseFreeBusyStatus($vevent);
+			}
+			if(!$participant || !isset($vevent->ATTENDEE)) {
+				continue;
+			}
+			foreach($vevent->ATTENDEE as $attendee) {
+				$email = str_ireplace('mailto:', '', (string)$attendee);
+				if(strcasecmp($email, $participant->email) !== 0 || empty($attendee['PARTSTAT'])) {
+					continue;
+				}
+				$status = strtolower((string)$attendee['PARTSTAT']);
+				if(in_array($status, $valid)) {
+					$participant->participationStatus = $status;
+				}
+			}
+		}
+		// The participants are another table, so the ORM does not update modifiedAt. It's the etag.
+		$event->modifiedAt = new DateTime('now', new \DateTimeZone('UTC'));
+	}
+
+	/**
+	 * @param string $type "c" for a calendar or "t" for a task list
+	 * @param int|string $id
+	 * @param int $level
+	 * @throws DAV\Exception\Forbidden
+	 */
+	private static function checkCollectionPermission(string $type, int|string $id, int $level): void
+	{
+		$collection = $type === 'c' ? Calendar::findById($id) : TaskList::findById($id);
+		if(!$collection || !$collection->hasPermissionLevel($level)) {
+			throw new DAV\Exception\Forbidden("Permission denied");
+		}
 	}
 
 	public function createCalendarObject($calendarId, $objectUri, $calendarData)
@@ -384,24 +554,37 @@ class CalDAVBackend extends AbstractBackend implements
 
 		switch($type) {
 			case 'c': // calendar
-				$object = self::eventByVEvent($vCalendar, $id);
+				self::checkCollectionPermission($type, $id, Acl::LEVEL_WRITE);
+				$mayChange = true;
+				$object = self::eventByVEvent($vCalendar, $id, $mayChange);
+				if(!$mayChange) {
+					self::applyUserData($object, $vCalendar);
+					$object->uri($objectUri);
+					break;
+				}
 				$object = ICalendarHelper::parseVObject($calendarData, $object);
 				$object->uri($objectUri);
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
 
 				break;
 			case 't': // tasklist
+				self::checkCollectionPermission($type, $id, Acl::LEVEL_WRITE);
 				$object = new Task();
 				$object = (new VCalendar)->vtodoToTask($vCalendar, $id, $object);
 				$object->setUri($objectUri);
 
 				break;
 			default:
-				go()->log("incorrect calendarId ".$calendarId. ' for '.$objectUri);
-				return false;
+				throw new DAV\Exception\NotFound("Calendar $calendarId not found");
 		}
 		if(!$object->save()) {
 			throw new SaveException($object);
+		}
+
+		if(isset($mayChange) && !$mayChange) {
+			$object->resetICalBlobsOfAllUsers();
+			// The stored event differs from what the client sent. Without an etag the client fetches it again.
+			return null;
 		}
 
 		$etag = $object->modifiedAt->getTimestamp();
@@ -420,14 +603,23 @@ class CalDAVBackend extends AbstractBackend implements
 
 		//$extraData = $this->getDenormalizedData($calendarData);
 		/** @var CalendarEvent $object */
-		$object = $type==='c' ? CalendarEvent::find()->where(['uri'=>$objectUri, 'calendarId'=>$id])->single() :
+		$object = $type==='c' ? CalendarEvent::find()->where(['cce.uri'=>$objectUri, 'calendarId'=>$id])->single() :
 			Task::find()->where(['task.tasklistId' => $id, 'task.uid' => $uid])->single();
 		if(!$object){
-			go()->log("Object $objectUri not found in calendar $calendarId");
-			return false;
+			throw new DAV\Exception\NotFound("Object $objectUri not found in calendar $calendarId");
 		}
+		if(!$object->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new DAV\Exception\Forbidden("Permission denied");
+		}
+		$mayChange = true;
 		switch($type) {
 			case 'c':
+				$vCalendar = VObject\Reader::read($calendarData, VObject\Reader::OPTION_FORGIVING + VObject\Reader::OPTION_IGNORE_INVALID_LINES);
+				if(!self::mayChange($object, $vCalendar)) {
+					$mayChange = false;
+					self::applyUserData($object, $vCalendar);
+					break;
+				}
 				$object = ICalendarHelper::parseVObject($calendarData, $object);
 				// The attached blob must be identical to the data used to create the event
 				$object->attachBlob(ICalendarHelper::makeBlob($object, $calendarData)->id);
@@ -440,8 +632,13 @@ class CalDAVBackend extends AbstractBackend implements
 
 
 		if(!$object->save()) {
-			go()->log("Failed to update event at ".$objectUri);
-			return false;
+			throw new SaveException($object);
+		}
+
+		if(!$mayChange) {
+			$object->resetICalBlobsOfAllUsers();
+			// The stored event differs from what the client sent. Without an etag the client fetches it again.
+			return null;
 		}
 
 		$etag = $object->modifiedAt->getTimestamp();
@@ -460,13 +657,14 @@ class CalDAVBackend extends AbstractBackend implements
 		switch($type) {
 			case 'c' :
 				$query->from('calendar_calendar_event','cce')
-					->join('calendar_event', 'ev', 'ev.eventId = cce.eventId')
-					->where(['calendarId' => $id, 'ev.uri'=> $objectUri]);
+					->where(['calendarId' => $id, 'cce.uri'=> $objectUri]);
+				self::checkCollectionPermission($type, $id, Acl::LEVEL_DELETE);
 				CalendarEvent::delete($query);
 				break;
 			case 't':
 				$query->from('tasks_task','task')
 					->where(['task.tasklistId' => $id, 'task.uid'=> $uid]);
+				self::checkCollectionPermission($type, $id, Acl::LEVEL_DELETE);
 				Task::delete($query);
 				break;
 		}
@@ -494,31 +692,14 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		go()->debug("CalDAVBackend::getSchedulingObject($principalUri, $objectUri)");
 
-		$stmt = go()->getDbConnection()->getPDO()
-			->prepare('SELECT uri, calendardata, lastmodified, etag, size FROM calendar_schedule_object WHERE principaluri = ? AND uri = ?');
-		$stmt->execute([$principalUri, $objectUri]);
-		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-		if (!$row) {
-			return null;
-		}
-
-		return [
-			'uri' => $row['uri'],
-			'calendardata' => $row['calendardata'],
-			'lastmodified' => $row['lastmodified'],
-			'etag' => '"'.$row['etag'].'"',
-			'size' => (int) $row['size'],
-		];
+		// Scheduling inbox is not used. Group-Office handles iTIP itself.
+		return null;
 	}
 
 	/**
 	 * Returns all scheduling objects for the inbox collection.
 	 *
-	 * These objects should be returned as an array. Every item in the array
-	 * should follow the same structure as returned from getSchedulingObject.
-	 *
-	 * The main difference is that 'calendardata' is optional.
+	 * No-op: the scheduling inbox is not used.
 	 *
 	 * @param string $principalUri
 	 *
@@ -526,28 +707,15 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function getSchedulingObjects($principalUri)
 	{
-
 		go()->debug("CalDAVBackend::getSchedulingObjects($principalUri)");
 
-		$stmt = go()->getDbConnection()->getPDO()->prepare('SELECT id, calendardata, uri, lastmodified, etag, size FROM calendar_schedule_object WHERE principaluri = ?');
-		$stmt->execute([$principalUri]);
-
-		$result = [];
-		foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-			$result[] = [
-				'calendardata' => $row['calendardata'],
-				'uri' => $row['uri'],
-				'lastmodified' => $row['lastmodified'],
-				'etag' => '"'.$row['etag'].'"',
-				'size' => (int) $row['size'],
-			];
-		}
-
-		return $result;
+		return [];
 	}
 
 	/**
 	 * Deletes a scheduling object.
+	 *
+	 * No-op: the scheduling inbox is not used.
 	 *
 	 * @param string $principalUri
 	 * @param string $objectUri
@@ -555,13 +723,12 @@ class CalDAVBackend extends AbstractBackend implements
 	public function deleteSchedulingObject($principalUri, $objectUri)
 	{
 		go()->debug("CalDAVBackend::deleteSchedulingObject($principalUri, $objectUri)");
-
-		$stmt = go()->getDbConnection()->getPDO()->prepare('DELETE FROM calendar_schedule_object WHERE principaluri = ? AND uri = ?');
-		$stmt->execute([$principalUri, $objectUri]);
 	}
 
 	/**
 	 * Creates a new scheduling object. This should land in a users' inbox.
+	 *
+	 * No-op: the scheduling inbox is not used.
 	 *
 	 * @param string          $principalUri
 	 * @param string          $objectUri
@@ -569,16 +736,7 @@ class CalDAVBackend extends AbstractBackend implements
 	 */
 	public function createSchedulingObject($principalUri, $objectUri, $objectData)
 	{
-
 		go()->debug("CalDAVBackend::createSchedulingObject($principalUri, $objectUri, ...)");
-
-		$stmt = go()->getDbConnection()->getPDO()->prepare('INSERT INTO calendar_schedule_object (principaluri, calendardata, uri, lastmodified, etag, size) VALUES (?, ?, ?, ?, ?, ?)');
-
-		if (is_resource($objectData)) {
-			$objectData = stream_get_contents($objectData);
-		}
-
-		$stmt->execute([$principalUri, $objectData, $objectUri, time(), md5($objectData), strlen($objectData)]);
 	}
 
 	/**

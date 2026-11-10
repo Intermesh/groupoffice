@@ -94,15 +94,11 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 		if ($feed != '' && strpos($feed, 'http') === 0) {
 			header('Content-Type: text/xml');
 
-			if (function_exists('curl_init')) {				
-				$httpclient = new \GO\Base\Util\HttpClient();
-				$xml = $httpclient->request($feed);
-			} else {
-				if (!\GO\Base\Fs\File::checkPathInput($feed))
-					throw new \Exception("Invalid request");
-
-				$xml = @file_get_contents($feed);
-			}
+			// The URL is user input: don't let it reach internal addresses, also not through a redirect
+			$httpclient = new \go\core\http\Client();
+			$httpclient->globalRangeOnly = true;
+			$httpclient->maxResponseSize = 10 * 1024 * 1024;
+			$xml = $httpclient->get($feed)['body'];
 
 			if ($xml) {
 

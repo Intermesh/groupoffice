@@ -521,3 +521,17 @@ $updates['202610121000'][] = "UPDATE core_principal p
 	JOIN core_user u ON u.id = rg.defaultOwnerId
 	SET p.email = u.email, p.description = IFNULL(c.description, u.displayName)
 	WHERE c.groupId IS NOT NULL;";
+
+// The CalDAV uri is per calendar. An event is stored once for all calendars it's in, and every CalDAV client must keep
+// the name it used for its copy.
+$updates['202611091200'][] = "ALTER TABLE `calendar_calendar_event`
+	ADD `uri` VARCHAR(512) NULL AFTER `calendarId`,
+	ADD INDEX `calendar_calendar_event_uri_idx` (`calendarId` ASC, `uri`(191) ASC);";
+
+$updates['202611091200'][] = "UPDATE calendar_calendar_event cce
+	JOIN calendar_event e ON e.eventId = cce.eventId
+	SET cce.uri = e.uri;";
+
+$updates['202611091200'][] = "ALTER TABLE `calendar_event` DROP COLUMN `uri`;";
+
+$updates['202611091200'][] = "delete from calendar_schedule_object;";

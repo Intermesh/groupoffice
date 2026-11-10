@@ -4,7 +4,10 @@ namespace go\modules\community\wopi;
 use go\core;
 use go\core\model;
 use go\core\model\Group;
+use go\core\cron\GarbageCollection;
+use go\core\model\User;
 use go\modules\community\wopi\model\Service;
+use go\modules\community\wopi\model\Token;
 
 /**						
  * 
@@ -45,6 +48,35 @@ class Module extends core\Module {
 	public function getDependencies(): array
 	{
 		return ['legacy/files'];
+	}
+
+	public function defineListeners()
+	{
+		User::on(User::EVENT_SAVE, static::class, 'onUserSave');
+		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'onGarbageCollection');
+	}
+
+	/**
+	 * Revoke the WOPI tokens of a user when the password changes or the account is disabled
+	 *
+	 * @param User $user
+	 * @return void
+	 */
+	public static function onUserSave(User $user): void
+	{
+		if(!$user->isNew() && ($user->isModified(['password']) || ($user->isModified(['enabled']) && !$user->enabled))) {
+			Token::deleteForUser($user->id);
+		}
+	}
+
+	/**
+	 * Delete expired WOPI tokens
+	 *
+	 * @return void
+	 */
+	public static function onGarbageCollection(): void
+	{
+		Token::collectGarbage();
 	}
 
 	protected function afterInstall(model\Module $model): bool

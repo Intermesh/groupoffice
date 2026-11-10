@@ -654,7 +654,7 @@ class Instance extends Entity {
         if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('userAgent')) {
             $data["userAgent"] = "Multi Instance Module";
             $data["lastActiveAt"] = $now;
-            $data["remoteIpAddress"] = $_SERVER['REMOTE_ADDR'];
+            $data["remoteIpAddress"] = Request::get()->getRemoteIpAddress() ?? "CLI";
         } else
         {
             //6.7 with clients

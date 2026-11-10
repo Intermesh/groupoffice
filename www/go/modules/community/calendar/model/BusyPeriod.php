@@ -51,7 +51,7 @@ class BusyPeriod {
 			->join('calendar_event', 'e', 'cce.eventId = e.eventId')
 			->join('calendar_calendar', 'cal', 'cal.id = cce.calendarId');
 
-		Acl::applyToQuery($query, 'cal.aclId', 5); // read free busy
+		Acl::applyToQuery($query, 'cal.aclId', Calendar::LEVEL_FREEBUSY);
 
 		if(substr($id, 0, 9) == 'Calendar:') {
 			$calendarId = str_replace('Calendar:', '', $id);

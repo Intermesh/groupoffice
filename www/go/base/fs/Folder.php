@@ -175,6 +175,10 @@ class Folder extends Base {
 				
 		if(!$newFolderName)
 			$newFolderName=$this->name();
+
+		if(!\go\core\fs\FileSystemObject::isValidName($newFolderName)) {
+			throw new \InvalidArgumentException("Invalid folder name");
+		}
 		
 		$newPath = $destinationFolder->path().'/'.$newFolderName;		
 				
@@ -236,6 +240,10 @@ class Folder extends Base {
 		
 		if(!$newFolderName)
 			$newFolderName=$this->name();
+
+		if(!\go\core\fs\FileSystemObject::isValidName($newFolderName)) {
+			throw new \InvalidArgumentException("Invalid folder name");
+		}
 		
 		\GO::debug('folder::copy: '.$this->path().' > '.$destinationFolder->path().'/'.$newFolderName);
 		
@@ -245,6 +253,10 @@ class Folder extends Base {
 		
 		$ls = $this->ls(true);
 		foreach($ls as $fsObject){
+			// Don't copy what a link points to. It can be anywhere on the server.
+			if($fsObject->isLink()) {
+				continue;
+			}
 			if($fsObject->isFolder()){				
 				//$newDestinationFolder= new Folder($destinationFolder->path().'/'.$this->name());				
 				$fsObject->copy($copiedFolder);

@@ -83,6 +83,8 @@ if (!empty($_POST)) {
 		App::get()->getInstaller()->install($admin);
 
 		//install not yet refactored modules
+		// Fresh install: the modules are installed for the whole system. The request ends after the install.
+		// nosemgrep: go-acl-bypass-not-restored
 		GO::$ignoreAclPermissions = true;
 		$modules = GO::modules()->getAvailableModules();
 

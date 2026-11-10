@@ -271,6 +271,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 	protected function beforeDelete() {
 
+		// Never delete a file elsewhere on the server through a link
+		if(!File::$deleteInDatabaseOnly) {
+			$this->fsFile->checkFileStoragePath();
+		}
+
 		//blocked database check. We check this in the controller now.
 		if($this->isLocked() && !\GO::user()->isAdmin())
 			throw new \Exception(\GO::t("File is locked", "files").': '.$this->path);
@@ -315,7 +320,21 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		}
 	}
 
+	public function validate() {
+		// The name is appended to the folder path on disk, so it must not contain a path separator or be "..".
+		if(($this->getIsNew() || $this->isModified('name')) && !\go\core\fs\FileSystemObject::isValidName((string) $this->name)) {
+			$this->setValidationError('name', \GO::t("Invalid file or folder name", "files"));
+		}
+		return parent::validate();
+	}
+
 	protected function beforeSave() {
+
+		// Never write, rename or move through a link to a file elsewhere on the server
+		$this->fsFile->checkFileStoragePath();
+		if(!$this->isNew && ($this->isModified('name') || $this->isModified('folder_id'))) {
+			$this->_getOldFsFile()->checkFileStoragePath();
+		}
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
 		$this->checkNormalization();
@@ -652,6 +671,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		if($appendNumberToNameIfExists)
 			$copy->appendNumberToNameIfExists();
 
+		$this->fsFile->checkFileStoragePath();
+		$copy->fsFile->checkFileStoragePath();
 		$this->fsFile->copy($copy->fsFile->parent(), $copy->name);
 
 		$copy->save(true);
@@ -692,6 +713,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 //		for safety allow replace action
 		if(!$this->isNew)
 			$this->log("update");
+
+		$this->fsFile->checkFileStoragePath();
 
 		$oldPath = $this->saveVersion();
 
@@ -734,6 +757,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			throw new AccessDenied();
 		}
 
+		$this->fsFile->checkFileStoragePath();
 		$this->fsFile->putContents($data);
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
@@ -779,6 +803,27 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			return false;
 		}
 		return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath));
+	}
+
+	/**
+	 * Find a file by a path that comes from the client and check that the current user may read it.
+	 *
+	 * A file that doesn't exist and a file the user may not read give the same exception, so it can't be used to find out
+	 * which files exist.
+	 *
+	 * @param mixed $relpath Relative path from \GO::config()->file_storage_path
+	 * @return File
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function findReadableByPath($relpath): File
+	{
+		$file = is_string($relpath) && $relpath !== '' ? $this->findByPath($relpath) : false;
+
+		if (!$file || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $file;
 	}
 
 	/**

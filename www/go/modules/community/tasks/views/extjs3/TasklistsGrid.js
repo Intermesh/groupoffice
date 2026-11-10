@@ -75,7 +75,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 					hidden: !canEditTaskLists,
 					handler: function() {
 						Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-							if (btn != "yes") {
+							if (btn !== "yes") {
 								return;
 							}
 							go.Db.store(this.support ? "SupportList" : "Tasklist").set({destroy: [this.moreMenu.record.id]});
@@ -102,8 +102,9 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 
 
 		this.on('beforeshowmenu', (menu, record) => {
-			menu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
-			menu.getComponent("delete").setDisabled(!go.Modules.get("community", 'tasks').userRights.mayChangeTasklists || record.get("permissionLevel") < go.permissionLevels.manage);
+			const permissionLevel = record.json.permissionLevel || 10;
+			menu.getComponent("edit").setDisabled(permissionLevel < go.permissionLevels.edit);
+			menu.getComponent("delete").setDisabled(!go.Modules.get("community", 'tasks').userRights.mayChangeTasklists || permissionLevel < go.permissionLevels.manage);
 		});
 	},
 });

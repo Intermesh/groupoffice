@@ -66,7 +66,7 @@ class CalendarEvent extends AclItemEntity {
 
 	const EventProperties = ['uid','isOrigin','replyTo', 'prodId', 'sequence','title','description','locale','location', 'showWithoutTime',
 		'start', 'timeZone','duration','priority','privacy','status', 'recurrenceRule','createdAt','modifiedAt',
-		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag','uri', 'eventId', 'recurrenceId'];
+		'createdBy','modifiedBy', 'lastOccurrence','firstOccurrence','etag', 'eventId', 'recurrenceId'];
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'veventBlobId'];
 
@@ -205,7 +205,8 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	protected $etag;
 	/**
-	 * @var string with CalDAV server the `uri` from the client needs to be persistent
+	 * @var string with CalDAV server the `uri` from the client needs to be persistent. It's per calendar because every
+	 * client uses its own name for its copy of the event.
 	 */
 	protected $uri;
 
@@ -266,7 +267,7 @@ class CalendarEvent extends AclItemEntity {
 
 	protected static function defineMapping(): Mapping {
 		return parent::defineMapping()
-			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId'])
+			->addTable('calendar_calendar_event', 'cce', ['eventId' => 'eventId'], ['id', 'calendarId', 'uri'])
 			->addQuery((new Query())->select("ownerId")->join('calendar_calendar', 'cal', 'cal.id=cce.calendarId'))
 			->addTable('calendar_event', "eventdata", ['cce.eventId' => 'eventId'], self::EventProperties)
 			->addUserTable('calendar_event_user', 'eventuser', ['cce.eventId' => 'eventId'],self::UserProperties)
@@ -354,12 +355,19 @@ class CalendarEvent extends AclItemEntity {
 				$crit->where('firstOccurrence', '<', $value);
 			})->add('inbox', function(Criteria $crit, $value, Query $query) {
 				// value must be true
-				$query->join('calendar_participant', 'p', 'p.eventId = eventdata.eventId AND p.id = cal.ownerId');
-				$crit->where('p.id', '=', go()->getUserId())
-					->andWhere('p.rolesMask & 1 = 0') // !isOwner
-					->andWhere('p.participationStatus', '=', 'needs-action')
+				// The participant is found by user id or by e-mail. The id is not the user id when the organizer could not
+				// see the user and picked another principal like "Contact:1".
+				$query->join('core_user', 'invitee', 'invitee.id = cal.ownerId');
+				$crit->where('cal.ownerId', '=', go()->getUserId())
 					->andWhere('eventdata.status', '=', 'confirmed')
-					->andWhere('eventdata.start', '>=', new DateTime());
+					->andWhere('eventdata.start', '>=', new DateTime())
+					->andWhereExists(go()->getDbConnection()
+						->select('p.id')
+						->from('calendar_participant', 'p')
+						->where('p.eventId = eventdata.eventId')
+						->andWhere('(p.id = cal.ownerId OR p.email COLLATE utf8mb4_unicode_ci = invitee.email)')
+						->andWhere('p.rolesMask & 1 = 0') // !isOwner
+						->andWhere('p.participationStatus', '=', 'needs-action'));
 			})->add('hideSecret', function(Criteria $criteria, $value, $query) {
 				$query->andWhere((new Criteria())
 					->where('privacy', '!=', 'secret')
@@ -550,7 +558,18 @@ class CalendarEvent extends AclItemEntity {
 			$this->uri = $uri;
 		}
 
-		return $this->uri ?? strtr($this->uid, '+/=', '-_.') . '.ics';
+		return $this->uri ?? self::defaultUri($this->uid);
+	}
+
+	/**
+	 * The CalDAV uri of an event in a calendar when no client gave it a name
+	 *
+	 * @param string $uid
+	 * @return string
+	 */
+	public static function defaultUri(string $uid): string
+	{
+		return strtr($uid, '+/=', '-_.') . '.ics';
 	}
 
 	public function etag($v = null) {
@@ -614,7 +633,7 @@ class CalendarEvent extends AclItemEntity {
 	protected function internalSave() : bool {
 
 		if(empty($this->uri)) {
-			$this->uri = strtr($this->uid, '+/=', '-_.') . '.ics';
+			$this->uri = self::defaultUri($this->uid);
 		}
 
 		$this->checkScheduleFor();
@@ -866,7 +885,7 @@ class CalendarEvent extends AclItemEntity {
 			$calendarId = $isNew ? self::participantCalendarId($pid, $participant) : null;
 			if($calendarId) {
 				go()->getDbConnection()->insertIgnore('calendar_calendar_event', [
-					['calendarId'=>$calendarId, 'eventId'=>$this->eventId]
+					['calendarId'=>$calendarId, 'eventId'=>$this->eventId, 'uri' => self::defaultUri($this->uid)]
 				])->execute();
 			}
 		}
@@ -1004,6 +1023,30 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	private $calendarParticipant = null;
+
+	/**
+	 * Whether the current user may change the event itself and not only their own participation status and per-user
+	 * properties. These are the same rules internalSave() enforces for JMAP clients.
+	 *
+	 * @return bool
+	 */
+	public function mayChangeEventData(): bool
+	{
+		if(!$this->isOrigin || !$this->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			return false;
+		}
+		$participant = $this->calendarParticipant();
+		return !$participant || $participant->isOwner() || $this->ownerId === null;
+	}
+
+	/**
+	 * Remove the stored iCalendar data of every user that has this event, so it's generated again on the next request.
+	 * Use this when shared data changed that resetICalBlob() does not see, like the participants.
+	 */
+	public function resetICalBlobsOfAllUsers(): void
+	{
+		go()->getDbConnection()->update('calendar_event_user', ['veventBlobId' => null], ['eventId' => $this->eventId])->execute();
+	}
 
 	/**
 	 * The participant in the event that owns the calendar this event is in

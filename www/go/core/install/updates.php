@@ -1892,15 +1892,21 @@ INNER JOIN core_entity e ON e.name = 'User' AND e.moduleId = (SELECT id FROM cor
 WHERE NOT EXISTS (SELECT 1 FROM core_principal p WHERE CAST(p.id AS BINARY) = CAST(u.id AS BINARY) OR (p.entityTypeId = e.id AND p.entityId = u.id));";
 
 
+$updates['202611091340'][] = "ALTER TABLE core_change
+  ADD INDEX aclId_entityTypeId_modSeq (aclId, entityTypeId, modSeq, entityId, destroyed);";
+
+$updates['202611091340'][] = "ALTER TABLE core_change_user
+  ADD INDEX userId_entityTypeId_modSeq (userId, entityTypeId, modSeq, entityId)";
+
 // 26.1
-$updates['202611061200'][] = "alter table core_module
+$updates['202611091340'][] = "alter table core_module
     drop column sort_order;";
 
-$updates['202611061200'][] = "alter table core_module
+$updates['202611091340'][] = "alter table core_module
     drop column admin_menu;";
 
 
-$updates['202611061200'][] = "create table if not exists core_module_user
+$updates['202611091340'][] = "create table if not exists core_module_user
 (
 	userId   int          not null,
     moduleId int          not null,
@@ -1914,7 +1920,7 @@ $updates['202611061200'][] = "create table if not exists core_module_user
             on delete cascade
 );";
 
-$updates['202611061200'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
+$updates['202611091340'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
 
-$updates['202611061200'][] = "alter table core_alert
+$updates['202611091340'][] = "alter table core_alert
     add isSent boolean default false not null;";

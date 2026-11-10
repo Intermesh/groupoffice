@@ -412,13 +412,11 @@ class Message extends \go\core\mail\Message {
 	 */
 	private function readableFileStoragePath(string $relativePath): string
 	{
-		$file = GO::modules()->isInstalled('files') ? \GO\Files\Model\File::model()->findByPath($relativePath) : false;
-
-		if (!$file || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+		if (!GO::modules()->isInstalled('files')) {
 			throw new \GO\Base\Exception\AccessDenied();
 		}
 
-		return $file->fsFile->path();
+		return \GO\Files\Model\File::model()->findReadableByPath($relativePath)->fsFile->path();
 	}
 
 	private function _embedPastedImages($body){

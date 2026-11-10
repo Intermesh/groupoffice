@@ -26,6 +26,7 @@ CREATE TABLE `wopi_token` (
   `id` int(11) NOT NULL,
   `serviceId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
+  `fileId` int(11) NOT NULL,
   `token` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiresAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -67,7 +68,8 @@ ALTER TABLE `wopi_lock`
 
 ALTER TABLE `wopi_token`
   ADD CONSTRAINT `wopi_token_ibfk_2` FOREIGN KEY (`serviceId`) REFERENCES `wopi_service` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `wopi_token_ibfk_3` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `wopi_token_ibfk_3` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wopi_token_fileId_fk` FOREIGN KEY (`fileId`) REFERENCES `fs_files` (`id`) ON DELETE CASCADE;
 
 
 alter table wopi_service add constraint wopi_service_core_acl_id_fk foreign key (aclId) references core_acl (id);
