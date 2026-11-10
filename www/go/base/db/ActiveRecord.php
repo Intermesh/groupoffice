@@ -3529,7 +3529,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$acl->ownedBy=$user_id;
 		$acl->entityTypeId = $this->entityType()->getId();
 		$acl->entityId = $this->id;
-		if(!$acl->save()) {
+		if(!$acl->save()) { // nosemgrep: go-setter-persists -- legacy ActiveRecord, not set through JMAP
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
 		}
 

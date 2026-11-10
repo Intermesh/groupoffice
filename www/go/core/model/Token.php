@@ -200,7 +200,7 @@ class Token extends Entity {
 				$client->status = 'allowed';
 			}
 			$client->lastSeen = $this->lastActiveAt;
-			if($client->save()) {
+			if($client->save()) { // nosemgrep: go-setter-persists -- private helper, not an API property
 				$this->clientId = $client->id;
 			} else {
 				throw new Exception('Failed to save the client identity'.var_export($client->getValidationErrors(), true));
@@ -331,7 +331,7 @@ class Token extends Entity {
 				$user->language = $_COOKIE['GO_LANGUAGE'];
 			}
 
-			if (!$user->save()) {
+			if (!$user->save()) { // nosemgrep: go-setter-persists -- Token has no JMAP set method; called by the server only
 				return false;
 			}
 		}
@@ -414,7 +414,7 @@ class Token extends Entity {
 	public function setPassedAuthenticator(array $authenticators): bool
 	{
 		$this->passedAuthenticators = trim(implode('|',$authenticators),'|');
-		return $this->save();
+		return $this->save(); // nosemgrep: go-setter-persists -- Token has no JMAP set method; called by the server only
 	}
 	
 	/**

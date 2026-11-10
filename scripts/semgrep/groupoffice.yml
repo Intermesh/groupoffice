@@ -572,3 +572,39 @@ rules:
       # The setter itself.
       - pattern-not-inside: |
           function setIgnoreAclPermissions(...) { ... }
+
+  - id: go-setter-persists
+    languages: [php]
+    severity: ERROR
+    message: >-
+      This setter writes to the database. JMAP "set" calls setters before it checks permissions (canUpdate() needs the
+      new values), so the write also happens when the update is refused. Store the value in a property and write it in
+      internalSave() or save().
+    metadata:
+      category: security
+      cwe: "CWE-285: Improper Authorization"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+    patterns:
+      # Public setters of models become writable API properties (see go\core\data\Model::getApiProperties()).
+      # Semgrep doesn't match on visibility, so private setters are found too. Mark those with nosemgrep.
+      - pattern-inside: |
+          class $CLASS extends $PARENT {
+            ...
+          }
+      - metavariable-regex:
+          metavariable: $PARENT
+          regex: .*(Entity|Property|Model|Settings)$
+      - pattern-inside: |
+          function $SETTER(...) { ... }
+      - metavariable-regex:
+          metavariable: $SETTER
+          regex: ^set[A-Z]
+      - pattern-either:
+          - pattern: $X->save(...)
+          - pattern: $X->delete(...)
+          - pattern: $X->setDefaultAcl(...)
+          - pattern: go()->getDbConnection()->$METHOD(...)
+          - pattern: $CLS::delete(...)

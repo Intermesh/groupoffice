@@ -176,3 +176,44 @@ class Test extends Controller
 		GO::$ignoreAclPermissions = $old;
 	}
 }
+
+class SetterModel extends \go\core\orm\Entity
+{
+	private $pending;
+
+	public function setDefaultGroups(array $groups)
+	{
+		// ruleid: go-setter-persists
+		go()->getDbConnection()->exec("DELETE FROM core_group_default_group");
+		foreach ($groups as $groupId) {
+			// ruleid: go-setter-persists
+			go()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute();
+		}
+	}
+
+	public function setEntities($entities)
+	{
+		// ruleid: go-setter-persists
+		\go\core\model\Group::entityType()->setDefaultAcl($entities);
+	}
+
+	public function setTemplate($values)
+	{
+		// ruleid: go-setter-persists
+		$this->getTemplate()->setValues($values)->save();
+	}
+
+	public function setStaged($values)
+	{
+		// ok: go-setter-persists
+		$this->pending = $values;
+	}
+
+	protected function internalSave(): bool
+	{
+		// ok: go-setter-persists
+		go()->getDbConnection()->exec("DELETE FROM core_group_default_group");
+		return parent::internalSave();
+	}
+}
+
