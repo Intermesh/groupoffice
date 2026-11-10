@@ -386,6 +386,7 @@ abstract class AbstractController extends Observable {
 		if(!method_exists($this, $methodName))
 			throw new NotFound();
 		
+		$oldIgnore = null;
 		try {
 			if($checkPermissions && !$this->_checkPermission($action)){
 				$cls = get_class($this);
@@ -425,10 +426,6 @@ abstract class AbstractController extends Observable {
 			
 			if($render && isset($response))
 				$this->render($action, $response);
-			
-			//restore old value for acl permissions if this method was allowed for guests.
-			if(isset($oldIgnore))
-				GO::setIgnoreAclPermissions($oldIgnore);
 
 			return $response;
 			
@@ -496,6 +493,11 @@ abstract class AbstractController extends Observable {
 			}
 
 			$this->view->render('Exception', array('response'=>$response));
+		}
+		finally {
+			//restore old value for acl permissions if this method was allowed for guests, also when the action failed.
+			if(isset($oldIgnore))
+				GO::setIgnoreAclPermissions($oldIgnore);
 		}
 	}
 	

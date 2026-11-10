@@ -551,6 +551,24 @@ rules:
           $OLD = $C::setIgnoreAclPermissions(...);
           ...
           $C::setIgnoreAclPermissions($OLD);
+      # Restored in a finally block, also when the setter is in a nested block of the try.
+      - pattern-not-inside: |
+          try {
+            ...
+          } finally {
+            ...
+            $C::setIgnoreAclPermissions($OLD);
+            ...
+          }
+      - pattern-not-inside: |
+          try {
+            ...
+          } finally {
+            ...
+            if ($COND)
+              $C::setIgnoreAclPermissions($OLD);
+            ...
+          }
       # The setter itself.
       - pattern-not-inside: |
           function setIgnoreAclPermissions(...) { ... }

@@ -269,6 +269,7 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 
 	public function run($action = '', $params = array(), $render = true, $checkPermissions = true)
 	{
+		$oldIgnore = null;
 		try
 		{
 			if (empty($action))
@@ -289,10 +290,6 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 			$methodName = 'action' . $action;
 			//$this->$methodName($_REQUEST);
 			$this->callActionMethod($methodName, $params);
-			
-			//restore old value for acl permissions if this method was allowed for guests.
-			if(isset($oldIgnore))
-				\GO::setIgnoreAclPermissions($oldIgnore);
 		}
 		catch (\GO\Base\Exception\MissingParameter $e){
 			echo $this->render('/site/404', array('error' => $e));
@@ -322,6 +319,11 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 			
 			echo $e->getMessage();
 			echo $this->render('/site/error', array('error' => $e));
+		}
+		finally {
+			//restore old value for acl permissions if this method was allowed for guests, also when the action failed.
+			if(isset($oldIgnore))
+				\GO::setIgnoreAclPermissions($oldIgnore);
 		}
 	}
 	

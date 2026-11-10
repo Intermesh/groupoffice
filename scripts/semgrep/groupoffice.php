@@ -139,6 +139,34 @@ class Test extends Controller
 		}
 	}
 
+	public function aclBypassRestoredInFinallyWithCatch($ignore)
+	{
+		$old = null;
+		try {
+			if ($ignore) {
+				// ok: go-acl-bypass-not-restored
+				$old = GO::setIgnoreAclPermissions(true);
+			}
+			$this->doSomething();
+		} catch (\Exception $e) {
+			$this->handle($e);
+		} finally {
+			if (isset($old))
+				GO::setIgnoreAclPermissions($old);
+		}
+	}
+
+	public function aclBypassFinallyWithoutRestore()
+	{
+		try {
+			// ruleid: go-acl-bypass-not-restored
+			$old = GO::setIgnoreAclPermissions(true);
+			$this->doSomething();
+		} finally {
+			$this->cleanup();
+		}
+	}
+
 	public function aclBypassPropertyRestored()
 	{
 		$old = GO::$ignoreAclPermissions;
