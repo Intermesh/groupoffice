@@ -144,6 +144,12 @@ class File extends \Sabre\DAV\FS\File {
 	 * @return string
 	 */
 	public function get() {
+		try {
+			(new \GO\Base\Fs\File($this->path))->checkFileStoragePath();
+		} catch (\GO\Base\Exception\AccessDenied $e) {
+			throw new Sabre\DAV\Exception\Forbidden("DAV: '" . $this->relpath . "' is a link or in a linked folder");
+		}
+
 		$file = $this->getFile();
 		$file->open();
 		return fopen($this->path, 'r');
