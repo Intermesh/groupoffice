@@ -56,4 +56,17 @@ class DavAccount extends EntityController {
 	{
 		return $this->rights->mayChangeAccount;
 	}
+
+	/**
+	 * Changing the host or credentials of an account requires the "Change account" permission, also for the owner
+	 */
+	protected function canUpdate(Entity $entity): bool
+	{
+		return $this->rights->mayChangeAccount && parent::canUpdate($entity);
+	}
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		return $this->rights->mayChangeAccount && parent::canDestroy($entity);
+	}
 }
