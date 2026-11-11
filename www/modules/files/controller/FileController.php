@@ -553,7 +553,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		$response=array();
 		
-		$file = \GO\Files\Model\File::model()->findByPk($params['id']);
+		$file = $this->findFileForDownloadLink($params['id']);
 		
 		$url = $file->getEmailDownloadURL(true,\GO\Base\Util\Date::date_add($params['expire_time'],1),$params['delete_when_expired']);
 		
@@ -563,6 +563,27 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		return $response;
 		
 	}	
+
+	/**
+	 * Anyone with the download link can download the file without logging in, so creating one or getting an existing
+	 * link requires write permission on the file.
+	 *
+	 * @param mixed $id
+	 * @return File
+	 * @throws AccessDenied
+	 * @throws NotFound
+	 */
+	private function findFileForDownloadLink($id): File
+	{
+		$file = File::model()->findByPk($id);
+		if(!$file) {
+			throw new NotFound();
+		}
+		if(!$file->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
+		return $file;
+	}
 	
 	/**
 	 * This action will generate multiple Email Download link and return a JSON
@@ -578,7 +599,11 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionEmailDownloadLink($params){
 		$msgController = new MessageController();
 		$templateContent = $msgController->loadTemplate($params);
-		$files = \GO\Files\Model\File::model()->findByAttribute('id', json_decode($params['ids']));
+		$ids = json_decode($params['ids'], true);
+		if(!is_array($ids) || empty($ids)) {
+			throw new NotFound();
+		}
+		$files = array_map(fn($id) => $this->findFileForDownloadLink($id), $ids);
 		
 		$html=$params['content_type']=='html';
 		$bodyindex = $html ? 'htmlbody' : 'plainbody';
@@ -589,7 +614,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		foreach($files as $file) {
 			$url = $file->getEmailDownloadURL($html,\GO\Base\Util\Date::date_add($params['expire_time'],1),$params['delete_when_expired']);
-			$linktext .= $html ?  '<li><a href="'.$url.'">'.$file->name.'</a></li>'.$lb : $url.$lb;
+			$linktext .= $html ?  '<li><a href="'.$url.'">'.htmlspecialchars($file->name, ENT_QUOTES, 'UTF-8').'</a></li>'.$lb : $url.$lb;
 		}
 		$linktext .= $html ? "</ul>" : "\n";
 		$text .= ' ('.\GO::t("possible until", "files").' '.\GO\Base\Util\Date::get_timestamp(\GO\Base\Util\Date::date_add($file->expire_time,-1), false).')'.$lb;
