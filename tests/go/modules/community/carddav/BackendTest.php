@@ -20,10 +20,12 @@ class BackendTest extends TestCase
 	private User $user;
 	private Group $group;
 	private AddressBook $addressBook;
+	private ?string $userAgent;
 
 	protected function setUp(): void
 	{
 		$this->authState = go()->getAuthState();
+		$this->userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
 
 		$name = uniqid('carddav');
@@ -72,6 +74,11 @@ class BackendTest extends TestCase
 		User::delete(['id' => $this->user->id]);
 		Group::delete(['id' => $this->group->id]);
 		go()->setAuthState($this->authState);
+		if ($this->userAgent === null) {
+			unset($_SERVER['HTTP_USER_AGENT']);
+		} else {
+			$_SERVER['HTTP_USER_AGENT'] = $this->userAgent;
+		}
 	}
 
 	private function grant(string $package, string $name): void
