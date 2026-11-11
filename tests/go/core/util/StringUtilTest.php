@@ -118,6 +118,79 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 		$this->assertNoActiveContent(\GO\Base\Util\StringHelper::filterXSS($html));
 	}
 
+	/**
+	 * Mail style that tries to end the <style> element that sanitizeHtml() adds with the extracted style, so that the
+	 * HTML after it is not sanitized.
+	 */
+	public static function styleBreakoutProvider(): array
+	{
+		$img = '<img alt=">" src=x onerror=alert(1)>';
+		return [
+			'end tag with attribute' => ['<style>a{color:red}</style x>' . $img . '</style><p>hi</p>'],
+			'end tag with slash' => ['<style>a{color:red}</style/>' . $img . '</style><p>hi</p>'],
+			'uppercase end tag with space' => ['<STYLE>a{color:red}</STYLE >' . $img . '</STYLE><p>hi</p>'],
+			'end tag with newline' => ["<style>a{color:red}</style\n>" . $img . '</style><p>hi</p>'],
+			'end tag with newline and attribute' => ["<style>a{color:red}</style\nx=\"1\">" . $img . '</style><p>hi</p>'],
+			'end tag with tab' => ["<style>a{color:red}</style\tx>" . $img . '</style><p>hi</p>'],
+			'end tag in css string' => ['<style>a{content:"</style>' . $img . '"}</style><p>hi</p>'],
+			'end tag with attribute in css string' => ['<style>a{content:"</style x>' . $img . '"}</style><p>hi</p>'],
+			'end tag in comment' => ['<style><!-- a{color:red} </style x>' . $img . ' --></style><p>hi</p>'],
+			'end tag in body style' => ['<html><body style="color:red</style>' . $img . '"><p>hi</p></body></html>'],
+			'unclosed style' => ['<p>hi</p><style>a{color:red}</style x>' . $img],
+		];
+	}
+
+	/**
+	 * Check that no <style> element in the HTML can be ended early by the browser. The browser ends it at the first
+	 * "</style" followed by white space, "/" or ">", so a style element must not contain any "<".
+	 */
+	private function assertStyleCannotBreakOut(string $html): void
+	{
+		preg_match_all('#<style[^>]*>(.*?)</style[\s/>]#is', $html, $matches);
+		foreach ($matches[1] as $css) {
+			$this->assertStringNotContainsString('<', $css, "Style can be ended early: " . $html);
+		}
+		// Everything after the style elements must be sanitized too
+		$this->assertNoActiveContent(preg_replace('#<style[^>]*>.*?</style[^>]*>#is', '', $html));
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('styleBreakoutProvider')]
+	public function testSanitizeHtmlStyleCannotBreakOut(string $html)
+	{
+		$result = StringUtil::sanitizeHtml($html);
+		$this->assertStyleCannotBreakOut($result);
+		$this->assertNoActiveContent($result);
+
+		$result = StringUtil::sanitizeHtml($html, false);
+		$this->assertStyleCannotBreakOut($result);
+		$this->assertNoActiveContent($result);
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('styleBreakoutProvider')]
+	public function testFilterXSSStyleCannotBreakOut(string $html)
+	{
+		$result = \GO\Base\Util\StringHelper::filterXSS($html);
+		$this->assertStyleCannotBreakOut($result);
+		$this->assertNoActiveContent($result);
+	}
+
+	public function testSanitizeHtmlKeepsMailStyle()
+	{
+		$html = '<style><!-- p.MsoNormal, li { margin: 0; font-family: "Calibri", sans-serif; } a > b { color: #00f; }'
+			. ' @media (max-width: 600px) { td { display: block; } } p::before { content: "<3"; } --></style>'
+			. '<p class="MsoNormal">Hello</p>';
+
+		$result = StringUtil::sanitizeHtml($html);
+
+		$this->assertStringContainsString('font-family: "Calibri", sans-serif;', $result);
+		$this->assertStringContainsString('a > b{ color: #00f;}', $result);
+		$this->assertStringContainsString('@media (max-width: 600px)', $result);
+		// "<" in a CSS string is escaped and still means "<"
+		$this->assertStringContainsString('content: "\\3c 3";', $result);
+		$this->assertStringContainsString('<p class="MsoNormal">Hello</p>', $result);
+		$this->assertStyleCannotBreakOut($result);
+	}
+
 	public function testSanitizeHtmlKeepsNormalMail()
 	{
 		$html = '<style>p { color: red; }</style><table width="100%"><tr><td style="color:#333">Hëllo wörld € ✓</td></tr></table>'
