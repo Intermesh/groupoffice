@@ -442,7 +442,7 @@ class Client {
 	 *
 	 * @param string $url
 	 * @param File $file
-	 * @return array
+	 * @return array{name: string, type: string, status: int} status is the HTTP status code
 	 * @throws CoreException
 	 */
   public function download(string $url, File $file): array
@@ -468,14 +468,17 @@ class Client {
       throw new CoreException($error);
     }
 
+		$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
+
     if(isset($this->lastHeaders['content-disposition'])) {
       preg_match('/filename="(.*)"/', $this->lastHeaders['content-disposition'], $matches);
       return [
         "name" => $matches[1] ?? "unknown",
-        "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream"
+        "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream",
+        "status" => $status
       ];
     } else{
-      return ["name"=> "unknown", "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream"];
+      return ["name"=> "unknown", "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream", "status" => $status];
     }
 
   }
