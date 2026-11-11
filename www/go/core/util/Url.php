@@ -87,4 +87,21 @@ class Url implements ArrayableInterface {
 		
 		
 	}
+
+	/**
+	 * Check if a URL is a path on this server, so it's safe to redirect to after a login (no open redirect)
+	 *
+	 * Only paths starting with a single "/" are accepted. "//example.com" or "/\example.com" are refused because browsers
+	 * treat them as another host, and so are URLs with a scheme, backslashes or control characters.
+	 *
+	 * @param string $url
+	 * @return bool
+	 */
+	public static function isLocalPath(string $url): bool
+	{
+		return str_starts_with($url, '/')
+			&& !str_starts_with($url, '//')
+			&& !str_contains($url, '\\')
+			&& !preg_match('/[\x00-\x1f\x7f]/', $url);
+	}
 }

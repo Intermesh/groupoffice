@@ -124,33 +124,16 @@ class Session extends Observable{
 	}
 	
 	/**
-	 * Attemts to login with stored cookies on the client.
-	 * This function is called in index.php
-	 * 
-	 * @return ?Model\User
+	 * Remove the cookies of the old "remember me" of the site module.
+	 *
+	 * These cookies contained the username and password and are no longer used to log in. This function is called in
+	 * index.php of the site module.
+	 *
+	 * @return null
 	 */
 	public function loginWithCookies(){
-		if(empty(\GO::session()->values['user_id']) && !empty($_COOKIE['GO_UN']) && !empty($_COOKIE['GO_UN'])){
-			try {
-				$username = Util\Crypt::decrypt($_COOKIE['GO_UN']);
-				$password = Util\Crypt::decrypt($_COOKIE['GO_PW']);
-			} catch (\Exception $e) {
-				$this->_unsetRemindLoginCookies ();
-				return null;
-			}
-
-			if(!$username){
-				$username = $_COOKIE['GO_UN'];
-				$password = $_COOKIE['GO_PW'];
-			}
-			
-			\GO::debug("Attempting login with cookies for ".$username);
-			
-			$user = $this->login($username, $password, false);
-			if(!$user)
-				$this->_unsetRemindLoginCookies ();
-			else
-				return $user;
+		if(isset($_COOKIE['GO_UN']) || isset($_COOKIE['GO_PW'])) {
+			$this->_unsetRemindLoginCookies();
 		}
 		return null;
 	}
