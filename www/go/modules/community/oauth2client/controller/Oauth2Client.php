@@ -72,14 +72,19 @@ final class Oauth2Client extends EntityController
 			throw new Exception(500, 'A session variable is missing. Please retry with a new session.');
 		}
 
-		if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+		if (empty($_GET['state']) || !is_string($_GET['state']) || !is_string($_SESSION['oauth2state']) || !hash_equals($_SESSION['oauth2state'], $_GET['state'])) {
 
 			// State is invalid, possible CSRF attack in progress
 			unset($_SESSION['oauth2state']);
 			unset($_SESSION['accountId']);
 			\GO::session()->closeWriting();
 			throw new Exception(500, 'Invalid state');
-		} else if(!empty($_SESSION['accountId'])) {
+		}
+
+		// The state can only be used once
+		unset($_SESSION['oauth2state']);
+
+		if(!empty($_SESSION['accountId'])) {
 			$this->callbackEmailAccount();
 		} else {
 			$this->callbackOpenId();
