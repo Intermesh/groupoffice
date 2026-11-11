@@ -378,7 +378,8 @@ class Token extends Entity {
 		$utc = new DateTimeZone("UTC");
 		$createdAt = (new DateTime($times['createdAt'], $utc))->getTimestamp();
 		$expiresAt = (new DateTime($times['expiresAt'], $utc))->getTimestamp();
-		if ($createdAt < time() - self::HANDOFF_LIFETIME || $expiresAt - $createdAt > 3600) {
+		// A minute of slack for the clocks of the servers
+		if ($createdAt < time() - self::HANDOFF_LIFETIME || $expiresAt - $createdAt > 3660) {
 			return null;
 		}
 

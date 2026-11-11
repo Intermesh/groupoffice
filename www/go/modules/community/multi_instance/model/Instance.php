@@ -641,7 +641,7 @@ class Instance extends Entity {
 		// UTC like the instance stores it. The instance only accepts the token shortly after it was created and when it
 		// expires within an hour. See Token::findHandoff().
 		$now = new DateTime("now", new \DateTimeZone("UTC"));
-		$expiresAt = new DateTime("+1 hour", new \DateTimeZone("UTC"));
+		$expiresAt = (clone $now)->modify("+1 hour");
 		
 		$data = [
 
