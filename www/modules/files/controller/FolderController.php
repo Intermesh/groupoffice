@@ -1430,8 +1430,21 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			return $this->checkEntityFolder($params);
 		}
 
-		$obj = new $cls(false);
-		$model = $obj->findByPk($params['id'],false, true);
+		// Only models that have a files folder
+		if(!is_string($cls) || !is_a($cls, \GO\Base\Db\ActiveRecord::class, true) || !$cls::model()->hasFiles()) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		$model = $cls::model()->findByPk($params['id']);
+		if(!$model) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		// Creating the folder of the model requires write permission on the model
+		$folderExists = $model->files_folder_id > 0 && Folder::model()->findByPk($model->files_folder_id, false, true);
+		if(!$folderExists && !$model->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
 
 		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
 		$folder = Folder::model()->findByPk($folderId);
@@ -2005,9 +2018,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionImages($params){
 		if(isset($params["id"])){
 			$currentFile = \GO\Files\Model\File::model()->findByPk($params["id"]);
+			if(!$currentFile) {
+				throw new \GO\Base\Exception\NotFound();
+			}
 		}else
 		{
-			$currentFile = \GO\Files\Model\File::model()->findByPath($params["path"]);
+			// The images of the folder are listed, so the user must be allowed to read it
+			$currentFile = \GO\Files\Model\File::model()->findReadableByPath($params["path"] ?? '');
 		}
 
 		$folder = $currentFile->folder();

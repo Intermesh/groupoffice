@@ -380,11 +380,13 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	
 	protected function actionHandlers($params){
 		if(!empty($params['path'])){
-			$folder = \GO\Files\Model\Folder::model()->findByPath(dirname($params['path']));
-			$file = $folder->hasFile(\GO\Base\Fs\File::utf8Basename($params['path']));
+			$file = File::model()->findReadableByPath($params['path']);
 		}else
 		{
-			$file = \GO\Files\Model\File::model()->findByPk($params['id'], false, true);
+			$file = File::model()->findByPk($params['id']);
+			if(!$file) {
+				throw new NotFound();
+			}
 		}
 
 		if(empty($params['all'])){
