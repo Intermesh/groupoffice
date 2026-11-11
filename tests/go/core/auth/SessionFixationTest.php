@@ -162,6 +162,25 @@ class SessionFixationTest extends TestCase
 		$this->assertSame($other->accessToken, $values['accessToken']);
 	}
 
+	/**
+	 * Like the login request of api/auth.php or a remember me login in index.php: the token is set by the server, not
+	 * sent by the client
+	 */
+	public function testSessionUserIsKeptWithTokenOfTheServerState(): void
+	{
+		$token = $this->newToken();
+		$this->resetClientToken();
+		$state = new State();
+		$state->setToken($token);
+		go()->setAuthState($state);
+
+		\GO::session()->values = ['user_id' => $token->userId, 'accessToken' => $token->accessToken, 'security_token' => 'abc'];
+		\GO::session()->start();
+
+		$this->assertEquals($token->userId, \GO::session()->values['user_id']);
+		$this->assertSame('abc', \GO::session()->values['security_token'], 'the security token of the page must stay valid');
+	}
+
 	public function testSessionUserWithInvalidAccessTokenIsDropped(): void
 	{
 		$victim = $this->newToken();
