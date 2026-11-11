@@ -72,6 +72,8 @@ class MessageController extends \GO\Base\Controller\AbstractController
 	protected function actionNotification(array $params): array
 	{
 		$account = Account::model()->findByPk($params['account_id']);
+		// The read notification is sent from this account to an address given by the client
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		
 		$alias = $this->_findAliasFromRecipients($account, new \GO\Base\Mail\EmailRecipients($params['message_to']));	
 		if(!$alias) {
@@ -466,6 +468,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$alias = Alias::model()->findByPk($params['alias_id']);
 		$account = Account::model()->findByPk($alias->account_id);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 
 		if (empty($account->drafts)) {
 			throw new \Exception(GO::t("Message could not be saved because the 'Drafts' folder is disabled.\n\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.", "email"));
@@ -579,6 +582,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$alias = Alias::model()->findByPk($params['alias_id']);
 		$account = Account::model()->findByPk($alias->account_id);
+		// Sending as an alias of a shared account requires "Use account"
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 
 		$message = new SmimeMessage();
 
@@ -673,15 +678,20 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			//set \Answered flag on IMAP message
 			GO::debug("Reply");
 			$account2 = Account::model()->findByPk($params['reply_account_id']);
-			$imap = $account2->openImapConnection($params['reply_mailbox']);
-			$imap->set_message_flag(array($params['reply_uid']), "\Answered");
+			// the message has been sent already, so only skip the flag
+			if($account2->checkPermissionLevel(Account::ACL_DELEGATED_PERMISSION)) {
+				$imap = $account2->openImapConnection($params['reply_mailbox']);
+				$imap->set_message_flag(array($params['reply_uid']), "\Answered");
+			}
 		}
 
 		if (!empty($params['forward_uid'])) {
 			//set forwarded flag on IMAP message
 			$account2 = Account::model()->findByPk($params['forward_account_id']);
-			$imap = $account2->openImapConnection($params['forward_mailbox']);
-			$imap->set_message_flag(array($params['forward_uid']), "\$Forwarded");
+			if($account2->checkPermissionLevel(Account::ACL_DELEGATED_PERMISSION)) {
+				$imap = $account2->openImapConnection($params['forward_mailbox']);
+				$imap->set_message_flag(array($params['forward_uid']), "\$Forwarded");
+			}
 		}
 
 		/**
