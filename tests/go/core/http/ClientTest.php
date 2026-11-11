@@ -222,6 +222,32 @@ PHP
 		}
 	}
 
+	public function testDownloadReturnsStatus()
+	{
+		$file = File::tempFile('txt');
+		try {
+			$response = (new Client())->download($this->url('127.0.0.1', '/target'), $file);
+			$this->assertSame(200, $response['status']);
+		} finally {
+			$file->delete();
+		}
+	}
+
+	public function testDownloadDoesNotFollowRedirectWhenDisabled()
+	{
+		// OnlyOffice turns redirects off so a download can't go to another server than the checked one
+		$file = File::tempFile('txt');
+		try {
+			$client = new Client();
+			$client->setOption(CURLOPT_FOLLOWLOCATION, false);
+			$response = $client->download($this->url('127.0.0.1', '/redirect?to=' . urlencode($this->url('127.0.0.1', '/secret'))), $file);
+			$this->assertSame(302, $response['status']);
+			$this->assertStringNotContainsString('content of /secret', (string) file_get_contents($file->getPath()));
+		} finally {
+			$file->delete();
+		}
+	}
+
 	public function testTooManyRedirects()
 	{
 		$url = $this->url(PublicTestHostClient::PUBLIC_HOST, '/target');
