@@ -244,6 +244,24 @@ PHP
 		$client->get($this->url(PublicTestHostClient::PUBLIC_HOST, '/large'));
 	}
 
+	public function testPostRedirectToPublicUrlIsFollowed()
+	{
+		// post() and the DAV client methods like PROPFIND go through request()
+		$to = $this->url(PublicTestHostClient::PUBLIC_HOST, '/target');
+		$response = $this->client()->post($this->url(PublicTestHostClient::PUBLIC_HOST, '/redirect?to=' . urlencode($to)), 'data');
+
+		$this->assertSame(200, $response['status']);
+		$this->assertSame('content of /target', $response['body']);
+	}
+
+	public function testPostRedirectToInternalUrlIsRefused()
+	{
+		$to = $this->url('127.0.0.1', '/secret');
+
+		$this->expectException(Forbidden::class);
+		$this->client()->post($this->url(PublicTestHostClient::PUBLIC_HOST, '/redirect?to=' . urlencode($to)), 'data');
+	}
+
 	public function testRedirectsAreFollowedWithoutGlobalRangeOnly()
 	{
 		// Internal services like WOPI with wopiAllowInternal keep working
