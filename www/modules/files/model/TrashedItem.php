@@ -136,6 +136,8 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 			if (!$f) {
 				throw new Exception(404, GO()->t("Folder not found."));
 			}
+			// a system folder may be put back in its original place
+			$f->systemSave = true;
 		}
 		if (!$f->move($parentFolder, true, true)) {
 			throw new Exception(500, \GO::t("Could not restore the item", "files"));
