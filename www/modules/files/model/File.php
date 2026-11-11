@@ -1009,13 +1009,26 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 */
 	public function moveToTrash(): void
 	{
-		TrashedItem::model()->saveForFile($this);
-
 		$trashFolder = Folder::model()->findByPath('trash');
 		if ($this->folder_id == $trashFolder->id) {
 			throw new Exception("File is already in trash");
 		}
-		$this->move($trashFolder, true);
+		$originalFolder = $this->folder;
+
+		// Only create the trash record when the file was moved
+		go()->getDbConnection()->beginTransaction();
+		try {
+			if (!$this->move($trashFolder, true)) {
+				throw new Exception("Unable to move file to trash");
+			}
+
+			TrashedItem::model()->saveForFile($this, $originalFolder);
+
+			go()->getDbConnection()->commit();
+		} catch (\Throwable $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
+		}
 	}
 
 	/**
