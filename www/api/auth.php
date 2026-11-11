@@ -152,7 +152,7 @@ try {
 			break;
 
 		case 'recover':
-			$user = $auth->recovery($data['hash']);
+			$user = $auth->recovery($data['hash'] ?? null);
 			if (empty($user)) {
 				output(['success' => false]);
 			}
@@ -173,6 +173,13 @@ try {
 		default:
 			/** @var ?Token $token */
 			$token = null;
+
+			// JSON can contain numbers and arrays. An array would be used as a list of tokens to look up.
+			foreach (['accessToken', 'rememberMeToken', 'loginToken'] as $key) {
+				if (isset($data[$key]) && !is_string($data[$key])) {
+					output(["error" => "Invalid token given"], 400, "Invalid token given");
+				}
+			}
 
 			if (isset($data['accessToken'])) {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
