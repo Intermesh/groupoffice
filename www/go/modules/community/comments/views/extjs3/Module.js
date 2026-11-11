@@ -54,7 +54,7 @@ go.Modules.register('community', 'comments', {
 						creator = {name: t("Unknown user")};
 					}
 
-					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}", "comments", "community").replace("{creator}", creator.name) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
+					panelCfg.html = Ext.util.Format.htmlEncode(go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}", "comments", "community").replace("{creator}", creator.name)) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
 					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("A comment was made by {creator}", "comments", "community").replace("{creator}", creator.name) + "\n\n"+alert.data.excerpt;
 					return panelCfg;
 
