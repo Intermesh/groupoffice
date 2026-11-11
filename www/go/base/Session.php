@@ -96,7 +96,7 @@ class Session extends Observable{
 		// A session user that was copied from an access token of the new framework only belongs to the client that
 		// sends that access token. Otherwise somebody else's session could be given the user of the client.
 		if (!empty($this->values['user_id']) && !empty($this->values['accessToken'])) {
-			$clientAccessToken = State::getClientAccessToken();
+			$clientAccessToken = $this->getCallerAccessToken();
 			if (!is_string($clientAccessToken) || !hash_equals($this->values['accessToken'], $clientAccessToken)) {
 				go()->debug("Removing the user from the session because the access token of the client doesn't match");
 				$this->values = [];
@@ -126,6 +126,23 @@ class Session extends Observable{
 			//$this->_log("security_token");
 			$this->values['security_token']=Util\StringHelper::randomPassword(20,'a-z,A-Z,1-9');				
 		}
+	}
+
+	/**
+	 * The access token of this request
+	 *
+	 * The token of the auth state when the server set it, for example in the login request or a remember me login.
+	 * Otherwise the token that the client sent in the cookie or the Authorization header.
+	 *
+	 * @return string|null
+	 */
+	private function getCallerAccessToken(): ?string
+	{
+		$state = go()->getAuthState();
+		if ($state instanceof State && $state->hasToken() && ($token = $state->getToken())) {
+			return $token->accessToken;
+		}
+		return State::getClientAccessToken();
 	}
 
 	/**
