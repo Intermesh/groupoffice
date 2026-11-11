@@ -6,9 +6,9 @@ require __DIR__ . '/vendor/autoload.php';
 use BadRequestException;
 use go\core\App;
 use go\core\auth\Authenticate;
+use go\core\auth\ExternalUserLink;
 use go\core\http\Response;
 use go\core\jmap\State;
-use go\core\model\User;
 use go\modules\community\oidc\model\Authenticator;
 use go\modules\community\oidc\model\Client;
 class Module extends \go\core\Module
@@ -58,17 +58,10 @@ class Module extends \go\core\Module
 
 		$info = $client->requestUserInfo();
 
-		if(empty($info->email)) {
-			var_dump($info);
-			throw new \Exception("Could not get e-mail from openid provider");
-		}
-
 		go()->getSettings()->allowRegistration = true;
 
-		$user = User::findOrCreateByUsername($info->email, $info->email, $info->name);
-
-		//register as oauth user
-		go()->getDbConnection()->insertIgnore("oidc_user", ['userId' => $user->id, 'clientId' => $client->id])->execute();
+		// Found by the subject at the provider. The e-mail address is only used to link a user the first time.
+		$user = (new ExternalUserLink('oidc_user', $client->id))->findOrCreateUser((array) $info);
 
 		$auth = new Authenticate();
 		$auth->setAuthenticated($user);
