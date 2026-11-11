@@ -8,6 +8,8 @@ use go\core\model\Group;
 use go\core\model\Module;
 use go\core\model\Permission;
 use go\core\model\User as UserModel;
+use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\addressbook\model\Contact;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -289,5 +291,65 @@ class UserTest extends TestCase
 		$result = $this->update(UserModel::ID_SUPER_ADMIN, $this->admin->id, ['recoveryEmail' => 'admin@example.com', 'disk_quota' => 1000]);
 
 		$this->assertUpdated($result, $this->admin->id);
+	}
+
+	public function testUserManagerMayNotUseProfileOfAnotherUser()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$adminProfile = Contact::findForUser($this->admin->id);
+		$this->assertNotEmpty($adminProfile);
+
+		$result = $this->create($this->manager->id, ['profile' => ['id' => $adminProfile->id]]);
+
+		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$this->assertEquals($adminProfile->id, Contact::findForUser($this->admin->id)->id);
+	}
+
+	public function testUserManagerMayNotUseContactWithoutWritePermissionAsProfile()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$addressBook = new AddressBook();
+		$addressBook->name = uniqid('profiletest');
+		$this->assertTrue($addressBook->save());
+		$contact = new Contact();
+		$contact->addressBookId = $addressBook->id;
+		$contact->firstName = 'Unlinked';
+		$this->assertTrue($contact->save());
+
+		try {
+			$result = $this->create($this->manager->id, ['profile' => ['id' => $contact->id]]);
+
+			$this->assertArrayNotHasKey('new', $result['created'] ?? []);
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			$this->assertNull(Contact::findById($contact->id)->goUserId);
+		} finally {
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			AddressBook::delete(['id' => $addressBook->id]);
+		}
+	}
+
+	public function testUserManagerMayUseUnlinkedContactAsProfile()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$addressBook = new AddressBook();
+		$addressBook->name = uniqid('profiletest');
+		$addressBook->setAcl([$this->managerGroup->id => Acl::LEVEL_WRITE]);
+		$this->assertTrue($addressBook->save());
+		$contact = new Contact();
+		$contact->addressBookId = $addressBook->id;
+		$contact->firstName = 'Unlinked';
+		$this->assertTrue($contact->save());
+
+		try {
+			$result = $this->create($this->manager->id, ['profile' => ['id' => $contact->id]]);
+
+			$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			$this->assertEquals($result['created']['new']['id'], Contact::findById($contact->id)->goUserId);
+		} finally {
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			AddressBook::delete(['id' => $addressBook->id]);
+		}
 	}
 }

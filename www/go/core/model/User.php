@@ -710,6 +710,10 @@ public function historyLog(): bool|array
 			}
 		}
 
+		if($this->profileForbidden) {
+			$this->setValidationError('profile', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
+		}
+
 		if(!$this->validatePasswordChange()) {
 			if($this->passwordVerified === null) {
 				$this->setValidationError('currentPassword', ErrorCode::REQUIRED);
@@ -1404,6 +1408,11 @@ public function historyLog(): bool|array
 	}
 
 	/**
+	 * Set when the client tried to use a contact as profile that it may not use
+	 */
+	private bool $profileForbidden = false;
+
+	/**
 	 * @throws Exception
 	 */
 	public function setProfile($values) {
@@ -1411,10 +1420,17 @@ public function historyLog(): bool|array
 			throw new Exception("Can't set profile without address book module.");
 		}
 		if(isset($values['id'])) {
+			// Only the user's own profile or a contact that isn't the profile of another user and that the logged-in user
+			// may change can become the profile. Otherwise it would be taken from its user and that user's e-mail address
+			// could be changed through it.
 			$contact = \go\modules\community\addressbook\model\Contact::findById($values['id']);
-			if(!empty($contact)){
-				$this->contact = $contact;
+			if(empty($contact) ||
+				(isset($contact->goUserId) && ($this->isNew() || $contact->goUserId != $this->id)) ||
+				!$contact->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+				$this->profileForbidden = true;
+				return;
 			}
+			$this->contact = $contact;
 		} else {
 			$this->contact = $this->getProfile();
 			$this->contact->setValues($values);
