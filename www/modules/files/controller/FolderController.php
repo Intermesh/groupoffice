@@ -707,9 +707,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			if (!isset($response['deleteSuccess'])){
 				$response['deleteSuccess'] = true;
 			}
-		} else {
-			$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
+
+			// Pasting into the trash is moving to the trash, which is done above with the delete permission of every
+			// item. Nothing is copied or moved into the trash folder itself.
+			unset(\GO::session()->values['files']['pasteIds']);
+			return $response;
 		}
+
+		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
 
 		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION))
 			throw new \GO\Base\Exception\AccessDenied();
@@ -1086,25 +1091,25 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (isset($params['trash_keys'])) {
 			$ids = $this->_splitFolderAndFileIds(json_decode($params['trash_keys'], true));
 
+				// Moving to trash is deleting, so it requires the same permission. All items are checked before
+				// anything is moved, so nothing is trashed when one of them may not be deleted.
+				$items = [];
 				foreach ($ids['folders'] as $folderId) {
-					$f = Folder::model()->findByPk($folderId);
-					if ($f) {
-						// Moving to trash is deleting, so it requires the same permission
-						if(!$f->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
-							throw new AccessDenied();
-						}
-						$f->moveToTrash();
+					$items[] = Folder::model()->findByPk($folderId);
+				}
+				foreach ($ids['files'] as $fileId) {
+					$items[] = File::model()->findByPk($fileId);
+				}
+				$items = array_filter($items);
+
+				foreach ($items as $f) {
+					if(!$f->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+						throw new AccessDenied();
 					}
 				}
 
-				foreach ($ids['files'] as $fileId) {
-					$f = File::model()->findByPk($fileId);
-					if ($f) {
-						if(!$f->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
-							throw new AccessDenied();
-						}
-						$f->moveToTrash();
-					}
+				foreach ($items as $f) {
+					$f->moveToTrash();
 				}
 		}
 	}
