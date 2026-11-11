@@ -207,12 +207,19 @@ class State extends AbstractState {
 	public function changeUser(int $userId): bool
 	{
 		$token = $this->getToken();
+		$oldAccessToken = $token->accessToken;
 		$token->userId = $userId;
 		$token->clientId = null;
+		// New tokens for the other user, so the tokens of the administrator's session can't be used for it
+		$token->accessToken = null;
+		$token->CSRFToken = null;
 		$success = $token->setAuthenticated(false);
 
-		go()->getCache()->delete('token-' . $token->accessToken);
-		go()->getCache()->delete('session-' . $token->accessToken);
+		go()->getCache()->delete('token-' . $oldAccessToken);
+		go()->getCache()->delete('session-' . $oldAccessToken);
+		if($success && self::$cookieAccessTokenUsed) {
+			$token->setCookie();
+		}
 		
 		//for old framework
 		$_SESSION['GO_SESSION'] = array_filter($_SESSION['GO_SESSION'], function($key) {

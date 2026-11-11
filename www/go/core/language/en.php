@@ -444,4 +444,5 @@ If you did not request a new password please delete this mail.',
   'The e-mail address is not verified by the identity provider' => 'The e-mail address is not verified by the identity provider',
   'There\'s already an account with this e-mail address. Ask your administrator to link it to this login.' => 'There\'s already an account with this e-mail address. Ask your administrator to link it to this login.',
   'User not found and registration not allowed' => 'User not found and registration not allowed',
+  'logged in by {username}' => 'logged in by {username}',
 );
