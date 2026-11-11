@@ -260,11 +260,24 @@ class Connection {
 			throw new Exception("INVALID IMAP INPUT DETECTED: command contains line breaks");
 		}
 
-		$command = 'A' . $this->commandNumber() . ' ' . $command . "\r\n";
+		$tag = 'A' . $this->commandNumber();
 
-		go()->debug('> ' . $command);
-		
+		go()->debug('> ' . $tag . ' ' . self::maskCommand($command));
+
+		$command = $tag . ' ' . $command . "\r\n";
+
 		return $this->fputs($command);
+	}
+
+	/**
+	 * Hide the password of a LOGIN command, so it's not written to the debug log
+	 *
+	 * @param string $command eg. LOGIN "user" "password"
+	 * @return string eg. LOGIN "user" "***"
+	 */
+	public static function maskCommand(string $command): string
+	{
+		return preg_replace('/^(LOGIN\s+"(?:[^"\\\\]|\\\\.)*"\s+)"(?:[^"\\\\]|\\\\.)*"/i', '$1"***"', $command);
 	}
 	
 	/**
@@ -487,23 +500,19 @@ class Connection {
 	 */
 	public function getQuota() {
 
-		if(!$this->has_capability("QUOTA"))
+		if(!$this->hasCapability("QUOTA"))
 			return false;
 
-		$command = "GETQUOTAROOT \"INBOX\"\r\n";
-
-		$this->send_command($command);
-		$res = $this->get_response();
-		$status = $this->check_response($res);
-		if($status){
-			foreach($res as $response){
-				if(strpos($response, 'STORAGE')!==false){
-					$parts = explode(" ", $response);
-					$storage_part = array_search("STORAGE", $parts);
-					if ($storage_part>0){
+		$this->sendCommand('GETQUOTAROOT "INBOX"');
+		$res = $this->getResponse();
+		if($res['success']){
+			foreach($res['data'] as $response){
+				foreach($response as $line) {
+					// eg. * QUOTA "" (STORAGE 10 512)
+					if(preg_match('/\(.*STORAGE\s+(\d+)\s+(\d+)/i', $line, $matches)) {
 						return array(
-							'usage'=>intval($parts[$storage_part+1]),
-							'limit'=>intval($parts[$storage_part+2]));
+							'usage'=>intval($matches[1]),
+							'limit'=>intval($matches[2]));
 					}
 				}
 			}
