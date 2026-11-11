@@ -2,6 +2,7 @@
 
 namespace go\modules\community\davclient\controller;
 
+use go\core\exception\NotFound;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\davclient\model;
@@ -35,19 +36,21 @@ class DavAccount extends EntityController {
 	}
 
 	public function sync($params) {
-		set_time_limit(600);
+		// getEntity() returns false when the user may not read the account
 		$account = $this->getEntity($params['accountId']);
+		if(empty($account)) {
+			throw new NotFound();
+		}
+		set_time_limit(600);
 		$success = false;
 		$collection = null;
-		if(!empty($account)) {
-			if(isset($params['collectionId'])) {
-				if(isset($account->collections[$params['collectionId']])) {
-					$collection = $account->collections[$params['collectionId']];
-					$success = $account->syncCollection($collection);
-				}
-			} else {
-				$success = $account->sync(true); // full sync, incl homeset
+		if(isset($params['collectionId'])) {
+			if(isset($account->collections[$params['collectionId']])) {
+				$collection = $account->collections[$params['collectionId']];
+				$success = $account->syncCollection($collection);
 			}
+		} else {
+			$success = $account->sync(true); // full sync, incl homeset
 		}
 		return ['accountId'=>$params['accountId'], 'collection'=>$collection, 'success' => $success, 'error' => $account->lastError];
 	}

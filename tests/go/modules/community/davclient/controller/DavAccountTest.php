@@ -121,4 +121,27 @@ class DavAccountTest extends TestCase
 		$this->assertArrayHasKey($this->accountId, $result['updated'] ?? [], var_export($result, true));
 		$this->assertSame('Changed', $this->storedName());
 	}
+
+	public function testUserCannotSyncAccountOfOtherUser(): void
+	{
+		$this->actAs(User::ID_SUPER_ADMIN);
+		$account = new DavAccountModel();
+		$account->ownerId = User::ID_SUPER_ADMIN;
+		$account->name = 'Account of the admin';
+		$account->host = '127.0.0.1:1';
+		$account->username = 'admin';
+		$account->setPassword('secret');
+		$account->refreshInterval = 30;
+		$this->assertTrue($account->save(), $account->getValidationErrorsAsString());
+
+		try {
+			$this->actAs($this->user->id);
+			$this->expectException(\go\core\exception\NotFound::class);
+			(new DavAccount())->sync(['accountId' => $account->id]);
+		} finally {
+			$this->actAs(User::ID_SUPER_ADMIN);
+			DavAccountModel::$keepData = false;
+			DavAccountModel::delete(['id' => $account->id]);
+		}
+	}
 }
