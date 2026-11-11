@@ -5,14 +5,15 @@ namespace go\modules\community\addressbook\convert;
 use go\core\auth\TemporaryState;
 use go\core\fs\File;
 use go\core\model\Acl;
+use go\core\model\Link;
 use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 use PHPUnit\Framework\TestCase;
 
 /**
- * vCard imports may only change contacts the user may write and may not create contacts
- * in address books the user may not create in.
+ * vCard imports may only change contacts the user may write and only link organizations the user may read. Exports
+ * only contain organizations the user may read.
  */
 class VCardTest extends TestCase
 {
@@ -147,5 +148,50 @@ class VCardTest extends TestCase
 
 		$this->assertSame(1, $result['count'], implode("\n", $result['errors']));
 		$this->assertSame('Changed', Contact::findById($contact->id)->firstName);
+	}
+
+	public function testImportDoesNotLinkOrganizationUserCanNotRead(): void
+	{
+		$name = $this->prefix . ' Hidden Inc';
+		$hidden = $this->createContact('none', $name, true);
+
+		$uid = $this->prefix . '-employee';
+		$result = $this->import('write', $this->vcard($uid, 'Employee', $name));
+		$this->assertSame(1, $result['count'], implode("\n", $result['errors']));
+
+		$contact = $this->importedContact('write', $uid);
+		$organizationIds = Contact::find()
+			->withLink($contact)
+			->andWhere('isOrganization', '=', true)
+			->selectSingleValue('c.id')
+			->all();
+		$this->assertNotContains((int) $hidden->id, array_map('intval', $organizationIds));
+		// A new organization was created in the address book of the contact instead
+		$this->assertSame([$name], $this->linkedOrganizationNames($contact));
+	}
+
+	public function testImportMatchesOrganizationNameExactly(): void
+	{
+		$existing = $this->createContact('write', $this->prefix . ' Acme', true);
+
+		$uid = $this->prefix . '-wildcard';
+		$result = $this->import('write', $this->vcard($uid, 'Employee', $this->prefix . '%'));
+		$this->assertSame(1, $result['count'], implode("\n", $result['errors']));
+
+		$contact = $this->importedContact('write', $uid);
+		$this->assertSame([$this->prefix . '%'], $this->linkedOrganizationNames($contact));
+		$this->assertEmpty(Link::find()->where(['fromId' => $contact->id, 'toId' => $existing->id])->single());
+	}
+
+	public function testExportOnlyContainsReadableOrganizations(): void
+	{
+		$contact = $this->createContact('write', 'Employee');
+		$hidden = $this->createContact('none', $this->prefix . ' Hidden Inc', true);
+		$this->assertNotFalse(Link::create($contact, $hidden));
+
+		go()->setAuthState(new TemporaryState($this->user->id));
+		$vcard = (new VCard())->export(Contact::findById($contact->id));
+
+		$this->assertStringNotContainsString('Hidden Inc', $vcard);
 	}
 }
