@@ -56,4 +56,39 @@ class ImapTest extends TestCase {
 
 		$this->assertEquals("", $this->written($imap), "Nothing may be written to the IMAP connection");
 	}
+
+	public function testAclIdentifierIsQuoted()
+	{
+		$imap = $this->createImap();
+		$imap->set_acl('INBOX', 'bob lrswipkxtecda', 'lrs');
+		$this->assertEquals("A1 SETACL \"INBOX\" \"bob lrswipkxtecda\" lrs\r\n", $this->written($imap));
+
+		$imap = $this->createImap();
+		$imap->delete_acl('INBOX', 'bob" "anyone');
+		$this->assertEquals("A1 DELETEACL \"INBOX\" \"bob\\\" \\\"anyone\"\r\n", $this->written($imap));
+	}
+
+	public function testAclIdentifierWithLineBreakIsRefused()
+	{
+		$imap = $this->createImap();
+		try {
+			$imap->set_acl('INBOX', "bob lrs\r\nA9 DELETE \"INBOX\"", 'lrs');
+			$this->fail("Identifier with line break was sent");
+		} catch (\Exception $e) {
+			$this->assertStringContainsString("INVALID IMAP INPUT DETECTED", $e->getMessage());
+		}
+		$this->assertEquals("", $this->written($imap));
+	}
+
+	public function testAclPermissionsMustBeRights()
+	{
+		$imap = $this->createImap();
+		try {
+			$imap->set_acl('INBOX', 'bob', 'lrs anyone');
+			$this->fail("Invalid rights were sent");
+		} catch (\Exception $e) {
+			$this->assertStringContainsString("INVALID IMAP INPUT DETECTED", $e->getMessage());
+		}
+		$this->assertEquals("", $this->written($imap));
+	}
 }
