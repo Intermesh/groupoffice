@@ -796,7 +796,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				//if contact_id is not set but email is check if there's contact info available
 				if (!empty($params['to']) || !empty($params['contact_id']) || !empty($params['company_id'])) {
 					if (!empty($params['contact_id'])) {
-						$contact = \go\modules\community\addressbook\model\Contact::findById($params['contact_id']);
+						// the template is filled with the data of this contact
+						$contact = \go\modules\community\addressbook\model\Contact::find()
+							->filter(['permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+							->where(['c.id' => $params['contact_id']])
+							->single();
 					} else {
 						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);		
 						
