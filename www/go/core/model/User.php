@@ -1521,9 +1521,9 @@ public function historyLog(): bool|array
 			// may change can become the profile. Otherwise it would be taken from its user and that user's e-mail address
 			// could be changed through it.
 			$contact = \go\modules\community\addressbook\model\Contact::findById($values['id']);
+			$isOwnProfile = !empty($contact) && !$this->isNew() && $contact->goUserId == $this->id;
 			if(empty($contact) ||
-				(isset($contact->goUserId) && ($this->isNew() || $contact->goUserId != $this->id)) ||
-				!$contact->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+				(!$isOwnProfile && (isset($contact->goUserId) || !$contact->hasPermissionLevel(Acl::LEVEL_WRITE)))) {
 				$this->profileForbidden = true;
 				return;
 			}

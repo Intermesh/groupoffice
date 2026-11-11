@@ -439,4 +439,37 @@ class UserTest extends TestCase
 			AddressBook::delete(['id' => $addressBook->id]);
 		}
 	}
+
+	public function testUserManagerCreatesUserWithProfile()
+	{
+		$result = $this->create($this->manager->id, []);
+
+		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$this->assertNotEmpty(Contact::findForUser($result['created']['new']['id']));
+	}
+
+	public function testOwnEmailChangeWithPasswordUpdatesProfile()
+	{
+		$email = uniqid('new') . '@example.com';
+
+		$result = $this->update($this->user->id, $this->user->id, ['email' => $email, 'currentPassword' => 'Pa55word!!xyz']);
+
+		$this->assertUpdated($result, $this->user->id);
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$profile = Contact::findForUser($this->user->id);
+		$this->assertContains($email, array_map(fn($e) => $e->email, $profile->emailAddresses));
+	}
+
+	public function testUserMayChangeOwnProfileWithItsId()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$profile = Contact::findForUser($this->user->id);
+
+		$result = $this->update($this->user->id, $this->user->id, ['profile' => ['id' => $profile->id]]);
+
+		$this->assertUpdated($result, $this->user->id);
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$this->assertEquals($profile->id, Contact::findForUser($this->user->id)->id);
+	}
 }
