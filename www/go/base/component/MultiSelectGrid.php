@@ -112,6 +112,16 @@ class MultiSelectGrid {
 			$this->selectedIds = empty($selectedPks) && $selectedPks!=='0' ? array() : explode(',', $selectedPks);
 			
 		}
+
+		if(!is_array($this->selectedIds)) {
+			$this->selectedIds = [];
+		}
+
+		// addSelectedToFindCriteria() ignores the ACL of the items because of these ids, so only keep the ones the
+		// user may read. Also the stored ones, because permissions may have changed since.
+		if($this->_checkPermissions && !empty($this->selectedIds)) {
+			$this->_validateSelection();
+		}
         
 		//add all the allowed models if it's empty. It's faster to find all allowed 
 		//addressbooks then too join the acl table.
@@ -190,15 +200,16 @@ class MultiSelectGrid {
 	 */
 	private function _validateSelection(){
 		$models = $this->_getSelectedModels();
-		if(count($models) != count($this->selectedIds)){
-			//one of the selections could not be fetched. This may happen when something is
-			//deleted or a user doesn't have permissions anymore.
-			//remove the id's from the selection.
-			$this->selectedIds=array();
-			foreach($this->_models as $model){
-				$this->selectedIds[]=$model->pk;
-			}
-			$this->_save();			
+		//one of the selections could not be fetched. This may happen when something is
+		//deleted or a user doesn't have permissions anymore.
+		//remove the id's from the selection. Use the keys of the models instead of the given values.
+		$selectedIds=array();
+		foreach($models as $model){
+			$selectedIds[]=$model->pk;
+		}
+		if($selectedIds != $this->selectedIds) {
+			$this->selectedIds = $selectedIds;
+			$this->_save();
 		}
 	}
 
@@ -213,6 +224,9 @@ class MultiSelectGrid {
 		{			
 			$this->_models=array();
 			foreach ($this->selectedIds as $modelId) {
+				if(!is_scalar($modelId)) {
+					continue;
+				}
 				try{
 					$model = \GO::getModel($this->_modelName)->findByPk($modelId);				
 					if($model)
