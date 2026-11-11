@@ -12,6 +12,7 @@ use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\fs\File;
 use go\core\orm\Property;
+use go\core\orm\Query;
 use go\core\util\QRcode;
 use go\core\validate\ErrorCode;
 
@@ -283,6 +284,16 @@ class OtpAuthenticator extends Property
 	 */
 	public function verifyCode(string $code, ?string $secret = null, int $discrepancy = 1, ?int $currentTimeSlice = null): bool
 	{
+		return $this->findTimeSlice($code, $secret, $discrepancy, $currentTimeSlice) !== null;
+	}
+
+	/**
+	 * Find the time slice of a code
+	 *
+	 * @return int|null null when the code is not correct
+	 */
+	private function findTimeSlice(string $code, ?string $secret = null, int $discrepancy = 1, ?int $currentTimeSlice = null): ?int
+	{
 
 		//replace spaces
 		$code = preg_replace('/\s+/', '', $code);
@@ -290,21 +301,51 @@ class OtpAuthenticator extends Property
 		$secret = empty($secret) ? $this->secret : $secret;
 
 		if ($currentTimeSlice === null) {
-			$currentTimeSlice = floor(time() / 30);
+			$currentTimeSlice = (int) floor(time() / 30);
 		}
 
 		if (strlen($code) != 6) {
-			return false;
+			return null;
 		}
 
 		for ($i = -$discrepancy; $i <= $discrepancy; ++$i) {
 			$calculatedCode = $this->internalGetCode($secret, $currentTimeSlice + $i);
 			if ($this->timingSafeEquals($calculatedCode, $code)) {
-				return true;
+				return $currentTimeSlice + $i;
 			}
 		}
 
-		return false;
+		return null;
+	}
+
+	/**
+	 * Check a code to log in
+	 *
+	 * A code can only be used once. Codes of the same or an earlier time slice than the last accepted code are
+	 * refused, so a code that somebody saw can't be used again while it's still valid.
+	 *
+	 * @param string $code
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function verifyLoginCode(string $code): bool
+	{
+		$timeSlice = $this->findTimeSlice($code);
+		if ($timeSlice === null) {
+			return false;
+		}
+
+		// One update, so two requests with the same code can't both succeed
+		$stmt = go()->getDbConnection()->update(
+			'otp_secret',
+			['lastTimeSlice' => $timeSlice],
+			(new Query())
+				->where('userId = :userId AND (lastTimeSlice IS NULL OR lastTimeSlice < :timeSlice)')
+				->bind([':userId' => $this->userId, ':timeSlice' => $timeSlice])
+		);
+		$stmt->execute();
+
+		return $stmt->rowCount() > 0;
 	}
 
 	/**

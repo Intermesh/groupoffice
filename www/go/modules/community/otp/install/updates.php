@@ -22,3 +22,6 @@ $updates['202601161050'][] = "ALTER TABLE `otp_secret` CHANGE COLUMN `secret` `s
 $updates['202601211115'][] = function() {
 	go\modules\community\otp\cron\ClearExpired::install('*/10 * * * *', true);
 };
+
+// The time slice of the last code used to log in. Older codes are refused, so a code can't be used twice.
+$updates['202611111200'][] = "ALTER TABLE `otp_secret` ADD `lastTimeSlice` INT NULL DEFAULT NULL;";

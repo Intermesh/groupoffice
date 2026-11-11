@@ -9,7 +9,8 @@ CREATE TABLE `otp_secret` (
   `secret` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime NOT NULL,
   `verified` bool default false not null,
-    `expiresAt` DATETIME NULL DEFAULT NULL
+    `expiresAt` DATETIME NULL DEFAULT NULL,
+  `lastTimeSlice` INT NULL DEFAULT NULL
 ) ENGINE=InnoDB;
 
 --

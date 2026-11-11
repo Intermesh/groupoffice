@@ -151,4 +151,39 @@ class OtpAuthenticatorTest extends TestCase
 		$this->assertTrue(User::findById($this->user->id)->otp->getIsEnabled());
 		$this->assertNotNull(User::findById($this->user->id)->otp->getExpiresAt());
 	}
+
+	/**
+	 * Like logging in: what \go\modules\community\otp\OtpAuthenticator::authenticate() checks
+	 */
+	private function login(string $code): bool
+	{
+		$token = new \go\core\model\Token();
+		$token->userId = $this->user->id;
+		$auth = new \go\modules\community\otp\OtpAuthenticator();
+		return $auth->authenticate($token, ['otp_code' => $code]);
+	}
+
+	public function testCodeCanOnlyBeUsedOnceToLogIn(): void
+	{
+		$this->enableOtp();
+		$otp = User::findById($this->user->id)->otp;
+		$timeSlice = (int) floor(time() / 30);
+
+		$this->assertTrue($this->login($otp->getCode(self::SECRET, $timeSlice)));
+		// somebody who saw the code
+		$this->assertFalse($this->login($otp->getCode(self::SECRET, $timeSlice)));
+		// an older code that is still within the allowed time drift
+		$this->assertFalse($this->login($otp->getCode(self::SECRET, $timeSlice - 1)));
+		// the next code works
+		$this->assertTrue($this->login($otp->getCode(self::SECRET, $timeSlice + 1)));
+	}
+
+	public function testWrongCodeDoesNotBlockLogin(): void
+	{
+		$this->enableOtp();
+		$otp = User::findById($this->user->id)->otp;
+
+		$this->assertFalse($this->login('000000' === $otp->getCode(self::SECRET) ? '111111' : '000000'));
+		$this->assertTrue($this->login($otp->getCode(self::SECRET)));
+	}
 }
