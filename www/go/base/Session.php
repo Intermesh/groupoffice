@@ -29,6 +29,7 @@
 namespace GO\Base;
 
 
+use go\core\auth\State as AbstractState;
 use go\core\ErrorHandler;
 use go\core\jmap\State;
 use go\core\model\Token;
@@ -55,28 +56,36 @@ class Session extends Observable{
 		//In some cases it doesn't make sense to use the session because the client is
 		//not capable. (WebDAV for example).
 		if(!defined("GO_NO_SESSION") && !$this->isActive() && !headers_sent()){		
-
-			if(isset($_REQUEST['GOSID'])){
-				session_id($_REQUEST['GOSID']);				
-			}
-
 			go()->sessionStart();
 		}
-	
-		if(isset($_REQUEST['GOSID'])){
-			if(!isset($_REQUEST['security_token']) || $_SESSION['GO_SESSION']['security_token']!=$_REQUEST['security_token']){
-				throw new \Exception\SecurityTokenMismatch();
-			} else{
-				State::$CSRFcheck = false;
-			}
-		}		
-		
 		
 		$this->values = &$_SESSION['GO_SESSION'];
 
+		// A session user that was copied from an access token of the new framework only belongs to the client that
+		// sends that access token. Otherwise somebody else's session could be given the user of the client.
+		if (!empty($this->values['user_id']) && !empty($this->values['accessToken'])) {
+			$clientAccessToken = State::getClientAccessToken();
+			if (!is_string($clientAccessToken) || !hash_equals($this->values['accessToken'], $clientAccessToken)) {
+				go()->debug("Removing the user from the session because the access token of the client doesn't match");
+				$this->values = [];
+			}
+		}
+
+		// if access token from new JMAP API connected to this session was destroyed then destroy this session too!
+		// this is set in go/core/model/Token.php
+		try {
+			if (!empty($this->values['user_id']) && !empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken', '=', $this->values['accessToken'])->single()) {
+				ErrorHandler::log("Destroying session because the access token of the session was not found");
+				$this->values = [];
+			}
+		} catch (\Exception $e) {
+			$this->values = [];
+			ErrorHandler::logException($e, "Destroying session because of db exception");
+		}
+
 		// copy auth from new framework
-		if(empty($this->values['user_id']) && go()->getAuthState() && go()->getAuthState()->getUserId()) {
-			$this->values['user_id'] = go()->getAuthState()->getUserId();
+		if(empty($this->values['user_id'])) {
+			$this->copyUserFromAuthState(go()->getAuthState());
 		}
 		
 		if(!isset($this->values['security_token'])){
@@ -85,18 +94,34 @@ class Session extends Observable{
 			//$this->_log("security_token");
 			$this->values['security_token']=Util\StringHelper::randomPassword(20,'a-z,A-Z,1-9');				
 		}
+	}
 
-		// if access token from new JMAP API connected to this session was destroyed then destroy this session too!
-		// this is set in go/core/model/Token.php
-		try {
-			if (!empty($this->values['user_id']) && !empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken', '=', $this->values['accessToken'])->single()) {
-				ErrorHandler::log("Destroying session because access token '" . $this->values['accessToken'] . "' not found");
-				$this->values = [];
-			}
-		} catch (\Exception $e) {
-			$this->values = [];
-			ErrorHandler::logException($e, "Destroying session because of db exception");
+	/**
+	 * Use the user of the new framework in this session
+	 *
+	 * When the user comes from an access token, that access token is stored too. The user is only kept in the session
+	 * while the client sends the same access token. {@see start()}
+	 *
+	 * @param AbstractState|null $state
+	 * @return string|null The user ID or null when there's no authenticated user
+	 */
+	private function copyUserFromAuthState(?AbstractState $state): ?string
+	{
+		if (!$state) {
+			return null;
 		}
+
+		$userId = $state->getUserId();
+		if (empty($userId)) {
+			return null;
+		}
+
+		$this->values['user_id'] = $userId;
+		if ($state instanceof State && ($token = $state->getToken())) {
+			$this->values['accessToken'] = $token->accessToken;
+		}
+
+		return $userId;
 	}
 
 	public function isActive() {
@@ -206,13 +231,9 @@ class Session extends Observable{
 		try {
 			if(empty($this->values['user_id'])){
 				// Check Bearer token before returning null
-				$state = go()->getAuthState();
-				if(!$state) {
-					$state = new \go\core\jmap\State();
-				}
-				if(!empty($state->getUserId())) {
-					$this->values['user_id'] = $state->getUserId();
-					return Model\User::model()->findByPk($state->getUserId(), array(), true);
+				$userId = $this->copyUserFromAuthState(go()->getAuthState() ?: new State());
+				if(!empty($userId)) {
+					return Model\User::model()->findByPk($userId, array(), true);
 				}
 				return null;
 			}else {

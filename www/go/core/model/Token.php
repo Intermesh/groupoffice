@@ -379,6 +379,12 @@ class Token extends Entity {
 			$_SESSION['GO_SESSION'] = [];
 		}			
 
+		// A new session ID when the user of the session is set or changes, so an ID that was known before the login
+		// can't be used for the logged in session.
+		if(($_SESSION['GO_SESSION']['user_id'] ?? null) != $this->userId && session_status() == PHP_SESSION_ACTIVE && !headers_sent()) {
+			session_regenerate_id(true);
+		}
+
 		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;
 	}
