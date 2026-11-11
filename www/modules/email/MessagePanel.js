@@ -49,27 +49,27 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 			'<td style="width:70px"><b>'+t("From", "email")+'</b></td>'+
 
-			'<td>: {from} &lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;">{sender}</a>&gt;</td>'+
+			'<td>: {from:htmlEncode} &lt;<a href="{[this.mailtoHref(values.from, values.sender)]}">{sender:htmlEncode}</a>&gt;</td>'+
 
 			'</tr>'+
 			'<tr><td><b>'+t("Subject", "email")+'</b></td><td>: {subject}</td></tr>'+
 			'<tr><td><b>'+t("Date")+'</b></td><td>: {date}</td></tr>'+
 			'<tr><td><b>'+t("To", "email")+'</b></td><td>: '+
 			'<tpl for="to">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal:htmlEncode} <tpl if="email.length">&lt;<a href="{[this.mailtoHref(values.personal, values.email)]}">{email:htmlEncode}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'<tpl if="cc.length">'+
 			'<tr><td><b>'+t("CC", "email")+'</b></td><td>: '+
 			'<tpl for="cc">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal:htmlEncode} <tpl if="email.length">&lt;<a href="{[this.mailtoHref(values.personal, values.email)]}">{email:htmlEncode}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
 			'<tpl if="bcc.length">'+
 			'<tr><td><b>'+t("BCC", "email")+'</b></td><td>: '+
 			'<tpl for="bcc">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal:htmlEncode} <tpl if="email.length">&lt;<a href="{[this.mailtoHref(values.personal, values.email)]}">{email:htmlEncode}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
@@ -82,10 +82,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<div class="em-attachments" id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
-				templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
+				templateStr += '<a class="filetype-link filetype-{extension:htmlEncode}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
 				templateStr += '</tpl>'+
 				'<tpl if="extension!=\'vcf\'">'+
-				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> '+
+				'<a class="filetype-link filetype-{extension:htmlEncode}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> '+
 				'</tpl>'+
 			'</tpl>'+
 
@@ -128,7 +128,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<div style="clear: both"></div>' +
 			'</tpl>' +
 			
-			'<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;" class="avatar" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</a>'+
+			'<a href="{[this.mailtoHref(values.from, values.sender)]}" class="avatar" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</a>'+
 
 		'</div><ul class="actions"></ul>';
 
@@ -166,6 +166,16 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			},
 
 			defaultFormatFunc : false,
+
+			/**
+			 * Build a mailto link for the href attribute. The name and address come from the message headers, so they
+			 * are URL encoded and HTML encoded. EmailClient decodes them when the link is clicked.
+			 */
+			mailtoHref: function(personal, email) {
+				personal = (personal || "").replace(/["\\]/g, "");
+				const address = personal ? '"' + personal + '" <' + (email || "") + '>' : (email || "");
+				return Ext.util.Format.htmlEncode("mailto:" + encodeURIComponent(address));
+			},
             linkIconCls: function (link) {
                 return go.Entities.getLinkIcon(link.entity, link.filter);
 

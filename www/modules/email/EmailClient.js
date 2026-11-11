@@ -1344,6 +1344,12 @@ go.Modules.register("legacy", 'email', {
 			email = href.substr(7);
 		}
 
+		try {
+			email = decodeURIComponent(email);
+		} catch (err) {
+			// not URL encoded
+		}
+
 		e.preventDefault();
 
 		var addresses = go.util.parseEmail(email);
