@@ -19,6 +19,7 @@ namespace GO\Summary\Model;
 
 
 use go\core\http\Client;
+use go\core\model\Module;
 
 class RssFeed extends \GO\Base\Db\ActiveRecord {
 	
@@ -56,6 +57,42 @@ class RssFeed extends \GO\Base\Db\ActiveRecord {
 		}
 
 		return parent::validate();
+	}
+
+	/**
+	 * A feed belongs to a user. Only the owner and administrators may read, change or delete it. Managers of the
+	 * module may also create feeds for other users with the "All users" option.
+	 *
+	 * @param int $level
+	 * @return bool
+	 */
+	public function checkPermissionLevel($level)
+	{
+		if (\GO::$ignoreAclPermissions) {
+			return true;
+		}
+
+		$userId = go()->getAuthState()->getUserId();
+		if (!$userId) {
+			return false;
+		}
+
+		if (go()->getAuthState()->isAdmin() || $this->user_id == $userId) {
+			return true;
+		}
+
+		return $this->isNew() && self::mayManage();
+	}
+
+	/**
+	 * Check if the current user may manage the summary module and so add feeds for all users
+	 *
+	 * @return bool
+	 */
+	public static function mayManage(): bool
+	{
+		$module = Module::findByName(null, 'summary');
+		return $module && !empty($module->getUserRights()->mayManage);
 	}
 
 	public static function isRSS($string): bool
