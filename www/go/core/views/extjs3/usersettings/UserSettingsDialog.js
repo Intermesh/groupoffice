@@ -432,7 +432,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	needCurrentPassword : function(){
 		let c = go.User.capabilities['go:core:core'] || {};
-		if(c.mayChangeUsers) {
+		// Administrators don't need it and user managers only need it when they change their own account
+		if(go.User.isAdmin || (c.mayChangeUsers && this.currentUserId != go.User.id)) {
 			return false;
 		}
 		

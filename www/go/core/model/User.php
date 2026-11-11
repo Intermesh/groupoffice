@@ -684,7 +684,51 @@ public function historyLog(): bool|array
 		return false;
 	}
 
+	/**
+	 * Check if the user changes their own e-mail or recovery e-mail address without the current password.
+	 *
+	 * The password reset mail is sent to these addresses, so someone who took over a logged-in session could take over
+	 * the account by changing them. Administrators and user managers who change another user don't need it.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function changesRecoveryAddressWithoutPassword(): bool
+	{
+		if($this->isNew() || $this->passwordVerified) {
+			return false;
+		}
+
+		$changed = false;
+		foreach(['email', 'recoveryEmail'] as $propName) {
+			if(!$this->isModified($propName) || empty($this->$propName)) {
+				continue;
+			}
+			// Setting the recovery e-mail to the unchanged e-mail address is harmless
+			if($propName == 'recoveryEmail' && !$this->isModified('email') && $this->recoveryEmail == $this->email) {
+				continue;
+			}
+			$changed = true;
+		}
+
+		if(!$changed || App::get()->getInstaller()->isInProgress()) {
+			return false;
+		}
+
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin() || $state->getUserId() != $this->id) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected function internalValidate() {
+
+		// Must be checked before the recovery e-mail is set to the e-mail address below
+		if($this->changesRecoveryAddressWithoutPassword()) {
+			$this->setValidationError('currentPassword', $this->passwordVerified === null ? ErrorCode::REQUIRED : ErrorCode::INVALID_INPUT);
+		}
 
 		if(!isset($this->homeDir) && in_array("homeDir", $this->selectedProperties)) {
 			$this->homeDir = "users/" . $this->username;
