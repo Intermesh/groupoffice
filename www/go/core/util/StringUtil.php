@@ -987,9 +987,9 @@ END;
 		ini_set('pcre.backtrack_limit',  3000000 );
 
 
-		//remove strange white spaces in tags first
-		//sometimes things like this happen <style> </ style >
-		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
+		//remove strange white spaces and attributes in end tags first
+		//sometimes things like this happen <style> </ style >. Browsers also end an element at </style x> or </style/>.
+		$html = preg_replace("'</[\s]*([\w]*)(?:[\s/][^>]*)?>'u","</$1>", $html);
 
 		// extract style before removing comments because sometimes style is wrapped in a comment
 		// <style><!-- body{} --></style>
@@ -1069,7 +1069,7 @@ END;
 
 
 		if(!empty($styles)) {
-
+			$styles = self::escapeStyleContent($styles);
 
 			if(str_contains($styles, $prefix)) {
 				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="groupoffice-msg-' . $prefix . '">' . $html . '</div>';
@@ -1147,6 +1147,10 @@ END;
 				continue;
 			}
 
+			if (strtolower($element->localName ?? $element->nodeName) === 'style') {
+				$element->textContent = self::escapeStyleContent($element->textContent);
+			}
+
 			foreach (iterator_to_array($element->attributes) as $attribute) {
 				/** @var \DOMAttr $attribute */
 				$name = strtolower($attribute->nodeName);
@@ -1161,6 +1165,21 @@ END;
 			$result .= $doc->saveHTML($child);
 		}
 		return $result;
+	}
+
+	/**
+	 * Make CSS safe to put inside a <style> element.
+	 *
+	 * The browser ends a style element at the first "</style", also inside a CSS string or comment, and parses the
+	 * rest as HTML. "<" isn't needed in CSS outside strings, so it's replaced with the CSS escape "\3c ", which is still
+	 * "<" inside a CSS string.
+	 *
+	 * @param string $css
+	 * @return string
+	 */
+	public static function escapeStyleContent(string $css): string
+	{
+		return str_replace('<', '\\3c ', $css);
 	}
 
 	private static function isActiveAttribute(string $name, string $value): bool
