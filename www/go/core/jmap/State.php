@@ -46,6 +46,7 @@ class State extends AbstractState {
 
 		if(!$tokenStr) {
 			$tokenStr = static::getFromHeader();
+			self::$headerAccessTokenUsed = !empty($tokenStr);
 		} else{
 			self::$cookieAccessTokenUsed = true;
 		}
@@ -55,6 +56,8 @@ class State extends AbstractState {
 
 	private static $cookieAccessTokenUsed = false;
 
+	private static $headerAccessTokenUsed = false;
+
 	/**
 	 * Check if cookies were used to authenticate
 	 * @return bool
@@ -62,6 +65,18 @@ class State extends AbstractState {
 	 */
 	public function isAuthenticatedUsingCookie() : bool {
 		return $this->isAuthenticated() && self::$cookieAccessTokenUsed;
+	}
+
+	/**
+	 * Check if the "Authorization: Bearer" header was used to authenticate
+	 *
+	 * Such requests can't be made by other websites, so they don't need a CSRF token.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isAuthenticatedUsingHeader() : bool {
+		return $this->isAuthenticated() && self::$headerAccessTokenUsed && !self::$cookieAccessTokenUsed;
 	}
 
 
