@@ -5,6 +5,8 @@ namespace go\modules\community\addressbook\convert;
 use Exception;
 use go\core\data\convert\AbstractConverter;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
+use go\core\model\Acl;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\orm\Entity;
@@ -628,6 +630,11 @@ class VCard extends AbstractConverter {
 				$contact = new Contact();
 			}
 			$contact->setValues($this->clientParams['values']);
+
+			// The contact is saved by import(), so check permissions before AbstractConverter::importFile() does
+			if(!$contact->hasPermissionLevel($contact->isNew() ? Acl::LEVEL_CREATE : Acl::LEVEL_WRITE)) {
+				throw new Forbidden("Access denied");
+			}
 			
 			//Serialize data to store vcard
 			$blob = $this->saveBlob($vcardComponent);			

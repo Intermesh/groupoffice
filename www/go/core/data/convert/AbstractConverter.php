@@ -272,7 +272,9 @@ abstract class AbstractConverter {
 					continue;
 				}
 
-				if($entity->hasPermissionLevel(Acl::LEVEL_CREATE)) {
+				// Updating an existing item requires write permission. If it's moved to another container then write
+				// permission is required on both.
+				if($entity->hasPermissionLevel($entity->isNew() ? Acl::LEVEL_CREATE : Acl::LEVEL_WRITE)) {
 					$entity->save();
 				} else {
 					$msg = "Item ". $this->index . ": access denied";
