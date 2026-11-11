@@ -51,7 +51,7 @@ try {
 		$inline = !empty($_GET['inline']);
 
 		// prevent html to render on same domain having access to all global JS stuff
-		if($blob->type == 'text/html') {
+		if(!Response::isSafeInlineContentType($blob->type)) {
 			$inline = false;
 		}
 
