@@ -620,8 +620,9 @@ END;
 	public static function detectXSS(string $string, ?bool $withStyle = false): bool
 	{
 		if($withStyle) {
-			// remove GO injected style
-			$string = preg_replace('/<style id="groupoffice-extracted-style">.*<\/style>/usi', '', $string);
+			// remove GO injected style. It's at the start, see sanitizeHtml(). Only up to the first end tag so a copy of
+			// the opening tag in the content can't hide what comes after it.
+			$string = preg_replace('/^<style id="groupoffice-extracted-style">.*?<\/style>/usi', '', $string, 1);
 		}
 // Keep a copy of the original string before cleaning up
 		$orig = $string;

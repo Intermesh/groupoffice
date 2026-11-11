@@ -54,6 +54,20 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 	}
 
 	/**
+	 * detectXSS() with style skips the style block that Group-Office adds to the start of a mail. A copy of its opening
+	 * tag in the content must not hide what follows it.
+	 */
+	public function testDetectXSSWithStyleOnlySkipsExtractedStyle()
+	{
+		$extracted = '<style id="groupoffice-extracted-style">p{color:red}</style>';
+
+		$this->assertFalse(StringUtil::detectXSS($extracted . '<p>Hello</p>', true));
+		$this->assertTrue(StringUtil::detectXSS($extracted . '<p>Hello</p><script>alert(1)</script><style id="groupoffice-extracted-style"></style>', true));
+		$this->assertTrue(StringUtil::detectXSS('<p>Hello</p><style id="groupoffice-extracted-style"></style><script>alert(1)</script><style>p{}</style>', true));
+		$this->assertTrue(StringUtil::detectXSS($extracted . '<style>p{}</style>', true));
+	}
+
+	/**
 	 * HTML that runs scripts. Some of these fooled the regular expressions of sanitizeHtml(), filterXSS() and detectXSS().
 	 */
 	public static function activeHtmlProvider(): array
