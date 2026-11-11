@@ -49,6 +49,13 @@ class PackageControllerTest extends TestCase
 		$this->assertNotContains('sendpackage', $method->invoke(new PackageController()));
 	}
 
+	public function testDownloadPackageFileIsNotForGuests(): void
+	{
+		// Packages need a license, so only logged in users with access to the licenses module may download them
+		$method = new \ReflectionMethod(PackageController::class, 'allowGuests');
+		$this->assertNotContains('downloadpackagefile', $method->invoke(new PackageController()));
+	}
+
 	public function testSendPackageIsOnlyForAdmins(): void
 	{
 		$this->actAs($this->user->id);
