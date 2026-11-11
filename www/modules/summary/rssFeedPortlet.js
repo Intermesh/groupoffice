@@ -103,8 +103,15 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 	rowDoubleClick : function(grid, index, e) {
 		var record = this.store.getAt(index);
 			
-		window.open(record.data.link);
+		this.openLink(record.data.link);
 			
+	},
+
+	// Links come from the feed. Only open web links, a "javascript:" link would run in Group-Office.
+	openLink : function(url) {
+		if (url && /^https?:\/\//i.test(url.trim())) {
+			window.open(url.trim(), '_blank', 'noopener');
+		}
 	},
 
 
@@ -119,7 +126,7 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 				return false;
 		}
 		e.preventDefault();
-		window.open(target.attributes['href'].value);
+		this.openLink(target.attributes['href'] ? target.attributes['href'].value : null);
 	},
 	onContextClick : function(grid, index, e){
 		if(!this.menu){ // create context menu on first right click
@@ -130,7 +137,7 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 					text: t("Go to Post", "summary"),
 					scope:this,
 					handler: function(){
-						window.open(this.ctxRecord.data.link);
+						this.openLink(this.ctxRecord.data.link);
 					}
 				},'-',{
 					iconCls: 'refresh-icon',
@@ -177,7 +184,10 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 	// within this function "this" is actually the GridView
 	applyRowClass: function(record, rowIndex, p, ds) {
 		if (this.showPreview) {
-			p.body = '<p class="description">' +Ext.util.Format.htmlDecode(record.data.description.trim()) + '</p>';
+			// the description is HTML from the feed
+			p.body = '<p class="description">' + DOMPurify.sanitize(Ext.util.Format.htmlDecode(record.data.description.trim()), {
+				FORBID_TAGS: ["style", "form", "input", "button", "textarea", "select"]
+			}) + '</p>';
 			return 'x-grid3-row-expanded';
 		}
 		return 'x-grid3-row-collapsed';
@@ -201,7 +211,7 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 	},
 
 	formatTitle: function(value, p, record) {
-		return '<div class="topic"><b>'+value+'</b></div>';
+		return '<div class="topic"><b>'+Ext.util.Format.htmlEncode(value)+'</b></div>';
                
 	}
 });
