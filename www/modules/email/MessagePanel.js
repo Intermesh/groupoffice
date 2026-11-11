@@ -105,7 +105,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 					'<div class="go-icon-list"><p class="more-btn"><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
 					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'{entity}\'});win.load({model_id});">'+
 					// '{name}</a> <label>{description}</label>' +
-					'{name}</a> <label>{[this.getLabel(values)]}</label>' +
+					'{name:htmlEncode}</a> <label>{[this.getLabel(values)]}</label>' +
 					'{[this.addDeleteBtn(values)]}</p>' +
 					'</div>' +
 				'</tpl>'+
@@ -122,7 +122,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tpl if="labels.length">' +
 				'<div class="em-message-labels-container">' +
 				'<tpl for="labels">'+
-					'<span style="background-color: #{color}">{name}</span>' +
+					'<span style="background-color: #{color:htmlEncode}">{name:htmlEncode}</span>' +
 				'</tpl>'+
 				'</div>' +
 				'<div style="clear: both"></div>' +
@@ -139,13 +139,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'</tpl>'+
 			'<tpl if="values.isInSpamFolder==\'0\';">'+
 				'<div class="message-move">'+
-					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
+					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToSpam(\'{values.uid}\',\'{[this.addSlashes(values.mailbox)]}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
 				'</div>'+
 			'</tpl>';
 
 		templateStr += '<div id="'+this.bodyId+'" class="message-body go-html-formatted">{htmlbody:raw}'+
 			'<tpl if="body_truncated">'+
-			'<br /><a href="javascript:GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);" class="normal-link">'+t("The actual message is larger than can be shown here. Click here to see the entire message.", "email")+'</a>'+
+			'<br /><a href="#" onclick="GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);return false;" class="normal-link">'+t("The actual message is larger than can be shown here. Click here to see the entire message.", "email")+'</a>'+
 			'</tpl>'+
 			'</div>';
 
@@ -190,20 +190,23 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
                 if(link.entity === "Task") {
                     const arDesc = link.description.split(":");
                     if(!arDesc.length) {
-                        return link.description || ""; // We always return something
+                        return Ext.util.Format.htmlEncode(link.description || ""); // We always return something
                     }
-                    return "<strong>"+arDesc[0]+"</strong>:"+(arDesc[1] || ""); // Let's not bother with more than one colon
+                    return "<strong>"+Ext.util.Format.htmlEncode(arDesc[0])+"</strong>:"+Ext.util.Format.htmlEncode(arDesc[1] || ""); // Let's not bother with more than one colon
                 }
-                return link.description;
+                return Ext.util.Format.htmlEncode(link.description);
             },
 			addDeleteBtn: function(link) {
 				return '<a class="icon" onclick="GO.email.unlink('+link.link_id+');">delete</a>';
 			},
+			/**
+			 * Escape a value for a JavaScript string in an HTML attribute
+			 */
 			addSlashes : function(str)
 			{
 				str = GO.util.html_entity_decode(str, 'ENT_QUOTES');
 				str = GO.util.add_slashes(str);
-				return str;
+				return Ext.util.Format.htmlEncode(str);
 			},
 
 		});
