@@ -99,7 +99,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {						
 						var linkIconCls = go.Entities.getLinkIcon(record.data.toEntity, record.data.to.filter);
 
-						return '<i class="entity ' + linkIconCls + '"></i> <a>' + record.data.to.name + '</a>';
+						return '<i class="entity ' + linkIconCls + '"></i> <a>' + Ext.util.Format.htmlEncode(record.data.to.name) + '</a>';
 					}
 				},
 				{
