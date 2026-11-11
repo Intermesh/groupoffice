@@ -52,6 +52,11 @@ trait SharedAccountTrait
 		$account->addAlias($this->owner->email, 'Owner');
 		$this->account = $account;
 
+		// the user of a new account manages it, so they can use the actions that need manage permission
+		$this->actAs($this->owner->id);
+		$this->assertEquals(\go\core\model\Acl::LEVEL_MANAGE, Account::model()->findByPk($account->id)->getPermissionLevel());
+		$this->actAs(User::ID_SUPER_ADMIN);
+
 		$acl = \go\core\model\Acl::findById($account->acl_id);
 		foreach($acl->groups as $group) {
 			if($group->groupId != $this->owner->getPersonalGroup()->id) {
