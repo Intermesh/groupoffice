@@ -190,15 +190,13 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 		
 		$rootDir = '/var/mail/vhosts/';
 		$tmp = $rootDir . "tmp/" . uniqid() .'/';
-		$this->exec("mkdir -p ".$tmp);
+		$this->exec("mkdir -p ".escapeshellarg($tmp));
 		
 		foreach($mailboxes as $mailbox) {
 			
 			echo "Converting ".$mailbox->username . "\n";
 
-			$parts = explode('@', $mailbox->username);
-			
-			$home = $rootDir . $mailbox->domain->domain . '/' . $parts[0] . '/';			
+			$home = self::mailboxHome($rootDir, $mailbox->domain->domain, $mailbox->username);
 			$maildir = $home . 'Maildir/';
 			
 			if(is_dir($maildir)) {
@@ -210,10 +208,15 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 				echo "Maildir does not exist\n";
 			} else {
 
-				$this->exec("mv ". $home .' '. $tmp);
-				$this->exec("mkdir " . $home);
-				$this->exec("mv " . $tmp . basename($home) .' '.$maildir);
-				exec('mv -f  '.$maildir.'sieve ' . $maildir.'.dovecot.sieve* ' . $maildir . '.dovecot.lda-dupes* ' .$maildir . '.dovecot.svbin ' . $maildir. '.customflags ' . $home);
+				$this->exec("mv ". escapeshellarg($home) .' '. escapeshellarg($tmp));
+				$this->exec("mkdir " . escapeshellarg($home));
+				$this->exec("mv " . escapeshellarg($tmp . basename($home)) .' '.escapeshellarg($maildir));
+				// Dovecot files that belong in the home directory and not in the Maildir
+				foreach(['sieve', '.dovecot.sieve*', '.dovecot.lda-dupes*', '.dovecot.svbin', '.customflags'] as $pattern) {
+					foreach(glob($maildir . $pattern) ?: [] as $file) {
+						rename($file, $home . basename($file));
+					}
+				}
 			}
 			$mailbox->maildir = substr($maildir, strlen($rootDir));
 			if(!$mailbox->save()) {
@@ -223,6 +226,28 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 		$this->exec("service dovecot restart");
 	}
 	
+	/**
+	 * Get the home directory of a mailbox
+	 *
+	 * The domain and the part of the username before the "@" are used as folder names in shell commands, so they may
+	 * not contain a slash, backslash or NUL or be "." or "..". Shell characters are escaped where the path is used.
+	 *
+	 * @param string $rootDir
+	 * @param string $domain
+	 * @param string $username
+	 * @return string
+	 * @throws \Exception
+	 */
+	private static function mailboxHome(string $rootDir, string $domain, string $username): string {
+		$localPart = explode('@', $username)[0];
+		foreach([$domain, $localPart] as $segment) {
+			if($segment === '' || $segment === '.' || $segment === '..' || strpbrk($segment, "/\\\0") !== false) {
+				throw new \Exception("Invalid characters in username or domain of mailbox " . $username);
+			}
+		}
+		return $rootDir . $domain . '/' . $localPart . '/';
+	}
+
 	private function exec($cmd) {
 		echo "Running " . $cmd . "\n";
 		system($cmd, $return);
