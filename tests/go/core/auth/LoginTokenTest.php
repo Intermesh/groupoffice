@@ -66,7 +66,7 @@ class LoginTokenTest extends TestCase
 	public function testExpiredLoginIsNotFound(): void
 	{
 		$token = $this->pendingLogin();
-		$token->expiresAt = new DateTime('-1 minute');
+		$token->expiresAt = new DateTime('-1 minute', new \DateTimeZone('UTC'));
 		$this->assertTrue($token->save());
 
 		$this->assertNull(Token::findPendingLogin($token->loginToken));

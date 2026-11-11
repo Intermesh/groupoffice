@@ -42,6 +42,8 @@ class UserLoginAsTest extends TestCase
 	{
 		go()->setAuthState($this->authState);
 		$_SESSION['GO_SESSION'] = $this->session;
+		// loginAs() adds its result to the JMAP response, which other tests read
+		(new \ReflectionProperty(\go\core\jmap\Response::class, 'data'))->setValue(\go\core\jmap\Response::get(), null);
 		UserModel::delete(['id' => $this->userIds]);
 	}
 
