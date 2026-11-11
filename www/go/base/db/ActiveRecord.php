@@ -1398,6 +1398,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$joins = "";
 		if (!empty($params['linkModel'])) { //passed in case of a MANY_MANY relation query
+			// only a model class may be created here, never any class
+			if(!is_string($params['linkModel']) || !is_subclass_of($params['linkModel'], self::class)) {
+				throw new \Exception("Invalid linkModel");
+			}
       $linkModel = new $params['linkModel'];
       $primaryKeys = $linkModel->primaryKey();
 
