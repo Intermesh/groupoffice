@@ -36,12 +36,19 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 		foreach ($feeds as $feed) {
 			if(!empty($feed['id'])) {
 				$feedModel = RssFeed::model()->findByPk($feed['id']);
+				// only your own feeds may be changed. Otherwise saving would also take it from its owner.
+				if(!$feedModel || $feedModel->user_id != $currUserId) {
+					throw new AccessDenied();
+				}
 				$this->doSave($feedModel, $feed, $currUserId);
 				$ids[] = $feed['id'];
 				$response['data'][$feed['id']] = $feed;
 			} else {
 				$ar = [$currUserId];
-				if(isset($feed['allUsers'])) {
+				if(!empty($feed['allUsers'])) {
+					if(!RssFeed::mayManage()) {
+						throw new AccessDenied();
+					}
 					$ar = $allUsers;
 				}
 				foreach($ar as $userId) {
@@ -93,6 +100,10 @@ class RssFeedController extends \GO\Base\Controller\AbstractModelController {
 		$feed = $params['feed'];
 		if ($feed != '' && strpos($feed, 'http') === 0) {
 			header('Content-Type: text/xml');
+			// the feed is loaded by the portlet. Don't let its markup run scripts when the URL is opened in the browser.
+			foreach (\go\core\http\Response::fileSecurityHeaders('text/xml', true) as $header => $value) {
+				header($header . ': ' . $value);
+			}
 
 			// The URL is user input: don't let it reach internal addresses, also not through a redirect
 			$httpclient = new \go\core\http\Client();
