@@ -260,22 +260,9 @@ class AccountController extends \GO\Site\Components\Controller {
 			if (!$user) {
 				\Site::notifier()->setMessage('error', \GO::t("Wrong username or password")); // set the correct login failure message
 			} else {
-				if (!empty($_POST['rememberMe'])) {
-
-					$encUsername = \GO\Base\Util\Crypt::encrypt($model->username);
-					if ($encUsername)
-						$encUsername = $model->username;
-
-					$encPassword = \GO\Base\Util\Crypt::encrypt($password);
-					if ($encPassword)
-						$encPassword = $password;
-
-					\GO\Base\Util\Http::setCookie('GO_UN', $encUsername);
-					\GO\Base\Util\Http::setCookie('GO_PW', $encPassword);
-				}
 				$this->redirect($this->getReturnUrl());
 			}
-		} elseif(isset($_GET['ref'])) { // url to go to after login
+		} elseif(isset($_GET['ref']) && is_string($_GET['ref']) && \go\core\util\Url::isLocalPath($_GET['ref'])) { // url to go to after login
 			\GO::session()->values['sites']['returnUrl'] = $_GET['ref'];
 		}
 
