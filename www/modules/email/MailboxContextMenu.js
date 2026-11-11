@@ -13,7 +13,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		this.node = node;
 		this.addFolderButton.setDisabled(node.attributes.noinferiors);
 		
-		this.shareBtn.setVisible(this.hasAcl(node));
+		this.shareBtn.setVisible(this.hasAcl(node) && node.attributes.permission_level >= GO.permissionLevels.manage);
 	},
 	initComponent : function(){
 		
