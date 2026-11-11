@@ -129,6 +129,18 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 	}
 
 	/**
+	 * The root folder can't be renamed
+	 *
+	 * The parent class would rename the file storage folder on disk.
+	 *
+	 * @param string $name
+	 * @throws Sabre\DAV\Exception\Forbidden
+	 */
+	public function setName($name) {
+		throw new Sabre\DAV\Exception\Forbidden();
+	}
+
+	/**
 	 * Deletes all files in this directory, and then itself
 	 *
 	 * @return void
