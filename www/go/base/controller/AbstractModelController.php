@@ -54,6 +54,8 @@ class AbstractModelController extends AbstractController {
 
 		$model = $this->getModelFromParams($params);
 
+		$params = $this->removeProtectedAttributes($model, $params);
+
 		$ret = $this->beforeSubmit($response, $model, $params);
 		
 		if($ret!==false)
@@ -106,6 +108,36 @@ class AbstractModelController extends AbstractController {
 			}	
 		}
 		return $response;
+	}
+
+	/**
+	 * Remove the owner (user_id) and the ACL of a model from the attributes that the client submitted.
+	 *
+	 * For a model with its own ACL, user_id is the owner of the ACL. Changing the ACL id would give the model the
+	 * permissions of another item, and deleting the model would delete that ACL. Only admins may change these, for
+	 * example the user of an e-mail account. On models that use the ACL of another model, like a time entry of a project,
+	 * user_id is just data and stays.
+	 *
+	 * @param \GO\Base\Db\ActiveRecord $model
+	 * @param array $attributes submitted attributes
+	 * @return array the attributes without the protected ones
+	 */
+	protected function removeProtectedAttributes(\GO\Base\Db\ActiveRecord $model, array $attributes): array
+	{
+		if(\GO::user() && \GO::user()->isAdmin()) {
+			return $attributes;
+		}
+
+		if($model->aclField() && !$model->isJoinedAclField) {
+			unset($attributes[$model->aclField()], $attributes['user_id']);
+		}
+
+		if($model->aclOverwrite()) {
+			// overwriting the ACL is done with the "overwriteAcl" attribute, never by setting the id
+			unset($attributes[$model->aclOverwrite()]);
+		}
+
+		return $attributes;
 	}
 
 	/**
@@ -1142,7 +1174,7 @@ class AbstractModelController extends AbstractController {
 		$sort = 0;
 		foreach ($records as $attributes) {
 			$model = \GO::getModel($this->model)->findByPk($attributes['id']);
-			$model->setAttributes($attributes);
+			$model->setAttributes($this->removeProtectedAttributes($model, $attributes));
 			
 			if($model->getSortOrderColumn())
 				$model->{$model->getSortOrderColumn()} = $sort;
