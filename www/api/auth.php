@@ -232,11 +232,8 @@ try {
 					output(["error" => "Invalid remember me token"], 400, "Invalid remember me token");
 				}
 			} elseif (isset($data['loginToken'])) {
-				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
-				// The login token is only valid for Token::LOGIN_LIFETIME. Expired ones stay in the database until garbage collection.
-				if ($token && $token->isExpired()) {
-					$token = null;
-				}
+				// Not after the login was finished or when it expired. Expired ones stay in the database until garbage collection.
+				$token = Token::findPendingLogin($data['loginToken']);
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {

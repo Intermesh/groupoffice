@@ -346,6 +346,25 @@ class Token extends Entity {
 	}
 
 	/**
+	 * Find the token of a login that isn't finished yet by its login token
+	 *
+	 * The login token is only valid for {@see LOGIN_LIFETIME} and only until the login is finished. Otherwise it could
+	 * be used to get the access token and CSRF token again.
+	 *
+	 * @param string $loginToken
+	 * @return Token|null
+	 * @throws Exception
+	 */
+	public static function findPendingLogin(string $loginToken): ?Token
+	{
+		$token = static::find()->where(['loginToken' => $loginToken])->single();
+		if (!$token || $token->isExpired() || isset($token->accessToken)) {
+			return null;
+		}
+		return $token;
+	}
+
+	/**
 	 * Check if this token is authenticated
 	 *
 	 * @return bool
