@@ -177,10 +177,11 @@ class VCard extends AbstractConverter {
 	 */
 	private function exportOrganization(Contact $contact) {
 		
-			$organizations = Contact::find()
+			// Only organizations the user may read
+			$organizations = Contact::applyAclToQuery(Contact::find()
 							->withLink($contact)
 							->andWhere('isOrganization', '=', true)
-							->selectSingleValue('name')
+							->selectSingleValue('c.name'))
 							->all();
 			$count = count($organizations);
 			switch($count) {
@@ -477,9 +478,10 @@ class VCard extends AbstractConverter {
 		go()->debug($vcardOrganizationNames);
 
 		//compare with existing.
-		$goOrganizations = $contact->isNew() ? [] : Contact::find()
+		// Organizations the user can't read are not in the vCard, so they are left alone
+		$goOrganizations = $contact->isNew() ? [] : Contact::applyAclToQuery(Contact::find()
 										->withLink($contact)
-										->andWhere('isOrganization', '=', true)
+										->andWhere('isOrganization', '=', true))
 										->all();
 
 		$goOrganizationsNames = [];
@@ -497,7 +499,8 @@ class VCard extends AbstractConverter {
 
 		$newVcardOrgNames = array_diff($vcardOrganizationNames, $goOrganizationsNames);
 		foreach ($newVcardOrgNames as $name) {
-			$org = Contact::find()->where(['isOrganization' => true])->andWhere('name', 'LIKE', $name)->single();
+			// Link an existing organization by its exact name, but only one the user may read
+			$org = Contact::applyAclToQuery(Contact::find()->where(['isOrganization' => true])->andWhere('name', '=', $name))->single();
 			if (!$org) {
 				go()->debug("Create org: " . $name);
 				$org = new Contact();
