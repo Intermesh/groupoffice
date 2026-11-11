@@ -210,7 +210,7 @@ export class Main extends Component {
 									};
 								return [
 									comp({cls:'pad'},
-										comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner'))+'</small>' }),
+										comp({html:'<i style="color:#'+item.color.htmlEncode()+'">&bull;</i> <strong>'+r.title.htmlEncode()+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner')).htmlEncode()+'</small>' }),
 										h3({html: item.start.format('D j M')+' '+t('at')+' '+Format.time(item.start)}),
 									comp({cls:'group'},
 										btn({itemId: 'accepted', text:t('Accept'), handler:b=>press(b,'accepted')}),

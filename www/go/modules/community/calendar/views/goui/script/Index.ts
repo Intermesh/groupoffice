@@ -1,7 +1,7 @@
 import {client, jmapds, modules, principalDS} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {router} from "@intermesh/groupoffice-core";
-import {datasourcestore, t as coreT, E, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
+import {datasourcestore, t as coreT, E, Format, translate, DateTime, Window, h3, Button} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
@@ -365,8 +365,8 @@ modules.register(  {
 								}
 							}
 						}
-						panelCfg.title = alertConfig.entity.title;
-						panelCfg.items = [{html: msg  }];
+						panelCfg.title = Format.htmlEncode(alertConfig.entity.title);
+						panelCfg.items = [{html: msg.htmlEncode()}];
 						panelCfg.notificationBody = msg ; // for desktop notifications (no html)
 						return panelCfg;
 					});
