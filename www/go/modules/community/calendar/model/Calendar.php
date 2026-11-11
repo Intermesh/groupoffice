@@ -18,6 +18,8 @@ use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\orm\Relation;
+use go\core\util\Color;
+use go\core\validate\ErrorCode;
 
 /**
  * Calendar entity
@@ -227,6 +229,9 @@ class Calendar extends AclOwnerEntity {
 			if(isset($this->webcalUri) && !$this->fetchWebcalBlob()) {
 				$this->setValidationError('webcalUri', 404, 'Could not download webcal file');
 			}
+		}
+		if($this->isModified('color') && !empty($this->color) && !Color::isHex($this->color)) {
+			$this->setValidationError('color', ErrorCode::MALFORMED, 'Color must be a hexadecimal value');
 		}
 		parent::internalValidate();
 	}
