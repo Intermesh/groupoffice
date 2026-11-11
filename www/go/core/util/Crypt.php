@@ -109,6 +109,23 @@ class Crypt {
 		return abs(time() - (int) $parts[1]) <= $maxAge;
 	}
 
+	/**
+	 * Keyed hash of the data with a key derived from the private server key
+	 *
+	 * Use it for values that must not be usable to check a secret without the server key, for example a cache key
+	 * that contains a password.
+	 *
+	 * @param string $data
+	 * @return string hexadecimal SHA-256 HMAC
+	 * @throws BadFormatException
+	 * @throws EnvironmentIsBrokenException
+	 */
+	public static function hmac(string $data): string
+	{
+		$key = hash_hkdf('sha256', self::getKey()->getRawBytes(), 32, 'go-core-hmac');
+		return hash_hmac('sha256', $data, $key);
+	}
+
 	private static $key;
 
 	/**

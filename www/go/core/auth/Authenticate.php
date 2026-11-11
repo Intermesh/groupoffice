@@ -15,6 +15,7 @@ use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\model\User;
 use go\core\orm\Query;
+use go\core\util\Crypt;
 use go\core\util\DateTime;
 use PDO;
 
@@ -326,9 +327,12 @@ class Authenticate
 			return $this->failWithoutAuthenticator($username);
 		}
 
-		$cacheKey = 'login-' . md5($username . '|' . $password);
+		// Keyed with the server key, so the cache can't be used to check passwords
+		$cacheKey = 'login-' . Crypt::hmac($username . '|' . $password);
 
 		if (!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
+			// The user may have been disabled or the IP address may not be allowed since the login was cached
+			$this->assertUserIdMayLogin($cache[0]->id);
 			$this->clearThrottle($username);
 			$this->usedPasswordAuthenticator = $cache[1];
 			return $cache[0];
