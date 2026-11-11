@@ -4,9 +4,9 @@ namespace go\modules\community\oidc;
 use BadRequestException;
 use go\core\App;
 use go\core\auth\Authenticate;
+use go\core\auth\ExternalUserLink;
 use go\core\http\Response;
 use go\core\jmap\State;
-use go\core\model\User;
 use go\modules\community\oidc\model\Authenticator;
 use go\modules\community\oidc\model\Client;
 class Module extends \go\core\Module
@@ -56,21 +56,10 @@ class Module extends \go\core\Module
 
 		$info = $client->requestUserInfo();
 
-		if(empty($info['email'])) {
-			throw new \Exception("Could not get e-mail from openid provider");
-		}
-
-		// The user is found by the e-mail address. Don't trust an address the provider didn't verify.
-		if(isset($info['email_verified']) && !filter_var($info['email_verified'], FILTER_VALIDATE_BOOLEAN)) {
-			throw new \Exception("The e-mail address is not verified by the openid provider");
-		}
-
 		go()->getSettings()->allowRegistration = true;
 
-		$user = User::findOrCreateByUsername($info['email'], $info['email'], $info['name']);
-
-		//register as oauth user
-		go()->getDbConnection()->insertIgnore("oidc_user", ['userId' => $user->id, 'clientId' => $client->id])->execute();
+		// Found by the subject at the provider. The e-mail address is only used to link a user the first time.
+		$user = (new ExternalUserLink('oidc_user', $client->id))->findOrCreateUser($info);
 
 		$auth = new Authenticate();
 		$auth->setAuthenticated($user);
