@@ -460,7 +460,8 @@ class Client
 		$this->initRequest($path);
 		$this->setOption(CURLOPT_POSTFIELDS, $data);
 
-		$body = curl_exec($this->getCurl());
+		// follows redirects when globalRangeOnly is set, and checks every location
+		$body = $this->exec();
 		$this->lastBody = $body;
 		$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
 
