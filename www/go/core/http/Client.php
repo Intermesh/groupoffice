@@ -5,6 +5,7 @@ use CurlHandle;
 use Exception as CoreException;
 use go\core\exception\Forbidden;
 use go\core\fs\File;
+use go\core\util\IpAddress;
 use go\core\util\JSON;
 
 /**
@@ -40,6 +41,11 @@ class Client {
 	 * Abort the request when the response body is larger than this number of bytes. Null for no limit.
 	 */
 	public ?int $maxResponseSize = null;
+
+	/**
+	 * The IP address checked by {@see checkUri()} for the current request
+	 */
+	private ?string $connectedIp = null;
 
 	/**
 	 * @return false|CurlHandle
@@ -97,10 +103,10 @@ class Client {
 	 */
   private function prepareUrl(string $url): void
   {
-	  $resolve = $this->checkUri($url);
-	  if($resolve !== false) {
-		  // pin the checked address, so a second DNS lookup by curl can't return another one
-		  $this->setOption(CURLOPT_RESOLVE, [$resolve]);
+	  $connectTo = $this->checkUri($url);
+	  if($connectTo !== false) {
+		  // Connect to the checked address whatever host name curl reads from the URL
+		  $this->setOption(CURLOPT_CONNECT_TO, [$connectTo]);
 		  // curl doesn't check redirect targets, so they're followed in exec()
 		  $this->setOption(CURLOPT_FOLLOWLOCATION, false);
 	  }
@@ -152,6 +158,8 @@ class Client {
 				return $body;
 			}
 
+			$this->checkConnectedIp();
+
 			$status = curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE);
 			$location = curl_getinfo($this->getCurl(), CURLINFO_REDIRECT_URL);
 			if($status < 300 || $status >= 400 || empty($location)) {
@@ -172,7 +180,10 @@ class Client {
 	/**
 	 * When globalRangeOnly is true, only allow URL's that resolve to a global IP address.
 	 *
-	 * It returns the curl "resolve" entry to pin the checked IP address.
+	 * It returns a CURLOPT_CONNECT_TO entry for the checked IP to harden security if an attacker controls DNS somehow.
+	 * curl_exec() does its own DNS lookup, an attacker controlling DNS (short TTL, rebinding) can return a
+	 * different IP the second time. curl may also read another host from the URL than parse_url() does, for example
+	 * when it's percent encoded. The entry makes curl connect to the checked IP for any host name.
 	 *
 	 * @param string $uri
 	 * @return string|false
@@ -180,8 +191,15 @@ class Client {
 	 */
 	private function checkUri(string $uri) : string|false {
 
+		$this->connectedIp = null;
+
 		if(!$this->globalRangeOnly) {
 			return false;
+		}
+
+		// Control characters, white space and backslashes are parsed differently by parse_url() and curl
+		if(preg_match('/[\x00-\x20\x7f\\\\]/', $uri)) {
+			throw new Forbidden("Invalid URI: " . $uri);
 		}
 
 		$parsed = parse_url($uri);
@@ -190,10 +208,17 @@ class Client {
 			throw new Forbidden("Invalid URI: " . $uri);
 		}
 
-		$ips = $this->resolveHost(trim($parsed['host'], '[]'));
+		$host = $this->normalizeHost($parsed['host']);
+		if($host === null) {
+			throw new Forbidden("Invalid URI: " . $uri);
+		}
+
+		// check if the IP
+		$ips = $this->resolveHost($host);
 		if(empty($ips)) {
 			throw new Forbidden("Can't resolve host for URI: " . $uri);
 		}
+		$firstIP = $ips[0];
 		foreach($ips as $ip) {
 			if (!$this->isAllowedAddress($ip)) {
 				throw new Forbidden("Invalid URI: " . $uri);
@@ -201,9 +226,84 @@ class Client {
 		}
 
 		$port = $parsed['port'] ?? (strtolower($parsed['scheme']) === 'https' ? 443 : 80);
+		if($port < 1 || $port > 65535) {
+			throw new Forbidden("Invalid URI: " . $uri);
+		}
 
-		return $parsed['host'] . ":" . $port. ":" . $ips[0];
+		$this->connectedIp = $firstIP;
+
+		return "::" . (str_contains($firstIP, ':') ? "[" . $firstIP . "]" : $firstIP) . ":" . $port;
 	}
+
+	/**
+	 * Get the host name or IP address the way curl will use it.
+	 *
+	 * curl decodes percent encoding and reads numbers like "2130706433", "0x7f.1" or "127.1" as IPv4 addresses. Only
+	 * plain host names, dotted IPv4 addresses and IPv6 addresses in brackets are accepted.
+	 *
+	 * @param string $host The host from parse_url()
+	 * @return string|null The host name in lower case or IP address. Null if it's not valid.
+	 */
+	private function normalizeHost(string $host): ?string
+	{
+		$host = strtolower(rawurldecode($host));
+
+		if(str_starts_with($host, '[') && str_ends_with($host, ']')) {
+			$ip = substr($host, 1, -1);
+			return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false ? $ip : null;
+		}
+
+		if(filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+			return $host;
+		}
+
+		if(preg_match('/[^\x21-\x7e]/', $host)) {
+			if(!function_exists('idn_to_ascii')) {
+				return null;
+			}
+			$host = idn_to_ascii($host);
+			if($host === false) {
+				return null;
+			}
+		}
+
+		$host = rtrim($host, '.');
+		$label = '[a-z0-9_]([a-z0-9_-]{0,61}[a-z0-9_])?';
+		if(!preg_match('/^' . $label . '(\.' . $label . ')*$/', $host)) {
+			return null;
+		}
+
+		// A numeric last label makes curl read the host as an IPv4 address
+		$lastLabel = substr(strrchr('.' . $host, '.'), 1);
+		if(preg_match('/^(0x[0-9a-f]*|[0-9]+)$/', $lastLabel)) {
+			return null;
+		}
+
+		return $host;
+	}
+
+	/**
+	 * Check that curl connected to the IP address that was checked by {@see checkUri()}
+	 *
+	 * @throws Forbidden
+	 */
+	private function checkConnectedIp(): void
+	{
+		if(!isset($this->connectedIp)) {
+			return;
+		}
+		$primaryIp = curl_getinfo($this->getCurl(), CURLINFO_PRIMARY_IP);
+		if(!empty($primaryIp) && !IpAddress::matches($primaryIp, $this->connectedIp)) {
+			throw new Forbidden("Connected to an address that wasn't checked");
+		}
+	}
+
+	/**
+	 * Address ranges that are refused besides the ones that aren't in the global range of filter_var().
+	 *
+	 * NAT64 addresses can reach any IPv4 address, including private ones, through a NAT64 gateway.
+	 */
+	private const BLOCKED_RANGES = ['64:ff9b::/96', '64:ff9b:1::/48'];
 
 	/**
 	 * Check if requests to this IP address are allowed when {@see $globalRangeOnly} is true.
@@ -215,7 +315,8 @@ class Client {
 	 */
 	protected function isAllowedAddress(string $ip): bool
 	{
-		return filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]) !== false;
+		return filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_GLOBAL_RANGE]) !== false
+			&& !IpAddress::inRanges($ip, self::BLOCKED_RANGES);
 	}
 
 	/**
@@ -318,6 +419,7 @@ class Client {
 		if(!empty($error)) {
       throw new CoreException($error .', HTTP Status: ' . $status);
     }
+		$this->checkConnectedIp();
 
 	  $info = curl_getinfo($this->getCurl());
 
