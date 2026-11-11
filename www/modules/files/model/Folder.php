@@ -693,6 +693,35 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		return $folder;
 	}
+
+	/**
+	 * Find a folder by a path that comes from the client and create it if it doesn't exist.
+	 *
+	 * The current user needs the given permission level on an existing folder. A missing folder is only created when the
+	 * user may create folders in the nearest existing parent folder.
+	 *
+	 * @param string $relpath Relative path from \GO::config()->file_storage_path
+	 * @param int $level Permission level required on the folder if it exists
+	 * @return Folder
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function findOrCreateByPathWithPermission(string $relpath, int $level = \GO\Base\Model\Acl::READ_PERMISSION): Folder
+	{
+		$folder = $this->findByPath($relpath);
+		if($folder) {
+			if(!$folder->checkPermissionLevel($level)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+			return $folder;
+		}
+
+		$parent = $this->findByPath($relpath, false, [], true);
+		if(!$parent || !$parent->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $this->findByPath($relpath, true);
+	}
 	/**
 	 * Return the home folder of a user.
 	 *
