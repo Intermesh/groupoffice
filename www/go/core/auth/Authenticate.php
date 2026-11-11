@@ -615,6 +615,8 @@ class Authenticate
 	 */
 	public function logout(): bool
 	{
+		// Otherwise the remember me login keeps working for anyone who has a copy of the cookie
+		RememberMe::deleteByCookie();
 		RememberMe::unsetCookie();
 		$state = new JmapState();
 		$token = $state->getToken();
