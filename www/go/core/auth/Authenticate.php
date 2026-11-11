@@ -16,6 +16,7 @@ use go\core\model\Token;
 use go\core\model\User;
 use go\core\orm\Query;
 use go\core\util\DateTime;
+use PDO;
 
 /**
  * Class Authenticate
@@ -244,7 +245,7 @@ class Authenticate
 		foreach($this->throttleKeys($username, $scope) as $key => $max) {
 			$state = go()->getCache()->get($key);
 			if($state && $state['lockedUntil'] > time()) {
-				throw new Forbidden($scope === 'recovery' ?
+				throw new Forbidden($scope === 'recovery' || $scope === 'recover' ?
 					go()->t("Too many password recovery requests. Please try again later.") :
 					go()->t("Too many failed login attempts. Please try again later."));
 			}
@@ -583,19 +584,27 @@ class Authenticate
 		return true;
 	}
 
-	public function recovery($hash)
+	/**
+	 * Find the user of a password recovery hash that was sent less than an hour ago
+	 *
+	 * @param mixed $hash The hash from the request. Only a string of 40 lowercase hexadecimal characters is accepted,
+	 *  as created by {@see User::sendRecoveryMail()}. A number would otherwise be compared numerically with the column
+	 *  by MySQL and match a hash that starts with the same digits.
+	 * @return false|User
+	 * @throws Exception
+	 */
+	public function recovery(mixed $hash): false|User
 	{
-		if (empty($hash)) {
+		if (!is_string($hash) || !preg_match('/^[0-9a-f]{40}$/', $hash)) {
 			return false;
 		}
 		$oneHourAgo = new DateTime('-1 hour');
 		$user = User::find()
 			->where('recoveryHash = :hash AND recoverySendAt > :time')
-			->bind([
-				':hash' => $hash,
-				':time' => $oneHourAgo->format(Column::DATETIME_FORMAT)
-			])->single();
-		if (empty($user)) {
+			->bind(':hash', $hash, PDO::PARAM_STR)
+			->bind(':time', $oneHourAgo->format(Column::DATETIME_FORMAT))
+			->single();
+		if (empty($user) || !$user->checkRecoveryHash($hash)) {
 			return false;
 		}
 		return $user;

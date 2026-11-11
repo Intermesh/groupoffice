@@ -1000,6 +1000,17 @@ public function historyLog(): bool|array
 		return $this->authenticators;
 	}
 
+	/**
+	 * Check a password recovery hash from the client against the one of this user
+	 *
+	 * @param mixed $hash The hash from the request. Anything other than a string never matches.
+	 * @return bool
+	 */
+	public function checkRecoveryHash(mixed $hash): bool
+	{
+		return is_string($hash) && !empty($this->recoveryHash) && hash_equals($this->recoveryHash, $hash);
+	}
+
   /**
    * Send a password recovery link
    *
