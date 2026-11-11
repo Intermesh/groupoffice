@@ -168,18 +168,7 @@ class Module extends core\Module
 		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
 		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
 
-		echo "BEGIN:VCALENDAR\r\n";
-		echo "VERSION:2.0\r\n";
-		echo "PRODID:".str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD)."\r\n";
-		echo "METHOD:PUBLISH\r\n";
-
-		if ($calendar->timeZone) {
-			echo "X-WR-TIMEZONE:" . $calendar->timeZone . "\r\n";
-			$tz = new model\VTimezone($calendar->timeZone);
-			echo $tz->serialize();
-		}
-
-		if($calendar->description) echo "X-WR-CALDESC:". $calendar->description. "\r\n";
+		echo self::icsHeader($calendar);
 		ob_end_flush();
 
 		foreach($events as $ev) {
@@ -190,6 +179,37 @@ class Module extends core\Module
 			flush();
 		}
 		echo "END:VCALENDAR\r\n";
+	}
+
+	/**
+	 * The start of an iCalendar export of a calendar, up to the events
+	 *
+	 * The properties are escaped by VObject, so a description with a line break or ";" can't add properties or events.
+	 *
+	 * @param Calendar $calendar
+	 * @return string
+	 */
+	private static function icsHeader(Calendar $calendar): string
+	{
+		$vcalendar = new \Sabre\VObject\Component\VCalendar();
+
+		$ics = "BEGIN:VCALENDAR\r\n";
+		$ics .= "VERSION:2.0\r\n";
+		$ics .= "PRODID:".str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD)."\r\n";
+		$ics .= "METHOD:PUBLISH\r\n";
+
+		if ($calendar->timeZone) {
+			// throws an exception for an invalid time zone
+			$tz = new model\VTimezone($calendar->timeZone);
+			$ics .= $vcalendar->createProperty("X-WR-TIMEZONE", $calendar->timeZone)->serialize();
+			$ics .= $tz->serialize();
+		}
+
+		if($calendar->description) {
+			$ics .= $vcalendar->createProperty("X-WR-CALDESC", $calendar->description)->serialize();
+		}
+
+		return $ics;
 	}
 
 	// https://uri/path/api/page.php/community/calendar/ics/key
