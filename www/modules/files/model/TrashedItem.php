@@ -149,6 +149,8 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 			}
 
 			$this->touchAcl($f);
+			// a system folder may be put back in its original place
+			$f->systemSave = true;
 		}
 		if (!$f->move($parentFolder, true, true)) {
 			throw new Exception(500, \GO::t("Could not restore the item", "files"));

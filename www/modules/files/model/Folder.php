@@ -419,7 +419,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		}
 
 		if(!$this->systemSave && !$this->isNew && $this->readonly){
-			if($this->isModified('name') || $this->isModified('folder_id'))
+			if($this->isModified('name') || $this->isModified('parent_id'))
 				return false;
 		}
 
