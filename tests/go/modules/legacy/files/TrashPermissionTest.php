@@ -281,4 +281,18 @@ class TrashPermissionTest extends TestCase
 		$this->assertFalse(Folder::model()->findByPk($this->subFolder->id, false, true, true));
 		$this->assertFalse($this->findTrashedItem($this->subFolder->id, 'Folder'));
 	}
+
+	public function testTrashingASharedFolderTouchesItsAcl(): void
+	{
+		// The shared folders of a user are rebuilt when the ACL of a shared folder changes
+		$this->actAs($this->owner->id);
+		$acl = $this->subFolder->setNewAcl($this->owner->id);
+		$this->assertTrue($this->subFolder->save(true));
+		go()->getDbConnection()->update('core_acl', ['modifiedAt' => '2000-01-01 00:00:00'], ['id' => $acl->id])->execute();
+
+		$this->trash('d:' . $this->subFolder->id);
+
+		$modifiedAt = go()->getDbConnection()->selectSingleValue('modifiedAt')->from('core_acl')->where(['id' => $acl->id])->single();
+		$this->assertGreaterThan(strtotime('2001-01-01'), strtotime($modifiedAt));
+	}
 }

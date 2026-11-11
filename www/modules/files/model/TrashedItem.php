@@ -81,7 +81,11 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	}
 
 	private function touchAcl(Folder $folder) {
-		$acl = $this->acl;
+		// The ACL of the folder itself. $this is the static model in saveForFolder(), which has no ACL.
+		if(empty($folder->acl_id)) {
+			return;
+		}
+		$acl = \GO\Base\Model\Acl::model()->findByPk($folder->acl_id, false, true);
 		if(!empty($acl)) {
 			//quick hack so that shares folder is rebuilt in SHaredRootFolder::rebuildCache()
 			$acl->mtime = time();
