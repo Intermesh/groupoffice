@@ -81,6 +81,10 @@ trait SharedAccountTrait
 
 		\GO::$ignoreAclPermissions = $this->ignoreAcl;
 		\GO::$disableModelCache = $this->disableModelCache;
+
+		// Saving the first account registers its entity type, which rebuilds the entity type cache. Entities keep their
+		// old entity type with a stale modseq, so later tests would get a JMAP state that doesn't change.
+		\go\core\orm\Entity::clearCache();
 	}
 
 	private function createUser(string $prefix): User
