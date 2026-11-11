@@ -40,6 +40,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	protected function actionSubscribe(array $params)
 	{
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 		$response = array();
 
 		$rawMail = json_decode($params["mailboxs"]);
@@ -74,6 +75,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	protected function actionUnsubscribe(array $params): array
 	{
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 
 		$response = array();
 		$rawMail = json_decode($params["mailboxs"]);
@@ -154,6 +156,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		\GO::session()->closeWriting();
 
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name" => $params["mailbox"]));
 
@@ -171,6 +174,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionMarkAsRead($params){
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(\GO\Email\Model\Account::ACL_DELEGATED_PERMISSION);
 				
 		/* @var $imap \GO\Base\Mail\Imap */	
 		

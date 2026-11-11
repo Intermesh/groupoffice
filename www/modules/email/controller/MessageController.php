@@ -1828,6 +1828,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$account = Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		$imap  = $account->openImapConnection($params['mailbox']);
 
 		$before_timestamp = \GO\Base\Util\Date::to_unixtime($params['until_date']);
@@ -1943,6 +1944,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	protected function actionDeleteAllAttachments(array $params): array
 	{
 		$account = Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		$response = ['success' => true];
 		$message = ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 		$nextUid = $message->getImapConnection()->get_uidnext();
@@ -1987,6 +1989,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 
 		$account = Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		$imap = $account->openImapConnection($params['from_mailbox_name']);
 		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : $account->spam;
 
@@ -2016,6 +2019,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : 'Spam';
 		
 		$accountModel = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$accountModel->requirePermissionLevel(Acl::CREATE_PERMISSION);
 				
 		$imap = $accountModel->openImapConnection($spamFolder);
 							

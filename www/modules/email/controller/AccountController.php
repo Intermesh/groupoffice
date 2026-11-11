@@ -573,6 +573,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				throw new \GO\Base\Exception\AccessDenied();
       }
 
+      // Moving removes the message from the source account
+      if($move) {
+        $srcAccountModel->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
+      }
+
       if($move && $targetAccountModel->id == $srcAccountModel->id) {
 
         $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
