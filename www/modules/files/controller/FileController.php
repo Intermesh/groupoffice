@@ -755,7 +755,11 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	public function actionConvertAndDownload($params)
 	{
 		$fileId = !empty($params['id']) ? $params['id'] : 0;
-		$format = !empty($params['format']) ? $params['format'] : 'pdf';
+		// the format is used as file extension
+		$format = !empty($params['format']) ? preg_replace('/[^a-z0-9]/i', '', $params['format']) : 'pdf';
+		if ($format === '') {
+			$format = 'pdf';
+		}
 
 		//check if file exists
 		$fileRecord = \GO\Files\Model\File::model()->findByPk($fileId);
@@ -768,8 +772,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			throw new AccessDenied();
 		}
 
-		//create temporary file
-		$tmpFile = \GO\Base\Fs\File::tempFile();
+		//create temporary file with the extension so the content type of the output is known
+		$tmpFile = \GO\Base\Fs\File::tempFile('', $format);
 
 		//convert file -> put output to temporary
 		$fileRecord->convertTo($tmpFile, $format);
@@ -778,13 +782,16 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$nameWithoutExtension = $fileRecord->fsFile->nameWithoutExtension();
 		$outputFileName = $nameWithoutExtension . '.' . $format;
 
+		// HTML, SVG and XML are downloaded. See Response::isSafeInlineContentType().
+		$inline = \go\core\http\Response::isSafeInlineContentType($tmpFile->mimeType());
+
 		//override previous headers because tempoary
 		$extraHeaders = [
-			'Content-Disposition' => 'inline; filename="' . $outputFileName . '"',
+			'Content-Disposition' => \go\core\http\Response::contentDisposition($inline ? 'inline' : 'attachment', $outputFileName),
 		];
 
 		//download
-		\GO\Base\Util\Http::outputDownloadHeaders($tmpFile, true, !empty($params['cache']), $extraHeaders);
+		\GO\Base\Util\Http::outputDownloadHeaders($tmpFile, $inline, !empty($params['cache']), $extraHeaders);
 		$tmpFile->output();
 	}
 }
