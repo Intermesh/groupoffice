@@ -121,7 +121,7 @@ trait SharedAccountTrait
 	/**
 	 * Assert that the action is refused before it does anything
 	 */
-	private function assertDenied(object $controller, string $action, array $params): void
+	private function assertDenied(object $controller, string $action, $params): void
 	{
 		try {
 			$this->invoke($controller, $action, [$params]);
@@ -136,7 +136,7 @@ trait SharedAccountTrait
 	/**
 	 * Assert that the action gets past the permission check. It fails later because the server can't be reached.
 	 */
-	private function assertAllowed(object $controller, string $action, array $params): void
+	private function assertAllowed(object $controller, string $action, $params): void
 	{
 		try {
 			$this->invoke($controller, $action, [$params]);
