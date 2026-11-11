@@ -7,6 +7,7 @@ use go\core\auth\TemporaryState;
 use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\model\Acl;
+use go\core\model\Module;
 use go\core\model\Principal;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
@@ -40,6 +41,11 @@ class CalDAVBackend extends AbstractBackend implements
 	{
 		go()->debug("CalDAVBackend::getCalendarsForUser($principalUri)");
 		$result = [];
+
+		// The calendars are also served by the general /dav/ entry point, which only checks access to the DAV module
+		if(!Module::isAvailableFor('community', 'calendar', go()->getAuthState()->getUserId())) {
+			return [];
+		}
 		$tz = new \GO\Base\VObject\VTimezone();
 
 		$username = basename($principalUri);
@@ -107,6 +113,10 @@ class CalDAVBackend extends AbstractBackend implements
 			return $result;
 		}
 
+		if(!Module::isAvailableFor('community', 'tasks', go()->getAuthState()->getUserId())) {
+			return $result;
+		}
+
 		$tasklists = TaskList::findFor($u->id)->where(['isSubscribed'=>1,'syncToDevice'=>1, 'role'=>1]);
 		TaskList::applyAclToQuery($tasklists, Acl::LEVEL_READ, $u->id);
 		foreach($tasklists as $tasklist) {
@@ -167,6 +177,11 @@ class CalDAVBackend extends AbstractBackend implements
 		if(isset($values['color'])) {
 			$values['color'] = substr($values['color'], 1); // remove #
 		}
+		$module = in_array('VEVENT', $components) ? 'calendar' : 'tasks';
+		if(!Module::isAvailableFor('community', $module, go()->getAuthState()->getUserId())) {
+			throw new DAV\Exception\Forbidden("Module community/" . $module . " not available");
+		}
+
 		if(in_array('VEVENT', $components)) {
 			// A collection for events and tasks becomes a calendar. GroupOffice keeps tasks in task lists.
 			$prefix = 'c-';
