@@ -21,6 +21,7 @@ trait ProjectsTrait
 	/** @var string[] Tables created for the projects module */
 	private array $projectTables = [];
 	private ?Template $template = null;
+	private ?Status $status = null;
 	private User $user;
 	/** @var Type[] */
 	private array $types = [];
@@ -106,6 +107,7 @@ trait ProjectsTrait
 		$status = new Status();
 		$status->name = 'Ongoing';
 		$this->assertTrue($status->save(true));
+		$this->status = $status;
 
 		$template = new Template();
 		$template->name = 'Standard project';
@@ -127,6 +129,9 @@ trait ProjectsTrait
 		if ($this->template) {
 			$this->template->delete(true);
 		}
+		if ($this->status) {
+			$this->status->delete(true);
+		}
 		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		try {
 			foreach ($this->projectTables as $table) {
@@ -137,6 +142,8 @@ trait ProjectsTrait
 				go()->getDbConnection()->foreignKeyChecks(true);
 			}
 		}
+		// Deleting legacy models doesn't delete their ACL
+		go()->getDbConnection()->exec("DELETE a FROM core_acl a INNER JOIN core_entity e ON e.id = a.entityTypeId INNER JOIN core_module m ON m.id = e.moduleId WHERE m.name = 'projects2' AND m.package IS NULL");
 		go()->getDbConnection()->delete('core_module', ['name' => 'projects2', 'package' => null])->execute();
 		go()->getCache()->delete('entity-types');
 		\go\core\orm\Entity::clearCache();
