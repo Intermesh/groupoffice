@@ -38,7 +38,13 @@ trait ModuleTablesTrait
 		$this->createdModuleIds[] = (int) go()->getDbConnection()->getPDO()->lastInsertId();
 		$this->createdModuleNames[] = [$package, $name];
 
-		$this->createTables($installSql, $onlyTables);
+		try {
+			$this->createTables($installSql, $onlyTables);
+		} catch (\Throwable $e) {
+			// tearDown() isn't called when setUp() fails
+			$this->uninstallModuleTables();
+			throw $e;
+		}
 		$this->clearModuleCaches($package, $name);
 	}
 
@@ -55,6 +61,8 @@ trait ModuleTablesTrait
 			return;
 		}
 
+		// install.sql files may add foreign keys to tables that are created further on
+		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		try {
 			foreach (\GO\Base\Util\SQL::getSqlQueries($installSql) as $query) {
 				if (!empty($onlyTables) && !preg_match('/^\s*create\s+table\s+(if\s+not\s+exists\s+)?`?(' . implode('|', array_map('preg_quote', $onlyTables)) . ')`?\s*\(/i', $query)) {
@@ -63,6 +71,9 @@ trait ModuleTablesTrait
 				go()->getDbConnection()->exec($query);
 			}
 		} finally {
+			if ($oldFKchecks) {
+				go()->getDbConnection()->foreignKeyChecks(true);
+			}
 			$this->createdModuleTables = array_merge($this->createdModuleTables, array_diff($this->findAllTables(), $tables));
 		}
 	}
