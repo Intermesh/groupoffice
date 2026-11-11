@@ -629,9 +629,16 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array(), $returnLastFound = false) {
 
 
-		$oldIgnoreAcl = \GO::$ignoreAclPermissions;
-		\GO::$ignoreAclPermissions=true;
+		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
+		try {
+			return $this->internalFindByPath($relpath, $autoCreate, $autoCreateAttributes, $returnLastFound);
+		} finally {
+			// always restore it, also when creating a folder fails. Otherwise permissions are ignored for the rest of the request.
+			\GO::setIgnoreAclPermissions($oldIgnoreAcl);
+		}
+	}
 
+	private function internalFindByPath($relpath, $autoCreate, $autoCreateAttributes, $returnLastFound) {
 		$folder=false;
 		if (substr($relpath, -1) == '/') {
 			$relpath = substr($relpath, 0, -1);
@@ -658,8 +665,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$folder = $this->findSingle($findParams);
 				if (!$folder) {
 					if (!$autoCreate) {
-						// restore it, otherwise permissions are ignored for the rest of the request
-						\GO::$ignoreAclPermissions=$oldIgnoreAcl;
 						if($returnLastFound) {
 							return $lastFolder;
 						} else{
@@ -672,7 +677,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
 					if(!$folder->save(true)){
-						\GO::$ignoreAclPermissions=$oldIgnoreAcl;
 						throw new Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
 					}
 				}elseif(!empty($autoCreateAttributes))
@@ -691,8 +695,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			$parent_id = $folder->id;
 		}
-
-		\GO::$ignoreAclPermissions=$oldIgnoreAcl;
 
 		return $folder;
 	}
@@ -896,8 +898,25 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
 
 		$oldCache = \GO::$disableModelCache;
+		$oldFileDeleteInDatabaseOnly = File::$deleteInDatabaseOnly;
+		$oldFolderDeleteInDatabaseOnly = Folder::$deleteInDatabaseOnly;
 
 		GO::$disableModelCache=$recurseAll;
+
+		try {
+			$this->internalSyncFilesystem($recurseAll, $recurseOneLevel);
+		} finally {
+			// always restore these, also when the sync fails. Otherwise permissions are ignored for the rest of the request.
+			\GO::$disableModelCache=$oldCache;
+
+			\GO::setIgnoreAclPermissions($oldIgnoreAcl);
+
+			File::$deleteInDatabaseOnly=$oldFileDeleteInDatabaseOnly;
+			Folder::$deleteInDatabaseOnly=$oldFolderDeleteInDatabaseOnly;
+		}
+	}
+
+	private function internalSyncFilesystem(bool $recurseAll, bool $recurseOneLevel): void {
 
 		if ($this->fsFolder->exists()) {
 			$items = $this->fsFolder->ls();
@@ -942,9 +961,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 
 		//make sure no filesystem items are deleted. Sometimes folders are stored as files somehow.
-		$oldFileDeleteInDatabaseOnly = File::$deleteInDatabaseOnly;
-		$oldFolderDeleteInDatabaseOnly = Folder::$deleteInDatabaseOnly;
-		
 		File::$deleteInDatabaseOnly=true;
 		Folder::$deleteInDatabaseOnly=true;
 
@@ -964,13 +980,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$this->mtime=$this->fsFolder->mtime();
 		$this->save(true);
-
-		\GO::$disableModelCache=$oldCache;
-
-		\GO::setIgnoreAclPermissions($oldIgnoreAcl);
-		
-		File::$deleteInDatabaseOnly=$oldFileDeleteInDatabaseOnly;
-		Folder::$deleteInDatabaseOnly=$oldFolderDeleteInDatabaseOnly;
 	}
 
 	/**
