@@ -1402,6 +1402,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			throw new Forbidden();
 		}
 
+		// Creating the folder saves the entity, so it requires write permission like for legacy models
+		$folderExists = !empty($entity->filesFolderId) && Folder::model()->findByPk($entity->filesFolderId, false, true);
+		if(!$folderExists && !$entity->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+
 		$folder = Folder::model()->findForEntity($entity);
 		return [
 			"success" => true,
