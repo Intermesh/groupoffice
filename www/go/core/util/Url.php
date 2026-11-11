@@ -104,4 +104,45 @@ class Url implements ArrayableInterface {
 			&& !str_contains($url, '\\')
 			&& !preg_match('/[\x00-\x1f\x7f]/', $url);
 	}
+
+	/**
+	 * Check if an absolute http(s) URL has the same scheme, host and port as another URL
+	 *
+	 * Use it to check that a URL from a request points to a known server, instead of comparing the start of the
+	 * strings: "https://example.com.evil.tld" starts with "https://example.com". URLs with a user name, white space,
+	 * backslashes or control characters are refused because they are parsed differently by browsers and curl.
+	 *
+	 * @param string $url The URL to check
+	 * @param string $origin The known URL, for example the URL of Group-Office. Only its scheme, host and port are used.
+	 * @return bool
+	 */
+	public static function isSameOrigin(string $url, string $origin): bool
+	{
+		$a = self::parseOrigin($url);
+		return $a !== null && $a === self::parseOrigin($origin);
+	}
+
+	/**
+	 * Get "scheme://host:port" of an absolute http(s) URL with the default port filled in, or null if it's not valid
+	 */
+	private static function parseOrigin(string $url): ?string
+	{
+		if(preg_match('/[\x00-\x20\x7f\\\\]/', $url)) {
+			return null;
+		}
+
+		$parts = parse_url($url);
+		if($parts === false || empty($parts['host']) || isset($parts['user']) || isset($parts['pass'])) {
+			return null;
+		}
+
+		$scheme = strtolower($parts['scheme'] ?? '');
+		if($scheme !== 'http' && $scheme !== 'https') {
+			return null;
+		}
+
+		$port = $parts['port'] ?? ($scheme === 'https' ? 443 : 80);
+
+		return $scheme . '://' . rtrim(strtolower($parts['host']), '.') . ':' . $port;
+	}
 }
