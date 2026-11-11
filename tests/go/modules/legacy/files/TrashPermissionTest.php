@@ -281,4 +281,53 @@ class TrashPermissionTest extends TestCase
 		$this->assertFalse(Folder::model()->findByPk($this->subFolder->id, false, true, true));
 		$this->assertFalse($this->findTrashedItem($this->subFolder->id, 'Folder'));
 	}
+
+
+	/**
+	 * Give the reader delete permission on the sub folder only
+	 */
+	private function shareSubFolderForDelete(): void
+	{
+		$this->actAs($this->owner->id);
+		$acl = $this->subFolder->setNewAcl($this->owner->id);
+		$this->assertTrue($this->subFolder->save(true));
+		\GO::$ignoreAclPermissions = true;
+		$acl->addGroup($this->reader->getPersonalGroup()->id, Acl::DELETE_PERMISSION);
+		\GO::$ignoreAclPermissions = false;
+	}
+
+	private function pasteIntoTrash(array $keys): array
+	{
+		\GO::request()->get['security_token'] = '';
+		return $this->invoke('actionPaste', [
+			'ids' => json_encode($keys),
+			'id' => 'trash',
+			'destination_folder_id' => 'trash',
+			'paste_mode' => 'cut'
+		]);
+	}
+
+	public function testPasteIntoTrashOnlyNeedsDeletePermission(): void
+	{
+		$this->shareSubFolderForDelete();
+		$this->actAs($this->reader->id);
+
+		$response = $this->pasteIntoTrash(['d:' . $this->subFolder->id]);
+
+		$this->assertTrue($response['deleteSuccess']);
+		$this->assertNotEmpty($this->findTrashedItem($this->subFolder->id, 'Folder'));
+	}
+
+	public function testPasteIntoTrashChecksAllItemsFirst(): void
+	{
+		$this->shareSubFolderForDelete();
+		$this->actAs($this->reader->id);
+
+		// The reader may delete the sub folder, but not the file
+		$response = $this->pasteIntoTrash(['d:' . $this->subFolder->id, 'f:' . $this->file->id]);
+
+		$this->assertFalse($response['deleteSuccess']);
+		$this->assertFalse($this->findTrashedItem($this->subFolder->id, 'Folder'));
+		$this->assertFalse($this->findTrashedItem($this->file->id, 'File'));
+	}
 }
