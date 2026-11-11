@@ -378,7 +378,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 					$text .= '<div class="em-folder-status" id="status_' . $nodeId . '"></div>';
 				}
 			}
-			$text .= '<div class="ellipsis">'.htmlspecialchars($mailbox->getDisplayName(), ENT_QUOTES, 'UTF-8').'</div>';
+			$text .= '<div class="ellipsis">'.htmlspecialchars($mailbox->getDisplayName(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'</div>';
 
 			$cls = $mailbox->noselect==1 ? 'em-tree-node-noselect' : "";
 			

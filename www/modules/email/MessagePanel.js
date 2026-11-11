@@ -168,7 +168,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				if(!v) {
 					return "cursor:pointer;";
 				}
-				return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;cursor:pointer;background-color: #" + v.color;;
+				return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;cursor:pointer;background-color: #" + Ext.util.Format.htmlEncode(v.color);
 			},
 
 			defaultFormatFunc : false,
