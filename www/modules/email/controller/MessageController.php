@@ -235,14 +235,22 @@ class MessageController extends \GO\Base\Controller\AbstractController
 			throw new NotFound();
 		}
 
-		$this->_filterMessages($params["mailbox"], $account);
+		// Filters move mail and expunge removes deleted mail, so they need "Use account". Users who may only read the
+		// account just see the mailbox as it is.
+		$mayChangeMail = $account->checkPermissionLevel(Acl::CREATE_PERMISSION);
+
+		if($mayChangeMail) {
+			$this->_filterMessages($params["mailbox"], $account);
+		}
 
 		$imap = $account->openImapConnection($params["mailbox"]);
 
 		$response['permission_level'] = $account->getPermissionLevel();
 
 		// ADDED EXPUNGE SO THE FOLDER WILL BE UP TO DATE (When moving folders in THUNDERBIRD)
-		$imap->expunge();
+		if($mayChangeMail) {
+			$imap->expunge();
+		}
 		$response['unseen']=array();
 
 		//special folder flags
