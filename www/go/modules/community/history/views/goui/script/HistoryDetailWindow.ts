@@ -43,7 +43,7 @@ export class HistoryDetailWindow extends Window {
 			case "object":
 				let str = "";
 				for (let key in v) {
-					str += `${key}: ${this.formatValue(v[key])} \n`;
+					str += `${key.htmlEncode()}: ${this.formatValue(v[key])} \n`;
 				}
 				return str;
 
@@ -74,7 +74,7 @@ export class HistoryDetailWindow extends Window {
 
 					this.changesComp.items.add(
 						comp({
-							html: `<b>${key}: </b> ${this.formatValue(value)}`
+							html: `<b>${key.htmlEncode()}: </b> ${this.formatValue(value)}`
 						})
 					);
 				}
