@@ -376,7 +376,7 @@ class Sieve {
 	# rule:[".go_sieve_script::single_line(GO::t("Standard vacation rule", "sieve"))."]
 	if false # anyof (true)
 	{
-	\tvacation :days 3 :addresses [".implode(',', array_map([go_sieve_script::class, 'escape_test_string'], $aliasEmails))."] ".go_sieve_script::escape_test_string(GO::t("I am on vacation", "sieve")).";
+	\tvacation :days 3 :addresses [".(empty($aliasEmails) ? '""' : implode(',', array_map([go_sieve_script::class, 'escape_test_string'], $aliasEmails)))."] ".go_sieve_script::escape_test_string(GO::t("I am on vacation", "sieve")).";
 	\tstop;
 	}
 
