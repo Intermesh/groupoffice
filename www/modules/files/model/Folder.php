@@ -1636,14 +1636,28 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function moveToTrash(): void
 	{
+		if($this->readonly) {
+			throw new Exception(\GO::t("You can't delete this system folder", "files"));
+		}
+
 		$this->fsFolder->checkFileStoragePath();
 
 		$trashFolder = Folder::model()->findByPath('trash');
-		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
+		$originalParent = $this->parent;
 
-		$this->move($trashFolder, true, true);
-		if (!$this->fsFolder->move($trashFolder->fsFolder, false, false)) {
-			throw new Exception("Unable to move current folder to trash");
+		// Only create the trash record when the folder was moved
+		go()->getDbConnection()->beginTransaction();
+		try {
+			if (!$this->move($trashFolder, true, true) || !$this->fsFolder->move($trashFolder->fsFolder, false, false)) {
+				throw new Exception("Unable to move current folder to trash");
+			}
+
+			\GO\Files\Model\TrashedItem::model()->saveForFolder($this, $originalParent);
+
+			go()->getDbConnection()->commit();
+		} catch (\Throwable $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
 		}
 	}
 }

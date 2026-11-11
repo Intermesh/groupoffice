@@ -1051,6 +1051,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				foreach ($ids['folders'] as $folderId) {
 					$f = Folder::model()->findByPk($folderId);
 					if ($f) {
+						// Moving to trash is deleting, so it requires the same permission
+						if(!$f->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+							throw new AccessDenied();
+						}
 						$f->moveToTrash();
 					}
 				}
@@ -1058,6 +1062,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				foreach ($ids['files'] as $fileId) {
 					$f = File::model()->findByPk($fileId);
 					if ($f) {
+						if(!$f->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+							throw new AccessDenied();
+						}
 						$f->moveToTrash();
 					}
 				}
