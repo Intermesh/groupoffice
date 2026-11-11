@@ -33,7 +33,11 @@ class SessionTest extends TestCase
 	protected function tearDown(): void
 	{
 		$_COOKIE = $this->cookies;
-		\GO::session()->values['user_id'] = $this->sessionUserId;
+		if ($this->sessionUserId === null) {
+			unset(\GO::session()->values['user_id']);
+		} else {
+			\GO::session()->values['user_id'] = $this->sessionUserId;
+		}
 		User::delete(['id' => $this->user->id]);
 	}
 
