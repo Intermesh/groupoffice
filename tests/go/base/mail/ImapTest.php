@@ -91,4 +91,31 @@ class ImapTest extends TestCase {
 		}
 		$this->assertEquals("", $this->written($imap));
 	}
+
+	#[DataProvider('injectedCredentials')]
+	public function testLoginWithLineBreakIsRefused(string $auth, string $username, string $password)
+	{
+		$imap = $this->createImap();
+		$imap->auth = $auth;
+		$method = new \ReflectionMethod(Imap::class, 'authenticate');
+		$message = null;
+		try {
+			$method->invoke($imap, $username, $password);
+		} catch (\Exception $e) {
+			$message = $e->getMessage();
+		}
+		$this->assertEquals("", $this->written($imap), "Nothing may be written to the IMAP connection");
+		$this->assertStringContainsString("INVALID IMAP INPUT DETECTED", (string) $message);
+	}
+
+	public static function injectedCredentials(): array
+	{
+		return [
+			'password crlf' => ['plain', 'user', "secret\r\nA9 DELETE \"INBOX\""],
+			'password lf' => ['plain', 'user', "secret\nA9 DELETE \"INBOX\""],
+			'username cr' => ['plain', "user\rA9 DELETE \"INBOX\"", 'secret'],
+			'password nul' => ['plain', 'user', "secret\0"],
+			'xoauth2 token' => ['xoauth2', 'user', "token\r\nA9 DELETE \"INBOX\""],
+		];
+	}
 }

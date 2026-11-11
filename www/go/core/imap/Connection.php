@@ -253,7 +253,13 @@ class Connection {
 	 * @throws Exception
 	 */
 	public function sendCommand($command) {
-		
+
+		// Values like the username, password and mailbox names are put into commands. A CR, LF or NUL in such a
+		// value would end the command and start a new one (IMAP command injection).
+		if (strpbrk($command, "\r\n\0") !== false) {
+			throw new Exception("INVALID IMAP INPUT DETECTED: command contains line breaks");
+		}
+
 		$command = 'A' . $this->commandNumber() . ' ' . $command . "\r\n";
 
 		go()->debug('> ' . $command);
