@@ -470,6 +470,7 @@ namespace go\core {
 				// IP addresses or CIDR ranges of reverse proxies / load balancers that set "X-Forwarded-For"
 				"trustedProxies" => [],
 				"wopiAllowInternal" => false, // Allow WOPI service URLs that resolve to private/loopback addresses
+				"davclientAllowInternal" => false, // Allow DAV client accounts on servers that resolve to private/loopback addresses
 				"theme" => "Paper",
 				"allow_themes" => true,
 				"file_storage_path" => '/var/lib/groupoffice',
