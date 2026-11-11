@@ -80,6 +80,18 @@ class SharedDirectory extends \Sabre\DAV\FS\Directory {
 	}
 
 	/**
+	 * The folder with the shared folders can't be renamed
+	 *
+	 * The parent class would rename a folder named "Shared" on disk.
+	 *
+	 * @param string $name
+	 * @throws Sabre\DAV\Exception\Forbidden
+	 */
+	public function setName($name) {
+		throw new Sabre\DAV\Exception\Forbidden();
+	}
+
+	/**
 	 * Deletes all files in this directory, and then itself
 	 *
 	 * @return void
