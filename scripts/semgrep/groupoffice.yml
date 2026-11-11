@@ -187,7 +187,7 @@ rules:
               class $CTRL extends $BASE { ... }
           - metavariable-regex:
               metavariable: $BASE
-              regex: Controller$
+              regex: .*Controller$
           - pattern-inside: |
               function $F(..., $params, ...) { ... }
           - pattern: $params
@@ -260,7 +260,7 @@ rules:
               class $CTRL extends $BASE { ... }
           - metavariable-regex:
               metavariable: $BASE
-              regex: Controller$
+              regex: .*Controller$
           - pattern-inside: |
               function $F(..., $params, ...) { ... }
           - pattern: $params
@@ -341,7 +341,7 @@ rules:
               class $CTRL extends $BASE { ... }
           - metavariable-regex:
               metavariable: $BASE
-              regex: Controller$
+              regex: .*Controller$
           - pattern-inside: |
               function $F(..., $params, ...) { ... }
           - pattern: $params
@@ -394,7 +394,7 @@ rules:
               class $CTRL extends $BASE { ... }
           - metavariable-regex:
               metavariable: $BASE
-              regex: Controller$
+              regex: .*Controller$
           - pattern-inside: |
               function $F(..., $params, ...) { ... }
           - pattern: $params
@@ -469,7 +469,7 @@ rules:
               class $CTRL extends $BASE { ... }
           - metavariable-regex:
               metavariable: $BASE
-              regex: Controller$
+              regex: .*Controller$
           - pattern-inside: |
               function $F(..., $params, ...) { ... }
           - pattern: $params
@@ -513,7 +513,7 @@ rules:
       - pattern-not-inside: $V = $T;
       - metavariable-regex:
           metavariable: $E
-          regex: (Exception|Forbidden|NotFound|AccessDenied|Unauthorized|SecurityException|InvalidArguments)$
+          regex: .*(Exception|Forbidden|NotFound|AccessDenied|Unauthorized|SecurityException|InvalidArguments)$
 
   - id: go-acl-bypass-not-restored
     languages: [php]

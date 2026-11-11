@@ -217,3 +217,36 @@ class SetterModel extends \go\core\orm\Entity
 	}
 }
 
+
+// Base classes and exceptions written with their namespace must match too
+class LegacyTest extends \GO\Base\Controller\AbstractModelController
+{
+	protected function actionRequest($params)
+	{
+		$db = go()->getDbConnection();
+		// ruleid: go-sql-from-request
+		$db->query("SELECT * FROM core_user WHERE id = " . $params['id']);
+
+		$cls = $params['class'];
+		// ruleid: go-class-from-request
+		$o = new $cls();
+
+		// ruleid: go-shell-from-request
+		exec('zip -r out.zip ' . $params['file']);
+
+		// ruleid: go-path-from-request
+		file_put_contents('/tmp/' . $params['name'], 'x');
+
+		// ruleid: go-imap-command-from-request
+		$params['imap']->send_command('SEARCH TEXT "' . $params['query'] . '"' . "\r\n");
+
+		if (!go()->getAuthState()->isAdmin()) {
+			// ruleid: go-exception-not-thrown
+			new \go\core\exception\Forbidden("Only admins");
+		}
+		if (!go()->getAuthState()->isAdmin()) {
+			// ruleid: go-exception-not-thrown
+			new \GO\Base\Exception\AccessDenied();
+		}
+	}
+}
