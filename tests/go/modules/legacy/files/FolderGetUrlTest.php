@@ -136,5 +136,8 @@ class FolderGetUrlTest extends TestCase
 		$folder = Folder::model()->findByPath($this->ownerFolder->path . '/created-by-owner/sub');
 		$this->assertNotEmpty($folder);
 		$this->assertStringContainsString('#folder/' . $folder->id, $response['url']);
+		// a link with the session ID would give the session to anyone who has the link
+		$this->assertStringNotContainsString('GOSID', $response['url']);
+		$this->assertStringNotContainsString('security_token', $response['url']);
 	}
 }

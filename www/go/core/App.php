@@ -1125,6 +1125,10 @@ namespace go\core {
 			//Avoid session id in url's to prevent session hijacking.
 			ini_set('session.use_only_cookies',1);
 
+			// Don't accept session ID's that weren't created by the server. Otherwise somebody could choose the ID of
+			// another user's session.
+			ini_set('session.use_strict_mode', 1);
+
 			session_set_cookie_params([
 				'httponly' => true,
 				'samesite' => 'Lax'

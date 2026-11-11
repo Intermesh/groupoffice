@@ -152,7 +152,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		$folderModel = Folder::model()->findOrCreateByPathWithPermission($path);
 		
-		return array('success'=>true,'url'=>  \GO\Base\Util\Http::addParamsToUrl($folderModel->getExternalURL(),array('GOSID'=>session_id(), 'security_token'=>\GO::session()->values['security_token'])));
+		// The session ID is never added: it would give the session to anyone who has the link
+		return array('success'=>true,'url'=>  $folderModel->getExternalURL());
 	}
 	
 	protected function actionCache($params){
