@@ -121,6 +121,65 @@ class Response extends Singleton{
 	 * @return $this
 	 */
 	/**
+	 * Media types that browsers can run scripts in when a file is opened inline. Any type ending with "+xml" is
+	 * refused as well.
+	 */
+	const INSECURE_MIME_TYPES = [
+		'text/html',
+		'image/svg+xml',
+		'image/svg',
+		'application/xhtml+xml',
+		'text/xml',
+		'application/xml',
+		'text/xsl',
+		'application/xslt+xml'
+	];
+
+	/**
+	 * Check if a file of this content type may be shown inside the browser.
+	 *
+	 * Files are served from the Group-Office origin. When a browser opens HTML, SVG or XML inline, scripts in it run
+	 * with access to the session of the user, so these types must be downloaded.
+	 *
+	 * @param string|null $contentType Content type that is sent to the browser. Parameters like "; charset=utf-8" are ignored.
+	 * @return bool
+	 */
+	public static function isSafeInlineContentType(?string $contentType): bool
+	{
+		$mediaType = strtolower(trim(explode(';', (string) $contentType)[0]));
+
+		if ($mediaType === '') {
+			// the browser would guess
+			return false;
+		}
+
+		return !in_array($mediaType, self::INSECURE_MIME_TYPES) && !str_ends_with($mediaType, '+xml');
+	}
+
+	/**
+	 * Security headers to send with a file download.
+	 *
+	 * "X-Content-Type-Options: nosniff" makes the browser use the content type that is sent, instead of guessing a
+	 * more dangerous one from the contents. A file shown inline is also sandboxed so scripts in it can't run. PDF isn't
+	 * sandboxed because the PDF viewer of the browser doesn't work in a sandbox.
+	 *
+	 * @param string|null $contentType Content type that is sent to the browser
+	 * @param bool $inline True when the file is sent with "Content-Disposition: inline"
+	 * @return array<string, string> header name => value
+	 */
+	public static function fileSecurityHeaders(?string $contentType, bool $inline): array
+	{
+		$headers = ['X-Content-Type-Options' => 'nosniff'];
+
+		$mediaType = strtolower(trim(explode(';', (string) $contentType)[0]));
+		if ($inline && $mediaType !== 'application/pdf') {
+			$headers['Content-Security-Policy'] = 'sandbox';
+		}
+
+		return $headers;
+	}
+
+	/**
 	 * Build a safe Content-Disposition header value for a user supplied file name.
 	 *
 	 * The plain "filename" parameter only contains printable ASCII without quotes, backslashes or percent signs so

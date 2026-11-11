@@ -190,7 +190,18 @@ class Http {
 		
 		header('Content-Transfer-Encoding: binary');		
 		
+		// prevent html to render on same domain having access to all global JS stuff
+		$mimeType = $file->mimeType();
+		if ($inline && !\go\core\http\Response::isSafeInlineContentType($mimeType)) {
+			$inline = false;
+		}
+
 		$disposition = $inline ? 'inline' : 'attachment';
+
+		// nosniff, and a sandbox when the file is shown inline
+		foreach (\go\core\http\Response::fileSecurityHeaders($inline ? $mimeType : 'application/octet-stream', $inline) as $header => $value) {
+			header($header . ': ' . $value);
+		}
 
 		if ($cache) {
 			header("Expires: " . date("D, j M Y G:i:s ", time() + 86400) . 'GMT'); //expires in 1 day
@@ -208,7 +219,7 @@ class Http {
 		} else {
 			// for workaround Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1759916
 			// we set application/octet-stream
-			header('Content-Type: ' .( $inline ? $file->mimeType() : 'application/octet-stream'));
+			header('Content-Type: ' .( $inline ? $mimeType : 'application/octet-stream'));
 			header('Content-Disposition: '.$disposition.'; filename="' . $file->name() . '"');
 
 			if (!$cache) {

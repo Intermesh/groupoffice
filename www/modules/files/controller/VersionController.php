@@ -29,8 +29,12 @@ class VersionController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function actionDownload($params){
 		$version = \GO\Files\Model\Version::model()->findByPk($params['id']);
+		if(!$version) {
+			throw new \GO\Base\Exception\NotFound();
+		}
 		$file = $version->getFilesystemFile();
-		\GO\Base\Util\Http::outputDownloadHeaders($file);
+		// Old versions are always downloaded. They are never shown inside the browser.
+		\GO\Base\Util\Http::outputDownloadHeaders($file, false);
 		$file->output();
 	}
 	
