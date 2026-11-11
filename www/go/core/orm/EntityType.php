@@ -168,14 +168,22 @@ class EntityType implements ArrayableInterface {
 			}
 			$record['id'] = go()->getDbConnection()->getPDO()->lastInsertId();
 
-			go()->getCache()->delete('entity-types');
-
 			$e = new static;
 			$e->className = $className;
 			$e->id = $record['id'];
 			$e->moduleId = $record['moduleId'];
 			$e->clientName = $record['clientName'];
 			$e->name = $record['name'];
+
+			// Add it to the cache instead of deleting the cache. Rebuilding it would create new objects for all entity
+			// types, while entities keep using the old ones in Entity::entityType(), so their mod sequences would differ.
+			$i = count($c['models']);
+			$c['models'][] = $e;
+			$c['id'][$e->getId()] = $i;
+			$c['name'][$e->getName()] = $i;
+			if(!go()->getInstaller()->isInProgress()) {
+				go()->getCache()->set('entity-types', $c);
+			}
 
 			return $e;
 		}
