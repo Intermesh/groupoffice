@@ -202,9 +202,17 @@ abstract class AbstractJsonController extends AbstractController {
 	/**
 	 * 
 	 * @param \GO\Base\Data\AbstractStore $store
-	 * @param type $params
+	 * @param array $params
 	 */
 	protected function renderExport(\GO\Base\Data\AbstractStore $store, $params) {
+		if(!empty($params['type'])) {
+			//temporary fix for compatibility with AbsractModelController
+			$params['type']=str_replace('GO\Base\Export', 'GO\Base\Storeexport', $params['type']);
+			if(!\GO\Base\Storeexport\AbstractExport::isExportClass($params['type'])) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+		}
+
 		//define('EXPORTING', true);
 		//used by custom fields to format diffently
 
@@ -240,8 +248,6 @@ abstract class AbstractJsonController extends AbstractController {
 		}
 		
 		if(!empty($params['type'])){
-			//temporary fix for compatibility with AbsractModelController
-			$params['type']=str_replace('GO\Base\Export', 'GO\Base\Storeexport', $params['type']);
 			$export = new $params['type']($store, $settings->export_include_headers, $settings->export_human_headers, $params['documentTitle'], $orientation);
 		}else
 			$export = new \GO\Base\Storeexport\ExportCSV($store, $settings->export_include_headers, $settings->export_human_headers, $params['documentTitle'], $orientation); // The default Export is the CSV outputter.

@@ -647,6 +647,10 @@ class AbstractModelController extends AbstractController {
 	 */
 	protected function actionExport($params) {	
 		
+		if(!empty($params['type']) && !\GO\Base\Export\AbstractExport::isExportClass($params['type'])) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		\GO::setMaxExecutionTime(0);
 
 
