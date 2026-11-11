@@ -707,6 +707,18 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	/**
+	 * Get the format to convert to from the request. It's used as file extension, so only letters and digits are kept.
+	 *
+	 * @param array $params
+	 * @return string
+	 */
+	private static function convertFormat(array $params): string
+	{
+		$format = !empty($params['format']) ? preg_replace('/[^a-z0-9]/i', '', (string) $params['format']) : '';
+		return $format === '' ? 'pdf' : $format;
+	}
+
+	/**
 	 * @param $params
 	 * @throws AccessDenied
 	 * @throws \go\core\exception\NotFound
@@ -714,7 +726,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	public function actionConvert($params)
 	{
 		$fileId = !empty($params['id']) ? $params['id'] : 0;
-		$format = !empty($params['format']) ? $params['format'] : 'pdf';
+		$format = self::convertFormat($params);
 
 		//check if file exists
 		$fileRecord = \GO\Files\Model\File::model()->findByPk($fileId);
@@ -722,8 +734,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			throw new \go\core\exception\NotFound();
 		}
 
-		//check user permissions
-		if (!\GO::user() || !$fileRecord->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+		//check user permissions. The converted file is added to the folder of the file.
+		if (!\GO::user() || !$fileRecord->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION) || !$fileRecord->folder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
 			throw new AccessDenied();
 		}
 
@@ -755,11 +767,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	public function actionConvertAndDownload($params)
 	{
 		$fileId = !empty($params['id']) ? $params['id'] : 0;
-		// the format is used as file extension
-		$format = !empty($params['format']) ? preg_replace('/[^a-z0-9]/i', '', $params['format']) : 'pdf';
-		if ($format === '') {
-			$format = 'pdf';
-		}
+		$format = self::convertFormat($params);
 
 		//check if file exists
 		$fileRecord = \GO\Files\Model\File::model()->findByPk($fileId);
