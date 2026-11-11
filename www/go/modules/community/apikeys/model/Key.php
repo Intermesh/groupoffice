@@ -6,6 +6,7 @@ use go\core\model\Token;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 
 class Key extends Entity {
 
@@ -32,6 +33,51 @@ class Key extends Entity {
 		return parent::defineMapping()
 						->addTable('apikeys_key', 'key');						
 	}
+
+	/**
+	 * The access token is created by the server
+	 *
+	 * @return string[]
+	 */
+	public static function readOnlyProps(): array
+	{
+		return array_merge(parent::readOnlyProps(), ['accessToken']);
+	}
+
+	/**
+	 * Set when the access token was created by this instance. Only then it's returned to the client.
+	 */
+	private bool $tokenCreated = false;
+
+	/**
+	 * The access token is only returned once, when the key is created. It works like a password, so it's never shown
+	 * again.
+	 *
+	 * @param array|null $properties
+	 * @return array
+	 */
+	public function toArray(?array $properties = null): array
+	{
+		$arr = parent::toArray($properties);
+		if(!$this->tokenCreated && array_key_exists('accessToken', $arr)) {
+			$arr['accessToken'] = null;
+		}
+		return $arr;
+	}
+
+	protected function internalValidate()
+	{
+		// Only administrators may create a key for another user. Otherwise a manager of this module could get a token
+		// of an administrator.
+		if($this->isNew() && isset($this->userId) && $this->userId != go()->getUserId()) {
+			$state = go()->getAuthState();
+			if($state && $state->isAuthenticated() && !$state->isAdmin()) {
+				$this->setValidationError('userId', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
+			}
+		}
+
+		parent::internalValidate();
+	}
 	
 	protected function internalSave(): bool
 	{
@@ -46,6 +92,7 @@ class Key extends Entity {
 			}
 			
 			$this->accessToken = $token->accessToken;
+			$this->tokenCreated = true;
 		}
 		
 		return parent::internalSave();
@@ -62,15 +109,15 @@ class Key extends Entity {
 
 	protected static function internalDelete(Query $query): bool
 	{
+		// Delete the tokens of all deleted keys
 		$q = clone $query;
-		$q->select('accessToken');
-		$qq = $q->single();
+		$accessTokens = $q->selectSingleValue('accessToken')->all();
 
 		if (!parent::internalDelete($query)) {
 			return false;
 		}
 
-		if ($qq && !Token::delete(['accessToken' => $qq['accessToken']])) {
+		if (!empty($accessTokens) && !Token::delete(['accessToken' => $accessTokens])) {
 			throw new \Exception("Could not delete access token");
 		}
 

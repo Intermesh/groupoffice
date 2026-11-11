@@ -1,5 +1,4 @@
 import {
-	Window,
 	btn,
 	column,
 	datasourcestore,
@@ -7,7 +6,7 @@ import {
 	datecolumn,
 	menu,
 	t,
-	Table, browser
+	Table
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
@@ -62,20 +61,6 @@ export class KeyGrid extends Table<DataSourceStore> {
 						return btn({
 							icon: "more_vert",
 							menu: menu({},
-								btn({
-									icon: "content_copy",
-									text: t("Copy token to clipboard"),
-									handler: (button, ev) => {
-										browser.copyTextToClipboard(record.accessToken, true);
-									}
-								}),
-								btn({
-									icon: "search",
-									text: t("View access token"),
-									handler: (button, ev) => {
-										Window.alert(record.accessToken, t("Access token"));
-									}
-								}),
 								btn({
 									icon: "delete",
 									text: t("Delete"),

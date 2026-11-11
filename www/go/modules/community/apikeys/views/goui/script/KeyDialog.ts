@@ -1,5 +1,5 @@
 import {FormWindow, principalcombo} from "@intermesh/groupoffice-core";
-import {fieldset, t, textfield} from "@intermesh/goui";
+import {browser, fieldset, t, textfield, Window} from "@intermesh/goui";
 
 export class KeyDialog extends FormWindow {
 	constructor() {
@@ -26,5 +26,15 @@ export class KeyDialog extends FormWindow {
 			)
 		)
 
+		// The access token is only returned once by the server, when the key is created
+		this.form.on("save", ({data, isNew}) => {
+			if(isNew && data.accessToken) {
+				browser.copyTextToClipboard(data.accessToken, true);
+				void Window.alert(
+					t("Copy the access token now. It's not possible to view it again.") + "<br><br><code>" + data.accessToken + "</code>",
+					t("Access token")
+				);
+			}
+		});
 	}
 }
