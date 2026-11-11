@@ -10,6 +10,8 @@ use GO\Files\Controller\FolderController;
 use GO\Files\Model\File;
 use GO\Files\Model\Folder;
 use GO\Files\Model\TrashedItem;
+use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\addressbook\model\Contact;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -187,6 +189,73 @@ class TrashPermissionTest extends TestCase
 		} catch (AccessDenied $e) {
 			$parentId = $entity == 'File' ? $this->reloadFile()->folder_id : Folder::model()->findByPk($id, false, true, true)->parent_id;
 			$this->assertNotEquals($this->ownerFolder->id, $parentId);
+		}
+	}
+
+	/**
+	 * The trashed item keeps the permissions it had in its original folder, also when that folder is moved to the trash
+	 * later.
+	 */
+	public function testOwnerCanRemoveFileFromTrashAfterItsFolderWasTrashed(): void
+	{
+		$this->actAs($this->owner->id);
+		$this->assertTrue($this->file->move($this->subFolder));
+
+		$this->trash('f:' . $this->file->id);
+		$this->trash('d:' . $this->subFolder->id);
+		$trashedFile = $this->findTrashedItem($this->file->id, 'File');
+		$this->assertNotEmpty($trashedFile);
+
+		$this->invoke('actionDeleteFromTrash', ['ids' => (string) $trashedFile->id]);
+		$this->assertFalse(File::model()->findByPk($this->file->id, false, true, true));
+	}
+
+	/**
+	 * Like deleting, write permission on a contact is enough to move its files to the trash, and to restore or delete
+	 * them from there.
+	 */
+	public function testWriterOfContactCanTrashRestoreAndDeleteItsFiles(): void
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		\GO::session()->setCurrentUser(User::ID_SUPER_ADMIN);
+
+		$addressBook = new AddressBook();
+		$addressBook->name = uniqid('trashtest');
+		$addressBook->setAcl([$this->reader->getPersonalGroup()->id => \go\core\model\Acl::LEVEL_WRITE]);
+		$this->assertTrue($addressBook->save(), $addressBook->getValidationErrorsAsString());
+
+		try {
+			$contact = new Contact();
+			$contact->addressBookId = $addressBook->id;
+			$contact->firstName = 'Trash';
+			$contact->lastName = 'Test';
+			$this->assertTrue($contact->save(), $contact->getValidationErrorsAsString());
+
+			$folder = Folder::model()->findForEntity($contact);
+			file_put_contents($folder->fsFolder->path() . '/contact.txt', 'content');
+			$fileId = $folder->addFile('contact.txt')->id;
+
+			$this->actAs($this->reader->id);
+			$this->trash('f:' . $fileId);
+			$trashedItem = $this->findTrashedItem($fileId, 'File');
+			$this->assertNotEmpty($trashedItem);
+
+			$this->invoke('actionRestore', ['ids' => (string) $trashedItem->id]);
+			$this->assertEquals($folder->id, File::model()->findByPk($fileId, false, true, true)->folder_id);
+
+			$this->trash('f:' . $fileId);
+			$trashedItem = $this->findTrashedItem($fileId, 'File');
+			$this->invoke('actionDeleteFromTrash', ['ids' => (string) $trashedItem->id]);
+			$this->assertFalse(File::model()->findByPk($fileId, false, true, true));
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			\GO::session()->setCurrentUser(User::ID_SUPER_ADMIN);
+			\GO::$ignoreAclPermissions = true;
+			if (isset($folder)) {
+				$folder->delete(true);
+			}
+			\GO::$ignoreAclPermissions = false;
+			AddressBook::delete(['id' => $addressBook->id]);
 		}
 	}
 

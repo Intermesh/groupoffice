@@ -188,30 +188,31 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	 */
 	private function checkMayRemoveFromTrash(): void
 	{
-		$folder = $this->getPermissionFolder();
-		// when the original folder is gone only an administrator may do this
-		$allowed = $folder ? $folder->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION) : (GO::$ignoreAclPermissions || GO::user()?->isAdmin());
+		if (GO::$ignoreAclPermissions || GO::user()?->isAdmin()) {
+			return;
+		}
+
+		$isFile = EntityType::findById($this->entityTypeId)->getName() == 'File';
+
+		if ($this->aclId > 0) {
+			// The ACL the item had in its original place
+			$level = \GO\Base\Model\Acl::getUserPermissionLevel($this->aclId);
+			$required = \GO\Base\Model\Acl::DELETE_PERMISSION;
+			// Like File::checkPermissionLevel(): write permission is enough to delete a file of a contact, project etc.
+			$acl = \GO\Base\Model\Acl::model()->findByPk($this->aclId, false, true);
+			if ($isFile && $acl && $acl->usedIn != 'fs_folders.acl_id') {
+				$required = \GO\Base\Model\Acl::WRITE_PERMISSION;
+			}
+			$allowed = $level >= $required;
+		} else {
+			// Older records without ACL: use the original parent folder. When it's gone only an administrator may do this.
+			$folder = Folder::model()->findByPk($this->parentId, false, true);
+			$allowed = $folder && $folder->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION);
+		}
+
 		if (!$allowed) {
 			throw new GO\Base\Exception\AccessDenied();
 		}
-	}
-
-	/**
-	 * The folder that had the permissions of this item before it was moved to trash.
-	 *
-	 * A folder with its own ACL kept it in the trash. Other items had the permissions of their original parent folder.
-	 */
-	private function getPermissionFolder(): ?Folder
-	{
-		$entityType = EntityType::findById($this->entityTypeId);
-		if ($entityType->getName() == 'Folder') {
-			$folder = Folder::model()->findByPk($this->entityId, false, true);
-			if ($folder && $folder->acl_id > 0) {
-				return $folder;
-			}
-		}
-
-		return Folder::model()->findByPk($this->parentId, false, true) ?: null;
 	}
 
 }
