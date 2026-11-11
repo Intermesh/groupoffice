@@ -3,7 +3,7 @@ export * from "./CommentEditor.js";
 export * from "./CommentDialog.js";
 
 import {client, entities, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
-import {t, Window} from "@intermesh/goui";
+import {Format, t, Window} from "@intermesh/goui";
 import {CommentDetail} from "./CommentDetail";
 import {CommentsPanel} from "./CommentsPanel";
 import {CommentEditor} from "./CommentEditor";
@@ -57,7 +57,7 @@ modules.register({
 						creator = {name: t("Unknown user")};
 					}
 
-					panelCfg.html = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "comments", "community").replace("{creator}", creator.name) + "<br /><br /><i>" + alert.data.excerpt + "</i>";
+					panelCfg.html = Format.htmlEncode(go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "comments", "community").replace("{creator}", creator.name)) + "<br /><br /><i>" + alert.data.excerpt + "</i>";
 					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by  {creator}.", "comments", "community").replace("{creator}", creator.name) + "\n\n" + alert.data.excerpt;
 					return panelCfg;
 

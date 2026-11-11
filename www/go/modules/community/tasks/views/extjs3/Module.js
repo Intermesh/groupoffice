@@ -160,7 +160,7 @@ go.Modules.register("community", "tasks", {
 							}
 
 							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("You were assigned to this task by {assigner}").replace("{assigner}", assigner.name);
-							panelCfg.items = [{html: msg }];
+							panelCfg.items = [{html: Ext.util.Format.htmlEncode(msg)}];
 							panelCfg.notificationBody = msg;
 							return panelCfg;
 						});
@@ -182,7 +182,7 @@ go.Modules.register("community", "tasks", {
 							}
 
 							const msg = go.util.Format.dateTime(alert.triggerAt) + ": " +t("A new task was created in your list by {creator}").replace("{creator}", creator.name);
-							panelCfg.items = [{html: msg}];
+							panelCfg.items = [{html: Ext.util.Format.htmlEncode(msg)}];
 							panelCfg.notificationBody = msg
 							return panelCfg;
 
