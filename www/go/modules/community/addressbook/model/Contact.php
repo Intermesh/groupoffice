@@ -832,25 +832,74 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 
-		$this->updateUser();
+		if(!$this->updateUser()) {
+			return false;
+		}
 
 		return $this->saveOriganizationIds();
 
 	}
 
-	private function updateUser() {
+	/**
+	 * Copy the name and e-mail address of a user's profile contact to the user
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function updateUser(): bool
+	{
 		if(isset($this->goUserId) && $this->isModified([
 				'name',
 				'emailAddresses',
 			])) {
 
 			$user = User::findById($this->goUserId,['email', 'displayName']);
+			if(!$user) {
+				return true;
+			}
 			$user->displayName = $this->name;
 			if(isset($this->emailAddresses[0])) {
 				$user->email = $this->emailAddresses[0]->email;
 			}
-			if($user->isModified()) {
-				$user->save();
+			if(!$user->isModified()) {
+				return true;
+			}
+
+			// The e-mail address of a user is used for password recovery. So only those who may change the user may change it.
+			if(!$user->currentUserMayChange()) {
+				$this->setValidationError('goUserId', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
+				return false;
+			}
+
+			if(!$user->save()) {
+				$this->setValidationError('goUserId', ErrorCode::RELATIONAL, $user->getValidationErrorsAsString());
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Only those who may change a user may make a contact the profile of that user or unlink it.
+	 *
+	 * @throws Exception
+	 */
+	private function validateGoUserId(): void
+	{
+		if(!$this->isModified(['goUserId'])) {
+			return;
+		}
+
+		foreach([$this->getOldValue('goUserId'), $this->goUserId] as $userId) {
+			if(empty($userId)) {
+				continue;
+			}
+
+			$user = User::findById($userId, ['id']);
+			if(!$user || !$user->currentUserMayChange()) {
+				$this->setValidationError('goUserId', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
+				return;
 			}
 		}
 	}
@@ -897,6 +946,8 @@ class Contact extends AclItemEntity {
 				}
 			}
 		}
+
+		$this->validateGoUserId();
 		
 		parent::internalValidate();
 	}

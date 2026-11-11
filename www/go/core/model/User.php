@@ -497,6 +497,28 @@ public function historyLog(): bool|array
 		return empty(array_diff($added, $allowed));
 	}
 
+	/**
+	 * Check if the logged-in user may change this user, like its e-mail address or display name.
+	 *
+	 * Administrators may change all users, users may change themselves and users with the "mayChangeUsers" right may
+	 * change users that are not administrators. Saves without a logged-in user, like the installer, are not restricted.
+	 *
+	 * @return bool
+	 */
+	public function currentUserMayChange(): bool
+	{
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin()) {
+			return true;
+		}
+
+		if($this->id == $state->getUserId()) {
+			return true;
+		}
+
+		return go()->getModel()->getUserRights()->mayChangeUsers && !$this->isAdmin() && $this->hasPermissionLevel(Acl::LEVEL_READ);
+	}
+
 	/** @noinspection PhpCastIsUnnecessaryInspection */
 	protected function init() {
 		parent::init();
