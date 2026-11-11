@@ -25,9 +25,23 @@ use TheNetworg\OAuth2\Client\Token\AccessToken;
 final class Oauth2Client extends EntityController
 {
 
+	/**
+	 * Set by gauth.php. The OpenID login and its callback are used before the user is logged in.
+	 */
+	public static bool $isPageRequest = false;
+
 	protected function authenticate()
 	{
-		return true;
+		if (self::$isPageRequest) {
+			return;
+		}
+
+		// Users without access to the module need to read the clients to choose one for their e-mail account. Only
+		// administrators can change them.
+		if (!go()->getAuthState()->isAuthenticated()) {
+			throw new Exception(401, "Unauthorized");
+		}
+		$this->rights = $this->getClassRights();
 	}
 
 	public function entityClass(): string

@@ -12,11 +12,6 @@ use go\modules\community\oidc\model;
 final class Client extends EntityController
 {
 
-	protected function authenticate()
-	{
-		return true;
-	}
-
 	public function entityClass(): string
 	{
 		return model\Client::class;
