@@ -19,16 +19,6 @@ use go\core\jmap\Response;
 use go\core\jmap\State;
 use go\core\http\Request;
 
-const INSECURE_MIME_TYPES = [
-	'text/html',
-	'image/svg+xml',
-	'application/xhtml+xml',
-	'text/xml',
-	'application/xml',
-	'text/xsl',
-	'application/xslt+xml'
-];
-
 App::get();
 if(Request::get()->getMethod() == 'OPTIONS') {
 	Response::get()->output();
@@ -61,7 +51,7 @@ try {
 		$inline = !empty($_GET['inline']);
 
 		// prevent html to render on same domain having access to all global JS stuff
-		if(in_array($blob->type, INSECURE_MIME_TYPES)) {
+		if(!Response::isSafeInlineContentType($blob->type)) {
 			$inline = false;
 			$blob->type = 'text/plain';
 		}

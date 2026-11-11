@@ -296,58 +296,87 @@ class File extends FileSystemObject {
 	}
 
 	/**
+	 * Set the download headers on the response for {@see output()}.
+	 *
+	 * A file is only shown inline when its content type is safe to show inside the browser, also when an inline
+	 * Content-Disposition header is passed.
+	 *
+	 * @param bool $useCache
+	 * @param array $headers key value array of http headers to send
+	 * @param bool $inline Show the file inside the browser
+	 * @throws Exception
+	 */
+	public function setOutputHeaders(bool $useCache = true, array $headers = [], bool $inline = false): void
+	{
+		$r = Response::get();
+
+		foreach($headers as $name => $value) {
+			$r->setHeader($name, $value);
+		}
+
+		if(!$r->hasHeader('Content-Type')) {
+			$r->setHeader('Content-Type', $this->getContentType());
+		}
+		$contentType = (string) ($r->getHeader('Content-Type')[0] ?? '');
+
+		//Don't set content length for zip files because gzip of apache will corrupt the download. http://www.heath-whyte.info/david/computers/corrupted-zip-file-downloads-with-php
+		if($this->getExtension() != 'zip') {
+			$r->setHeader('Content-Length', $this->getSize());
+		}
+
+		// prevent html to render on same domain having access to all global JS stuff
+		$safeInline = Response::isSafeInlineContentType($contentType);
+		if(!$r->hasHeader('Content-Disposition')) {
+			$disp = $inline && $safeInline ? 'inline' : 'attachment';
+			$r->setHeader('Content-Disposition', Response::contentDisposition($disp, $this->getName()));
+		} else if(!$safeInline) {
+			$r->setHeader('Content-Disposition', preg_replace('/^\s*inline\b/i', 'attachment', (string) $r->getHeader('Content-Disposition')[0]));
+		}
+		$isInline = (bool) preg_match('/^\s*inline\b/i', (string) $r->getHeader('Content-Disposition')[0]);
+
+		foreach(Response::fileSecurityHeaders($contentType, $isInline) as $name => $value) {
+			$r->setHeader($name, $value);
+		}
+
+		if(!$r->hasHeader('Content-Transfer-Encoding')) {
+			$r->setHeader('Content-Transfer-Encoding', 'binary');
+		}
+
+		if ($useCache) {
+			if(!$r->hasHeader('Cache-Control')) {
+				$r->setHeader('Cache-Control', 'PRIVATE');
+			}
+			$r->removeHeader('Pragma');
+
+			if(!$r->hasHeader('Last-Modified')) {
+				$r->setModifiedAt($this->getModifiedAt());
+			}
+
+			if(!$r->hasHeader('Etag')) {
+				$r->setETag($this->getEtag());
+			}
+			$r->abortIfCached();
+		} else{
+			$r->setHeader('Cache-Control','no-cache, must-revalidate, post-check=0, pre-check=0'); //prevent caching
+			$r->setHeader('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT'); //resolves problem with IE GET requests
+			$r->setHeader('Pragma', 'no-cache');
+			$r->removeHeader('Last-Modified');
+		}
+	}
+
+	/**
 	 * Send download headers and output the contents of this file to standard out (browser).
 	 * @param boolean $sendHeaders
 	 * @param boolean $useCache
 	 * @param array $headers key value array of http headers to send
-	 * @param bool $inline
+	 * @param bool $inline Show the file inside the browser. HTML, SVG and XML are always downloaded, see {@see Response::isSafeInlineContentType()}.
 	 * @throws Exception
 	 */
 	public function output(bool $sendHeaders = true, bool $useCache = true, array $headers = [], bool $inline = false) {
 		$r = Response::get();
 	
 		if($sendHeaders) {
-			foreach($headers as $name => $value) {
-				$r->setHeader($name, $value);
-			}
-
-			if(!$r->hasHeader('Content-Type')) {
-				$r->setHeader('Content-Type', $this->getContentType());
-			}
-
-			//Don't set content length for zip files because gzip of apache will corrupt the download. http://www.heath-whyte.info/david/computers/corrupted-zip-file-downloads-with-php
-			if($this->getExtension() != 'zip') {
-				$r->setHeader('Content-Length', $this->getSize());
-			}
-
-			if(!$r->hasHeader('Content-Disposition')) {
-				$disp = $inline ? 'inline' : 'attachment';
-				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
-			}
-			if(!$r->hasHeader('Content-Transfer-Encoding')) {
-				$r->setHeader('Content-Transfer-Encoding', 'binary');
-			}
-
-			if ($useCache) {
-				if(!$r->hasHeader('Cache-Control')) {
-					$r->setHeader('Cache-Control', 'PRIVATE');
-				}
-				$r->removeHeader('Pragma');
-
-				if(!$r->hasHeader('Last-Modified')) {
-					$r->setModifiedAt($this->getModifiedAt());
-				}
-
-				if(!$r->hasHeader('Etag')) {
-					$r->setETag($this->getEtag());
-				}
-				$r->abortIfCached();
-			} else{
-				$r->setHeader('Cache-Control','no-cache, must-revalidate, post-check=0, pre-check=0'); //prevent caching
-				$r->setHeader('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT'); //resolves problem with IE GET requests
-				$r->setHeader('Pragma', 'no-cache');
-				$r->removeHeader('Last-Modified');
-			}
+			$this->setOutputHeaders($useCache, $headers, $inline);
 		}
 
 		if (isset($_SERVER['HTTP_RANGE'])){

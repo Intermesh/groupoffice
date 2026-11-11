@@ -511,11 +511,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			//Supports range download
 			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
 
-			// prevent html to render on same domain having access to all global JS stuff
-			if($coreFsFile->getContentType() == 'text/html' || $coreFsFile->getContentType() == 'image/svg+xml') {
-				$inline = false;
-			}
-
+			// HTML, SVG and XML are downloaded even when $inline is true. See Response::isSafeInlineContentType().
 			$coreFsFile->output(true, !array_key_exists('cache', $params) || !empty($params['cache']), [], $inline);
 
 		}catch(NotFound $e) {

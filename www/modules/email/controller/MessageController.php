@@ -1590,10 +1590,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$inline = false;
 		}
 
-		if($file->mimeType() == 'text/html') {
-			$inline = false;
-		}
-		
+		// HTML, SVG and XML are downloaded even when $inline is true. See Response::isSafeInlineContentType().
 		$imap = $account->openImapConnection($params['mailbox']);
 		
 		\GO\Base\Util\Http::outputDownloadHeaders($file,$inline,true);
