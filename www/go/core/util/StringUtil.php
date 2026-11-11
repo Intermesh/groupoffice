@@ -1407,4 +1407,44 @@ END;
 		return floatval($number);
 	}
 
+	/**
+	 * Make a value safe for a CSV file that may be opened in a spreadsheet application
+	 *
+	 * Spreadsheet applications run text that starts with "=", "+", "-", "@", a tab or a carriage return as a
+	 * formula (CSV injection), for example to open a link or start a program. Such text gets a "'" in front so it's
+	 * shown as text. Numbers, also formatted ones like "-1.234,56", and phone numbers like "+31 (0)20 1234567" are
+	 * kept as they are, because they can't call a function. Values that are not a string are returned unchanged.
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public static function escapeCsvFormula(mixed $value): mixed
+	{
+		if (!is_string($value) || $value === '' || strpbrk($value[0], "=+-@\t\r") === false) {
+			return $value;
+		}
+
+		if (preg_match("/^[+-]?[0-9][0-9.,' ()\\/-]*$/", $value)) {
+			return $value;
+		}
+
+		return "'" . $value;
+	}
+
+	/**
+	 * Remove the "'" that {@see escapeCsvFormula()} added, so exported data can be imported again unchanged
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public static function unescapeCsvFormula(mixed $value): mixed
+	{
+		if (!is_string($value) || !str_starts_with($value, "'")) {
+			return $value;
+		}
+
+		$unescaped = substr($value, 1);
+		return self::escapeCsvFormula($unescaped) === $value ? $unescaped : $value;
+	}
+
 }

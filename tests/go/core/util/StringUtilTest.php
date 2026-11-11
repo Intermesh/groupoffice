@@ -225,4 +225,40 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 		$this->assertStringContainsString('groupoffice-extracted-style', $result);
 		$this->assertNoActiveContent($result);
 	}
+
+	public static function csvValues(): array
+	{
+		return [
+			'formula' => ['=1+1', "'=1+1"],
+			'at' => ['@SUM(A1)', "'@SUM(A1)"],
+			'plus formula' => ['+HYPERLINK("https://example.com")', "'+HYPERLINK(\"https://example.com\")"],
+			'minus formula' => ['-2+3+cmd|\' /C calc\'!A0', "'-2+3+cmd|' /C calc'!A0"],
+			'minus sum' => ['-1+1', "'-1+1"],
+			'tab' => ["\t=1", "'\t=1"],
+			'carriage return' => ["\r=1", "'\r=1"],
+			'lone minus' => ['-', "'-"],
+			'negative number' => ['-12.5', '-12.5'],
+			'negative formatted number' => ['-1.234,56', '-1.234,56'],
+			'negative swiss number' => ["-1'234.56", "-1'234.56"],
+			'phone number' => ['+31 (0)20 1234567', '+31 (0)20 1234567'],
+			'float' => [-12.5, -12.5],
+			'int' => [-3, -3],
+			'null' => [null, null],
+			'text' => ['Hello = world', 'Hello = world'],
+			'empty' => ['', ''],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('csvValues')]
+	public function testEscapeCsvFormula(mixed $value, mixed $expected): void
+	{
+		$this->assertSame($expected, StringUtil::escapeCsvFormula($value));
+		$this->assertSame($value, StringUtil::unescapeCsvFormula($expected), "Import must restore the value");
+	}
+
+	public function testUnescapeCsvFormulaKeepsOtherQuotes(): void
+	{
+		$this->assertSame("'quoted'", StringUtil::unescapeCsvFormula("'quoted'"));
+		$this->assertSame("'-12", StringUtil::unescapeCsvFormula("'-12"));
+	}
 }

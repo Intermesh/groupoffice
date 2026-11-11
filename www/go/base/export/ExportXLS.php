@@ -54,7 +54,12 @@ class ExportXLS extends AbstractExport
 	private function _write($data) {
 		$col = 1;
 		foreach ($data as $key => $val) {
-			$this->_sheet->setCellValue([$col, $this->excel_row], $val);
+			if (is_string($val) && str_starts_with($val, '=')) {
+				// prevent formula detection
+				$this->_sheet->setCellValueExplicit([$col, $this->excel_row], $val, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+			} else {
+				$this->_sheet->setCellValue([$col, $this->excel_row], $val);
+			}
 			$col++;
 		}
 		$this->excel_row++;
