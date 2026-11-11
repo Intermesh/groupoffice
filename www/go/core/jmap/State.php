@@ -113,7 +113,7 @@ class State extends AbstractState {
 			return false;
 		}
 
-		if($csrfToken != $token->CSRFToken) {
+		if(!is_string($csrfToken) || !is_string($token->CSRFToken) || !hash_equals($token->CSRFToken, $csrfToken)) {
 			go()->debug("CSRFToken mismatch");
 			return false;
 		}
