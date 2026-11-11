@@ -115,10 +115,12 @@ try {
 			date_default_timezone_set('UTC');
 			//used for direct token login from multi_instance module
 			//this token is used in Extjs3.clientSettings() too
-			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
+			// Only a short-lived token made for this. Otherwise another website could log the user in to its own account.
+			$token = is_string($_POST['accessToken']) ? Token::findHandoff($_POST['accessToken']) : null;
 			// isAuthenticated() also checks the expiry. An expired token must not be revived.
-			if($token && $token->isAuthenticated() && userMayLogin($token->userId)) {
+			if($token && $token->isAuthenticated() && userMayLogin($token->userId) && $token->rotate()) {
 
+                $_POST['accessToken'] = $token->accessToken;
                 go()->getAuthState()->setToken($token);
 				$token->setAuthenticated();
 				$token->setCookie();

@@ -638,8 +638,10 @@ class Instance extends Entity {
 	 * @throws Exception
 	 */
 	public function createAccessToken() {
-		$now = new DateTime();
-		$expiresAt = new DateTime("+1 hour");
+		// UTC like the instance stores it. The instance only accepts the token shortly after it was created and when it
+		// expires within an hour. See Token::findHandoff().
+		$now = new DateTime("now", new \DateTimeZone("UTC"));
+		$expiresAt = new DateTime("+1 hour", new \DateTimeZone("UTC"));
 		
 		$data = [
 

@@ -346,6 +346,67 @@ class Token extends Entity {
 	}
 
 	/**
+	 * Seconds that a token which another server created for a direct login can be handed over. {@see findHandoff()}
+	 */
+	const HANDOFF_LIFETIME = 300;
+
+	/**
+	 * Find a token that another server created to log in directly by posting its access token to index.php
+	 *
+	 * Used by the multi_instance module, which creates a token in the database of the instance that expires an hour
+	 * after it was created. Only such tokens are accepted, and only for {@see HANDOFF_LIFETIME} seconds. The token of a
+	 * normal login expires a day after it was last used, so another website can't log a user in to its own account by
+	 * posting the access token of its own login. Use {@see rotate()} after accepting it, so it can only be used once.
+	 *
+	 * @param string $accessToken
+	 * @return Token|null
+	 * @throws Exception
+	 */
+	public static function findHandoff(string $accessToken): ?Token
+	{
+		// Read before loading the token, because loading an authenticated token extends its expiry time
+		$times = go()->getDbConnection()
+			->select('createdAt, expiresAt')
+			->from('core_auth_token')
+			->where('accessToken', '=', $accessToken)
+			->single();
+
+		if (!$times || empty($times['expiresAt'])) {
+			return null;
+		}
+
+		$utc = new DateTimeZone("UTC");
+		$createdAt = (new DateTime($times['createdAt'], $utc))->getTimestamp();
+		$expiresAt = (new DateTime($times['expiresAt'], $utc))->getTimestamp();
+		if ($createdAt < time() - self::HANDOFF_LIFETIME || $expiresAt - $createdAt > 3600) {
+			return null;
+		}
+
+		$token = static::find()->where(['accessToken' => $accessToken])->single();
+		if (!$token || !$token->isAuthenticated()) {
+			return null;
+		}
+		return $token;
+	}
+
+	/**
+	 * Replace the access token and CSRF token, so the old ones can't be used anymore
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function rotate(): bool
+	{
+		if (isset($this->accessToken)) {
+			go()->getCache()->delete('token-' . $this->accessToken);
+		}
+		$this->accessToken = null;
+		$this->CSRFToken = null;
+
+		return $this->refresh();
+	}
+
+	/**
 	 * Find the token of a login that isn't finished yet by its login token
 	 *
 	 * The login token is only valid for {@see LOGIN_LIFETIME} and only until the login is finished. Otherwise it could
