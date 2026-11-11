@@ -37,7 +37,12 @@ class KeyTest extends TestCase
 	{
 		if (self::$installedByTest) {
 			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			// Module::uninstall() switches off change tracking and history without switching them on again
+			$trackChanges = \go\core\jmap\Entity::$trackChanges;
+			$history = \go\modules\community\history\Module::$enabled;
 			Module::get()->uninstall();
+			\go\core\jmap\Entity::$trackChanges = $trackChanges;
+			\go\modules\community\history\Module::$enabled = $history;
 			self::$installedByTest = false;
 		}
 	}
