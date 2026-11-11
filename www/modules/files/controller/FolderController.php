@@ -146,7 +146,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (substr($path,-1,1)=='/')
 			$path = substr($path,0,-1);
 		
-		$folderModel = Folder::model()->findByPath($path,true);
+		$folderModel = Folder::model()->findOrCreateByPathWithPermission($path);
 		
 		return array('success'=>true,'url'=>  \GO\Base\Util\Http::addParamsToUrl($folderModel->getExternalURL(),array('GOSID'=>session_id(), 'security_token'=>\GO::session()->values['security_token'])));
 	}
