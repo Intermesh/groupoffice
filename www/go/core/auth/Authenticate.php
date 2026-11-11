@@ -15,6 +15,7 @@ use go\core\jmap\Request;
 use go\core\util\DateTime;
 use go\core\jmap\State as JmapState;
 use go\modules\community\addressbook\model\Contact;
+use PDO;
 
 /**
  * Class Authenticate
@@ -266,18 +267,27 @@ class Authenticate {
 		return true;
 	}
 
-	public function recovery($hash) {
-		if(empty($hash)) {
+	/**
+	 * Find the user of a password recovery hash that was sent less than an hour ago
+	 *
+	 * @param mixed $hash The hash from the request. Only a string of 40 lowercase hexadecimal characters is accepted,
+	 *  as created by {@see User::sendRecoveryMail()}. A number would otherwise be compared numerically with the column
+	 *  by MySQL and match a hash that starts with the same digits.
+	 * @return false|User
+	 * @throws Exception
+	 */
+	public function recovery(mixed $hash): false|User
+	{
+		if (!is_string($hash) || !preg_match('/^[0-9a-f]{40}$/', $hash)) {
 			return false;
 		}
 		$oneHourAgo = new DateTime('-1 hour');
 		$user = User::find()
 			->where('recoveryHash = :hash AND recoverySendAt > :time')
-			->bind([
-				':hash' => $hash,
-				':time' => $oneHourAgo->format(Column::DATETIME_FORMAT)
-			])->single();
-		if (empty($user)) {
+			->bind(':hash', $hash, PDO::PARAM_STR)
+			->bind(':time', $oneHourAgo->format(Column::DATETIME_FORMAT))
+			->single();
+		if (empty($user) || !$user->checkRecoveryHash($hash)) {
 			return false;
 		}
 		return $user;
