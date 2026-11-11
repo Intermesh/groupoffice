@@ -4,12 +4,12 @@ namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\auth\Authenticate;
+use go\core\auth\ExternalUserLink;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\http\Exception;
 use go\core\jmap\EntityController;
 use go\core\model\Acl;
-use go\core\model\User;
 use go\core\webclient\Extjs3;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
@@ -115,10 +115,8 @@ final class Oauth2Client extends EntityController
 	}
 
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {
-		$user = User::findOrCreateByUsername($response['email'], $response['email'], $response['name']);
-
-		//register as oauth user
-		go()->getDbConnection()->insertIgnore("oauth2client_openid_user", ['userId' => $user->id, 'clientId' => $client->id])->execute();
+		// Found by the subject at the provider. The e-mail address is only used to link a user the first time.
+		$user = (new ExternalUserLink('oauth2client_openid_user', $client->id))->findOrCreateUser($response);
 
 		$auth = new Authenticate();
 		$auth->setAuthenticated($user);
