@@ -207,12 +207,17 @@ EOT;
 	 * @apiParam string number Number of the message part with the VCard
 	 * @apiParam string encoding Encoding of the message part
 	 * @apiResponse {success: bool, contactId: string} The ID of the imported contact
+	 * @apiPermission Read permission on the file or e-mail account, and create permission on the default address book of the user.
 	 * @param array $params
 	 * @return array
 	 * @throws \Exception
 	 */
 	public function loadVCF( array $params) :array
 	{
+		// The default address book is a setting of the user, which may point to any address book
+		$addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
+		$this->checkPermissionsForAddressBook(['values' => ['addressBookId' => $addressBookId]]);
+
 		if(!empty($params['fileId'])) {
 			$file = \GO\Files\Model\File::model()->findByPk($params['fileId']);
 			if(!$file) {
@@ -231,7 +236,7 @@ EOT;
 		$vcard = \GO\Base\VObject\Reader::read($data);
 		$importer = new VCard();
 		$contact = new model\Contact();
-		$contact->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();;
+		$contact->addressBookId = $addressBookId;
 		$contact = $importer->import($vcard, $contact);
 		return ['success' => true, 'contactId' => $contact->id];
 
