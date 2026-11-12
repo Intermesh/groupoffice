@@ -11,6 +11,7 @@ use go\core\data\convert\Json;
 use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\App;
@@ -972,8 +973,12 @@ abstract class Entity extends Property {
 
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
 
-			if(!isset($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
-				throw new \LogicException("link filter must have 'entity' and an optional 'id' parameter");
+			if(!is_array($value) || !isset($value['entity']) || !is_string($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
+				throw new InvalidArguments("link filter must have 'entity' and an optional 'id' parameter");
+			}
+
+			if(!EntityType::existsByName($value['entity'])) {
+				throw new InvalidArguments("link filter has an unknown entity '" . $value['entity'] . "'");
 			}
 
 
@@ -981,10 +986,10 @@ abstract class Entity extends Property {
 			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
 
 			$query->join('core_link', $linkAlias, $on, "LEFT");
-			$criteria->where('toId', '!=');
+			$criteria->where($linkAlias . '.toId', '!=');
 
 			if (!empty($value['id'])) {
-				$criteria->andWhere('fromId', '=', $value['id']);
+				$criteria->andWhere($linkAlias . '.fromId', '=', $value['id']);
 			}
 
 			$query->groupBy([$query->getTableAlias() . '.id']);

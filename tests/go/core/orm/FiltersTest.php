@@ -4,6 +4,8 @@ namespace go\core\orm;
 
 use go\core\db\Criteria;
 use go\core\db\Query as DbQuery;
+use go\core\jmap\exception\InvalidArguments;
+use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\modules\community\notes\model\Note;
@@ -92,5 +94,40 @@ class FiltersTest extends TestCase
 			$expected = $expectMatch ? [$note->id] : [];
 			$this->assertEquals($expected, $this->findNoteIds([$filterName => $value($user)]), $filterName);
 		}
+	}
+
+	public function testLinkFilter(): void
+	{
+		$a = $this->createNote("a");
+		$b = $this->createNote("b");
+		$c = $this->createNote("c");
+		$d = $this->createNote("d");
+
+		Link::create($a, $b);
+		Link::create($c, $b);
+		Link::create($a, $d);
+
+		$this->assertEquals([$b->id, $d->id], $this->findNoteIds(['link' => ['entity' => 'Note', 'id' => $a->id]]));
+
+		// Two link filters must each use their own join alias
+		$this->assertEquals([$b->id], $this->findNoteIds([
+			'operator' => 'AND',
+			'conditions' => [
+				['link' => ['entity' => 'Note', 'id' => $a->id]],
+				['link' => ['entity' => 'Note', 'id' => $c->id]]
+			]
+		]));
+	}
+
+	public function testLinkFilterWithUnknownEntity(): void
+	{
+		$this->expectException(InvalidArguments::class);
+		$this->findNoteIds(['link' => ['entity' => 'NoSuchEntity']]);
+	}
+
+	public function testLinkFilterWithInvalidValue(): void
+	{
+		$this->expectException(InvalidArguments::class);
+		$this->findNoteIds(['link' => 'Note']);
 	}
 }
