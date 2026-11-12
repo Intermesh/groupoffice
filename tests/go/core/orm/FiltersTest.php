@@ -250,4 +250,71 @@ class FiltersTest extends TestCase
 		$this->expectException(\InvalidArgumentException::class);
 		(new Filters(A::class))->addColumn('noSuchColumn');
 	}
+
+	public function testDescribeAddsDescriptionAndSchema(): void
+	{
+		$filters = (new Filters(A::class))
+			->add('foo', function () {})
+			->describe("Foo id", ['type' => 'integer'])
+			->addNumber('bar', function () {}, 5);
+
+		$props = (array) $filters->toJsonSchema()['$defs']['FilterCondition']['properties'];
+
+		$this->assertEquals('integer', $props['foo']['type']);
+		$this->assertEquals('Foo id', $props['foo']['description']);
+		$this->assertEquals('generic', $props['foo']['x-filterType']);
+
+		$this->assertEquals(['number', 'string'], $props['bar']['type']);
+		$this->assertEquals(5, $props['bar']['default']);
+		$this->assertStringContainsString('1..10', $props['bar']['description']);
+	}
+
+	public function testDescribeWithoutFilterThrows(): void
+	{
+		$this->expectException(\LogicException::class);
+		(new Filters(A::class))->describe("Nothing");
+	}
+
+	public function testAddColumnInfersSchemaFromColumn(): void
+	{
+		$filters = (new Filters(A::class))
+			->addColumn('id')
+			->addColumn('propA')
+			->addColumn('createdAt');
+
+		$props = (array) $filters->toJsonSchema()['$defs']['FilterCondition']['properties'];
+
+		$this->assertEquals('integer', $props['id']['anyOf'][0]['type']);
+		$this->assertEquals('string', $props['propA']['anyOf'][0]['type']);
+		$this->assertEquals('array', $props['propA']['anyOf'][1]['type']);
+		$this->assertEquals('datetime', $props['createdAt']['x-filterType']);
+	}
+
+	public function testDescribeKeepsInferredSchemaWhenNoneGiven(): void
+	{
+		$filters = (new Filters(A::class))
+			->addColumn('id')
+			->describe("The id");
+
+		$props = (array) $filters->toJsonSchema()['$defs']['FilterCondition']['properties'];
+
+		$this->assertEquals('The id', $props['id']['description']);
+		$this->assertEquals('integer', $props['id']['anyOf'][0]['type']);
+	}
+
+	public function testToJsonSchemaForAllEntities(): void
+	{
+		foreach (EntityType::findAll() as $type) {
+			$cls = $type->getClassName();
+			if (!is_a($cls, Entity::class, true)) {
+				continue;
+			}
+
+			$schema = $cls::getFilters()->toJsonSchema();
+			$props = (array) $schema['$defs']['FilterCondition']['properties'];
+
+			$this->assertArrayHasKey('text', $props, $type->getName());
+			$this->assertNotFalse(json_encode($schema), $type->getName());
+		}
+	}
 }
