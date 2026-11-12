@@ -143,19 +143,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return $count;
 	}
 
-	protected function actionGetURL($path){
-		
-		if (substr($path,0,1)=='/')
-			$path = substr($path,1);
-		if (substr($path,-1,1)=='/')
-			$path = substr($path,0,-1);
-		
-		$folderModel = Folder::model()->findOrCreateByPathWithPermission($path);
-		
-		// The session ID is never added: it would give the session to anyone who has the link
-		return array('success'=>true,'url'=>  $folderModel->getExternalURL());
-	}
-	
 	protected function actionCache($params){
 		\GO\Files\Model\SharedRootFolder::model()->rebuildCache(\GO::user()->id);
 	}
