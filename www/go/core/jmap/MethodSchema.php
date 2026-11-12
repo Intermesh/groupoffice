@@ -180,6 +180,7 @@ final class MethodSchema
 	 * - "@apiParam <type> <name> <description>": a parameter. Start the description with "Required." for required parameters.
 	 * - "@apiResponse <type> <description>": the response.
 	 * - "@apiNoParams": the method has no parameters.
+	 * - "@apiPermission <text>": the permission the method requires. See {@see permission()}.
 	 *
 	 * The types are described in {@see ApiType}. A tag continues on the next lines until the next tag.
 	 *
@@ -196,7 +197,8 @@ final class MethodSchema
 	 *
 	 * @param string|false $docComment The doc block of the method
 	 * @param string $entityName The entity of the method. See {@see ApiType::toJsonSchema()}
-	 * @return array{params: array, response?: array}|null Null when the doc block has none of these tags
+	 * @return array{params?: array, response?: array, permission?: string}|null Null when the doc block has none of these
+	 *   tags. "params" is only set when the parameters are documented.
 	 * @throws \InvalidArgumentException When a tag is invalid
 	 */
 	public static function fromDocComment(string|false $docComment, string $entityName): ?array
@@ -244,18 +246,59 @@ final class MethodSchema
 				case 'apiNoParams':
 					$found = true;
 					break;
+
+				case 'apiPermission':
+					$permission = $text;
+					break;
 			}
 		}
 
-		if (!$found) {
-			return null;
+		$result = [];
+		if ($found) {
+			$result['params'] = self::object($properties, $required);
+			if (isset($response)) {
+				$result['response'] = $response;
+			}
+		}
+		if (isset($permission)) {
+			$result['permission'] = $permission;
 		}
 
-		$result = ['params' => self::object($properties, $required)];
-		if (isset($response)) {
-			$result['response'] = $response;
+		return empty($result) ? null : $result;
+	}
+
+	/**
+	 * Text of "@apiPermission" that says access to the module is enough. Follow it with the reason, for example
+	 * "Module access: only counts the tasks of the user".
+	 */
+	const PERMISSION_MODULE_ACCESS = 'Module access:';
+
+	/**
+	 * Text of "@apiPermission" that says the permission is checked outside the method, for example
+	 * "Checked in Board::getBacklogCards(): read permission on the board".
+	 */
+	const PERMISSION_CHECKED_IN = 'Checked in ';
+
+	/**
+	 * Get the "@apiPermission" text of a doc block
+	 *
+	 * It documents the permission a method requires. Every method of a controller must check permissions, unless the
+	 * text starts with {@see PERMISSION_MODULE_ACCESS} or {@see PERMISSION_CHECKED_IN}.
+	 *
+	 * @param string|false $docComment
+	 * @return string|null Null when the doc block has no "@apiPermission"
+	 */
+	public static function permission(string|false $docComment): ?string
+	{
+		if (!$docComment) {
+			return null;
 		}
-		return $result;
+		foreach (self::docTags($docComment) as [$tag, $text]) {
+			if ($tag === 'apiPermission') {
+				return $text;
+			}
+		}
+		return null;
 	}
 
 	/**

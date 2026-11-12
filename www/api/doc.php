@@ -174,6 +174,7 @@ foreach($types as $type) {
 			$anchors = [$entityName => $entityName, 'Filter' => $entityName . '.filters', 'SetError' => 'SetError'];
 			$customHtml .= "<h4 id='" . e($anchor) . "'>" . e($entityName . '/' . $method) . "</h4>" .
 				"<p>" . description($description) . "</p>" .
+				(isset($methodSchema['permission']) ? "<p><b>Permission:</b> " . description($methodSchema['permission']) . "</p>" : "") .
 				"<h5>Parameters</h5>" . methodTable($methodSchema['params'], $anchors) .
 				(isset($methodSchema['response']) ? "<h5>Response</h5>" . methodTable($methodSchema['response'], $anchors, true) : "");
 		} else {
@@ -424,7 +425,9 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 <h2 id="methods">Standard methods</h2>
 
 <p>
-	Most entities support these methods. Replace "Foo" with the entity name, for example Note/get. "Foo" in a type is the
+	Most entities support these methods. They check the permission level of each entity: read for get, query, changes
+	and export, create, write or delete for set, and write on the kept entity and delete on the others for merge.
+	Replace "Foo" with the entity name, for example Note/get. "Foo" in a type is the
 	entity itself. The methods each entity supports are listed with the entity.
 </p>
 

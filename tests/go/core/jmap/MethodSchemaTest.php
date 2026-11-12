@@ -97,6 +97,24 @@ class MethodSchemaTest extends TestCase
 		$this->assertEquals('The notes', $schema['response']['description']);
 	}
 
+	public function testPermission(): void
+	{
+		$doc = "/**\n * @apiParam string id Required. The ID\n * @apiPermission Write permission on the\n *   book.\n */";
+
+		$this->assertEquals('Write permission on the book.', MethodSchema::permission($doc));
+		$this->assertEquals('Write permission on the book.', MethodSchema::fromDocComment($doc, 'Note')['permission']);
+		$this->assertNull(MethodSchema::permission("/**\n * @apiNoParams\n */"));
+		$this->assertNull(MethodSchema::permission(false));
+	}
+
+	public function testPermissionWithoutParams(): void
+	{
+		// Only the permission is documented, so the parameters are not
+		$schema = MethodSchema::fromDocComment("/**\n * @apiPermission Module access: counts only the own tasks.\n */", 'Note');
+
+		$this->assertEquals(['permission' => 'Module access: counts only the own tasks.'], $schema);
+	}
+
 	public function testFromDocCommentWithoutTags(): void
 	{
 		$this->assertNull(MethodSchema::fromDocComment("/**\n * @param array \$params\n */", 'Note'));
