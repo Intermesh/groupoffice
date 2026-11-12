@@ -258,6 +258,8 @@ return array (
   'Display as' => 'Anzeigen als',
   'Change organizer' => 'Organisator ändern',
   'Show multiline event blocks' => 'Mehrzeilige Terminblöcke anzeigen',
+  'Show event in category color' => 'Termin in Kategoriefarbe anzeigen',
+  'Only when one calendar is selected and the event has one category' => 'Nur wenn ein Kalender ausgewählt ist und der Termin eine Kategorie hat',
   'Paste \'{title}\' at {date}' => '{title}\' einfügen um {date}',
   'Paste at original time ({time})' => 'Mit der Originalzeit ({time}) einfügen',
   'Paste at original time' => 'Mit der Originalzeit einfügen',
