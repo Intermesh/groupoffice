@@ -1,9 +1,10 @@
 <?php
 use go\core\App;
-use go\core\jmap\Response;
 use go\core\jmap\Router;
-use go\core\jmap\Request;
 use go\core\jmap\State;
+use go\core\orm\EntityType;
+use go\core\orm\PropertySchema;
+use go\core\util\StringUtil;
 use Jasny\PhpdocParser\PhpdocParser;
 use Jasny\PhpdocParser\Set\PhpDocumentor;
 use Jasny\PhpdocParser\Tag\Summery;
@@ -13,42 +14,87 @@ require("../vendor/autoload.php");
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
-$entities = [];
-
 $parser = new PhpdocParser(PhpDocumentor::tags()->with([new Summery()]));
-
-$toc = [];
-
-$html = '';
 
 $mods = [];
 
 /**
- * Short type notation of a JSON schema for the docs table. For example "string|string[]".
+ * Escape text for HTML
  */
-function schemaType(array $schema): string {
-	if (isset($schema['enum'])) {
-		return implode(' | ', array_map('json_encode', $schema['enum']));
-	}
-	if (isset($schema['anyOf'])) {
-		return implode(' | ', array_map('schemaType', $schema['anyOf']));
-	}
-	$type = $schema['type'] ?? 'mixed';
-	if ($type === 'array') {
-		$items = schemaType($schema['items'] ?? []);
-		return (str_contains($items, '|') ? '(' . $items . ')' : $items) . '[]';
-	}
-	if ($type === 'object' && isset($schema['properties'])) {
-		$props = [];
-		foreach ($schema['properties'] as $name => $prop) {
-			$props[] = $name . (in_array($name, $schema['required'] ?? []) ? '' : '?') . ': ' . schemaType($prop);
-		}
-		return '{' . implode(', ', $props) . '}';
-	}
-	return is_array($type) ? implode(' | ', $type) : $type;
+function e(?string $text): string {
+	return htmlspecialchars($text ?? "");
 }
 
-$types = \go\core\orm\EntityType::findAll();
+/**
+ * Description text as HTML with links for URLs and e-mail addresses
+ */
+function description(?string $text): string {
+	return StringUtil::textToHtml($text ?? "");
+}
+
+/**
+ * Short type notation of a JSON schema as HTML. For example "string | string[]". References to other types link to
+ * their table, which has the id "$anchorPrefix.$name".
+ */
+function schemaType(array $schema, string $anchorPrefix = ''): string {
+	if (isset($schema['$ref'])) {
+		$name = substr($schema['$ref'], strlen('#/$defs/'));
+		return "<a href='#" . e($anchorPrefix . '.' . $name) . "'>" . e($name) . "</a>";
+	}
+	if (isset($schema['enum'])) {
+		return e(implode(' | ', array_map('json_encode', $schema['enum'])));
+	}
+	if (isset($schema['anyOf'])) {
+		return implode(' | ', array_map(fn($s) => schemaType($s, $anchorPrefix), $schema['anyOf']));
+	}
+	if (isset($schema['x-phpType'])) {
+		return e($schema['x-phpType']);
+	}
+	$type = $schema['type'] ?? 'mixed';
+	$types = (array) $type;
+	$nullable = in_array('null', $types, true) && count($types) > 1;
+	$types = array_values(array_diff($types, $nullable ? ['null'] : []));
+
+	if ($types === ['array']) {
+		$items = schemaType($schema['items'] ?? [], $anchorPrefix);
+		$str = (str_contains($items, '|') ? '(' . $items . ')' : $items) . '[]';
+	} else if ($types === ['object'] && isset($schema['additionalProperties']) && is_array($schema['additionalProperties'])) {
+		$str = '{id: ' . schemaType($schema['additionalProperties'], $anchorPrefix) . '}';
+	} else if ($types === ['object'] && !empty((array) ($schema['properties'] ?? []))) {
+		$props = [];
+		foreach ($schema['properties'] as $name => $prop) {
+			$props[] = e($name) . (in_array($name, $schema['required'] ?? []) ? '' : '?') . ': ' . schemaType($prop, $anchorPrefix);
+		}
+		$str = '{' . implode(', ', $props) . '}';
+	} else {
+		$str = e(implode(' | ', $types));
+		if (isset($schema['format'])) {
+			$str .= ' (' . e($schema['format']) . ')';
+		}
+	}
+
+	return $nullable ? $str . ' | null' : $str;
+}
+
+/**
+ * Table with the properties of an object schema
+ */
+function propertiesTable(array $schema, string $anchorPrefix): string {
+	$html = "<table><tr><th>Property</th><th>Type</th><th>Read only</th><th>Description</th></tr>";
+	foreach ($schema['properties'] as $name => $prop) {
+		$description = $prop['description'] ?? '';
+		if (isset($prop['maxLength'])) {
+			$description = trim($description . ' Max length ' . $prop['maxLength'] . '.');
+		}
+		$html .= "<tr><td>" . e($name) . "</td>" .
+			"<td>" . schemaType($prop, $anchorPrefix) . "</td>" .
+			"<td>" . (!empty($prop['readOnly']) ? 'yes' : '') . "</td>" .
+			"<td>" . description($description) . "</td></tr>";
+	}
+	return $html . "</table>";
+}
+
+$types = EntityType::findAll();
 usort($types, function($a, $b) {
 	return strcmp($a->getName(), $b->getName());
 });
@@ -57,57 +103,56 @@ foreach($types as $type) {
 	$mod = $type->getModule()->getTitle();
 
 	$cls = $type->getClassName();
-	if(is_a($cls, \go\core\jmap\Entity::class, true)) {
-
-		if(!isset($mods[$mod])) {
-			$mods[$mod] = [];
-		}
-
-		$toc[] = $type->getName();
-
-		$html = "<h3 id='".$type->getName()."'>" . $type->getName() . "</h3>";
-
-		$meta = $parser->parse((new ReflectionClass($cls))->getDocComment());
-
-		if(isset($meta['description'])) {
-			$html .= "<p>" . $meta['description'] . "</p>";
-		}
-
-//		$entities[] = [
-//			'name' => $type->getName(),
-//			'properties' => $cls::buildApiProperties(true)
-//		];
-
-		$html .= "<table><tr><th>Property</th><th>Type</th><th>Description</th></tr>";
-		$properties = $cls::buildApiProperties(true);
-		uksort($properties, function($a, $b) {
-			return strcmp($a, $b);
-		});
-		foreach($properties as $name => $property) {
-			$html .= "<tr><td>" . $name . "</td><td>".($property['type'] ?? "")."</td><td>".($property['description'] ?? "")."</td></tr>";
-		}
-
-		$html .= "</table>";
-
-		// Custom fields are installation specific and this page is public, so leave them out.
-		$customFieldNames = method_exists($cls, 'getCustomFieldModels') ? array_keys($cls::getCustomFieldModels()) : [];
-		$filterProperties = (array) $cls::getFilters()->toJsonSchema(false)['$defs']['FilterCondition']['properties'];
-
-		$html .= "<h4>Filters</h4><table><tr><th>Filter</th><th>Type</th><th>Value</th><th>Description</th><th>Default</th></tr>";
-		foreach($filterProperties as $name => $schema) {
-			if(in_array($name, $customFieldNames, true)) {
-				continue;
-			}
-			$html .= "<tr><td>" . htmlspecialchars($name) . "</td>" .
-				"<td>" . htmlspecialchars($schema['x-filterType']) . "</td>" .
-				"<td>" . htmlspecialchars(schemaType($schema)) . "</td>" .
-				"<td>" . htmlspecialchars($schema['description'] ?? "") . "</td>" .
-				"<td>" . (array_key_exists('default', $schema) ? htmlspecialchars(json_encode($schema['default'])) : "") . "</td></tr>";
-		}
-		$html .= "</table>";
-
-		$mods[$mod][$type->getName()] = $html;
+	if(!is_a($cls, \go\core\jmap\Entity::class, true)) {
+		continue;
 	}
+
+	$entityName = $type->getName();
+
+	$html = "<h3 id='" . e($entityName) . "'>" . e($entityName) . "</h3>";
+
+	$meta = $parser->parse((new ReflectionClass($cls))->getDocComment());
+
+	if(isset($meta['description'])) {
+		$html .= "<p>" . description($meta['description']) . "</p>";
+	}
+
+	$html .= "<h4>Methods</h4><table><tr><th>Method</th><th>Description</th></tr>";
+	foreach(Router::getEntityMethods($type) as $method => $description) {
+		$html .= "<tr><td>" . e($entityName . '/' . $method) . "</td><td>" . description($description) . "</td></tr>";
+	}
+	$html .= "</table>";
+
+	// Custom fields are installation specific and this page is public, so they are left out.
+	$schema = PropertySchema::build($cls);
+	$rootName = substr($schema['$ref'], strlen('#/$defs/'));
+
+	$html .= "<h4>Properties</h4>" . propertiesTable($schema['$defs'][$rootName], $entityName);
+
+	foreach($schema['$defs'] as $defName => $def) {
+		if($defName === $rootName) {
+			continue;
+		}
+		$html .= "<h4 id='" . e($entityName . '.' . $defName) . "'>" . e($defName) . "</h4>" . propertiesTable($def, $entityName);
+	}
+
+	$customFieldNames = method_exists($cls, 'getCustomFieldModels') ? array_keys($cls::getCustomFieldModels()) : [];
+	$filterProperties = (array) $cls::getFilters()->toJsonSchema(false)['$defs']['FilterCondition']['properties'];
+
+	$html .= "<h4>Filters</h4><table><tr><th>Filter</th><th>Type</th><th>Value</th><th>Description</th><th>Default</th></tr>";
+	foreach($filterProperties as $name => $filterSchema) {
+		if(in_array($name, $customFieldNames, true)) {
+			continue;
+		}
+		$html .= "<tr><td>" . e($name) . "</td>" .
+			"<td>" . e($filterSchema['x-filterType']) . "</td>" .
+			"<td>" . schemaType($filterSchema) . "</td>" .
+			"<td>" . description($filterSchema['description'] ?? null) . "</td>" .
+			"<td>" . (array_key_exists('default', $filterSchema) ? e(json_encode($filterSchema['default'])) : "") . "</td></tr>";
+	}
+	$html .= "</table>";
+
+	$mods[$mod][$entityName] = $html;
 }
 
 uksort($mods, function($a, $b) {return strcmp($a, $b);})
@@ -223,6 +268,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 	<input type="search" id="search" placeholder="Search entities" aria-label="Search entities">
 	<ul>
 		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#properties">Methods and properties</a></li>
 		<li><a href="#filters">Filters</a></li>
 	</ul>
 	<?php foreach($mods as $modName => $entities): ?>
@@ -264,8 +310,25 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 </code>
 
 <p>
-	More examples and information about getting an API bearer token can be found in the <a href="https://groupoffice.readthedocs.io/en/latest/developer/jmap.html">online Group-Office documentation</a>.
+	More examples and information about getting an API bearer token can be found in the <a href="https://groupoffice.readthedocs.io/en/latest/developer/jmap.html">online GroupOffice documentation</a>.
 </p>
+
+<h2 id="properties">Methods and properties</h2>
+
+<p>
+	Each entity lists the methods it supports, like Note/get, and its properties. Properties marked "read only" are set by
+	the server and ignored in Foo/set. Required properties are not listed: Foo/set returns an "invalidProperties" error
+	with the properties that are missing or invalid.
+</p>
+
+<ul>
+	<li>IDs are strings.</li>
+	<li>"date-time" is ISO 8601 in UTC, for example "2025-01-31T09:00:00+00:00".</li>
+	<li>"local-date-time" has no time zone, for example "2025-01-31T09:00:00".</li>
+	<li>"date" has no time, for example "2025-01-31".</li>
+	<li>Types like Address link to their own table below the entity. {id: Type} is an object with the ID as key.</li>
+	<li>"customFields" holds the custom field values with the database name of the field as key.</li>
+</ul>
 
 <h2 id="filters">Filters</h2>
 
@@ -298,7 +361,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 
 <?php
 foreach($mods as $modName => $entities) {
-	echo "<h2>" . htmlspecialchars($modName) . "</h2>";
+	echo "<h2>" . e($modName) . "</h2>";
 	foreach($entities as $entityName => $html) {
 		echo $html;
 	}
