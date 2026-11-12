@@ -10,6 +10,7 @@ use go\core\model\User;
 use go\core\orm\exception\SaveException;
 use go\modules\community\notes\model\Note;
 use go\modules\community\notes\model\NoteBook;
+use go\modules\community\test\model\A;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -134,5 +135,24 @@ class FiltersTest extends TestCase
 	public function testCustomRelationsFilterIsRemoved(): void
 	{
 		$this->assertFalse(Note::getFilters()->hasFilter('customrelations'));
+	}
+
+	public function testAddColumnUsesDateTimeForDatetimeColumns(): void
+	{
+		$filters = (new Filters(A::class))
+			->addColumn('createdAt')
+			->addColumn('propA');
+
+		$prop = new \ReflectionProperty(Filters::class, 'filters');
+		$defs = $prop->getValue($filters);
+
+		$this->assertEquals('datetime', $defs['createdat']['type']);
+		$this->assertEquals('generic', $defs['propa']['type']);
+	}
+
+	public function testAddColumnThrowsForUnknownColumn(): void
+	{
+		$this->expectException(\InvalidArgumentException::class);
+		(new Filters(A::class))->addColumn('noSuchColumn');
 	}
 }

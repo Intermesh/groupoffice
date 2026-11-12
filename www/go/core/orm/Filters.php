@@ -67,10 +67,11 @@ class Filters {
 	 *
 	 * ```
 	 *
-	 * If the column is a date or datetime it will use {@link addDate())
+	 * If the column is a datetime it will use {@see addDateTime()} and for date or localdatetime {@see addDate()}
 	 *
 	 * @param string $name
 	 * @return $this
+	 * @throws \InvalidArgumentException When the column does not exist
 	 */
 	public function addColumn(string $name): Filters
 	{
@@ -81,7 +82,16 @@ class Filters {
 
 		$col = $cls::getMapping()->getColumn($name);
 
-		if(in_array($col->dbType, ["localdatetime", "datetime", "date"])) {
+		if(!$col) {
+			throw new \InvalidArgumentException("Column '$name' does not exist in " . $cls);
+		}
+
+		if($col->dbType == "datetime") {
+			// datetime columns are stored in UTC so the user's input must be converted
+			return $this->addDateTime($name, function (Criteria $c, $comparator, $value) use ($name) {
+				$c->andWhere($name, $comparator, $value);
+			});
+		} else if(in_array($col->dbType, ["localdatetime", "date"])) {
 			return $this->addDate($name, function (Criteria $c, $comparator, $value) use ($name) {
 				$c->andWhere($name, $comparator, $value);
 			});
