@@ -1024,14 +1024,14 @@ abstract class Entity extends Property {
 	 */
 	private static function defineLegacyFilters(Filters $filters) {
 		if (static::getMapping()->getColumn('ctime')) {
-			$filters->addDateTime('createdAt', function (Criteria $criteria, $comparator, DateTime $value) {
-				$criteria->andWhere('ctime', $comparator, $value->format("U"));
+			$filters->addDateTime('createdAt', function (Criteria $criteria, $comparator, ?DateTime $value) {
+				$criteria->andWhere('ctime', $comparator, $value?->format("U"));
 			});
 		}
 
 		if (static::getMapping()->getColumn('mtime')) {
-			$filters->addDateTime('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value) {
-				$criteria->andWhere('mtime', $comparator, $value->format("U"));
+			$filters->addDateTime('modifiedAt', function (Criteria $criteria, $comparator, ?DateTime $value) {
+				$criteria->andWhere('mtime', $comparator, $value?->format("U"));
 			});
 		}
 
