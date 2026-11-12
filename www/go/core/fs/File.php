@@ -609,9 +609,15 @@ class File extends FileSystemObject {
 			return false;
 		}
 
-		$enc = mb_detect_encoding($this->getContents(), "ASCII,JIS,UTF-8,ISO-8859-1,ISO-8859-15,EUC-JP,SJIS");
-		if (!$enc) {
+		// Valid UTF-8 is UTF-8. Guessing in non strict mode takes short UTF-8 texts with a few accents for SJIS, so "ä"
+		// became "ﾃ､".
+		if (mb_check_encoding($str, 'UTF-8')) {
 			$enc = 'UTF-8';
+		} else {
+			$enc = mb_detect_encoding($str, "ASCII,JIS,ISO-8859-1,ISO-8859-15,EUC-JP,SJIS");
+			if (!$enc) {
+				$enc = 'UTF-8';
+			}
 		}
 
 		$bom = pack("CCC", 0xef, 0xbb, 0xbf);
