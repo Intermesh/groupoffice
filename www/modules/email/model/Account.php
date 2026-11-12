@@ -363,6 +363,22 @@ class Account extends \GO\Base\Db\ActiveRecord
 	}
 
 	/**
+	 * Throw an AccessDenied exception when the current user doesn't have the given permission level on this account.
+	 *
+	 * Use Acl::CREATE_PERMISSION ("Use account") for sending and changing mail, ACL_DELEGATED_PERMISSION for marking
+	 * mail as read or flagged and Acl::MANAGE_PERMISSION for managing the account, for example filters or folder sharing.
+	 *
+	 * @param int $level \GO\Base\Model\Acl::*_PERMISSION or self::ACL_DELEGATED_PERMISSION
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function requirePermissionLevel(int $level): void
+	{
+		if(!$this->checkPermissionLevel($level)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
+
+	/**
 	 * Open a connection to the imap server.
 	 *
 	 * @param string $mailbox
