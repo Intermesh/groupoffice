@@ -132,4 +132,35 @@ class NewsletterTest extends TestCase
 		$this->expectExceptionMessage(go()->t("Please add at least one recipient to the list to send a test message.", 'business', 'newsletters'));
 		$this->test();
 	}
+
+	private function saveNewsletter(): \go\modules\business\newsletters\model\Newsletter
+	{
+		$this->actAs($this->user->id);
+		$newsletter = new \go\modules\business\newsletters\model\Newsletter();
+		$newsletter->setValues([
+			'addressListId' => $this->addressList->id,
+			'smtpAccountId' => $this->smtpAccount->id,
+			'subject' => 'Test',
+			'body' => 'Test'
+		]);
+		$newsletter->save();
+		return $newsletter;
+	}
+
+	public function testSaveWithSmtpAccountWithoutPermission(): void
+	{
+		$newsletter = $this->saveNewsletter();
+		$this->assertArrayHasKey('smtpAccountId', $newsletter->getValidationErrors());
+	}
+
+	public function testSaveWithSmtpAccountWithPermission(): void
+	{
+		$this->grant($this->smtpAccount, Acl::LEVEL_READ);
+		$newsletter = $this->saveNewsletter();
+		$this->assertArrayNotHasKey('smtpAccountId', $newsletter->getValidationErrors());
+		if (isset($newsletter->id)) {
+			$this->actAs(User::ID_SUPER_ADMIN);
+			\go\modules\business\newsletters\model\Newsletter::delete(['id' => $newsletter->id]);
+		}
+	}
 }
