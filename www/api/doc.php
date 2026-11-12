@@ -52,6 +52,9 @@ function schemaType(array $schema, string $anchorPrefix = '', array $anchors = [
 	if (isset($schema['anyOf'])) {
 		return implode(' | ', array_map(fn($s) => schemaType($s, $anchorPrefix, $anchors), $schema['anyOf']));
 	}
+	if (isset($schema['x-entity'])) {
+		return "<a href='#" . e($schema['x-entity']) . "'>" . e($schema['x-entity']) . "</a>";
+	}
 	if (isset($schema['x-phpType'])) {
 		return e($schema['x-phpType']);
 	}
@@ -109,8 +112,11 @@ function methodTable(array $schema, array $anchors, bool $isResponse = false): s
 	if (!empty($schema['description'])) {
 		$html .= "<p>" . description($schema['description']) . "</p>";
 	}
-	if (empty($schema['properties'])) {
+	if (!isset($schema['properties'])) {
 		return $html . "<p>Type: " . schemaType($schema, '', $anchors) . "</p>";
+	}
+	if (empty((array) $schema['properties'])) {
+		return $html . "<p>None</p>";
 	}
 
 	$html .= "<table><tr><th>Name</th><th>Type</th>" . ($isResponse ? "" : "<th>Required</th><th>Default</th>") . "<th>Description</th></tr>";
@@ -154,18 +160,29 @@ foreach($types as $type) {
 
 	$html .= "<h4>Methods</h4><table><tr><th>Method</th><th>Description</th></tr>";
 	$standardNames = array_change_key_case(array_combine(array_keys($standardMethods), array_keys($standardMethods)));
-	foreach(Router::getEntityMethods($type) as $method => $description) {
+	$methodSchemas = MethodSchema::forEntity($type)['methods'];
+	$customHtml = "";
+	foreach($methodSchemas as $method => $methodSchema) {
+		$description = $methodSchema['description'];
 		$standardName = $standardNames[strtolower($method)] ?? null;
 		if(isset($standardName)) {
 			// Parameters and response are documented once in the "Standard methods" section
 			$name = "<a href='#method-" . e($standardName) . "'>" . e($entityName . '/' . $method) . "</a>";
+		} else if(isset($methodSchema['params'])) {
+			$anchor = $entityName . '/' . $method;
+			$name = "<a href='#" . e($anchor) . "'>" . e($entityName . '/' . $method) . "</a>";
+			$anchors = [$entityName => $entityName, 'Filter' => $entityName . '.filters', 'SetError' => 'SetError'];
+			$customHtml .= "<h4 id='" . e($anchor) . "'>" . e($entityName . '/' . $method) . "</h4>" .
+				"<p>" . description($description) . "</p>" .
+				"<h5>Parameters</h5>" . methodTable($methodSchema['params'], $anchors) .
+				(isset($methodSchema['response']) ? "<h5>Response</h5>" . methodTable($methodSchema['response'], $anchors, true) : "");
 		} else {
 			$name = e($entityName . '/' . $method);
-			$description = trim($description . "\nThe parameters of this method are not documented.");
+			$description = trim($description . "\n\nThe parameters of this method are not documented.");
 		}
 		$html .= "<tr><td>" . $name . "</td><td>" . description($description) . "</td></tr>";
 	}
-	$html .= "</table>";
+	$html .= "</table>" . $customHtml;
 
 	// Custom fields are installation specific and this page is public, so they are left out.
 	$schema = PropertySchema::build($cls);
@@ -183,7 +200,7 @@ foreach($types as $type) {
 	$customFieldNames = method_exists($cls, 'getCustomFieldModels') ? array_keys($cls::getCustomFieldModels()) : [];
 	$filterProperties = (array) $cls::getFilters()->toJsonSchema(false)['$defs']['FilterCondition']['properties'];
 
-	$html .= "<h4>Filters</h4><table><tr><th>Filter</th><th>Type</th><th>Value</th><th>Description</th><th>Default</th></tr>";
+	$html .= "<h4 id='" . e($entityName . '.filters') . "'>Filters</h4><table><tr><th>Filter</th><th>Type</th><th>Value</th><th>Description</th><th>Default</th></tr>";
 	foreach($filterProperties as $name => $filterSchema) {
 		if(in_array($name, $customFieldNames, true)) {
 			continue;

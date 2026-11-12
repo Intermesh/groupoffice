@@ -12,7 +12,7 @@ use go\core\orm\PropertySchema;
  * The schemas refer to the entity with "#/$defs/<entity name>" and to the filter with "#/$defs/Filter". Use
  * {@see forEntity()} to get them with those definitions.
  *
- * Other methods of a controller have no schema because their parameters are not declared.
+ * Other methods of a controller declare their parameters and response with doc block tags. See {@see fromDocComment()}.
  */
 final class MethodSchema
 {
@@ -173,9 +173,116 @@ final class MethodSchema
 	}
 
 	/**
+	 * Read the parameters and response of a custom method from its doc block
+	 *
+	 * Tags:
+	 *
+	 * - "@apiParam <type> <name> <description>": a parameter. Start the description with "Required." for required parameters.
+	 * - "@apiResponse <type> <description>": the response.
+	 * - "@apiNoParams": the method has no parameters.
+	 *
+	 * The types are described in {@see ApiType}. A tag continues on the next lines until the next tag.
+	 *
+	 * @example
+	 * ```
+	 * /**
+	 *  * Decrypt the content of encrypted notes
+	 *  *
+	 *  * @apiParam string[] ids Required. IDs of the notes
+	 *  * @apiParam string password Required. The encryption password
+	 *  * @apiResponse {list: Note[]}
+	 *  *\/
+	 * ```
+	 *
+	 * @param string|false $docComment The doc block of the method
+	 * @param string $entityName The entity of the method. See {@see ApiType::toJsonSchema()}
+	 * @return array{params: array, response?: array}|null Null when the doc block has none of these tags
+	 * @throws \InvalidArgumentException When a tag is invalid
+	 */
+	public static function fromDocComment(string|false $docComment, string $entityName): ?array
+	{
+		if (!$docComment) {
+			return null;
+		}
+
+		$properties = [];
+		$required = [];
+		$response = null;
+		$found = false;
+
+		foreach (self::docTags($docComment) as [$tag, $text]) {
+			switch ($tag) {
+				case 'apiParam':
+					$found = true;
+					$typeLength = ApiType::typeLength($text);
+					$schema = ApiType::toJsonSchema(substr($text, 0, $typeLength), $entityName);
+					$rest = ltrim(substr($text, $typeLength));
+					if (!preg_match('/^\$?([A-Za-z_][A-Za-z0-9_]*)\s*(.*)$/s', $rest, $matches)) {
+						throw new \InvalidArgumentException("@apiParam needs a type and a name: '" . $text . "'");
+					}
+					[, $name, $description] = $matches;
+					if (str_starts_with($description, 'Required.')) {
+						$required[] = $name;
+						$description = ltrim(substr($description, strlen('Required.')));
+					}
+					if ($description !== '') {
+						$schema['description'] = $description;
+					}
+					$properties[$name] = $schema;
+					break;
+
+				case 'apiResponse':
+					$found = true;
+					$typeLength = ApiType::typeLength($text);
+					$response = ApiType::toJsonSchema(substr($text, 0, $typeLength), $entityName);
+					$description = ltrim(substr($text, $typeLength));
+					if ($description !== '') {
+						$response['description'] = $description;
+					}
+					break;
+
+				case 'apiNoParams':
+					$found = true;
+					break;
+			}
+		}
+
+		if (!$found) {
+			return null;
+		}
+
+		$result = ['params' => self::object($properties, $required)];
+		if (isset($response)) {
+			$result['response'] = $response;
+		}
+		return $result;
+	}
+
+	/**
+	 * Split a doc block in tags
+	 *
+	 * @return array<int, array{string, string}> Tag name without "@" and its text
+	 */
+	private static function docTags(string $docComment): array
+	{
+		$lines = preg_split('/\R/', $docComment);
+		$tags = [];
+		foreach ($lines as $line) {
+			$line = preg_replace('~^\s*(/\*\*|\*/|\*)?\s?~', '', $line);
+			$line = preg_replace('~\s*\*/\s*$~', '', $line);
+			if (preg_match('/^@([A-Za-z]+)\s*(.*)$/', $line, $matches)) {
+				$tags[] = [$matches[1], trim($matches[2])];
+			} else if (!empty($tags) && trim($line) !== '') {
+				$tags[count($tags) - 1][1] .= ' ' . trim($line);
+			}
+		}
+		return $tags;
+	}
+
+	/**
 	 * Get the schemas of the methods of an entity with the entity, filter and error definitions in "$defs"
 	 *
-	 * Methods without a schema have only a description.
+	 * Methods without a schema have only a description. Custom methods get their schema from {@see fromDocComment()}.
 	 *
 	 * @param EntityType $entityType
 	 * @param bool $withCustomFields See {@see PropertySchema::build()}
@@ -190,10 +297,12 @@ final class MethodSchema
 		$entityName = substr($properties['$ref'], strlen('#/$defs/'));
 
 		$standard = array_change_key_case(self::standard($entityName));
+		$controllerClass = Router::entityControllerClass($entityType);
 
 		$methods = [];
 		foreach (Router::getEntityMethods($entityType) as $name => $description) {
-			$methods[$name] = ['description' => $description] + ($standard[strtolower($name)] ?? []);
+			$schema = $standard[strtolower($name)] ?? self::fromDocComment((new \ReflectionMethod($controllerClass, $name))->getDocComment(), $entityName);
+			$methods[$name] = ['description' => $description] + ($schema ?? []);
 		}
 
 		return [
@@ -217,7 +326,8 @@ final class MethodSchema
 
 	private static function object(array $properties, array $required = [], string $description = ''): array
 	{
-		$schema = ['type' => 'object', 'properties' => $properties];
+		// An empty object instead of an empty array in JSON
+		$schema = ['type' => 'object', 'properties' => empty($properties) ? new \stdClass() : $properties];
 		if (!empty($required)) {
 			$schema['required'] = $required;
 		}

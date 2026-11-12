@@ -45,16 +45,15 @@ class MethodSchemaTest extends TestCase
 		$this->assertNull(B::findById($id));
 	}
 
-	public function testForEntityHasSchemasForStandardMethodsOnly(): void
+	public function testForEntityHasStandardAndCustomMethods(): void
 	{
 		$schema = MethodSchema::forEntity(EntityType::findByName('Note'));
 
 		$this->assertArrayHasKey('params', $schema['methods']['get']);
 		$this->assertArrayHasKey('response', $schema['methods']['query']);
 
-		// Note/decrypt is a custom method without declared parameters
-		$this->assertArrayHasKey('decrypt', $schema['methods']);
-		$this->assertArrayNotHasKey('params', $schema['methods']['decrypt']);
+		// Note/decrypt is a custom method documented with @apiParam
+		$this->assertEquals(['data', 'password'], $schema['methods']['decrypt']['params']['required']);
 	}
 
 	public function testForEntityReferencesExistingDefinitions(): void
@@ -72,5 +71,65 @@ class MethodSchemaTest extends TestCase
 				$this->assertArrayHasKey($ref, $schema['$defs'], $type->getName() . ' refers to missing ' . $ref);
 			}
 		}
+	}
+
+	public function testFromDocComment(): void
+	{
+		$doc = <<<'DOC'
+		/**
+		 * Do something
+		 *
+		 * @apiParam string[] ids Required. The IDs
+		 * @apiParam ?int limit Maximum number of
+		 *   results
+		 * @apiResponse {list: Note[]} The notes
+		 * @param array $params
+		 */
+		DOC;
+
+		$schema = MethodSchema::fromDocComment($doc, 'Note');
+
+		$this->assertEquals(['ids'], $schema['params']['required']);
+		$this->assertEquals('The IDs', $schema['params']['properties']['ids']['description']);
+		$this->assertEquals(['integer', 'null'], $schema['params']['properties']['limit']['type']);
+		$this->assertEquals('Maximum number of results', $schema['params']['properties']['limit']['description']);
+		$this->assertEquals(['$ref' => '#/$defs/Note'], $schema['response']['properties']['list']['items']);
+		$this->assertEquals('The notes', $schema['response']['description']);
+	}
+
+	public function testFromDocCommentWithoutTags(): void
+	{
+		$this->assertNull(MethodSchema::fromDocComment("/**\n * @param array \$params\n */", 'Note'));
+		$this->assertNull(MethodSchema::fromDocComment(false, 'Note'));
+	}
+
+	public function testNoParams(): void
+	{
+		$schema = MethodSchema::fromDocComment("/**\n * @apiNoParams\n * @apiResponse int\n */", 'Note');
+
+		$this->assertEquals('{}', json_encode($schema['params']['properties']));
+		$this->assertEquals(['type' => 'integer'], $schema['response']);
+	}
+
+	/**
+	 * Every method that can be called through JMAP must be documented. Use "@noapi" for methods that are not for API
+	 * clients.
+	 */
+	public function testAllCustomMethodsAreDocumented(): void
+	{
+		$undocumented = [];
+		foreach (EntityType::findAll() as $type) {
+			if (!is_a($type->getClassName(), Entity::class, true)) {
+				continue;
+			}
+
+			foreach (MethodSchema::forEntity($type)['methods'] as $name => $method) {
+				if (!isset($method['params'])) {
+					$undocumented[] = $type->getName() . '/' . $name;
+				}
+			}
+		}
+
+		$this->assertEquals([], $undocumented, "Document these methods with @apiParam or @apiNoParams, or hide them with @noapi");
 	}
 }

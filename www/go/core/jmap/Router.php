@@ -258,8 +258,8 @@ class Router
 	/**
 	 * Get the JMAP methods of an entity, for example "get", "query" and "set" for Note/get, Note/query and Note/set.
 	 *
-	 * These are the public methods of the controller from {@see entityControllerClass()}. The standard methods are
-	 * described by {@see STANDARD_METHODS}, others by their doc block.
+	 * These are the public methods of the controller from {@see entityControllerClass()}, except the ones tagged "@noapi".
+	 * The standard methods are described by {@see STANDARD_METHODS}, others by their doc block.
 	 *
 	 * @param EntityType $entityType
 	 * @return array<string, string> Method name => description
@@ -279,6 +279,12 @@ class Router
 				continue;
 			}
 
+			// Like Model::buildApiProperties(), "@noapi" hides a method from the API documentation. It can still be called.
+			$doc = $method->getDocComment();
+			if ($doc && str_contains($doc, '@noapi')) {
+				continue;
+			}
+
 			$name = $method->getName();
 
 			// Method names are case insensitive in PHP. For example User has importCsvMapping.
@@ -288,13 +294,13 @@ class Router
 				continue;
 			}
 
-			$doc = $method->getDocComment();
 			try {
 				$meta = $doc ? $parser->parse($doc) : [];
 			} catch (Throwable) {
 				$meta = [];
 			}
-			$methods[$name] = trim($meta['description'] ?? '');
+			// Join wrapped lines but keep paragraphs
+			$methods[$name] = preg_replace('/(?<!\n)\n(?!\n)/', ' ', trim($meta['description'] ?? ''));
 		}
 
 		ksort($methods);
