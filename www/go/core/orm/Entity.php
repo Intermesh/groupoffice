@@ -920,23 +920,7 @@ abstract class Entity extends Property {
 
 		if (static::getMapping()->getColumn('modifiedBy')) {
 			$filters->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-
-				foreach($value as &$v) {
-					if ($v == "{{me}}") {
-						$v = go()->getUserId();
-					}
-				}
-
-				if(is_numeric($value[0])) {
-					$criteria->andWhere('modifiedBy', '=', $value);
-				} else {
-
-					if (!$query->isJoined('core_user', 'modifier')) {
-						$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
-					}
-
-					$criteria->where('modifier.displayName', $comparator, $value);
-				}
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'modifiedBy', 'modifier');
 			});
 		}
 
@@ -953,22 +937,7 @@ abstract class Entity extends Property {
 				$criteria->where('createdBy', '=', go()->getAuthState()->getUserId());
 			});
 			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-
-				foreach($value as &$v) {
-					if ($v == "{{me}}") {
-						$v = go()->getUserId();
-					}
-				}
-
-				if(is_numeric($value[0])) {
-					$criteria->andWhere('createdBy', '=', $value);
-				} else {
-					if (!$query->isJoined('core_user', 'creator')) {
-						$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
-					}
-
-					$criteria->where('creator.displayName', $comparator, $value);
-				}
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'createdBy', 'creator');
 			});
 		}
 
@@ -1057,16 +1026,59 @@ abstract class Entity extends Property {
 
 		if (static::getMapping()->getColumn('user_id')) {
 			$filters->addText('createdBy', function (Criteria $criteria, $comparator, $value, Query $query) {
-				$query->join('core_user', 'creator', 'creator.id = p.user_id');
-				$query->andWhere('creator.displayName', $comparator, $value);
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'user_id', 'creator');
 			});
 		}
 
 		if (static::getMapping()->getColumn('muser_id')) {
 			$filters->addText('modifiedBy', function (Criteria $criteria, $comparator, $value, Query $query) {
-				$query->join('core_user', 'modifier', 'creator.id = p.muser_id');
-				$query->andWhere('modifier.displayName', $comparator, $value);
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'muser_id', 'modifier');
 			});
+		}
+	}
+
+	/**
+	 * Applies a createdBy / modifiedBy style filter on a user id column.
+	 *
+	 * Each value can be a user ID, "{{me}}" for the current user or a display name to match. IDs and names may be mixed
+	 * and match with OR.
+	 *
+	 * @param Criteria $criteria
+	 * @param string $comparator Comparator for the display name match
+	 * @param array $value User ID's, "{{me}}" or display names
+	 * @param Query $query
+	 * @param string $column The column holding the user ID
+	 * @param string $joinAlias Alias for the core_user join used for display name matching
+	 */
+	private static function applyUserFilter(Criteria $criteria, string $comparator, array $value, Query $query, string $column, string $joinAlias): void
+	{
+		$ids = [];
+		$names = [];
+		foreach($value as $v) {
+			if ($v === "{{me}}") {
+				$ids[] = go()->getUserId();
+			} else if (is_numeric($v)) {
+				$ids[] = (int) $v;
+			} else if (is_string($v) && $v !== '') {
+				$names[] = $v;
+			}
+		}
+
+		$userCriteria = new Criteria();
+
+		if (!empty($ids)) {
+			$userCriteria->where($query->getTableAlias() . '.' . $column, 'IN', $ids);
+		}
+
+		if (!empty($names)) {
+			if (!$query->isJoined('core_user', $joinAlias)) {
+				$query->join('core_user', $joinAlias, $joinAlias . '.id = ' . $query->getTableAlias() . '.' . $column, 'LEFT');
+			}
+			$userCriteria->orWhere($joinAlias . '.displayName', $comparator, $names);
+		}
+
+		if ($userCriteria->hasConditions()) {
+			$criteria->andWhere($userCriteria);
 		}
 	}
 
