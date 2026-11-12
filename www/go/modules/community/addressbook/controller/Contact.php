@@ -214,9 +214,15 @@ EOT;
 	{
 		if(!empty($params['fileId'])) {
 			$file = \GO\Files\Model\File::model()->findByPk($params['fileId']);
+			if(!$file) {
+				throw new \go\core\exception\NotFound();
+			}
 			$data = $file->fsFile->getContents();
 		} else {
-			$account = Account::model()->findByPk($params['account_id']);
+			$account = Account::model()->findByPk($params['account_id'] ?? 0);
+			if(!$account) {
+				throw new \go\core\exception\NotFound();
+			}
 			$imap = $account->openImapConnection($params['mailbox']);
 			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
 		}

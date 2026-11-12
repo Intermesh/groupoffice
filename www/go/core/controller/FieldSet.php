@@ -190,7 +190,14 @@ class FieldSet extends EntityController {
 			throw new Forbidden();
 		}
 
-		$blob = Blob::findById($params['blobId']);
+		$blob = Blob::findById($params['blobId'] ?? '');
+		if(!$blob) {
+			throw new \go\core\exception\NotFound();
+		}
+		if(!\go\core\orm\EntityType::existsByName($params['entity'] ?? '')) {
+			throw new \go\core\jmap\exception\InvalidArguments("Unknown entity");
+		}
+		$e = \go\core\orm\EntityType::findByName($params['entity']);
 		$json = $blob->getFile()->getContents();
 		$jsonArray = json_decode($json, true);
 		if (false && $jsonArray['goVersion'] !== go()->getVersion()) {
@@ -206,7 +213,6 @@ class FieldSet extends EntityController {
 			foreach ($jsonArray['fieldSets'] as $fieldSetArray) {
 				$fieldSet = (object)$fieldSetArray;
 				// check if fieldSet->name exists
-				$e = \go\core\orm\EntityType::findByName($params['entity']);
 				$newFieldSet = model\FieldSet::find()
 					->where('entityId', '=', $e->getId())
 					->where('name', '=', $fieldSet->name)

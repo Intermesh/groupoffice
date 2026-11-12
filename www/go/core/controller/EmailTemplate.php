@@ -45,8 +45,6 @@ class EmailTemplate extends EntityController {
 	 */
 	public function fromZip(array $params)
 	{
-		// must have BlobId, Subject will be echoed back for result reference
-		$blob = Blob::findById($params['blobId']);
 		// For now, only newsletts uses this
 		if(!isset($params['module']) || !isset($params['package'])) {
 			throw new InvalidArguments();
@@ -54,8 +52,14 @@ class EmailTemplate extends EntityController {
 		$modName = $params['module'];
 		$package = $params['package'];
 
+		// must have BlobId, Subject will be echoed back for result reference
+		$blob = Blob::findById($params['blobId'] ?? '');
+
 		if (!empty($blob)) {
 			$module = model\Module::findByName($package, $modName);
+			if (!$module) {
+				throw new InvalidArguments("Module not found");
+			}
 			$tpl = model\EmailTemplate::fromBlob($blob);
 			$tpl->moduleId = $module->id;
 			if(!$this->canCreate($tpl)) {

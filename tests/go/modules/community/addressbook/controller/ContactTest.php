@@ -235,4 +235,11 @@ class ContactTest extends TestCase
 		$this->assertArrayNotHasKey($profile->id, $result['notUpdated'] ?? [], var_export($result['notUpdated'][$profile->id] ?? null, true));
 		$this->assertSame('Changed Name', $this->storedUser($this->attacker)->displayName);
 	}
+
+	public function testLoadVcfFromUnknownFile(): void
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		$this->expectException(\go\core\exception\NotFound::class);
+		(new Contact())->loadVCF(['fileId' => 999999999]);
+	}
 }
