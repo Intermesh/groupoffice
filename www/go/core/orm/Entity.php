@@ -995,16 +995,6 @@ abstract class Entity extends Property {
 			$query->groupBy([$query->getTableAlias() . '.id']);
 		});
 
-		$filters->add("customrelations", function(Criteria $criteria, $value, Query $query) {
-			$cfRelationAlias = 'relation_' . uniqid();
-			$on =  $cfRelationAlias .'entityTypeId=' . static::entityType()->getId();
-			$query->join('core_customfields_relation', $cfRelationAlias,$on, 'LEFT');
-			if (!empty($value['id'])) {
-				$criteria->andWhere('entityId', '=', $value['id']);
-			}
-			$query->groupBy([$query->getTableAlias() . '.id']);
-		});
-
 		static::fireEvent(self::EVENT_FILTER, $filters);
 
 		return $filters;

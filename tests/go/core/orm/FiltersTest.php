@@ -130,4 +130,9 @@ class FiltersTest extends TestCase
 		$this->expectException(InvalidArguments::class);
 		$this->findNoteIds(['link' => 'Note']);
 	}
+
+	public function testCustomRelationsFilterIsRemoved(): void
+	{
+		$this->assertFalse(Note::getFilters()->hasFilter('customrelations'));
+	}
 }
