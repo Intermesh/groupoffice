@@ -19,4 +19,6 @@ return array (
   'Server' => 'Serwer',
   'Sync now' => 'Synchronizuj teraz',
   'Remove from sync' => 'Usuń z synchronizacji',
+  'Every 15 minutes' => 'Co 15 minut',
+  'Sync' => 'Synchronizuj',
 );

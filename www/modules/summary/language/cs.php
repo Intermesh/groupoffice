@@ -35,4 +35,5 @@ return array (
   'statuses' => 'statusy',
   'Visible calendars' => 'Viditelné kalendáře',
   'Visible' => 'Viditelné',
+  'note' => 'poznámka',
 );

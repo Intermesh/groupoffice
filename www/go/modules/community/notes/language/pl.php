@@ -20,4 +20,8 @@ return array (
   'Default note book' => 'Domyślny notes',
   'Start in' => 'Rozpocznij w',
   'Remember last selected note book' => 'Pamiętaj ostatni zaznaczony notes',
+  'notes' => 'notatki',
+  'Cannot decrypt' => 'Nie można odszyfrować',
+  'Encrypt' => 'Zaszyfruj',
+  'Passwords do not match' => 'Hasła nie są zgodne',
 );

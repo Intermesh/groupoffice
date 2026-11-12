@@ -34,4 +34,6 @@ return array (
   'statuses' => 'Stati',
   'Visible calendars' => 'Calendari visibili',
   'Visible' => 'Visibile',
+  'Record of latest read announcement' => 'Registro dell\'ultimo annuncio letto',
+  'note' => 'nota',
 );

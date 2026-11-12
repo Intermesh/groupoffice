@@ -148,4 +148,7 @@ return array (
   'Failed to add contacts to the group' => 'Nepodařilo se přidat kontakty do skupiny',
   'Add to group' => 'Přidat do skupiny',
   'Delete %d items' => 'Smazat %d položek',
+  'vCard importer' => 'Import vCard',
+  'Please select at least two items to merge.' => 'Vyberte prosím alespoň dvě položky ke sloučení.',
+  'Please select a company' => 'Vyberte prosím společnost',
 );

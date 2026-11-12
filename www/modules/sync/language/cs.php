@@ -29,4 +29,5 @@ return array (
   'Allow delete via synchronization' => 'Povolit mazání při synchronizaci',
   'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Ve výchozím nastavení nemají zařízení povoleno mazat položky. Přidáno kvůli chybě v Androidu 12, který po aktualizaci smazal všechny kontakty',
   'Tasklists' => 'Seznam úkolů',
+  '** 2-Factor authentication **' => '** Dvoufázové ověření **',
 );

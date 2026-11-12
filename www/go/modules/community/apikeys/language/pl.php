@@ -6,4 +6,7 @@ return array (
   'API Key' => 'Klucz API',
   'View access token' => 'Pokaż token dostępu',
   'Copy token to clipboard' => 'Copy token to clipboard',
+  'Access token' => 'Token dostępu',
+  'API keys' => 'Klucze API',
+  'API key' => 'Klucz API',
 );

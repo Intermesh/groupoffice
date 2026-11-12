@@ -144,4 +144,5 @@ return array (
   'Body' => 'Body',
   'Mailing list' => 'Mailing list',
   'Sieve' => 'Sieve',
+  'I am away' => 'Sono assente',
 );

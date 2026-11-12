@@ -19,4 +19,6 @@ return array (
   'If only the account is deleted the calendars can still be deleted manually' => 'Pokud dojde pouze k odstranění účtu, kalendáře lze stále smazat ručně',
   'Keep calendar data' => 'Uchovat data kalendáře',
   'Delete all' => 'Smazat vše',
+  'Every 15 minutes' => 'Každých 15 minut',
+  'Sync' => 'Synchronizovat',
 );

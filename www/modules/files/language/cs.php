@@ -161,4 +161,6 @@ Byly provedeny následující změny %s:
   'id' => 'id',
   'Deleted by' => 'Smazal',
   'Deleted at' => 'Smazáno v',
+  'Send notification email when something changes in subscribed files folder' => 'Odeslat upozornění e-mailem, když se něco změní v odebírané složce souborů',
+  'Send an email to the user when a folder is changed' => 'Odeslat uživateli e-mail, když se složka změní',
 );

@@ -151,4 +151,10 @@ Le seguenti modifiche sono state effettuate da %s:
   'Deleted by' => 'Eliminato da',
   'Deleted at' => 'Eliminato il',
   'Sorry, something went wrong' => 'Spiacente, qualcosa è andato storto.',
+  'The upload failed! Ask the server manager for what wrong' => 'Caricamento non riuscito! Chiedi all\'amministratore del server cosa è andato storto',
+  'You can\'t delete this system folder' => 'Non puoi eliminare questa cartella di sistema',
+  'Delete expired download link files' => 'Elimina i file dei link di download scaduti',
+  'Delete download link files that are no longer valid' => 'Elimina i file dei link di download non più validi',
+  'Send notification email when something changes in subscribed files folder' => 'Invia un\'e-mail di notifica quando qualcosa cambia in una cartella di file a cui sei iscritto',
+  'Send an email to the user when a folder is changed' => 'Invia un\'e-mail all\'utente quando una cartella viene modificata',
 );

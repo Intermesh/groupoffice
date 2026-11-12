@@ -29,4 +29,5 @@ return array (
   'Display options for notebooks' => 'Zobrazit možnosti zobrazení poznámek',
   'Start in' => 'Začátek v',
   'Remember last selected note book' => 'Zapamatovat si poslední vybrané poznámky',
+  'notes' => 'poznámky',
 );

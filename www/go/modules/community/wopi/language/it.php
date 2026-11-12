@@ -6,4 +6,5 @@ return array (
   'Only for use with Microsoft Office Online. WOPI traffic must be tunneled through a wopi subdomain.' => 'Da utilizzare solo con Microsoft Office Online. Il traffico WOPI deve essere incanalato attraverso un sottodominio WOPI.',
   'Online Office' => 'Online Office',
   'Office Online' => 'Office Online',
+  'Libre Office Online' => 'Libre Office Online',
 );

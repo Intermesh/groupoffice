@@ -19,4 +19,6 @@ return array (
   'Keep calendar data' => 'Mantieni dati del calendario',
   'Delete all' => 'Elimina tutto',
   'Calendar' => 'Calendario',
+  'Every 15 minutes' => 'Ogni 15 minuti',
+  'Sync' => 'Sincronizza',
 );

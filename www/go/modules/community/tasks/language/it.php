@@ -75,4 +75,6 @@ return array (
   'List: None' => 'Lista: nessuna',
   'Percent Complete' => 'percentuale di completamento',
   'Message' => 'Messaggio',
+  'Task list' => 'Lista attività',
+  'Tasklists' => 'Liste attività',
 );
