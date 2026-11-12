@@ -102,10 +102,11 @@ class BusyPeriod {
 		}
 		//ksort($list);
 
-		return [
-			'sql' => (string)$stmt,
-			'list' => array_values($list)
-		];
+		$response = ['list' => array_values($list)];
+		if (go()->getDebugger()->enabled) {
+			$response['sql'] = (string) $stmt;
+		}
+		return $response;
 	}
 
 	static function expand($p, string $from, string $until) {

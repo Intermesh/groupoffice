@@ -111,4 +111,19 @@ class DebtorTest extends TestCase
 		$this->actAs($this->user->id);
 		$this->assertEquals(['count' => 0, 'errors' => []], $this->controller()->runActions(['dryRun' => true, 'businessId' => $this->business->id]));
 	}
+
+	public function testReportOnlyReturnsTheSqlWhenDebugging(): void
+	{
+		$debugger = go()->getDebugger();
+		$enabled = $debugger->enabled;
+		try {
+			$debugger->enabled = false;
+			$this->assertArrayNotHasKey('query', $this->controller()->report([]));
+
+			$debugger->enabled = true;
+			$this->assertArrayHasKey('query', $this->controller()->report([]));
+		} finally {
+			$debugger->enabled = $enabled;
+		}
+	}
 }
