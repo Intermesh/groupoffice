@@ -173,13 +173,15 @@ class Filters {
 	 * Each filter property has an "x-filterType" keyword with the filter type (generic, text, number, date or datetime).
 	 *
 	 * @link https://jmap.io/spec-core.html#query
+	 * @param bool $withTypeSyntax Append the value syntax of the filter type ({@see getTypeSyntax()}) to each description.
+	 *   Pass false when the syntax is documented once elsewhere.
 	 * @return array
 	 */
-	public function toJsonSchema(): array
+	public function toJsonSchema(bool $withTypeSyntax = true): array
 	{
 		$properties = [];
 		foreach ($this->filters as $filter) {
-			$properties[$filter['name']] = $this->filterSchema($filter);
+			$properties[$filter['name']] = $this->filterSchema($filter, $withTypeSyntax);
 		}
 		ksort($properties, SORT_STRING | SORT_FLAG_CASE);
 
@@ -214,30 +216,38 @@ class Filters {
 	}
 
 	/**
+	 * Get the value syntax per filter type: text, number, date and datetime. Generic filters have no fixed syntax.
+	 *
+	 * @return array<string, string> Filter type => syntax description
+	 */
+	public static function getTypeSyntax(): array
+	{
+		$date = 'A date with an optional comparator (>, >=, <, <=) or a range "2025-01-01..2025-01-31". ' .
+			'Relative dates like "now" and "-1 week" are supported. A date without time in a range end includes that whole day.';
+
+		return [
+			'text' => 'Matched with SQL LIKE, use % as wildcard. An array matches any of the values.',
+			'number' => 'A number with an optional comparator (>, >=, <, <=, !=) or a range "1..10".',
+			'date' => $date,
+			'datetime' => $date . ' Times are in the time zone of the user.'
+		];
+	}
+
+	/**
 	 * JSON schema of a single filter value
 	 */
-	private function filterSchema(array $filter): array
+	private function filterSchema(array $filter, bool $withTypeSyntax): array
 	{
-		[$typeSchema, $syntax] = match ($filter['type']) {
-			'text' => [
-				['anyOf' => [['type' => 'string'], ['type' => 'array', 'items' => ['type' => 'string']]]],
-				'Matched with SQL LIKE, use % as wildcard. An array matches any of the values.'
-			],
-			'number' => [
-				['type' => ['number', 'string']],
-				'A number with an optional comparator (>, >=, <, <=, !=) or a range "1..10".'
-			],
-			'date', 'datetime' => [
-				['type' => ['string', 'null']],
-				'A date with an optional comparator (>, >=, <, <=) or a range "2025-01-01..2025-01-31". ' .
-				'Relative dates like "now" and "-1 week" are supported. A date without time in a range end includes that whole day.' .
-				($filter['type'] == 'datetime' ? ' Times are in the time zone of the user.' : '')
-			],
-			default => [[], '']
+		$typeSchema = match ($filter['type']) {
+			'text' => ['anyOf' => [['type' => 'string'], ['type' => 'array', 'items' => ['type' => 'string']]]],
+			'number' => ['type' => ['number', 'string']],
+			'date', 'datetime' => ['type' => ['string', 'null']],
+			default => []
 		};
 
 		$schema = $filter['schema'] ?? $typeSchema;
 
+		$syntax = $withTypeSyntax ? (self::getTypeSyntax()[$filter['type']] ?? '') : '';
 		$description = trim(($filter['description'] ?? '') . ' ' . $syntax);
 		if ($description !== '') {
 			$schema['description'] = $description;

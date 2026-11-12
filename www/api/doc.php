@@ -91,7 +91,7 @@ foreach($types as $type) {
 
 		// Custom fields are installation specific and this page is public, so leave them out.
 		$customFieldNames = method_exists($cls, 'getCustomFieldModels') ? array_keys($cls::getCustomFieldModels()) : [];
-		$filterProperties = (array) $cls::getFilters()->toJsonSchema()['$defs']['FilterCondition']['properties'];
+		$filterProperties = (array) $cls::getFilters()->toJsonSchema(false)['$defs']['FilterCondition']['properties'];
 
 		$html .= "<h4>Filters</h4><table><tr><th>Filter</th><th>Type</th><th>Value</th><th>Description</th><th>Default</th></tr>";
 		foreach($filterProperties as $name => $schema) {
@@ -172,6 +172,16 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 	filter operator that combines conditions with AND, OR or NOT. Operators can be nested.
 	Custom fields can be filtered on by their database name.
 </p>
+
+<p>The value syntax depends on the filter type shown in the filter tables:</p>
+
+<table>
+	<tr><th>Type</th><th>Value syntax</th></tr>
+	<?php foreach(\go\core\orm\Filters::getTypeSyntax() as $filterType => $syntax): ?>
+	<tr><td><?= htmlspecialchars($filterType) ?></td><td><?= htmlspecialchars($syntax) ?></td></tr>
+	<?php endforeach; ?>
+	<tr><td>generic</td><td>See the value type and description of the filter.</td></tr>
+</table>
 
 <code>["Note/query", {
   "filter": {

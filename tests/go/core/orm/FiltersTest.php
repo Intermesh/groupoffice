@@ -269,6 +269,19 @@ class FiltersTest extends TestCase
 		$this->assertStringContainsString('1..10', $props['bar']['description']);
 	}
 
+	public function testToJsonSchemaWithoutTypeSyntax(): void
+	{
+		$filters = (new Filters(A::class))
+			->addDate('due', function () {})
+			->describe("Due date");
+
+		$with = (array) $filters->toJsonSchema()['$defs']['FilterCondition']['properties'];
+		$without = (array) $filters->toJsonSchema(false)['$defs']['FilterCondition']['properties'];
+
+		$this->assertStringContainsString(Filters::getTypeSyntax()['date'], $with['due']['description']);
+		$this->assertEquals('Due date', $without['due']['description']);
+	}
+
 	public function testDescribeWithoutFilterThrows(): void
 	{
 		$this->expectException(\LogicException::class);
