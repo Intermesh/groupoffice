@@ -1,5 +1,7 @@
 # GroupOffice
 
+Write the product name as "GroupOffice" in new text (changelog, messages, comments, docs), not "Group-Office" or "Group Office". Older code and changelog entries still use "Group-Office"; leave those unless asked.
+
 ## Reuse existing code
 
 Before writing any helper or utility (IP/CIDR, string, date, URL, file, crypto, etc.), search for existing functionality and reuse or extend it instead of duplicating it. Check at least:
