@@ -274,6 +274,39 @@ class EntityFromParamsTest extends \go\core\jmap\EntityController
 		$note = $this->getEntity($params['id']);
 	}
 
+	public function copiedToVariable($params)
+	{
+		$id = $params['id'];
+		// ruleid: go-entity-from-params-without-acl
+		$note = Note::findById($id);
+		return $note;
+	}
+
+	public function copiedWithCast($params)
+	{
+		$id = (int) ($params['id'] ?? 0);
+		// ruleid: go-entity-from-params-without-acl
+		return Note::findById($id);
+	}
+
+	public function derivedId($params)
+	{
+		$note = $this->getEntity($params['id']);
+		// ok: go-entity-from-params-without-acl
+		return User::findById($note->createdBy);
+	}
+
+	public function copiedToVariableAndChecked($params)
+	{
+		$id = $params['id'];
+		// ok: go-entity-from-params-without-acl
+		$note = Note::findById($id);
+		if (!$note->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new Forbidden();
+		}
+		return $note;
+	}
+
 	public function checked($params)
 	{
 		// ok: go-entity-from-params-without-acl

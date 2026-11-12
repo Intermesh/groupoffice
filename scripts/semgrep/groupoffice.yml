@@ -640,6 +640,28 @@ rules:
       - pattern-either:
           - pattern: $C::findById(<... $params ...>, ...)
           - pattern: $C::findByIds(<... $params ...>, ...)
+          # The ID was copied to a variable first
+          - patterns:
+              # Only a direct copy, not an ID of an entity that was loaded with the request
+              - pattern-either:
+                  - pattern-inside: |
+                      $ID = $params[$K];
+                      ...
+                  - pattern-inside: |
+                      $ID = $params[$K] ?? $DEFAULT;
+                      ...
+                  - pattern-inside: |
+                      $ID = (int) $params[$K];
+                      ...
+                  - pattern-inside: |
+                      $ID = (int) ($params[$K] ?? $DEFAULT);
+                      ...
+                  - pattern-inside: |
+                      $ID = (string) $params[$K];
+                      ...
+              - pattern-either:
+                  - pattern: $C::findById(<... $ID ...>, ...)
+                  - pattern: $C::findByIds(<... $ID ...>, ...)
       # A blob ID is a hash of the content and works like a key: download.php serves any blob by its ID.
       - metavariable-regex:
           metavariable: $C
