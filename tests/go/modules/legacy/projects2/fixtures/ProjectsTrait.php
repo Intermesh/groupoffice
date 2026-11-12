@@ -146,6 +146,9 @@ trait ProjectsTrait
 		go()->getDbConnection()->exec("DELETE a FROM core_acl a INNER JOIN core_entity e ON e.id = a.entityTypeId INNER JOIN core_module m ON m.id = e.moduleId WHERE m.name = 'projects2' AND m.package IS NULL");
 		go()->getDbConnection()->delete('core_module', ['name' => 'projects2', 'package' => null])->execute();
 		go()->getCache()->delete('entity-types');
+		// Listeners of the module, like the one that adds the projects settings to users, may be cached
+		go()->getCache()->flush(false);
+		\go\core\event\Listeners::get()->clear();
 		\go\core\orm\Entity::clearCache();
 	}
 

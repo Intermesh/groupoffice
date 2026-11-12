@@ -67,8 +67,9 @@ class InvoiceControllerTest extends TestCase
 		if (isset($this->business->id)) {
 			Business::delete(['id' => $this->business->id]);
 		}
-		$this->uninstallModuleTables();
+		// Projects first: uninstallModuleTables() clears the caches, which must not still know the projects module
 		$this->tearDownProjects();
+		$this->uninstallModuleTables();
 	}
 
 	private function createInvoice(): void

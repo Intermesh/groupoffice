@@ -318,6 +318,10 @@ class FiltersTest extends TestCase
 	public function testToJsonSchemaForAllEntities(): void
 	{
 		foreach (EntityType::findAll() as $type) {
+			// Another test may have uninstalled or removed the module, the entity types are still cached
+			if (!\go\core\model\Module::findById($type->getModuleId())?->enabled) {
+				continue;
+			}
 			$cls = $type->getClassName();
 			if (!is_a($cls, Entity::class, true)) {
 				continue;

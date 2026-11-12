@@ -110,6 +110,9 @@ trait ModuleTablesTrait
 	private function clearModuleCaches(?string $package = null, ?string $name = null): void
 	{
 		go()->getCache()->delete('entity-types');
+		// Listeners and entity references of the module would otherwise still be used after it's gone
+		go()->getCache()->flush(false);
+		\go\core\event\Listeners::get()->clear();
 		if (isset($name)) {
 			go()->getCache()->delete('module-' . ($package ?? 'legacy') . '/' . $name);
 		}

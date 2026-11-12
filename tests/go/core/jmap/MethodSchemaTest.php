@@ -59,6 +59,10 @@ class MethodSchemaTest extends TestCase
 	public function testForEntityReferencesExistingDefinitions(): void
 	{
 		foreach (EntityType::findAll() as $type) {
+			// Another test may have uninstalled or removed the module, the entity types are still cached
+			if (!\go\core\model\Module::findById($type->getModuleId())?->enabled) {
+				continue;
+			}
 			if (!is_a($type->getClassName(), Entity::class, true)) {
 				continue;
 			}
@@ -137,6 +141,10 @@ class MethodSchemaTest extends TestCase
 	{
 		$undocumented = [];
 		foreach (EntityType::findAll() as $type) {
+			// Another test may have uninstalled or removed the module, the entity types are still cached
+			if (!\go\core\model\Module::findById($type->getModuleId())?->enabled) {
+				continue;
+			}
 			if (!is_a($type->getClassName(), Entity::class, true)) {
 				continue;
 			}
