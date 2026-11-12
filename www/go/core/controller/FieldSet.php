@@ -113,7 +113,7 @@ class FieldSet extends EntityController {
 		}
 
 		$jsonArray = ['entity' => $params['entity'], 'goVersion' => go()->getVersion(), 'fieldSets' => []];
-		$fieldSets = model\FieldSet::findByIds($params['fieldSetIds']);
+		$fieldSets = model\FieldSet::findByIds($params['fieldSetIds']); // nosemgrep: go-entity-from-params-without-acl -- mayChangeCustomFields is checked above and grants access to all field sets
 		$fieldSetArray = [];
 		foreach ($fieldSets as $fieldSet) {
 			$fields = model\Field::find()->where('fieldSetId', '=', $fieldSet->id)->orderBy(['sortOrder' => 'asc']);

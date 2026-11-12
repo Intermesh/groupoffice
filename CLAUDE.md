@@ -51,6 +51,9 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - Admin-only or privileged behaviour needs a test that proves the guard actually fires. Recent fixes (#1593) were guards that never triggered.
 - Don't trust client-supplied properties on save, and never expose secrets to the browser.
 - Take the client IP from the existing `IpAddress` util, never from `X-Forwarded-For` directly.
+- In controller methods, load entities with `$this->getEntity()` or `findEntity()`, which check read permission, not `Model::findById($params[...])`, which checks nothing. Methods that change data or send mail need a write or manage check on the entity or its container.
+- Don't override `checkModulePermissions()` to return true without another guard, don't pass `$params` straight to `setValues()`, and don't return SQL in responses unless the debugger is enabled.
+- When you change a public controller method, check its permission guard first. Every public method of a JMAP controller can be called by any user with access to the module.
 
 ## Writing tests
 

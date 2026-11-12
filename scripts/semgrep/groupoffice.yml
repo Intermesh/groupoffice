@@ -608,3 +608,59 @@ rules:
           - pattern: $X->setDefaultAcl(...)
           - pattern: go()->getDbConnection()->$METHOD(...)
           - pattern: $CLS::delete(...)
+
+  # ---------------------------------------------------------------------------------------------------------------
+  # Permissions
+  # ---------------------------------------------------------------------------------------------------------------
+
+  - id: go-entity-from-params-without-acl
+    languages: [php]
+    severity: ERROR
+    message: >-
+      An entity is loaded with an ID from the request, but findById() and findByIds() don't check permissions. Any
+      user who can call this method can read or change an entity of someone else. Use $this->getEntity($id) in an
+      EntityController, or check $entity->hasPermissionLevel(Acl::LEVEL_...) before using it.
+    metadata:
+      category: security
+      cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+    paths:
+      exclude:
+        - "**/vendor/**"
+        - "**/node_modules/**"
+        - "**/cli/**"
+    patterns:
+      # JMAP controllers. Legacy controllers use findByPk(), which checks permissions.
+      - pattern-inside: |
+          class $CLASS extends $PARENT {
+            ...
+          }
+      - metavariable-regex:
+          metavariable: $PARENT
+          regex: .*Controller$
+      - pattern-either:
+          - pattern: $C::findById(<... $params ...>, ...)
+          - pattern: $C::findByIds(<... $params ...>, ...)
+      # A blob ID is a hash of the content and works like a key: download.php serves any blob by its ID.
+      - metavariable-regex:
+          metavariable: $C
+          regex: ^(?!(.*\\)?Blob$)
+      # The permission level of the entity is checked after loading it
+      - pattern-not-inside: |
+          $E = $C::$FIND(...);
+          ...
+          if (<... $E->hasPermissionLevel(...) ...>) { ... }
+          ...
+      - pattern-not-inside: |
+          $E = $C::$FIND(...);
+          ...
+          if (<... $E->getPermissionLevel(...) ...>) { ... }
+          ...
+      - pattern-not-inside: |
+          $E = $C::$FIND(...);
+          ...
+          if (<... $this->$CAN($E) ...>) { ... }
+          ...
+      # Only for administrators
+      - pattern-not-inside: |
+          if (<... $AUTH->isAdmin() ...>) { ... }
+          ...
