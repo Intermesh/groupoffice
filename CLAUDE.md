@@ -45,6 +45,15 @@ Schema changes go in the module's `install/updates.php` as a new entry keyed by 
 
 Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module's `language/<lang>.php` (English is the source, `en.php`). Add new strings to `en.php`. Core translations are in `www/go/core/language/`.
 
+- The English text is the key, so it must be correct English: no typos, no Dutch or German. Fixing a key means changing the source and every language file; if the corrected text already exists (often in core), remove the old entries instead of renaming them.
+- Argument order differs: `go()->t($text, $package, $module)`, legacy `GO::t($text, $module, $package)`, and in JS/TS `t($text, $module, $package)` (the current module by default).
+- Lookup falls back from the module to core. A string that two or more modules use, or that core already translates (check the Dutch core file `www/go/core/language/nl.php`), belongs in the core language file instead of each module.
+- When adding translations, append entries before the closing `);` or `];` in the file's own style and indentation. Don't rewrite a file with `var_export()`; that reformats every line.
+- Keep placeholders exactly as in the source (`{count}`, `{{contact.name}}`, `%s`, HTML tags, `\n`). Reuse the existing terms of the language file and its register: Dutch "u", German "Sie", French "vous", Spanish "usted".
+- Short strings are ambiguous ("Read", "Bill", "Archive", "Split", "Quit", "To"). Check where they're used before translating: a permission level, a button (verb), a column header (noun) and a view name each need a different translation.
+- The dev module's `community/dev/Language/export` lists missing strings, but only from `t()` in JS/TS. Strings from `go()->t()` and `GO::t()` in PHP need to be checked too.
+- Language files are cached. Check new translations with a `go\core\Language` object after `initExport()`, or rebuild the cache.
+
 ## Permissions and security
 
 - Every new JMAP entity and controller must enforce ACL. Use `Entity::hasPermissionLevel()`, `applyAclToQuery()` and `internalGetPermissionLevel()`, and don't skip them for convenience.
