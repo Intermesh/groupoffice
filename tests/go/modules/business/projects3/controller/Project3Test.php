@@ -35,6 +35,7 @@ class Project3Test extends TestCase
 
 		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
 		$this->installModuleTables('business', 'business', $path . 'business/install/install.sql');
+		$this->installModuleTables('business', 'finance', $path . 'finance/install/install.sql');
 		$this->installModuleTables('business', 'projects3', $path . 'projects3/install/install.sql');
 		// The tables are created for every test, so books get the same id. Forget the books of other tests.
 		(new \ReflectionProperty(\go\core\acl\model\AclItemEntity::class, 'aclEntityCache'))->setValue(null, []);
@@ -129,5 +130,11 @@ class Project3Test extends TestCase
 
 		$this->actAs($this->user->id);
 		$this->assertEquals([], iterator_to_array($this->controller()->getTaskProgress(['projectId' => $this->project->id])));
+	}
+
+	public function testCreateInvoiceInUnknownBook(): void
+	{
+		$this->expectException(Forbidden::class);
+		$this->controller()->createInvoice(['projectId' => $this->project->id, 'bookId' => 999999999, 'daterange' => null]);
 	}
 }

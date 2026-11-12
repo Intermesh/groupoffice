@@ -126,4 +126,9 @@ class DebtorTest extends TestCase
 			$debugger->enabled = $enabled;
 		}
 	}
+
+	public function testRunActionsWithoutBusinessParameter(): void
+	{
+		$this->assertIsArray($this->controller()->runActions(['dryRun' => true]));
+	}
 }
