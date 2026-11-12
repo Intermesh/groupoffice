@@ -7,7 +7,10 @@ use go\core\model\EmailTemplate;
 use go\core\model\PdfTemplate;
 use go\core\model\User;
 use go\modules\business\business\model\Business;
+use go\core\model\Acl;
 use go\modules\business\finance\model\FinanceBook;
+use go\modules\business\finance\model\FinanceDocument as FinanceDocumentModel;
+use go\modules\community\addressbook\model\Contact;
 use go\modules\business\ModuleTablesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +29,10 @@ class FinanceDocumentTest extends TestCase
 	private User $user;
 	private ?Business $business = null;
 	private ?FinanceBook $book = null;
+	private ?FinanceBook $purchaseOrderBook = null;
+	private ?FinanceBook $orderBook = null;
+	private ?Contact $customer = null;
+	private ?FinanceDocumentModel $document = null;
 
 	protected function setUp(): void
 	{
@@ -60,6 +67,19 @@ class FinanceDocumentTest extends TestCase
 	protected function tearDown(): void
 	{
 		$this->actAs(User::ID_SUPER_ADMIN);
+		if (isset($this->document->id)) {
+			FinanceDocumentModel::delete(['id' => $this->document->id]);
+		}
+		if (isset($this->customer->id)) {
+			Contact::delete(['id' => $this->customer->id]);
+		}
+		foreach ([$this->purchaseOrderBook, $this->orderBook] as $book) {
+			if (isset($book->id)) {
+				PdfTemplate::delete(['key' => 'fb-def-' . $book->id]);
+				EmailTemplate::delete(['key' => 'fb-def-' . $book->id]);
+				FinanceBook::delete(['id' => $book->id]);
+			}
+		}
 		if (isset($this->book->id)) {
 			PdfTemplate::delete(['key' => 'fb-def-' . $this->book->id]);
 			EmailTemplate::delete(['key' => 'fb-def-' . $this->book->id]);
@@ -86,6 +106,8 @@ class FinanceDocumentTest extends TestCase
 	private function actAs(int $userId): void
 	{
 		go()->setAuthState(new TemporaryState($userId));
+		// The books of documents are cached with the permission level of the previous user
+		(new \ReflectionProperty(\go\core\acl\model\AclItemEntity::class, 'aclEntityCache'))->setValue(null, []);
 	}
 
 	public static function totals(): array
@@ -115,5 +137,74 @@ class FinanceDocumentTest extends TestCase
 		$this->actAs($this->user->id);
 		$this->expectException(Forbidden::class);
 		$this->controller()->statement(['businessId' => $this->business->id, 'contactId' => 1]);
+	}
+
+	/**
+	 * Create a sales order without items and a purchase order book for the business. A sales order doesn't need a debtor
+	 * profile.
+	 */
+	private function createDocument(): void
+	{
+		$this->orderBook = new FinanceBook();
+		$this->orderBook->name = uniqid('so');
+		$this->orderBook->businessId = $this->business->id;
+		$this->orderBook->type = FinanceBook::TYPE_SALES_ORDER;
+		$this->assertTrue($this->orderBook->save(), $this->orderBook->getValidationErrorsAsString());
+
+		$this->purchaseOrderBook = new FinanceBook();
+		$this->purchaseOrderBook->name = uniqid('po');
+		$this->purchaseOrderBook->businessId = $this->business->id;
+		$this->purchaseOrderBook->type = FinanceBook::TYPE_PURCHASE_ORDER;
+		$this->assertTrue($this->purchaseOrderBook->save(), $this->purchaseOrderBook->getValidationErrorsAsString());
+
+		$this->customer = new Contact();
+		$this->customer->isOrganization = true;
+		$this->customer->name = uniqid('customer');
+		$this->customer->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
+		$this->assertTrue($this->customer->save(), $this->customer->getValidationErrorsAsString());
+
+		$this->document = new FinanceDocumentModel();
+		$this->document->bookId = $this->orderBook->id;
+		$this->document->setCustomerId($this->customer->id);
+		$this->document->date = new \DateTime();
+		$this->assertTrue($this->document->save(), $this->document->getValidationErrorsAsString());
+	}
+
+	private function grant(FinanceBook $book, int $level): void
+	{
+		$book = FinanceBook::findById($book->id);
+		$book->setAcl([$this->user->getPersonalGroup()->id => $level]);
+		$this->assertTrue($book->save(), $book->getValidationErrorsAsString());
+	}
+
+	public function testCreatePurchaseOrdersNeedsWritePermissionOnTheDocument(): void
+	{
+		$this->createDocument();
+		$this->grant($this->orderBook, Acl::LEVEL_READ);
+		$this->grant($this->purchaseOrderBook, Acl::LEVEL_CREATE);
+
+		$this->actAs($this->user->id);
+		$this->expectException(Forbidden::class);
+		$this->controller()->createPurchaseOrders(['id' => $this->document->id]);
+	}
+
+	public function testCreatePurchaseOrdersNeedsCreatePermissionOnThePurchaseOrderBook(): void
+	{
+		$this->createDocument();
+		$this->grant($this->orderBook, Acl::LEVEL_WRITE);
+
+		$this->actAs($this->user->id);
+		$this->expectException(Forbidden::class);
+		$this->controller()->createPurchaseOrders(['id' => $this->document->id]);
+	}
+
+	public function testCreatePurchaseOrders(): void
+	{
+		$this->createDocument();
+		$this->grant($this->orderBook, Acl::LEVEL_WRITE);
+		$this->grant($this->purchaseOrderBook, Acl::LEVEL_CREATE);
+
+		$this->actAs($this->user->id);
+		$this->assertEquals(['ids' => []], $this->controller()->createPurchaseOrders(['id' => $this->document->id]));
 	}
 }
