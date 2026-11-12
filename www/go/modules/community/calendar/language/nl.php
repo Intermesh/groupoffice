@@ -248,6 +248,8 @@ return array (
   'This' => 'Dit',
 	'Auto-accept available resources' => 'Beschikbare faciliteiten automatisch accepteren',
 	'Show multiline event blocks' => 'Toon afspraak blokken op meerdere regels',
+	'Show event in category color' => 'Toon afspraak in categoriekleur',
+	'Only when one calendar is selected and the event has one category' => 'Alleen als er één agenda is geselecteerd en de afspraak één categorie heeft',
 	'Past appointments' => 'Verlopen afspraken',
 	'Upcoming appointments' => 'Aankomende afspraken',
 );

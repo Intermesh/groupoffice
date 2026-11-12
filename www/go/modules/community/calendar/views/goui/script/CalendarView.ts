@@ -416,7 +416,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 		const stripes: HTMLElement[] = [];
 		for(const key in e.calendarIds) {
 			const own = key === e.data.calendarId;
-			const color = own ? e.color : calendarStore.findById(key)?.color;
+			const color = own ? e.calendarColor : calendarStore.findById(key)?.color;
 			if(color) {
 				const stripe = E('i');
 				stripe.style.color = '#' + color;
