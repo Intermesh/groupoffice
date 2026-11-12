@@ -55,7 +55,7 @@ return array (
   'Invite not sent yet' => 'Einladung noch nicht versendet',
   'Participants' => 'Teilnehmer',
   'You' => 'Du',
-  'This' => 'Dieser',
+  'This' => 'Dieser Kalender',
   'Organizer' => 'Organisator',
   'Exceptions' => 'Ausnahmen',
   'Override' => 'Überschreiben',

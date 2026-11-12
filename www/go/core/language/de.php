@@ -1895,7 +1895,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'BCC' => 'BCC',
   'Bank card' => 'Bankkarte',
   'Best regards' => 'Mit freundlichen Grüßen',
-  'Bill' => 'Rechnung',
+  'Bill' => 'Abrechnen',
   'Billable' => 'Abrechenbar',
   'Billed' => 'Abgerechnet',
   'Body' => 'Inhalt',

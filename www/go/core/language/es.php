@@ -1376,7 +1376,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Add from personal folder' => 'Añadir desde carpeta personal',
   'Add from item' => 'Añadir desde elemento',
   'Main menu' => 'Menú principal',
-  'Register' => 'Regístrese en',
+  'Register' => 'Registrarse',
   'Install on your desktop' => 'Instalar en el escritorio',
   'Browser is offline' => 'El navegador está desconectado',
   'Waiting for connection to return' => 'Esperando a que vuelva la conexión',
