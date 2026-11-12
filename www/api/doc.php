@@ -295,7 +295,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 </table>
 
 	<p>
-		All entities listed below usually implement the standard methods as described in the <a href="https://jmap.io/spec-core.html#standard-methods-and-naming-convention">core JMAP spec</a>.
+		All entities listed below usually implement the standard methods as described in the <a href="https://jmap.io/spec/">core JMAP spec</a>.
 	</p>
 
 <h3>Example request:</h3>
