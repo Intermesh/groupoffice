@@ -1,3 +1,4 @@
+- Calendar: new preference "Show event in category color". When enabled, an event is shown in the color of its category if one calendar is selected and the event has exactly one category.
 - Newsletters: users with only read permission on a list can no longer use the add and delete recipient buttons. A failed change now shows an error instead of doing nothing.
 - Security: this release fixes a large number of security issues that were found in an extensive security review. Some were critical. We advise everyone to update. Please check the points below after updating.
 - Core: If debugging was enabled, remove old debug logs (data/log/debug.log), because they could contain IMAP passwords.
