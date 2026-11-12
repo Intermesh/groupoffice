@@ -462,7 +462,7 @@ abstract class EntityController extends Controller {
 
 		} else
 		{
-			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly);
+			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly); // nosemgrep: go-entity-from-params-without-acl -- defaultGet() checks canRead() for every entity
 		}
 
 		return $query;	
@@ -1174,7 +1174,7 @@ abstract class EntityController extends Controller {
 			$entityClass = $this->entityClass();
 			$mapping = ImportMapping::findByChecksum($entityClass::entityType()->getId(), $checkSum);
 		} else if(!empty($params['id'])) {
-			$mapping = ImportMapping::findById($params['id']);
+			$mapping = ImportMapping::findById($params['id']); // nosemgrep: go-entity-from-params-without-acl -- an import mapping is the column mapping of a CSV file for an entity type, not user data
 		}
 
 		if(!empty($mapping)) {
