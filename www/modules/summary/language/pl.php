@@ -30,4 +30,6 @@ return array (
 <p>Mamy nadzieję, że spodoba Ci się Group-Office!</p>",
   'Record of latest read announcement' => 'Zapis ostatnio przeczytanego ogłoszenia',
   'note' => 'notatka',
+  'Confirmed' => 'Potwierdzone',
+  'Tentative' => 'Wstępne',
 );

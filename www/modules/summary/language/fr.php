@@ -30,4 +30,6 @@ return array (
 <p>Voici un lien pour vous aider à démarrer : {{link}}</p>
 <p>Nous espérons que vous apprécierez Group-Office !</p>",
   'note' => 'note',
+  'Confirmed' => 'Confirmé',
+  'Tentative' => 'Provisoire',
 );

@@ -36,4 +36,6 @@ return array (
   'Visible calendars' => 'Viditelné kalendáře',
   'Visible' => 'Viditelné',
   'note' => 'poznámka',
+  'Confirmed' => 'Potvrzeno',
+  'Tentative' => 'Předběžně',
 );

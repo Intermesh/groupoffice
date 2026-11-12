@@ -36,4 +36,6 @@ return array (
   'Visible' => 'Visibile',
   'Record of latest read announcement' => 'Registro dell\'ultimo annuncio letto',
   'note' => 'nota',
+  'Confirmed' => 'Confermato',
+  'Tentative' => 'Provvisorio',
 );
