@@ -17,6 +17,11 @@ use GO\Files\Model\File;
  */
 class Edit extends Controller
 {
+  /**
+   * Open a file in the editor of a WOPI service
+   *
+   * @apiPermission Read permission on the WOPI service and on the file (File::findByPk()).
+   */
   public function launch($serviceId, $fileId)
   {
 	  $service = model\Service::findById($serviceId);

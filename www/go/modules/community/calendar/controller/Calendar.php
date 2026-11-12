@@ -47,6 +47,7 @@ class Calendar extends EntityController {
 	 *
 	 * @apiNoParams
 	 * @apiResponse {success: bool, calendarId: string, calendar: Calendar}
+	 * @apiPermission Module access: returns or creates the default calendar owned by the user.
 	 * @param $params
 	 * @return array
 	 * @throws \go\core\db\DbException
@@ -68,6 +69,7 @@ class Calendar extends EntityController {
 	 * Import the events of a webcal subscription again, replacing the events in the calendar
 	 *
 	 * @apiParam string calendarId Required. ID of the calendar. Requires write permission.
+	 * @apiPermission Write permission on the calendar.
 	 * @param array $params
 	 * @throws Forbidden
 	 */

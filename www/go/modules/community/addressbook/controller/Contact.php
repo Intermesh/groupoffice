@@ -154,6 +154,7 @@ class Contact extends EntityController {
 	 * @apiParam string font Font name. Defaults to "dejavusans".
 	 * @apiParam float fontSize Font size in points. Defaults to 10.
 	 * @apiResponse {blobId: string} ID of the PDF file
+	 * @apiPermission Checked in Labels::render(): only contacts the user can read are rendered (permissionLevel filter with Acl::LEVEL_READ).
 	 * @param array $params
 	 * @return array
 	 */

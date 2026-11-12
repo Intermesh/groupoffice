@@ -46,6 +46,7 @@ class Principal extends EntityController {
 	 * @apiParam string start Required. Start date and time of the period
 	 * @apiParam string end Required. End date and time of the period
 	 * @apiResponse {list: object[]} The busy periods
+	 * @apiPermission Checked in BusyPeriod::fetch(): only events in calendars on which the user has at least free/busy permission (Acl::applyToQuery() with Calendar::LEVEL_FREEBUSY).
 	 */
 	public function getAvailability($params){
  		if(Module::isInstalled('community', 'calendar')) {

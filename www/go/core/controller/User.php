@@ -92,6 +92,7 @@ class User extends EntityController {
 	 *
 	 * @apiParam string userId Required. ID of the user to log in as. The user must be enabled.
 	 * @apiResponse {success: bool}
+	 * @apiPermission Only administrators.
 	 * @throws InvalidArguments
 	 * @throws Forbidden
 	 */

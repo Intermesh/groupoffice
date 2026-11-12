@@ -59,6 +59,7 @@ class Language extends Controller {
 	 * docker compose exec groupoffice php www/cli.php community/dev/Language/import --path=lang.csv
 	 * ```
 	 *
+	 * @apiPermission Module access: exports the translatable strings from the source files and their translations. No user data is read.
 	 * @param $params
 	 * @return void
 	 * @throws \Exception
@@ -169,6 +170,11 @@ class Language extends Controller {
 		return array_map('stripslashes', $matches[1]);
 	}
 
+	/**
+	 * Write the strings of a module with their translations to the export file
+	 *
+	 * @apiPermission Module access: helper of export() that only writes translations of the given strings. No user data is read.
+	 */
 	function writeStrings($package, $module, $strings) {
 
 		foreach ($strings as $string) {
@@ -209,6 +215,11 @@ class Language extends Controller {
 	}
 
 
+	/**
+	 * Machine translate a string with LibreTranslate when export() is called with "translate"
+	 *
+	 * @apiPermission Module access: called directly it returns the given string, because only export() enables translation on its own controller instance.
+	 */
 	function translateAPI($string) {
 
 		if(!$this->translate) {

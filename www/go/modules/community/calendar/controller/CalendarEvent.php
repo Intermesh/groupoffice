@@ -104,6 +104,7 @@ class CalendarEvent extends EntityController {
 	 * @apiParam string number Number of the message part with the ICS data
 	 * @apiParam string encoding Encoding of the message part
 	 * @apiResponse {success: bool, data: CalendarEvent} The event. It is not saved.
+	 * @apiPermission Checked in ActiveRecord::findByPk(): read permission on the folder of the file, or on the e-mail account. The event is parsed but not saved.
 	 * @param array $params
 	 * @return array
 	 */
@@ -160,6 +161,7 @@ class CalendarEvent extends EntityController {
 	 *
 	 * @apiNoParams
 	 * @apiResponse int
+	 * @apiPermission Module access: the "inbox" filter only counts events in calendars owned by the user.
 	 */
 	public function countMine(): int
 	{

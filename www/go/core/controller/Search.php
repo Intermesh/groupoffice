@@ -33,6 +33,7 @@ class Search extends EntityController {
 	 * @apiParam {text?: string} filter Text to search in the e-mail address and name
 	 * @apiParam int position Offset of the first result. Defaults to 0.
 	 * @apiResponse {list: object[]} The results with entityId, entity ("Contact" or "User"), email, type, name, photoBlobId and extra (department)
+	 * @apiPermission Users are filtered on the ACL of their user group (Acl::applyToQuery()) and contacts on the ACL of their address book (Contact::applyAclToQuery()).
 	 */
 	public function email(array $params)
 	{

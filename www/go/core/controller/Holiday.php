@@ -8,6 +8,11 @@ use go\core\model\Holiday as HolidayModel;
 
 class Holiday extends Controller
 {
+	/**
+	 * Get the public holidays of a holiday set in a period
+	 *
+	 * @apiPermission Module access: returns public holidays generated from the holiday files shipped with GroupOffice. No user data is read.
+	 */
 	public function fetch(array $params): array
 	{
 		// params need '

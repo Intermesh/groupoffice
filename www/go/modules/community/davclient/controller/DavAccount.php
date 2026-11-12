@@ -43,6 +43,7 @@ class DavAccount extends EntityController {
 	 * including the home set.
 	 * @apiResponse {accountId: string, collection: ?object, success: bool, error: ?string} "collection" is null when
 	 * the whole account is synchronized or the collection was not found
+	 * @apiPermission Read permission on the account.
 	 * @param array $params
 	 * @return array
 	 * @throws NotFound

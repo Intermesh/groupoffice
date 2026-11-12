@@ -15,6 +15,7 @@ class Serverclient extends \go\core\Controller
 	 *
 	 * password is synchronized in user save event
 	 *
+	 * @apiPermission Write permission on the user. Users have write permission on themselves.
 	 * @param array $params
 	 * @return void
 	 * @see Module::onUserSave

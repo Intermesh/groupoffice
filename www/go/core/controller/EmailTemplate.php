@@ -37,6 +37,7 @@ class EmailTemplate extends EntityController {
 	 * @apiParam string module Required. Name of the module the template is for
 	 * @apiParam string package Required. Package of the module the template is for
 	 * @apiParam string subject Subject to set on the template
+	 * @apiPermission Access to the module given by "package" and "module". The template's create permission is checked with canCreate(), which uses the permission on that module.
 	 * @param array $params
 	 * @return false|model\EmailTemplate
 	 * @throws InvalidArguments

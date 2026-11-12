@@ -76,6 +76,7 @@ class Bookmark extends EntityController {
 	 * @apiParam string url Required. URL of the web page
 	 * @apiResponse {url: string, title: string, description: string, logo: string} The URL after a redirect, the title
 	 * and the description of the page, and the blob ID of the icon. Values that can't be fetched are empty.
+	 * @apiPermission Module access: only fetches a public web page and its icon. Client::$globalRangeOnly refuses addresses that are not global, also after redirects.
 	 * @param array $params
 	 * @return array
 	 */

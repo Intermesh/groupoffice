@@ -16,6 +16,11 @@ use function GO;
 
 class Migrate extends Controller {
 
+	/**
+	 * Does nothing
+	 *
+	 * @apiPermission Module access: the method is empty.
+	 */
 	public function run() {
 		
 	}

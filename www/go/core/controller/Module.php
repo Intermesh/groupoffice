@@ -95,6 +95,7 @@ class Module extends EntityController {
 	 *
 	 * @apiNoParams
 	 * @apiResponse {success: bool}
+	 * @apiPermission Only administrators.
 	 */
 	public function installLicensed(): array
 	{
@@ -113,6 +114,7 @@ class Module extends EntityController {
 	 * @apiParam string package Required. Package of the module, like "community"
 	 * @apiParam string name Required. Name of the module
 	 * @apiResponse {list: Module[]} The Module/get response for the installed module
+	 * @apiPermission Only administrators.
 	 */
 	public function install($params) {
 
@@ -151,6 +153,7 @@ class Module extends EntityController {
 	 * @apiParam string package Required. Package of the module, like "community". "legacy" for legacy modules.
 	 * @apiParam string name Required. Name of the module
 	 * @apiResponse {success: bool}
+	 * @apiPermission Only administrators.
 	 */
 	public function uninstall($params) {
 		if(!go()->getAuthState()->isAdmin()) {

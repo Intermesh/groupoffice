@@ -19,6 +19,7 @@ class SwitchUser extends Controller
 	/**
 	 * Returns the user ID the method runs as. It also reads the legacy user so it's copied into the legacy session.
 	 *
+	 * @apiPermission Module access: test module. No authentication, authenticate() switches to the administrator for this method. Returns only user IDs.
 	 * @return array
 	 */
 	public function whoAmI(): array
@@ -29,6 +30,7 @@ class SwitchUser extends Controller
 	/**
 	 * Fails after authentication, like WOPI methods that aren't implemented.
 	 *
+	 * @apiPermission Module access: test module. It always throws an exception.
 	 * @throws \Exception
 	 */
 	public function fail(): void

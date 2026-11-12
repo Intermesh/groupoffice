@@ -98,6 +98,11 @@ class Wopi extends Controller
     return $file;
   }
 
+  /**
+   * Output the contents of the file (WOPI GetFile)
+   *
+   * @apiPermission A WOPI access token for this file (authenticate() and findFile()) and read permission on the file.
+   */
   public function getFile($fileId)
   {
     $file = $this->findFile($fileId);
@@ -191,6 +196,11 @@ class Wopi extends Controller
     }
   }
 
+  /**
+   * Replace the contents of the file (WOPI PutFile)
+   *
+   * @apiPermission A WOPI access token for this file, and write permission on the file and on the WOPI service.
+   */
   public function putFile($fileId)
   {
     $file = $this->findFile($fileId);
@@ -215,6 +225,11 @@ class Wopi extends Controller
 		return $this->checkFileInfo($fileId);
   }
 
+  /**
+   * Get the properties of the file (WOPI CheckFileInfo)
+   *
+   * @apiPermission A WOPI access token for this file and read permission on the file.
+   */
   public function checkFileInfo($fileId)
   {
 
@@ -270,6 +285,11 @@ class Wopi extends Controller
   }
 
   // TODO lock in GO and webdav too!
+  /**
+   * Lock the file (WOPI Lock)
+   *
+   * @apiPermission A WOPI access token for this file (authenticate() and findFile()) and read permission on the file (File::findByPk()).
+   */
   public function lock($fileId)
   {
 		$file = $this->findFile($fileId);
@@ -310,6 +330,11 @@ class Wopi extends Controller
 		Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
   }
 
+  /**
+   * Get the lock of the file (WOPI GetLock)
+   *
+   * @apiPermission A WOPI access token for this file (authenticate() and findFile()) and read permission on the file (File::findByPk()).
+   */
   public function getLock($fileId)
   { 
     $file = $this->findFile($fileId);
@@ -327,6 +352,11 @@ class Wopi extends Controller
     }     
   }
 
+  /**
+   * Refresh the lock of the file (WOPI RefreshLock)
+   *
+   * @apiPermission A WOPI access token for this file (authenticate() and findFile()) and read permission on the file (File::findByPk()).
+   */
   public function refreshLock($fileId)
   {
 		go()->debug("WOPI: refreshLock($fileId)");
@@ -348,6 +378,11 @@ class Wopi extends Controller
 
   }
 
+  /**
+   * Unlock the file (WOPI Unlock)
+   *
+   * @apiPermission A WOPI access token for this file (authenticate() and findFile()) and read permission on the file (File::findByPk()).
+   */
   public function unlock($fileId)
   { 
     $file = $this->findFile($fileId);
@@ -374,6 +409,11 @@ class Wopi extends Controller
 
   }
 
+  /**
+   * Save the contents as a new file in the folder of the file (WOPI PutRelativeFile)
+   *
+   * @apiPermission A WOPI access token for the base file, and write permission on it and on the WOPI service. Overwriting an existing file also requires write permission on that file.
+   */
   public function putRelative($fileId)
   {
 
@@ -464,6 +504,11 @@ class Wopi extends Controller
     return $response;
   }
 
+  /**
+   * Rename the file (WOPI RenameFile)
+   *
+   * @apiPermission A WOPI access token for this file, and write permission on the file and on the WOPI service.
+   */
   public function renameFile($fileId)
   { 
     $file = $this->findFile($fileId);
@@ -481,6 +526,11 @@ class Wopi extends Controller
     }    
   }
 
+  /**
+   * Delete the file (WOPI DeleteFile)
+   *
+   * @apiPermission A WOPI access token for this file, write and delete permission on the file, and write permission on the WOPI service.
+   */
   public function delete($fileId)
   {
     $file = $this->findFile($fileId);
@@ -499,6 +549,11 @@ class Wopi extends Controller
     }
    }
 
+  /**
+   * Store user information (WOPI PutUserInfo). Not implemented.
+   *
+   * @apiPermission Module access: not implemented, it always returns HTTP status 501. Wopi::authenticate() requires a WOPI access token.
+   */
   public function putUserInfo($fileId)
   { 
     throw new Exception(501);

@@ -11,6 +11,7 @@ class Notify extends Controller {
 	/**
 	 * Notifies the system administrator via email
 	 *
+	 * @apiPermission Any user may send a message to the system e-mail address. Only administrators may set the "to" recipients.
 	 * @param $params
 	 * @return true[]
 	 * @throws \PHPMailer\PHPMailer\Exception

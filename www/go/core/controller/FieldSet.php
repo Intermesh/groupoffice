@@ -102,6 +102,7 @@ class FieldSet extends EntityController {
 	 * @apiParam string entity Required. Name of the entity the field sets belong to. Also used as the file name.
 	 * @apiParam string[] fieldSetIds Required. IDs of the field sets to export
 	 * @apiResponse {success: bool, blobId: string} The blob ID of the JSON file. Requires the "mayChangeCustomFields" permission.
+	 * @apiPermission The "mayChangeCustomFields" permission.
 	 * @param $params
 	 * @return array
 	 * @throws \ReflectionException
@@ -181,6 +182,7 @@ class FieldSet extends EntityController {
 	 * @apiParam string blobId Required. ID of the uploaded JSON file
 	 * @apiParam string entity Required. Name of the entity to import the field sets for
 	 * @apiResponse {success: bool, feedback: string} Feedback lists the imported, merged and skipped fields. Requires the "mayChangeCustomFields" permission.
+	 * @apiPermission The "mayChangeCustomFields" permission.
 	 * @param $params
 	 * @return array
 	 */

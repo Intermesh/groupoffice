@@ -14,6 +14,11 @@ use go\core\jmap\Response;
 use go\core\model;
 
 class System extends Controller {
+	/**
+	 * Create demo data
+	 *
+	 * @apiPermission Only administrators.
+	 */
 	public function demo() {
 
 		if(!go()->getAuthState()->isAdmin()) {
@@ -35,6 +40,7 @@ class System extends Controller {
 	 *
 	 * It aborts the regular JMAP output and outputs the file instead!
 	 *
+	 * @apiPermission Only administrators.
 	 * @param $params
 	 * @return void
 	 * @throws Forbidden
@@ -50,6 +56,11 @@ class System extends Controller {
 		exit();
 	}
 
+	/**
+	 * Write an error of the client to the server error log
+	 *
+	 * @apiPermission Module access: only writes the given message to the server error log. Nothing is returned or changed.
+	 */
 	public function logClientError($params) {
 		if(!isset($params['message'])) {
 			throw new InvalidArguments("Required parameter 'message' is missing");

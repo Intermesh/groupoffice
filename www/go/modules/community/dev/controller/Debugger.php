@@ -18,6 +18,11 @@ class Debugger extends Controller {
 		return true;
 	}
 
+	/**
+	 * Get the debug entries of the current request
+	 *
+	 * @apiPermission Module access: no authentication at all, authenticate() is overridden. Returns only the debug entries collected during the caller's own request, which only exist when debugging is enabled.
+	 */
 	public function get() {
 		Response::get()->addResponse(App::get()->getDebugger()->getEntries());
 	}

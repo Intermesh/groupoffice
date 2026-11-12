@@ -20,6 +20,11 @@ class Settings extends Controller {
 		}
 	}
 
+	/**
+	 * Send a test message to the system e-mail address with the given settings. The settings are not saved.
+	 *
+	 * @apiPermission Checked in Settings::authenticate(): only administrators.
+	 */
 	public function sendTestMessage($params) {
 		
 		$settings = go()->getSettings()->setValues($params);

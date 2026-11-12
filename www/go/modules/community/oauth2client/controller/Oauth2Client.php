@@ -388,6 +388,7 @@ final class Oauth2Client extends EntityController
 	 *
 	 * sadshs-Ssd3-sd&
 	 *
+	 * @apiPermission Module access: starts the OpenID Connect login of the caller's own session. The redirect contains the public client ID but no secret.
 	 * @noapi Browser redirect to the OAuth2 provider via gauth.php
 	 * @return void
 	 * @throws \go\core\exception\NotFound

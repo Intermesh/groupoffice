@@ -118,6 +118,7 @@ final class Domain extends EntityController
 	 * @apiNoParams
 	 * @apiResponse {ip: string, resolved: string|bool, status: string}[] Per IP address the resolved host name (false
 	 * when it could not be resolved) and "SUCCESS" or "FAILED"
+	 * @apiPermission Module access: takes no input and only reports the reverse DNS records of the configured mail host.
 	 * @param array $params
 	 * @return ArrayObject
 	 * @throws \go\core\http\Exception

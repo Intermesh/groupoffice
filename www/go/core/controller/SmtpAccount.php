@@ -89,6 +89,7 @@ class SmtpAccount extends EntityController
 	 * @apiParam string fromEmail E-mail address of the sender and recipient. Required when no id is given.
 	 * @apiParam int maxMessagesPerMinute Maximum number of messages per minute
 	 * @apiResponse {success: bool} An error is returned when sending fails.
+	 * @apiPermission Only administrators.
 	 * @param array $params
 	 * @throws Exception
 	 */
