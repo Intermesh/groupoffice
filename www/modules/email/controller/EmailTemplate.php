@@ -28,7 +28,7 @@ class EmailTemplate extends EntityController {
 	 */
 	public function parse($params) {
 		
-		$template = \GO\Email\Model\EmailTemplate::findById($params['id']);
+		$template = \GO\Email\Model\EmailTemplate::findById($params['id']); // nosemgrep: go-entity-from-params-without-acl -- unreachable: the model class doesn't exist and the JMAP router only routes go\ namespaces
 		
 		$parser = $this->getParser($params['entities'] ?? []);
 		
