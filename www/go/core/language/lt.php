@@ -866,7 +866,6 @@ return array (
   'is greater than or equal' => 'yra didesnis arba lygus',
   'is less than' => 'yra mažiau nei',
   'is less than or equal' => 'yra mažesnis arba lygus',
-  'Emtpy' => 'Emtpy',
   'Not set' => 'Nenustatytas',
   'is before, today plus' => 'yra anksčiau, šiandien plius',
   'is after, today plus' => 'yra po, šiandien plius',

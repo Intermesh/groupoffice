@@ -603,7 +603,6 @@ return array (
   'contains' => 'агуулсан',
   'starts with' => 'Эхэлсэн',
   'ends with' => 'Төгссөн',
-  'Emtpy' => 'Хоосон',
   'is before, today plus' => 'is before, today plus',
   'is after, today plus' => 'is after, today plus',
   'is before' => 'is before',

@@ -374,7 +374,6 @@ return array (
   'contains' => '含む',
   'starts with' => '始まり：',
   'ends with' => '終わり：',
-  'Emtpy' => '空っぽ',
   'is before; today plus' => 'は前、今日プラス',
   'is after; today plus' => 'は後、今日プラス',
   'is before' => 'は前です',

@@ -1491,7 +1491,6 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
   'Is empty' => 'è vuoto',
   'months' => 'mesi',
   'years' => 'anni',
-  'Emtpy' => 'Vuoto',
   'Filters' => 'Filtri',
   'Your session is no longer valid. Press OK to authenticate.' => 'La sessione è scaduta. Premere OK per autenticarsi',
   'An error occured on the server. The console shows details.' => 'Si è ferificato un errore sul server. La console mostra i dettagli',

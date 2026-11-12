@@ -641,7 +641,6 @@ return array (
   'months' => 'meseci',
   'years' => 'leta',
   'Not set' => 'Ni nastavljen',
-  'Emtpy' => 'Prazno',
   'Are you sure you want to delete this item?' => 'Ali ste prepričani, da želite izbrisati ta izdelek?',
   'Add condition' => 'Dodajte pogoj',
   'Add sub group' => 'Dodaj pod skupino',
