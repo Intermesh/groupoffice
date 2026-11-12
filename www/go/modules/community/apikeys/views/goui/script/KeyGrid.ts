@@ -1,5 +1,4 @@
 import {
-	Window,
 	btn,
 	column,
 	datasourcestore,

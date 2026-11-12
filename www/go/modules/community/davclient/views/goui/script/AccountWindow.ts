@@ -47,7 +47,7 @@ export class AccountWindow extends FormWindow {
 
 					const f = containerfield({cls:'hbox', style: {alignItems: 'center', cursor:'default'}},
 						icon,
-						comp({flex: '1 0 30%', html: v.name+'<br><small>'+v.uri+'</small>'}),
+						comp({flex: '1 0 30%', html: Format.htmlEncode(v.name)+'<br><small>'+Format.htmlEncode(v.uri)+'</small>'}),
 						comp({width:160, html: v.lastSync ? Format.dateTime(v.lastSync) : t('Never')}),
 						btn({icon:'more_vert', menu: menu({},
 							btn({icon:'sync',text:t('Sync now'), handler: _ =>{

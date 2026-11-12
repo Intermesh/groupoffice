@@ -11,6 +11,9 @@ class HttpClient extends \go\core\http\Client
 	{
 		$this->baseUri = $uri;
 		$this->headers = $headers;
+		// The host of an account is entered by the user, so it may not reach internal addresses of the server or the
+		// local network, unless the administrator allows it with "davclientAllowInternal" in config.php
+		$this->globalRangeOnly = !go()->getConfig()['davclientAllowInternal'];
 	}
 
 	protected function getHeadersForCurl(): array

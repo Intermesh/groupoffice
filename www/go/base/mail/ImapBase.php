@@ -329,7 +329,7 @@ abstract class ImapBase {
 	 * @param string $command
 	 * @throws \Exception
 	 */
-	private function assertSingleLineCommand(string $command): void
+	protected function assertSingleLineCommand(string $command): void
 	{
 		if (substr($command, -2) !== "\r\n" || strpbrk(substr($command, 0, -2), "\r\n\0") !== false) {
 			throw new \Exception("INVALID IMAP INPUT DETECTED: command contains line breaks");

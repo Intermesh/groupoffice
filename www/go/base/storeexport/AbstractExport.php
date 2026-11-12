@@ -5,6 +5,17 @@ namespace GO\Base\Storeexport;
 use GO;
 
 abstract class AbstractExport {
+
+	/**
+	 * Check if a class name given by the client is an export class that can be created
+	 *
+	 * @param string $className
+	 * @return bool
+	 */
+	public static function isExportClass(string $className): bool
+	{
+		return class_exists($className) && is_subclass_of($className, self::class) && !(new \ReflectionClass($className))->isAbstract();
+	}
 	
 	/**
 	 *

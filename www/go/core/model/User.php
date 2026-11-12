@@ -519,6 +519,28 @@ public function historyLog(): bool|array
 		return empty(array_diff($added, $allowed));
 	}
 
+	/**
+	 * Check if the logged-in user may change this user, like its e-mail address or display name.
+	 *
+	 * Administrators may change all users, users may change themselves and users with the "mayChangeUsers" right may
+	 * change users that are not administrators. Saves without a logged-in user, like the installer, are not restricted.
+	 *
+	 * @return bool
+	 */
+	public function currentUserMayChange(): bool
+	{
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin()) {
+			return true;
+		}
+
+		if($this->id == $state->getUserId()) {
+			return true;
+		}
+
+		return go()->getModel()->getUserRights()->mayChangeUsers && !$this->isAdmin() && $this->hasPermissionLevel(Acl::LEVEL_READ);
+	}
+
 	/** @noinspection PhpCastIsUnnecessaryInspection */
 	protected function init() {
 		parent::init();
@@ -666,7 +688,51 @@ public function historyLog(): bool|array
 		return false;
 	}
 
+	/**
+	 * Check if the user changes their own e-mail or recovery e-mail address without the current password.
+	 *
+	 * The password reset mail is sent to these addresses, so someone who took over a logged-in session could take over
+	 * the account by changing them. Administrators and user managers who change another user don't need it.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function changesRecoveryAddressWithoutPassword(): bool
+	{
+		if($this->isNew() || $this->passwordVerified) {
+			return false;
+		}
+
+		$changed = false;
+		foreach(['email', 'recoveryEmail'] as $propName) {
+			if(!$this->isModified($propName) || empty($this->$propName)) {
+				continue;
+			}
+			// Setting the recovery e-mail to the unchanged e-mail address is harmless
+			if($propName == 'recoveryEmail' && !$this->isModified('email') && $this->recoveryEmail == $this->email) {
+				continue;
+			}
+			$changed = true;
+		}
+
+		if(!$changed || App::get()->getInstaller()->isInProgress()) {
+			return false;
+		}
+
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin() || $state->getUserId() != $this->id) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected function internalValidate() {
+
+		// Must be checked before the recovery e-mail is set to the e-mail address below
+		if($this->changesRecoveryAddressWithoutPassword()) {
+			$this->setValidationError('currentPassword', $this->passwordVerified === null ? ErrorCode::REQUIRED : ErrorCode::INVALID_INPUT);
+		}
 
 		if(!isset($this->homeDir) && in_array("homeDir", $this->selectedProperties)) {
 			$this->homeDir = "users/" . $this->username;
@@ -702,6 +768,10 @@ public function historyLog(): bool|array
 			if(!$this->currentUserMayAssignGroups()) {
 				$this->setValidationError('groups', ErrorCode::FORBIDDEN, go()->t("Only administrators may add users to groups other than the default groups"));
 			}
+		}
+
+		if($this->profileForbidden) {
+			$this->setValidationError('profile', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
 		}
 
 		if(!$this->validatePasswordChange()) {
@@ -932,6 +1002,17 @@ public function historyLog(): bool|array
 		}
 
 		return $this->authenticators;
+	}
+
+	/**
+	 * Check a password recovery hash from the client against the one of this user
+	 *
+	 * @param mixed $hash The hash from the request. Anything other than a string never matches.
+	 * @return bool
+	 */
+	public function checkRecoveryHash(mixed $hash): bool
+	{
+		return is_string($hash) && !empty($this->recoveryHash) && hash_equals($this->recoveryHash, $hash);
 	}
 
   /**
@@ -1439,6 +1520,11 @@ public function historyLog(): bool|array
 	}
 
 	/**
+	 * Set when the client tried to use a contact as profile that it may not use
+	 */
+	private bool $profileForbidden = false;
+
+	/**
 	 * @throws Exception
 	 */
 	public function setProfile($values) {
@@ -1446,10 +1532,17 @@ public function historyLog(): bool|array
 			throw new Exception("Can't set profile without address book module.");
 		}
 		if(isset($values['id'])) {
+			// Only the user's own profile or a contact that isn't the profile of another user and that the logged-in user
+			// may change can become the profile. Otherwise it would be taken from its user and that user's e-mail address
+			// could be changed through it.
 			$contact = \go\modules\community\addressbook\model\Contact::findById($values['id']);
-			if(!empty($contact)){
-				$this->contact = $contact;
+			$isOwnProfile = !empty($contact) && !$this->isNew() && $contact->goUserId == $this->id;
+			if(empty($contact) ||
+				(!$isOwnProfile && (isset($contact->goUserId) || !$contact->hasPermissionLevel(Acl::LEVEL_WRITE)))) {
+				$this->profileForbidden = true;
+				return;
 			}
+			$this->contact = $contact;
 		} else {
 			$this->contact = $this->getProfile();
 			$this->contact->setValues($values);

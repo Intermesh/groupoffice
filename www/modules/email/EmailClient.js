@@ -518,7 +518,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 				var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
-				if(record && !record.data.seen && data.notification) {
+				// sending the notification requires "Use account"
+				if(record && !record.data.seen && data.notification && this.permissionLevel >= GO.permissionLevels.create) {
 					if(GO.email.alwaysRespondToNotifications || confirm(t("The sender of this messages likes a read notification by you at: %s. Do you want to send a read notification now?", "email").replace('%s', data.notification))) {
 						GO.request({
 							url: "email/message/notification",
@@ -1408,6 +1409,12 @@ GO.email.extraTreeContextMenuItems = [];
 			queryString = href.substr(indexOf+1);
 		} else {
 			email = href.substr(7);
+		}
+
+		try {
+			email = decodeURIComponent(email);
+		} catch (err) {
+			// not URL encoded
 		}
 
 		e.preventDefault();

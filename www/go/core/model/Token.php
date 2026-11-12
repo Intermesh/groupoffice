@@ -200,7 +200,7 @@ class Token extends Entity {
 				$client->status = 'allowed';
 			}
 			$client->lastSeen = $this->lastActiveAt;
-			if($client->save()) {
+			if($client->save()) { // nosemgrep: go-setter-persists -- private helper, not an API property
 				$this->clientId = $client->id;
 			} else {
 				throw new Exception('Failed to save the client identity'.var_export($client->getValidationErrors(), true));
@@ -331,7 +331,7 @@ class Token extends Entity {
 				$user->language = $_COOKIE['GO_LANGUAGE'];
 			}
 
-			if (!$user->save()) {
+			if (!$user->save()) { // nosemgrep: go-setter-persists -- Token has no JMAP set method; called by the server only
 				return false;
 			}
 		}
@@ -343,6 +343,87 @@ class Token extends Entity {
 		
 		// Create accessToken and set expire time
 		return true;						
+	}
+
+	/**
+	 * Seconds that a token which another server created for a direct login can be handed over. {@see findHandoff()}
+	 */
+	const HANDOFF_LIFETIME = 300;
+
+	/**
+	 * Find a token that another server created to log in directly by posting its access token to index.php
+	 *
+	 * Used by the multi_instance module, which creates a token in the database of the instance that expires an hour
+	 * after it was created. Only such tokens are accepted, and only for {@see HANDOFF_LIFETIME} seconds. The token of a
+	 * normal login expires a day after it was last used, so another website can't log a user in to its own account by
+	 * posting the access token of its own login. Use {@see rotate()} after accepting it, so it can only be used once.
+	 *
+	 * @param string $accessToken
+	 * @return Token|null
+	 * @throws Exception
+	 */
+	public static function findHandoff(string $accessToken): ?Token
+	{
+		// Read before loading the token, because loading an authenticated token extends its expiry time
+		$times = go()->getDbConnection()
+			->select('createdAt, expiresAt')
+			->from('core_auth_token')
+			->where('accessToken', '=', $accessToken)
+			->single();
+
+		if (!$times || empty($times['expiresAt'])) {
+			return null;
+		}
+
+		$utc = new DateTimeZone("UTC");
+		$createdAt = (new DateTime($times['createdAt'], $utc))->getTimestamp();
+		$expiresAt = (new DateTime($times['expiresAt'], $utc))->getTimestamp();
+		// A minute of slack for the clocks of the servers
+		if ($createdAt < time() - self::HANDOFF_LIFETIME || $expiresAt - $createdAt > 3660) {
+			return null;
+		}
+
+		$token = static::find()->where(['accessToken' => $accessToken])->single();
+		if (!$token || !$token->isAuthenticated()) {
+			return null;
+		}
+		return $token;
+	}
+
+	/**
+	 * Replace the access token and CSRF token, so the old ones can't be used anymore
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function rotate(): bool
+	{
+		if (isset($this->accessToken)) {
+			go()->getCache()->delete('token-' . $this->accessToken);
+		}
+		$this->accessToken = null;
+		$this->CSRFToken = null;
+
+		return $this->refresh();
+	}
+
+	/**
+	 * Find the token of a login that isn't finished yet by its login token
+	 *
+	 * The login token is only valid for {@see LOGIN_LIFETIME} and only until the login is finished. Otherwise it could
+	 * be used to get the access token and CSRF token again.
+	 *
+	 * @param string $loginToken
+	 * @return Token|null
+	 * @throws Exception
+	 */
+	public static function findPendingLogin(string $loginToken): ?Token
+	{
+		$token = static::find()->where(['loginToken' => $loginToken])->single();
+		if (!$token || $token->isExpired() || isset($token->accessToken)) {
+			return null;
+		}
+		return $token;
 	}
 
 	/**
@@ -375,6 +456,12 @@ class Token extends Entity {
 		if(!isset($_SESSION['GO_SESSION'])) {
 			$_SESSION['GO_SESSION'] = [];
 		}			
+
+		// A new session ID when the user of the session is set or changes, so an ID that was known before the login
+		// can't be used for the logged in session.
+		if(($_SESSION['GO_SESSION']['user_id'] ?? null) != $this->userId && session_status() == PHP_SESSION_ACTIVE && !headers_sent()) {
+			session_regenerate_id(true);
+		}
 
 		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;
@@ -414,7 +501,7 @@ class Token extends Entity {
 	public function setPassedAuthenticator(array $authenticators): bool
 	{
 		$this->passedAuthenticators = trim(implode('|',$authenticators),'|');
-		return $this->save();
+		return $this->save(); // nosemgrep: go-setter-persists -- Token has no JMAP set method; called by the server only
 	}
 	
 	/**

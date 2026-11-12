@@ -19,16 +19,6 @@ use go\core\jmap\Response;
 use go\core\jmap\State;
 use go\core\http\Request;
 
-const INSECURE_MIME_TYPES = [
-	'text/html',
-	'image/svg+xml',
-	'application/xhtml+xml',
-	'text/xml',
-	'application/xml',
-	'text/xsl',
-	'application/xslt+xml'
-];
-
 App::get();
 if(Request::get()->getMethod() == 'OPTIONS') {
 	Response::get()->output();
@@ -61,15 +51,10 @@ try {
 		$inline = !empty($_GET['inline']);
 
 		// prevent html to render on same domain having access to all global JS stuff
-		// compare the bare media type: "TEXT/HTML; charset=utf-8" is html too
-		$mediaType = strtolower(trim(explode(';', (string) $blob->type)[0]));
-		if(in_array($mediaType, INSECURE_MIME_TYPES)) {
+		if(!Response::isSafeInlineContentType($blob->type)) {
 			$inline = false;
 			$blob->type = 'text/plain';
 		}
-
-		// don't let the browser guess a more dangerous type than we send
-		Response::get()->setHeader('X-Content-Type-Options', 'nosniff');
 
 		try {
 			$ua_info = \donatj\UserAgent\parse_user_agent();
@@ -107,10 +92,11 @@ try {
 		}
 		//left over are params
 
-		$ctrlCls = "go\\modules\\" . $package . "\\" . $module . "\\Module";
-		if (!class_exists($ctrlCls)) {
+		// only installed and enabled modules
+		$ctrlCls = \go\core\Module::findClassForRequest((string) $package, (string) $module);
+		if (!isset($ctrlCls)) {
 			Response::get()->setStatus(404);
-			Response::get()->output("Class '$ctrlCls' not found");
+			Response::get()->output("Not found");
 			exit();
 		}
 

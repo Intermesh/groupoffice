@@ -533,6 +533,10 @@ class Blob extends orm\Entity {
 	 * @throws Exception
 	 */
 	public function output($inline = false) {
+		// prevent html to render on same domain having access to all global JS stuff
+		if($inline && !Response::isSafeInlineContentType($this->type)) {
+			$inline = false;
+		}
 		$disp = $inline ? 'inline' : 'attachment';
 
 		$this->getFile()->output(true, true, [

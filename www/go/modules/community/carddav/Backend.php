@@ -9,6 +9,7 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\http\Request;
 use go\core\model\Acl;
+use go\core\model\Module;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\util\DateTime;
@@ -167,6 +168,11 @@ class Backend extends AbstractBackend
 	 */
 	public function getAddressBooksForUser($principalUri): array
 	{
+
+		// The address books are also served by the general /dav/ entry point, which only checks access to the DAV module
+		if(!Module::isAvailableFor('community', 'carddav', go()->getAuthState()->getUserId())) {
+			return [];
+		}
 
 		if ($this->isMacOs()) {
 			return [

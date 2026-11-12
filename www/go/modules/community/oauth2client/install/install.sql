@@ -57,6 +57,9 @@ create table oauth2client_openid_user
     userId   int          not null
         primary key,
     clientId int unsigned not null,
+    sub      varchar(255) collate ascii_bin null,
+    constraint oauth2client_openid_user_clientId_sub_uindex
+        unique (clientId, sub),
     constraint oauth2client_openid_user_core_user_id_fk
         foreign key (userId) references core_user (id)
             on delete cascade,

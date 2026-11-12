@@ -214,9 +214,7 @@ class ImapMailbox extends \GO\Base\Model {
 	public function rename(string $name) :bool
 	{
 
-	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
-		  throw new \GO\Base\Exception\AccessDenied();
-	  }
+	  $this->getAccount()->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 
 		$name = trim($name);
 		$this->_validateName($name);
@@ -240,9 +238,7 @@ class ImapMailbox extends \GO\Base\Model {
 	 */
 	public function delete() :bool
 	{
-	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
-		  throw new \GO\Base\Exception\AccessDenied();
-	  }
+	  $this->getAccount()->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 		
 		if($this->getHasChildren()) {
 			foreach ($this->getChildren() as $mailBox) {
@@ -263,9 +259,7 @@ class ImapMailbox extends \GO\Base\Model {
 	 */
 	public function truncate() :bool
 	{
-		if ($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
-			throw new \GO\Base\Exception\AccessDenied();
-		}
+		$this->getAccount()->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 		$imap = $this->getAccount()->openImapConnection($this->name);
 		$success = true;
 
@@ -310,9 +304,7 @@ class ImapMailbox extends \GO\Base\Model {
 	 */
 	public function createChild(string $name, ?bool $subscribe=true) :bool
 	{
-		if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
-		  throw new \GO\Base\Exception\AccessDenied();
-		}
+		$this->getAccount()->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 		$name = trim($name);
 		$newMailbox = empty($this->name) ? $name : $this->name.$this->delimiter.$name;
 
@@ -330,9 +322,7 @@ class ImapMailbox extends \GO\Base\Model {
 	 */
 	public function move(ImapMailbox $targetMailbox) :bool
 	{
-		if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
-			throw new \GO\Base\Exception\AccessDenied();
-		}
+		$this->getAccount()->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 		$newMailbox = "";
 
 		if(!empty($targetMailbox->name)) {
@@ -357,6 +347,7 @@ class ImapMailbox extends \GO\Base\Model {
 	 */
 	public function setSubscribed(bool $value)
 	{
+		$this->getAccount()->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
 		if($value) {
 			$this->_attributes['subscribed'] = $this->getAccount()->openImapConnection()->subscribe($this->name);
 		} else {

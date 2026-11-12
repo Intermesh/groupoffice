@@ -569,9 +569,15 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 
 			$requests = json_decode($params['requests'], true);
 			if(is_array($requests)){
+				// A sub request must never run with the permissions that a previous sub request left behind
+				$ignoreAcl = GO::$ignoreAclPermissions;
 				foreach($requests as $responseIndex=>$requestParams){
 					ob_start();				
-					GO::router()->runController($requestParams);
+					try {
+						GO::router()->runController($requestParams);
+					} finally {
+						GO::setIgnoreAclPermissions($ignoreAcl);
+					}
 					echo "\n".'"'.$responseIndex.'" : '.ob_get_clean().",\n";
 				}
 			}

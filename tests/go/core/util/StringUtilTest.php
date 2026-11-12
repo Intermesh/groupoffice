@@ -54,6 +54,20 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 	}
 
 	/**
+	 * detectXSS() with style skips the style block that Group-Office adds to the start of a mail. A copy of its opening
+	 * tag in the content must not hide what follows it.
+	 */
+	public function testDetectXSSWithStyleOnlySkipsExtractedStyle()
+	{
+		$extracted = '<style id="groupoffice-extracted-style">p{color:red}</style>';
+
+		$this->assertFalse(StringUtil::detectXSS($extracted . '<p>Hello</p>', true));
+		$this->assertTrue(StringUtil::detectXSS($extracted . '<p>Hello</p><script>alert(1)</script><style id="groupoffice-extracted-style"></style>', true));
+		$this->assertTrue(StringUtil::detectXSS('<p>Hello</p><style id="groupoffice-extracted-style"></style><script>alert(1)</script><style>p{}</style>', true));
+		$this->assertTrue(StringUtil::detectXSS($extracted . '<style>p{}</style>', true));
+	}
+
+	/**
 	 * HTML that runs scripts. Some of these fooled the regular expressions of sanitizeHtml(), filterXSS() and detectXSS().
 	 */
 	public static function activeHtmlProvider(): array
@@ -118,6 +132,79 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 		$this->assertNoActiveContent(\GO\Base\Util\StringHelper::filterXSS($html));
 	}
 
+	/**
+	 * Mail style that tries to end the <style> element that sanitizeHtml() adds with the extracted style, so that the
+	 * HTML after it is not sanitized.
+	 */
+	public static function styleBreakoutProvider(): array
+	{
+		$img = '<img alt=">" src=x onerror=alert(1)>';
+		return [
+			'end tag with attribute' => ['<style>a{color:red}</style x>' . $img . '</style><p>hi</p>'],
+			'end tag with slash' => ['<style>a{color:red}</style/>' . $img . '</style><p>hi</p>'],
+			'uppercase end tag with space' => ['<STYLE>a{color:red}</STYLE >' . $img . '</STYLE><p>hi</p>'],
+			'end tag with newline' => ["<style>a{color:red}</style\n>" . $img . '</style><p>hi</p>'],
+			'end tag with newline and attribute' => ["<style>a{color:red}</style\nx=\"1\">" . $img . '</style><p>hi</p>'],
+			'end tag with tab' => ["<style>a{color:red}</style\tx>" . $img . '</style><p>hi</p>'],
+			'end tag in css string' => ['<style>a{content:"</style>' . $img . '"}</style><p>hi</p>'],
+			'end tag with attribute in css string' => ['<style>a{content:"</style x>' . $img . '"}</style><p>hi</p>'],
+			'end tag in comment' => ['<style><!-- a{color:red} </style x>' . $img . ' --></style><p>hi</p>'],
+			'end tag in body style' => ['<html><body style="color:red</style>' . $img . '"><p>hi</p></body></html>'],
+			'unclosed style' => ['<p>hi</p><style>a{color:red}</style x>' . $img],
+		];
+	}
+
+	/**
+	 * Check that no <style> element in the HTML can be ended early by the browser. The browser ends it at the first
+	 * "</style" followed by white space, "/" or ">", so a style element must not contain any "<".
+	 */
+	private function assertStyleCannotBreakOut(string $html): void
+	{
+		preg_match_all('#<style[^>]*>(.*?)</style[\s/>]#is', $html, $matches);
+		foreach ($matches[1] as $css) {
+			$this->assertStringNotContainsString('<', $css, "Style can be ended early: " . $html);
+		}
+		// Everything after the style elements must be sanitized too
+		$this->assertNoActiveContent(preg_replace('#<style[^>]*>.*?</style[^>]*>#is', '', $html));
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('styleBreakoutProvider')]
+	public function testSanitizeHtmlStyleCannotBreakOut(string $html)
+	{
+		$result = StringUtil::sanitizeHtml($html);
+		$this->assertStyleCannotBreakOut($result);
+		$this->assertNoActiveContent($result);
+
+		$result = StringUtil::sanitizeHtml($html, false);
+		$this->assertStyleCannotBreakOut($result);
+		$this->assertNoActiveContent($result);
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('styleBreakoutProvider')]
+	public function testFilterXSSStyleCannotBreakOut(string $html)
+	{
+		$result = \GO\Base\Util\StringHelper::filterXSS($html);
+		$this->assertStyleCannotBreakOut($result);
+		$this->assertNoActiveContent($result);
+	}
+
+	public function testSanitizeHtmlKeepsMailStyle()
+	{
+		$html = '<style><!-- p.MsoNormal, li { margin: 0; font-family: "Calibri", sans-serif; } a > b { color: #00f; }'
+			. ' @media (max-width: 600px) { td { display: block; } } p::before { content: "<3"; } --></style>'
+			. '<p class="MsoNormal">Hello</p>';
+
+		$result = StringUtil::sanitizeHtml($html);
+
+		$this->assertStringContainsString('font-family: "Calibri", sans-serif;', $result);
+		$this->assertStringContainsString('a > b{ color: #00f;}', $result);
+		$this->assertStringContainsString('@media (max-width: 600px)', $result);
+		// "<" in a CSS string is escaped and still means "<"
+		$this->assertStringContainsString('content: "\\3c 3";', $result);
+		$this->assertStringContainsString('<p class="MsoNormal">Hello</p>', $result);
+		$this->assertStyleCannotBreakOut($result);
+	}
+
 	public function testSanitizeHtmlKeepsNormalMail()
 	{
 		$html = '<style>p { color: red; }</style><table width="100%"><tr><td style="color:#333">Hëllo wörld € ✓</td></tr></table>'
@@ -137,5 +224,41 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 		// The extracted mail style is kept
 		$this->assertStringContainsString('groupoffice-extracted-style', $result);
 		$this->assertNoActiveContent($result);
+	}
+
+	public static function csvValues(): array
+	{
+		return [
+			'formula' => ['=1+1', "'=1+1"],
+			'at' => ['@SUM(A1)', "'@SUM(A1)"],
+			'plus formula' => ['+HYPERLINK("https://example.com")', "'+HYPERLINK(\"https://example.com\")"],
+			'minus formula' => ['-2+3+cmd|\' /C calc\'!A0', "'-2+3+cmd|' /C calc'!A0"],
+			'minus sum' => ['-1+1', "'-1+1"],
+			'tab' => ["\t=1", "'\t=1"],
+			'carriage return' => ["\r=1", "'\r=1"],
+			'lone minus' => ['-', "'-"],
+			'negative number' => ['-12.5', '-12.5'],
+			'negative formatted number' => ['-1.234,56', '-1.234,56'],
+			'negative swiss number' => ["-1'234.56", "-1'234.56"],
+			'phone number' => ['+31 (0)20 1234567', '+31 (0)20 1234567'],
+			'float' => [-12.5, -12.5],
+			'int' => [-3, -3],
+			'null' => [null, null],
+			'text' => ['Hello = world', 'Hello = world'],
+			'empty' => ['', ''],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('csvValues')]
+	public function testEscapeCsvFormula(mixed $value, mixed $expected): void
+	{
+		$this->assertSame($expected, StringUtil::escapeCsvFormula($value));
+		$this->assertSame($value, StringUtil::unescapeCsvFormula($expected), "Import must restore the value");
+	}
+
+	public function testUnescapeCsvFormulaKeepsOtherQuotes(): void
+	{
+		$this->assertSame("'quoted'", StringUtil::unescapeCsvFormula("'quoted'"));
+		$this->assertSame("'-12", StringUtil::unescapeCsvFormula("'-12"));
 	}
 }

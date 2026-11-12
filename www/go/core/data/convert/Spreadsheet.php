@@ -198,7 +198,7 @@ th {
 
 				break;
 			case 'csv':
-				fputcsv($this->fp, $array, $this->delimiter, $this->enclosure, "");
+				fputcsv($this->fp, array_map([StringUtil::class, 'escapeCsvFormula'], $array), $this->delimiter, $this->enclosure, "");
 				break;
 			default:
 
@@ -751,7 +751,8 @@ th {
 			}
 			return $cells;
 		} else{
-			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure, "");
+			$record = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure, "");
+			return $record === false ? false : array_map([StringUtil::class, 'unescapeCsvFormula'], $record);
 		}
 	}
 
@@ -807,6 +808,10 @@ th {
 			}
 		} elseif(!empty($this->updateBy) && !empty($values[$this->updateBy])) {
 			$entity = $entityClass::find()->where($this->updateBy,'=', $values[$this->updateBy])->single();
+			// Only update items the user may change. Otherwise a new item is created.
+			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
+				$entity = false;
+			}
 		}
 		if(!$entity) {
 			$entity = new $entityClass;

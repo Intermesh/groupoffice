@@ -30,7 +30,7 @@ class OtpAuthenticator extends SecondaryAuthenticator
 			return false;
 		}
 
-		$expiresAt = $otp->expiresAt;
+		$expiresAt = $otp->getExpiresAt();
 
 		if ($expiresAt && new DateTime($expiresAt) < new DateTime()) {
 			$this->setValidationError('otp_code', ErrorCode::NOT_FOUND);
@@ -39,7 +39,7 @@ class OtpAuthenticator extends SecondaryAuthenticator
 		}
 
 
-		if (!$otp->verifyCode($data['otp_code'])) {
+		if (!is_string($data['otp_code']) || !$otp->verifyLoginCode($data['otp_code'])) {
 			$this->setValidationError('otp_code', ErrorCode::INVALID_INPUT);
 			ErrorHandler::log("Token authentication failed for user ". $user->username . " from IP: '" . Request::get()->getRemoteIpAddress() . "'");
 			return false;

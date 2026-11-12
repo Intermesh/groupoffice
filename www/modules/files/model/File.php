@@ -579,9 +579,17 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * The link that can be send in an e-mail as download link.
 	 *
+	 * Anyone who may read the file may create or extend the link. Deleting the file when the link expires requires
+	 * delete permission.
+	 *
 	 * @return string
+	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	public function getEmailDownloadURL($html=true, $newExpireTime=false, $deleteWhenExpired=false) {
+
+		if(!$this->checkPermissionLevel($deleteWhenExpired ? \GO\Base\Model\Acl::DELETE_PERMISSION : \GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		if($newExpireTime && $this->expire_time < $newExpireTime){
 			if($this->expire_time <= time() || empty($this->random_code)) {
@@ -589,7 +597,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			}
 			$this->expire_time = $newExpireTime;
 			$this->delete_when_expired = $deleteWhenExpired;
-			$this->save();
+			// The link fields may be changed with read permission, which is checked above
+			$this->save(true);
 		}
 
 		if (!empty($this->expire_time) && !empty($this->random_code)) {
@@ -1010,13 +1019,31 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 */
 	public function moveToTrash(): void
 	{
-		TrashedItem::model()->saveForFile($this);
+		// Moving to the trash is deleting, so it requires delete permission
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		$trashFolder = Folder::model()->findByPath('trash');
 		if ($this->folder_id == $trashFolder->id) {
 			throw new Exception("File is already in trash");
 		}
-		$this->move($trashFolder, true);
+		$originalFolder = $this->folder;
+
+		// Only create the trash record when the file was moved
+		go()->getDbConnection()->beginTransaction();
+		try {
+			if (!$this->move($trashFolder, true)) {
+				throw new Exception("Unable to move file to trash");
+			}
+
+			TrashedItem::model()->saveForFile($this, $originalFolder);
+
+			go()->getDbConnection()->commit();
+		} catch (\Throwable $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
+		}
 	}
 
 	/**

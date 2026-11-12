@@ -72,6 +72,8 @@ class MessageController extends \GO\Base\Controller\AbstractController
 	protected function actionNotification(array $params): array
 	{
 		$account = Account::model()->findByPk($params['account_id']);
+		// The read notification is sent from this account to an address given by the client
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		
 		$alias = $this->_findAliasFromRecipients($account, new \GO\Base\Mail\EmailRecipients($params['message_to']));	
 		if(!$alias) {
@@ -233,14 +235,22 @@ class MessageController extends \GO\Base\Controller\AbstractController
 			throw new NotFound();
 		}
 
-		$this->_filterMessages($params["mailbox"], $account);
+		// Filters move mail and expunge removes deleted mail, so they need "Use account". Users who may only read the
+		// account just see the mailbox as it is.
+		$mayChangeMail = $account->checkPermissionLevel(Acl::CREATE_PERMISSION);
+
+		if($mayChangeMail) {
+			$this->_filterMessages($params["mailbox"], $account);
+		}
 
 		$imap = $account->openImapConnection($params["mailbox"]);
 
 		$response['permission_level'] = $account->getPermissionLevel();
 
 		// ADDED EXPUNGE SO THE FOLDER WILL BE UP TO DATE (When moving folders in THUNDERBIRD)
-		$imap->expunge();
+		if($mayChangeMail) {
+			$imap->expunge();
+		}
 		$response['unseen']=array();
 
 		//special folder flags
@@ -466,6 +476,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$alias = Alias::model()->findByPk($params['alias_id']);
 		$account = Account::model()->findByPk($alias->account_id);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 
 		if (empty($account->drafts)) {
 			throw new \Exception(GO::t("Message could not be saved because the 'Drafts' folder is disabled.\n\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.", "email"));
@@ -579,6 +590,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$alias = Alias::model()->findByPk($params['alias_id']);
 		$account = Account::model()->findByPk($alias->account_id);
+		// Sending as an alias of a shared account requires "Use account"
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 
 		$message = new SmimeMessage();
 
@@ -673,15 +686,20 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			//set \Answered flag on IMAP message
 			GO::debug("Reply");
 			$account2 = Account::model()->findByPk($params['reply_account_id']);
-			$imap = $account2->openImapConnection($params['reply_mailbox']);
-			$imap->set_message_flag(array($params['reply_uid']), "\Answered");
+			// the message has been sent already, so only skip the flag
+			if($account2->checkPermissionLevel(Account::ACL_DELEGATED_PERMISSION)) {
+				$imap = $account2->openImapConnection($params['reply_mailbox']);
+				$imap->set_message_flag(array($params['reply_uid']), "\Answered");
+			}
 		}
 
 		if (!empty($params['forward_uid'])) {
 			//set forwarded flag on IMAP message
 			$account2 = Account::model()->findByPk($params['forward_account_id']);
-			$imap = $account2->openImapConnection($params['forward_mailbox']);
-			$imap->set_message_flag(array($params['forward_uid']), "\$Forwarded");
+			if($account2->checkPermissionLevel(Account::ACL_DELEGATED_PERMISSION)) {
+				$imap = $account2->openImapConnection($params['forward_mailbox']);
+				$imap->set_message_flag(array($params['forward_uid']), "\$Forwarded");
+			}
 		}
 
 		/**
@@ -786,7 +804,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				//if contact_id is not set but email is check if there's contact info available
 				if (!empty($params['to']) || !empty($params['contact_id']) || !empty($params['company_id'])) {
 					if (!empty($params['contact_id'])) {
-						$contact = \go\modules\community\addressbook\model\Contact::findById($params['contact_id']);
+						// the template is filled with the data of this contact
+						$contact = \go\modules\community\addressbook\model\Contact::find()
+							->filter(['permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+							->where(['c.id' => $params['contact_id']])
+							->single();
 					} else {
 						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);		
 						
@@ -1594,10 +1616,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$inline = false;
 		}
 
-		if($file->mimeType() == 'text/html') {
-			$inline = false;
-		}
-		
+		// HTML, SVG and XML are downloaded even when $inline is true. See Response::isSafeInlineContentType().
 		$imap = $account->openImapConnection($params['mailbox']);
 		
 		\GO\Base\Util\Http::outputDownloadHeaders($file,$inline,true);
@@ -1831,6 +1850,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$account = Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		$imap  = $account->openImapConnection($params['mailbox']);
 
 		$before_timestamp = \GO\Base\Util\Date::to_unixtime($params['until_date']);
@@ -1946,6 +1966,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	protected function actionDeleteAllAttachments(array $params): array
 	{
 		$account = Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		$response = ['success' => true];
 		$message = ImapMessage::model()->findByUid($account, $params["mailbox"], $params["uid"]);
 		$nextUid = $message->getImapConnection()->get_uidnext();
@@ -1990,6 +2011,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 
 		$account = Account::model()->findByPk($params['account_id']);
+		$account->requirePermissionLevel(Acl::CREATE_PERMISSION);
 		$imap = $account->openImapConnection($params['from_mailbox_name']);
 		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : $account->spam;
 
@@ -2019,6 +2041,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$spamFolder = isset(GO::config()->spam_folder) ? GO::config()->spam_folder : 'Spam';
 		
 		$accountModel = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$accountModel->requirePermissionLevel(Acl::CREATE_PERMISSION);
 				
 		$imap = $accountModel->openImapConnection($spamFolder);
 							

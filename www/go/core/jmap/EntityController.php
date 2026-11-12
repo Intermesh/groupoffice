@@ -812,6 +812,22 @@ abstract class EntityController extends Controller {
 	}
 
 	/**
+	 * Override this to refuse an update before the client's changes are applied to the entity.
+	 *
+	 * Use it when the permission doesn't depend on the new values. Applying the changes may already modify shared
+	 * objects, for example a JSON pointer patch like "settings/defaultGroups" on a Module writes into the settings
+	 * singleton, so a refusal in canUpdate() comes too late for those.
+	 *
+	 * @param Entity $entity The entity as it is stored, without the client's changes
+	 * @param array $properties The changes sent by the client
+	 * @return bool
+	 */
+	protected function canUpdateBeforePatch(Entity $entity, array $properties): bool
+	{
+		return true;
+	}
+
+	/**
 	 * Checks if the entity only has modifications to the user properties. As they belong to the current user it's ok that
 	 * they are modified by the current user.
 	 *
@@ -857,6 +873,11 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 			
+			if(!$this->canUpdateBeforePatch($entity, $properties)) {
+				$result['notUpdated'][$id] = new SetError("forbidden", go()->t("Permission denied"));
+				continue;
+			}
+
 			//create snapshot of props client should be aware of
 			$clientProps = JSON::patch($entity->toArray(), $properties);
 			
@@ -881,7 +902,13 @@ abstract class EntityController extends Controller {
 			//if($entity::getMapping()->getQuery() != null) {
 				$entity = $this->getEntity($id);
 			//}
-			
+
+			if(!$entity) {
+				// The item was saved, but the user can't read it anymore. For example when it was moved to another container.
+				$result['updated'][$id] = null;
+				continue;
+			}
+
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
 			$entityProps = new ArrayObject($entity->toArray());			
 			$diff = $entityProps->diff($clientProps);

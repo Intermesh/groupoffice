@@ -4,12 +4,12 @@ namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\auth\Authenticate;
+use go\core\auth\ExternalUserLink;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\http\Exception;
 use go\core\jmap\EntityController;
 use go\core\model\Acl;
-use go\core\model\User;
 use go\core\webclient\Extjs3;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
@@ -25,9 +25,23 @@ use TheNetworg\OAuth2\Client\Token\AccessToken;
 final class Oauth2Client extends EntityController
 {
 
+	/**
+	 * Set by gauth.php. The OpenID login and its callback are used before the user is logged in.
+	 */
+	public static bool $isPageRequest = false;
+
 	protected function authenticate()
 	{
-		return true;
+		if (self::$isPageRequest) {
+			return;
+		}
+
+		// Users without access to the module need to read the clients to choose one for their e-mail account. Only
+		// administrators can change them.
+		if (!go()->getAuthState()->isAuthenticated()) {
+			throw new Exception(401, "Unauthorized");
+		}
+		$this->rights = $this->getClassRights();
 	}
 
 	public function entityClass(): string
@@ -72,14 +86,19 @@ final class Oauth2Client extends EntityController
 			throw new Exception(500, 'A session variable is missing. Please retry with a new session.');
 		}
 
-		if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+		if (empty($_GET['state']) || !is_string($_GET['state']) || !is_string($_SESSION['oauth2state']) || !hash_equals($_SESSION['oauth2state'], $_GET['state'])) {
 
 			// State is invalid, possible CSRF attack in progress
 			unset($_SESSION['oauth2state']);
 			unset($_SESSION['accountId']);
 			\GO::session()->closeWriting();
 			throw new Exception(500, 'Invalid state');
-		} else if(!empty($_SESSION['accountId'])) {
+		}
+
+		// The state can only be used once
+		unset($_SESSION['oauth2state']);
+
+		if(!empty($_SESSION['accountId'])) {
 			$this->callbackEmailAccount();
 		} else {
 			$this->callbackOpenId();
@@ -118,20 +137,8 @@ final class Oauth2Client extends EntityController
 	}
 
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {
-
-
-		// The user is found by the e-mail address. Don't trust an address the provider didn't verify.
-		if(isset($response['email_verified']) && !filter_var($response['email_verified'], FILTER_VALIDATE_BOOLEAN)) {
-			throw new Exception(403, "The e-mail address is not verified by the OAuth2 provider");
-		}
-
-		go()->getSettings()->allowRegistration = true;
-
-
-		$user = User::findOrCreateByUsername($response['email'], $response['email'], $response['name']);
-
-		//register as oauth user
-		go()->getDbConnection()->insertIgnore("oauth2client_openid_user", ['userId' => $user->id, 'clientId' => $client->id])->execute();
+		// Found by the subject at the provider. The e-mail address is only used to link a user the first time.
+		$user = (new ExternalUserLink('oauth2client_openid_user', $client->id))->findOrCreateUser($response);
 
 		$auth = new Authenticate();
 		$auth->setAuthenticated($user);

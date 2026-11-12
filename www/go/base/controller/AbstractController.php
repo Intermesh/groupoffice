@@ -190,16 +190,24 @@ abstract class AbstractController extends Observable {
 	 */
 	protected function checkSecurityToken()
 	{
-		// When using JMAP API requests without cookies don't check CSRF
+		// Requests that authenticate with an "Authorization: Bearer" header can't be made by other websites, so they
+		// don't need the token. When the JMAP state isn't authenticated, for example because its CSRF check failed, a
+		// session user that came from an access token still needs it.
 		$state = go()->getAuthState();
-		$usingCookies = (!($state instanceof State) || $state->isAuthenticatedUsingCookie());
+		if ($state instanceof State) {
+			$usingCookies = !$state->isAuthenticatedUsingHeader() &&
+				($state->isAuthenticatedUsingCookie() || !empty(GO::session()->values['accessToken']));
+		} else {
+			$usingCookies = true;
+		}
+		$requestToken = $_REQUEST['security_token'] ?? null;
+		$sessionToken = GO::session()->values['security_token'] ?? null;
 		if (
       $usingCookies &&
 			!GO::config()->debug &&
 			!GO::config()->disable_security_token_check &&
 			!empty($_REQUEST['r']) &&
-			(!isset($_REQUEST['security_token']) || $_REQUEST['security_token'] != GO::session()->values['security_token']) &&
-			!($state instanceof State && $state->hasValidCSRFToken())
+			(!is_string($requestToken) || !is_string($sessionToken) || !hash_equals($sessionToken, $requestToken))
 		) {
 			throw new SecurityTokenMismatch();
 		} else {

@@ -13,7 +13,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		this.node = node;
 		this.addFolderButton.setDisabled(node.attributes.noinferiors);
 		
-		this.shareBtn.setVisible(this.hasAcl(node));
+		this.shareBtn.setVisible(this.hasAcl(node) && node.attributes.permission_level >= GO.permissionLevels.manage);
 	},
 	initComponent : function(){
 		
@@ -104,7 +104,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 
 				var tpl = new Ext.Template(t("Are you sure you want to mark all messages in folder '{name}' as read?", "email"));
 
-				Ext.MessageBox.confirm(t("Confirm"), tpl.applyTemplate({name:node.attributes.name}), function(btn){
+				Ext.MessageBox.confirm(t("Confirm"), tpl.applyTemplate({name:Ext.util.Format.htmlEncode(node.attributes.name)}), function(btn){
 					if(btn=='yes')
 					{
 						GO.request({
@@ -150,7 +150,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 
 				var template = new Ext.Template(t("Are you sure you want to EMPTY '{name}'?", "email"));
 
-				Ext.MessageBox.confirm(t("Confirm"), template.applyTemplate({name:node.attributes.name}), function(btn){
+				Ext.MessageBox.confirm(t("Confirm"), template.applyTemplate({name:Ext.util.Format.htmlEncode(node.attributes.name)}), function(btn){
 					if(btn=='yes')
 					{
 						GO.request({

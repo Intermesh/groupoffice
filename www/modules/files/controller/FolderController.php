@@ -143,18 +143,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return $count;
 	}
 
-	protected function actionGetURL($path){
-		
-		if (substr($path,0,1)=='/')
-			$path = substr($path,1);
-		if (substr($path,-1,1)=='/')
-			$path = substr($path,0,-1);
-		
-		$folderModel = Folder::model()->findByPath($path,true);
-		
-		return array('success'=>true,'url'=>  \GO\Base\Util\Http::addParamsToUrl($folderModel->getExternalURL(),array('GOSID'=>session_id(), 'security_token'=>\GO::session()->values['security_token'])));
-	}
-	
 	protected function actionCache($params){
 		\GO\Files\Model\SharedRootFolder::model()->rebuildCache(\GO::user()->id);
 	}
@@ -707,9 +695,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			if (!isset($response['deleteSuccess'])){
 				$response['deleteSuccess'] = true;
 			}
-		} else {
-			$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
+
+			// Pasting into the trash is moving to the trash, which is done above with the delete permission of every
+			// item. Nothing is copied or moved into the trash folder itself.
+			unset(\GO::session()->values['files']['pasteIds']);
+			return $response;
 		}
+
+		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
 
 		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION))
 			throw new \GO\Base\Exception\AccessDenied();
@@ -1086,18 +1079,25 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (isset($params['trash_keys'])) {
 			$ids = $this->_splitFolderAndFileIds(json_decode($params['trash_keys'], true));
 
+				// moveToTrash() checks the delete permission. All items are checked before anything is moved too, so
+				// nothing is trashed when one of them may not be deleted.
+				$items = [];
 				foreach ($ids['folders'] as $folderId) {
-					$f = Folder::model()->findByPk($folderId);
-					if ($f) {
-						$f->moveToTrash();
+					$items[] = Folder::model()->findByPk($folderId);
+				}
+				foreach ($ids['files'] as $fileId) {
+					$items[] = File::model()->findByPk($fileId);
+				}
+				$items = array_filter($items);
+
+				foreach ($items as $f) {
+					if(!$f->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+						throw new AccessDenied();
 					}
 				}
 
-				foreach ($ids['files'] as $fileId) {
-					$f = File::model()->findByPk($fileId);
-					if ($f) {
-						$f->moveToTrash();
-					}
+				foreach ($items as $f) {
+					$f->moveToTrash();
 				}
 		}
 	}
@@ -1395,6 +1395,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			throw new Forbidden();
 		}
 
+		// Creating the folder saves the entity, so it requires write permission like for legacy models
+		$folderExists = !empty($entity->filesFolderId) && Folder::model()->findByPk($entity->filesFolderId, false, true);
+		if(!$folderExists && !$entity->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+
 		$folder = Folder::model()->findForEntity($entity);
 		return [
 			"success" => true,
@@ -1423,8 +1429,21 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			return $this->checkEntityFolder($params);
 		}
 
-		$obj = new $cls(false);
-		$model = $obj->findByPk($params['id'],false, true);
+		// Only models that have a files folder
+		if(!is_string($cls) || !is_a($cls, \GO\Base\Db\ActiveRecord::class, true) || !$cls::model()->hasFiles()) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		$model = $cls::model()->findByPk($params['id']);
+		if(!$model) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		// Creating the folder of the model requires write permission on the model
+		$folderExists = $model->files_folder_id > 0 && Folder::model()->findByPk($model->files_folder_id, false, true);
+		if(!$folderExists && !$model->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
 
 		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
 		$folder = Folder::model()->findByPk($folderId);
@@ -1998,9 +2017,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionImages($params){
 		if(isset($params["id"])){
 			$currentFile = \GO\Files\Model\File::model()->findByPk($params["id"]);
+			if(!$currentFile) {
+				throw new \GO\Base\Exception\NotFound();
+			}
 		}else
 		{
-			$currentFile = \GO\Files\Model\File::model()->findByPath($params["path"]);
+			// The images of the folder are listed, so the user must be allowed to read it
+			$currentFile = \GO\Files\Model\File::model()->findReadableByPath($params["path"] ?? '');
 		}
 
 		$folder = $currentFile->folder();

@@ -250,7 +250,7 @@ export class Main extends Component {
 									};
 								return [
 									comp({cls:'pad'},
-										comp({html:'<i style="color:#'+item.color+'">&bull;</i> <strong>'+r.title.htmlEncode()+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner')).htmlEncode()+'</small>' }),
+										comp({html:'<i style="color:#'+item.color.htmlEncode()+'">&bull;</i> <strong>'+r.title.htmlEncode()+'</strong><br><small>'+(owner?.name ?? owner?.email ?? t('Unknown owner')).htmlEncode()+'</small>' }),
 										h3({text: item.compactDate}),
 										comp({tagName: 'small', hidden: !item.isRecurring, text: item.isRecurring ? RecurrenceField.toText(r.recurrenceRule, item.start) : ''}),
 									comp({cls:'group'},

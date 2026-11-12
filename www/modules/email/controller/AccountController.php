@@ -378,7 +378,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 					$text .= '<div class="em-folder-status" id="status_' . $nodeId . '"></div>';
 				}
 			}
-			$text .= '<div class="ellipsis">'.$mailbox->getDisplayName().'</div>';
+			$text .= '<div class="ellipsis">'.htmlspecialchars($mailbox->getDisplayName(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'</div>';
 
 			$cls = $mailbox->noselect==1 ? 'em-tree-node-noselect' : "";
 			
@@ -571,6 +571,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 
       if(!$targetAccountModel->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
 				throw new \GO\Base\Exception\AccessDenied();
+      }
+
+      // Moving removes the message from the source account
+      if($move) {
+        $srcAccountModel->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
       }
 
       if($move && $targetAccountModel->id == $srcAccountModel->id) {

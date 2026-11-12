@@ -204,7 +204,7 @@ class Server extends Entity
 		}
 
 		try {
-			$query = $this->getAuthenticationQuery("*");
+			$query = $this->buildAuthenticationQuery("*");
 			Record::find($connection, $this->peopleDN, $query)->fetch();
 		} catch (Exception $e) {
 			$this->setValidationError('peopleDN', ErrorCode::MALFORMED, go()->t("Failed to query user for authentication") . ": " . $e->getMessage());
@@ -229,9 +229,26 @@ class Server extends Entity
 		return parent::internalDelete($query);
 	}
 
-	public function getAuthenticationQuery($username): string
+	/**
+	 * Get the LDAP filter to find the user with the given login name
+	 *
+	 * The username is escaped so it can't change the filter, for example with "*" or ")(".
+	 *
+	 * @param string $username
+	 * @return string
+	 */
+	public function getAuthenticationQuery(string $username): string
 	{
-		$query = $this->usernameAttribute . "=" . $username;
+		return $this->buildAuthenticationQuery(ldap_escape($username, "", LDAP_ESCAPE_FILTER));
+	}
+
+	/**
+	 * @param string $value Escaped filter value
+	 * @return string
+	 */
+	private function buildAuthenticationQuery(string $value): string
+	{
+		$query = $this->usernameAttribute . "=" . $value;
 		if ($this->syncUsersQuery) {
 			$query = '(&' . $this->syncUsersQuery . "(" . $query . "))";
 		}

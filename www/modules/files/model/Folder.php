@@ -419,7 +419,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		}
 
 		if(!$this->systemSave && !$this->isNew && $this->readonly){
-			if($this->isModified('name') || $this->isModified('folder_id'))
+			if($this->isModified('name') || $this->isModified('parent_id'))
 				return false;
 		}
 
@@ -624,9 +624,16 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array(), $returnLastFound = false) {
 
 
-		$oldIgnoreAcl = \GO::$ignoreAclPermissions;
-		\GO::$ignoreAclPermissions=true;
+		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
+		try {
+			return $this->internalFindByPath($relpath, $autoCreate, $autoCreateAttributes, $returnLastFound);
+		} finally {
+			// always restore it, also when creating a folder fails. Otherwise permissions are ignored for the rest of the request.
+			\GO::setIgnoreAclPermissions($oldIgnoreAcl);
+		}
+	}
 
+	private function internalFindByPath($relpath, $autoCreate, $autoCreateAttributes, $returnLastFound) {
 		$folder=false;
 		if (substr($relpath, -1) == '/') {
 			$relpath = substr($relpath, 0, -1);
@@ -653,8 +660,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$folder = $this->findSingle($findParams);
 				if (!$folder) {
 					if (!$autoCreate) {
-						// restore it, otherwise permissions are ignored for the rest of the request
-						\GO::$ignoreAclPermissions=$oldIgnoreAcl;
 						if($returnLastFound) {
 							return $lastFolder;
 						} else{
@@ -667,7 +672,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
 					if(!$folder->save(true)){
-						\GO::$ignoreAclPermissions=$oldIgnoreAcl;
 						throw new Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
 					}
 				}elseif(!empty($autoCreateAttributes))
@@ -687,9 +691,36 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$parent_id = $folder->id;
 		}
 
-		\GO::$ignoreAclPermissions=$oldIgnoreAcl;
-
 		return $folder;
+	}
+
+	/**
+	 * Find a folder by a path that comes from the client and create it if it doesn't exist.
+	 *
+	 * The current user needs the given permission level on an existing folder. A missing folder is only created when the
+	 * user may create folders in the nearest existing parent folder.
+	 *
+	 * @param string $relpath Relative path from \GO::config()->file_storage_path
+	 * @param int $level Permission level required on the folder if it exists
+	 * @return Folder
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function findOrCreateByPathWithPermission(string $relpath, int $level = \GO\Base\Model\Acl::READ_PERMISSION): Folder
+	{
+		$folder = $this->findByPath($relpath);
+		if($folder) {
+			if(!$folder->checkPermissionLevel($level)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+			return $folder;
+		}
+
+		$parent = $this->findByPath($relpath, false, [], true);
+		if(!$parent || !$parent->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $this->findByPath($relpath, true);
 	}
 	/**
 	 * Return the home folder of a user.
@@ -891,8 +922,25 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
 
 		$oldCache = \GO::$disableModelCache;
+		$oldFileDeleteInDatabaseOnly = File::$deleteInDatabaseOnly;
+		$oldFolderDeleteInDatabaseOnly = Folder::$deleteInDatabaseOnly;
 
 		GO::$disableModelCache=$recurseAll;
+
+		try {
+			$this->internalSyncFilesystem($recurseAll, $recurseOneLevel);
+		} finally {
+			// always restore these, also when the sync fails. Otherwise permissions are ignored for the rest of the request.
+			\GO::$disableModelCache=$oldCache;
+
+			\GO::setIgnoreAclPermissions($oldIgnoreAcl);
+
+			File::$deleteInDatabaseOnly=$oldFileDeleteInDatabaseOnly;
+			Folder::$deleteInDatabaseOnly=$oldFolderDeleteInDatabaseOnly;
+		}
+	}
+
+	private function internalSyncFilesystem(bool $recurseAll, bool $recurseOneLevel): void {
 
 		if ($this->fsFolder->exists()) {
 			$items = $this->fsFolder->ls();
@@ -937,9 +985,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 
 		//make sure no filesystem items are deleted. Sometimes folders are stored as files somehow.
-		$oldFileDeleteInDatabaseOnly = File::$deleteInDatabaseOnly;
-		$oldFolderDeleteInDatabaseOnly = Folder::$deleteInDatabaseOnly;
-		
 		File::$deleteInDatabaseOnly=true;
 		Folder::$deleteInDatabaseOnly=true;
 
@@ -959,13 +1004,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$this->mtime=$this->fsFolder->mtime();
 		$this->save(true);
-
-		\GO::$disableModelCache=$oldCache;
-
-		\GO::setIgnoreAclPermissions($oldIgnoreAcl);
-		
-		File::$deleteInDatabaseOnly=$oldFileDeleteInDatabaseOnly;
-		Folder::$deleteInDatabaseOnly=$oldFolderDeleteInDatabaseOnly;
 	}
 
 	/**
@@ -1593,15 +1631,33 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function moveToTrash(): void
 	{
+		if($this->readonly) {
+			throw new Exception(\GO::t("You can't delete this system folder", "files"));
+		}
+
+		// Moving to the trash is deleting, so it requires delete permission
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		$this->fsFolder->checkFileStoragePath();
 
 		$trashFolder = Folder::model()->findByPath('trash');
+		$originalParent = $this->parent;
 
-		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
+		// Only create the trash record when the folder was moved
+		go()->getDbConnection()->beginTransaction();
+		try {
+			if (!$this->move($trashFolder, true, true) || !$this->fsFolder->move($trashFolder->fsFolder, false, false)) {
+				throw new Exception("Unable to move current folder to trash");
+			}
 
-		$this->move($trashFolder, true, true);
-		if (!$this->fsFolder->move($trashFolder->fsFolder, false, false)) {
-			throw new Exception("Unable to move current folder to trash");
+			\GO\Files\Model\TrashedItem::model()->saveForFolder($this, $originalParent);
+
+			go()->getDbConnection()->commit();
+		} catch (\Throwable $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
 		}
 	}
 }

@@ -44,6 +44,10 @@ class SieveModule extends Module{
 	 *
 	 */
 	public static function loadOutOfOfficeMessage($self,&$response,&$model,&$params){
+		// Like the filters, the out of office reply is only for account managers
+		if(!$model->checkPermissionLevel(\GO\Base\Model\Acl::MANAGE_PERMISSION)) {
+			return;
+		}
 		try {
 			$sieve = new \GO\Sieve\Util\Sieve();
 			$connected = $sieve->connect($model->username,$model->decryptPassword(),$model->host,$model->sieve_port,null,!empty($model->sieve_usetls),array(),true);

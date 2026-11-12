@@ -46,6 +46,7 @@ class State extends AbstractState {
 
 		if(!$tokenStr) {
 			$tokenStr = static::getFromHeader();
+			self::$headerAccessTokenUsed = !empty($tokenStr);
 		} else{
 			self::$cookieAccessTokenUsed = true;
 		}
@@ -55,6 +56,8 @@ class State extends AbstractState {
 
 	private static $cookieAccessTokenUsed = false;
 
+	private static $headerAccessTokenUsed = false;
+
 	/**
 	 * Check if cookies were used to authenticate
 	 * @return bool
@@ -62,6 +65,18 @@ class State extends AbstractState {
 	 */
 	public function isAuthenticatedUsingCookie() : bool {
 		return $this->isAuthenticated() && self::$cookieAccessTokenUsed;
+	}
+
+	/**
+	 * Check if the "Authorization: Bearer" header was used to authenticate
+	 *
+	 * Such requests can't be made by other websites, so they don't need a CSRF token.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isAuthenticatedUsingHeader() : bool {
+		return $this->isAuthenticated() && self::$headerAccessTokenUsed && !self::$cookieAccessTokenUsed;
 	}
 
 
@@ -98,7 +113,7 @@ class State extends AbstractState {
 			return false;
 		}
 
-		if($csrfToken != $token->CSRFToken) {
+		if(!is_string($csrfToken) || !is_string($token->CSRFToken) || !hash_equals($token->CSRFToken, $csrfToken)) {
 			go()->debug("CSRFToken mismatch");
 			return false;
 		}
@@ -214,12 +229,19 @@ class State extends AbstractState {
 	public function changeUser(int $userId): bool
 	{
 		$token = $this->getToken();
+		$oldAccessToken = $token->accessToken;
 		$token->userId = $userId;
 		$token->clientId = null;
+		// New tokens for the other user, so the tokens of the administrator's session can't be used for it
+		$token->accessToken = null;
+		$token->CSRFToken = null;
 		$success = $token->setAuthenticated(false);
 
-		go()->getCache()->delete('token-' . $token->accessToken);
-		go()->getCache()->delete('session-' . $token->accessToken);
+		go()->getCache()->delete('token-' . $oldAccessToken);
+		go()->getCache()->delete('session-' . $oldAccessToken);
+		if($success && self::$cookieAccessTokenUsed) {
+			$token->setCookie();
+		}
 		
 		//for old framework
 		$_SESSION['GO_SESSION'] = array_filter($_SESSION['GO_SESSION'], function($key) {

@@ -177,8 +177,11 @@ try {
 			break;
 
 		case 'recover':
-			$user = $auth->recovery($data['hash']);
+			// Wrong hashes are counted per IP address, so they can't be guessed
+			$auth->checkThrottle('recover', 'recover');
+			$user = $auth->recovery($data['hash'] ?? null);
 			if (empty($user)) {
+				$auth->registerFailure('recover', 'recover');
 				output(['success' => false]);
 			}
 			if (!empty($data['newPassword'])) {
@@ -198,6 +201,13 @@ try {
 		default:
 			/** @var ?Token $token */
 			$token = null;
+
+			// JSON can contain numbers and arrays. An array would be used as a list of tokens to look up.
+			foreach (['accessToken', 'rememberMeToken', 'loginToken'] as $key) {
+				if (isset($data[$key]) && !is_string($data[$key])) {
+					output(["error" => "Invalid token given"], 400, "Invalid token given");
+				}
+			}
 
 			if (isset($data['accessToken'])) {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
@@ -222,11 +232,8 @@ try {
 					output(["error" => "Invalid remember me token"], 400, "Invalid remember me token");
 				}
 			} elseif (isset($data['loginToken'])) {
-				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
-				// The login token is only valid for Token::LOGIN_LIFETIME. Expired ones stay in the database until garbage collection.
-				if ($token && $token->isExpired()) {
-					$token = null;
-				}
+				// Not after the login was finished or when it expired. Expired ones stay in the database until garbage collection.
+				$token = Token::findPendingLogin($data['loginToken']);
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {

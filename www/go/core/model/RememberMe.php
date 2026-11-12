@@ -204,13 +204,17 @@ class RememberMe extends Entity {
 	{
 
 		if(!isset($value)) {
-			if(!isset($_COOKIE['goRememberMe'])) {
+			if(!isset($_COOKIE['goRememberMe']) || !is_string($_COOKIE['goRememberMe'])) {
 				return false;
 			}
 			$value = $_COOKIE['goRememberMe'];
 		}
 
-		$cookieParts = explode(':', $value);
+		$cookieParts = self::parseCookie($value);
+		if(!$cookieParts) {
+			// Not a value that this class created. Don't treat it as theft.
+			return false;
+		}
 
 		$rememberMe = static::find()
 			->where('series','=', $cookieParts[0])
@@ -229,7 +233,8 @@ class RememberMe extends Entity {
 
 		if(!password_verify($cookieParts[1], $rememberMe->token)) {
 
-			ErrorHandler::log("Remember me token theft. Cookie: " . $value . " didn't match token: " . $rememberMe->token);
+			// Don't log the cookie or the hash. They would allow guessing or using the token.
+			ErrorHandler::log("Remember me token theft detected for user ID " . $rememberMe->userId . " from IP: " . Request::get()->getRemoteIpAddress());
 
 			// clear logins
 			Token::delete(
@@ -258,6 +263,50 @@ class RememberMe extends Entity {
 
 
 		return $rememberMe;
+	}
+
+	/**
+	 * Split the cookie value in series and token
+	 *
+	 * @param string $value
+	 * @return string[]|null [series, token] or null when it's not a value created by {@see getToken()}
+	 */
+	private static function parseCookie(string $value): ?array
+	{
+		$parts = explode(':', $value);
+		if(count($parts) != 2 || !preg_match('/^[0-9a-f]{1,100}$/', $parts[0]) || !preg_match('/^[0-9a-f]{1,100}$/', $parts[1])) {
+			return null;
+		}
+		return $parts;
+	}
+
+	/**
+	 * Delete the remember me login of the cookie, eg. when the user logs out
+	 *
+	 * @param string|null $value The cookie value. Defaults to the cookie of the request.
+	 * @return bool True if a remember me login was deleted
+	 * @throws Exception
+	 */
+	public static function deleteByCookie(?string $value = null): bool
+	{
+		if(!isset($value)) {
+			$value = $_COOKIE['goRememberMe'] ?? null;
+			if(!is_string($value)) {
+				return false;
+			}
+		}
+
+		$cookieParts = self::parseCookie($value);
+		if(!$cookieParts) {
+			return false;
+		}
+
+		// The whole series is deleted, also when the token doesn't match because it was already used by a thief
+		$ids = static::find()->selectSingleValue('id')->where('series', '=', $cookieParts[0])->all();
+		if(empty($ids)) {
+			return false;
+		}
+		return static::delete(['id' => $ids]);
 	}
 
 	/**

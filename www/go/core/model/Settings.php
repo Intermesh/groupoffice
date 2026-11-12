@@ -688,22 +688,43 @@ class Settings extends core\Settings
 	}
 
 	/**
-	 * Set default groups for new groups
+	 * Default groups set by setDefaultGroups() that are written on save()
 	 *
-	 * @param array $groups eg [['groupId' => 1]]
-	 * @throws Exception
+	 * Private so the parent save() doesn't store it in core_setting.
+	 *
+	 * @var string[]|null
+	 */
+	private $pendingDefaultGroups;
+
+	/**
+	 * Set default groups for new users. They are stored when save() is called.
+	 *
+	 * @param int[] $groups eg [1, 3]
 	 */
 	public function setDefaultGroups(array $groups) {
-		
-		go()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
-		
-		foreach($groups as $groupId) {
+		$this->pendingDefaultGroups = array_map("strval", $groups);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function saveDefaultGroups(): void
+	{
+		if(!isset($this->pendingDefaultGroups)) {
+			return;
+		}
+
+		// DELETE and not TRUNCATE because TRUNCATE commits the current transaction
+		go()->getDbConnection()->exec("DELETE FROM core_group_default_group");
+
+		foreach($this->pendingDefaultGroups as $groupId) {
 			if(!go()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {
 				throw new Exception("Could not save group id ".$groupId);
 			}
 		}
+
+		$this->pendingDefaultGroups = null;
 		unset($this->defaultGroups);
-		$this->getDefaultGroups();
 	}
 
 
@@ -770,6 +791,8 @@ class Settings extends core\Settings
 		if($this->isModified('maintenanceMode') && $this->maintenanceMode) {
 			Token::logoutEveryoneButAdmins();
 		}
+
+		$this->saveDefaultGroups();
 		
 		return parent::save();
 	}

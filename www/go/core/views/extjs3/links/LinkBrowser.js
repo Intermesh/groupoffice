@@ -119,7 +119,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 				}			
 			],
 			store: this.store,
-			view: new Ext.grid.GroupingView({
+			view: new go.grid.GroupingView({
 				hideGroupedColumn: true,
 				forceFit: true,
 				// custom grouping text template to display the number of items per group
@@ -140,7 +140,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 							record.data.to.description = "-";
 						}
 
-						var str = record.data.to.name + " <br /><label>" + record.data.to.description + "</label>";
+						var str = Ext.util.Format.htmlEncode(record.data.to.name) + " <br /><label>" + Ext.util.Format.htmlEncode(record.data.to.description) + "</label>";
 
 						var linkIconCls = go.Entities.getLinkIcon(record.data.toEntity, record.data.to.filter);
 						

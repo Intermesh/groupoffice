@@ -257,12 +257,14 @@ class Imap extends ImapBodyStruct
 
 			case 'xoauth2': // TODO: ???
 				$login = 'A'.$this->command_number().' AUTHENTICATE XOAUTH2 ' . $pass . "\r\n";
+				$this->assertSingleLineCommand($login);
 				$this->commands[trim(str_replace($pass, 'xxxx', $login))] = \GO\Base\Util\Date::getmicrotime();
 				fputs($this->handle, $login);
 				break;
 
 			default:
 				$login = 'A' . $this->command_number() . ' LOGIN "' . $this->_escape($username) . '" "' . $this->_escape($pass) . "\"\r\n";
+				$this->assertSingleLineCommand($login);
 				$this->commands[trim(str_replace($pass, 'xxxx', $login))] = \GO\Base\Util\Date::getmicrotime();
 				fputs($this->handle, $login);
 				break;
@@ -403,6 +405,11 @@ class Imap extends ImapBodyStruct
 		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
 
+		$identifier = $this->quoteAclIdentifier($identifier);
+		if(!preg_match('/^[a-z0-9]*$/', $permissions)) {
+			throw new \Exception("INVALID IMAP INPUT DETECTED: permissions: " . $permissions);
+		}
+
 		$command = "SETACL \"$mailbox\" $identifier $permissions\r\n";
 		//throw new \Exception($command);
 		$this->send_command($command);
@@ -412,9 +419,24 @@ class Imap extends ImapBodyStruct
 		return $this->check_response($response);
 	}
 
+	/**
+	 * Quote the user or group name of an ACL command as an IMAP string
+	 *
+	 * @param string $identifier
+	 * @return string
+	 * @throws Exception when it contains a line break
+	 */
+	private function quoteAclIdentifier(string $identifier): string
+	{
+		$this->clean($identifier, 'mailbox');
+		return '"' . $this->_escape($identifier) . '"';
+	}
+
 	public function delete_acl($mailbox, $identifier){
 		$mailbox = $this->addslashes($this->utf7_encode($mailbox));
 		$this->clean($mailbox, 'mailbox');
+
+		$identifier = $this->quoteAclIdentifier($identifier);
 
 		$command = "DELETEACL \"$mailbox\" $identifier\r\n";
 		$this->send_command($command);

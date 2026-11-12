@@ -18,8 +18,9 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
+use go\core\oauth\server\IdTokenResponse;
+use go\core\oauth\server\PendingAuthorization;
 use OpenIDConnectServer\ClaimExtractor;
-use OpenIDConnectServer\IdTokenResponse;
 use Psr\Http\Message\ResponseInterface;
 
 App::get();
@@ -97,12 +98,11 @@ class OAuthController {
 		try {
 			// Validate the HTTP request and return an AuthorizationRequest object.
 			// The auth request object can be serialized into a user's session
-			$authRequest = $_SESSION['authRequest'] ?? $server->validateAuthorizationRequest($request);
-
-			unset($_SESSION['authRequest']);
+			// Only resumed when the user returns from the login page
+			$authRequest = PendingAuthorization::take($request->getQueryParams()) ?? $server->validateAuthorizationRequest($request);
 
 			if(!go()->getAuthState()->isAuthenticated()) {
-				$_SESSION['authRequest'] = $authRequest;
+				PendingAuthorization::save($authRequest);
 
 				$loginUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthAuthorize=1';
 				return $response->withStatus(302)->withHeader('Location', $loginUrl);
@@ -256,7 +256,7 @@ class OAuthController {
 		$signing_alg_values_supported = array('HS256', 'RS256');
 
 		$discovery = array(
-			'issuer' => 'https://' . $_SERVER['HTTP_HOST'],
+			'issuer' => IdTokenResponse::issuer(),
 			'authorization_endpoint' => $endpointBase . '/authorize',
 			'token_endpoint' => $endpointBase . '/token',
 			'userinfo_endpoint' => $endpointBase . '/userinfo',

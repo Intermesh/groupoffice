@@ -8,6 +8,8 @@ use go\core\model\Group;
 use go\core\model\Module;
 use go\core\model\Permission;
 use go\core\model\User as UserModel;
+use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\addressbook\model\Contact;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -289,5 +291,185 @@ class UserTest extends TestCase
 		$result = $this->update(UserModel::ID_SUPER_ADMIN, $this->admin->id, ['recoveryEmail' => 'admin@example.com', 'disk_quota' => 1000]);
 
 		$this->assertUpdated($result, $this->admin->id);
+	}
+
+	public function testUserManagerMayNotUseProfileOfAnotherUser()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$adminProfile = Contact::findForUser($this->admin->id);
+		$this->assertNotEmpty($adminProfile);
+
+		$result = $this->create($this->manager->id, ['profile' => ['id' => $adminProfile->id]]);
+
+		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$this->assertEquals($adminProfile->id, Contact::findForUser($this->admin->id)->id);
+	}
+
+	public function testUserManagerMayNotUseContactWithoutWritePermissionAsProfile()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$addressBook = new AddressBook();
+		$addressBook->name = uniqid('profiletest');
+		$this->assertTrue($addressBook->save());
+		$contact = new Contact();
+		$contact->addressBookId = $addressBook->id;
+		$contact->firstName = 'Unlinked';
+		$this->assertTrue($contact->save());
+
+		try {
+			$result = $this->create($this->manager->id, ['profile' => ['id' => $contact->id]]);
+
+			$this->assertArrayNotHasKey('new', $result['created'] ?? []);
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			$this->assertNull(Contact::findById($contact->id)->goUserId);
+		} finally {
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			AddressBook::delete(['id' => $addressBook->id]);
+		}
+	}
+
+	public function testUserManagerMayUseUnlinkedContactAsProfile()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$addressBook = new AddressBook();
+		$addressBook->name = uniqid('profiletest');
+		$addressBook->setAcl([$this->managerGroup->id => Acl::LEVEL_WRITE]);
+		$this->assertTrue($addressBook->save());
+		$contact = new Contact();
+		$contact->addressBookId = $addressBook->id;
+		$contact->firstName = 'Unlinked';
+		$this->assertTrue($contact->save());
+
+		try {
+			$result = $this->create($this->manager->id, ['profile' => ['id' => $contact->id]]);
+
+			$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			$this->assertEquals($result['created']['new']['id'], Contact::findById($contact->id)->goUserId);
+		} finally {
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			AddressBook::delete(['id' => $addressBook->id]);
+		}
+	}
+
+	public static function recoveryAddresses(): array
+	{
+		return [
+			'email' => ['email'],
+			'recoveryEmail' => ['recoveryEmail'],
+		];
+	}
+
+	#[DataProvider('recoveryAddresses')]
+	public function testUserMayNotChangeOwnRecoveryAddressWithoutPassword(string $property)
+	{
+		$before = UserModel::findById($this->user->id)->$property;
+
+		$result = $this->update($this->user->id, $this->user->id, [$property => uniqid('attacker') . '@example.com']);
+
+		$this->assertArrayHasKey($this->user->id, $result['notUpdated'] ?? []);
+		$this->assertArrayHasKey('currentPassword', $result['notUpdated'][$this->user->id]->validationErrors ?? []);
+		$this->assertSame($before, UserModel::findById($this->user->id)->$property);
+	}
+
+	#[DataProvider('recoveryAddresses')]
+	public function testUserMayNotChangeOwnRecoveryAddressWithWrongPassword(string $property)
+	{
+		$before = UserModel::findById($this->user->id)->$property;
+
+		$result = $this->update($this->user->id, $this->user->id, [$property => uniqid('attacker') . '@example.com', 'currentPassword' => 'wrong']);
+
+		$this->assertArrayHasKey($this->user->id, $result['notUpdated'] ?? []);
+		$this->assertSame($before, UserModel::findById($this->user->id)->$property);
+	}
+
+	#[DataProvider('recoveryAddresses')]
+	public function testUserMayChangeOwnRecoveryAddressWithPassword(string $property)
+	{
+		$email = uniqid('new') . '@example.com';
+
+		$result = $this->update($this->user->id, $this->user->id, [$property => $email, 'currentPassword' => 'Pa55word!!xyz']);
+
+		$this->assertUpdated($result, $this->user->id);
+		$this->assertSame($email, UserModel::findById($this->user->id)->$property);
+	}
+
+	public function testUserManagerNeedsPasswordForOwnEmail()
+	{
+		$result = $this->update($this->manager->id, $this->manager->id, ['email' => uniqid('attacker') . '@example.com']);
+
+		$this->assertArrayHasKey($this->manager->id, $result['notUpdated'] ?? []);
+	}
+
+	public function testUserManagerMayChangeEmailOfAUserWithoutPassword()
+	{
+		$email = uniqid('new') . '@example.com';
+
+		$result = $this->update($this->manager->id, $this->user->id, ['email' => $email]);
+
+		$this->assertUpdated($result, $this->user->id);
+		$this->assertSame($email, UserModel::findById($this->user->id)->email);
+	}
+
+	public function testUserMayNotChangeOwnEmailThroughProfileWithoutPassword()
+	{
+		// Put the profile in an address book the user may write
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$addressBook = new AddressBook();
+		$addressBook->name = uniqid('profiletest');
+		$addressBook->setAcl([$this->user->getPersonalGroup()->id => Acl::LEVEL_WRITE]);
+		$this->assertTrue($addressBook->save());
+		$profile = Contact::findForUser($this->user->id);
+		$this->assertNotEmpty($profile);
+		$profile->addressBookId = $addressBook->id;
+		$this->assertTrue($profile->save(), $profile->getValidationErrorsAsString());
+		$before = UserModel::findById($this->user->id)->email;
+
+		try {
+			$this->actAs($this->user->id);
+			$result = (new \go\modules\community\addressbook\controller\Contact())->set(['update' => [$profile->id => [
+				'emailAddresses' => [['email' => uniqid('attacker') . '@example.com']]
+			]]])->getArray();
+
+			$this->assertArrayHasKey($profile->id, $result['notUpdated'] ?? []);
+			$this->assertSame($before, UserModel::findById($this->user->id)->email);
+		} finally {
+			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			AddressBook::delete(['id' => $addressBook->id]);
+		}
+	}
+
+	public function testUserManagerCreatesUserWithProfile()
+	{
+		$result = $this->create($this->manager->id, []);
+
+		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$this->assertNotEmpty(Contact::findForUser($result['created']['new']['id']));
+	}
+
+	public function testOwnEmailChangeWithPasswordUpdatesProfile()
+	{
+		$email = uniqid('new') . '@example.com';
+
+		$result = $this->update($this->user->id, $this->user->id, ['email' => $email, 'currentPassword' => 'Pa55word!!xyz']);
+
+		$this->assertUpdated($result, $this->user->id);
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$profile = Contact::findForUser($this->user->id);
+		$this->assertContains($email, array_map(fn($e) => $e->email, $profile->emailAddresses));
+	}
+
+	public function testUserMayChangeOwnProfileWithItsId()
+	{
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$profile = Contact::findForUser($this->user->id);
+
+		$result = $this->update($this->user->id, $this->user->id, ['profile' => ['id' => $profile->id]]);
+
+		$this->assertUpdated($result, $this->user->id);
+		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$this->assertEquals($profile->id, Contact::findForUser($this->user->id)->id);
 	}
 }

@@ -221,7 +221,7 @@ class Group extends AclOwnerEntity {
 			$acl->addGroup($this->id, Acl::LEVEL_READ);
 		}
 		
-		return $acl->save();
+		return $acl->save(); // nosemgrep: go-setter-persists -- private helper, not an API property
 	}
 	
 	protected static function internalDelete(Query $query): bool

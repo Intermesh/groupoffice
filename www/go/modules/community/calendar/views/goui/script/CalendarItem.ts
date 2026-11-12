@@ -559,7 +559,7 @@ export class CalendarItem {
 	}
 
 	get quickText(): string {
-		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+(this.cal.name || t("Unknown"))+'</sup>') : '';
+		const cal = this.cal ? ('<sup style="color:#'+Format.htmlEncode(this.cal.color)+';">'+(this.cal.name || t("Unknown")).htmlEncode()+'</sup>') : '';
 		const lines = [
 			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal + "<br />",
 			this.humanReadableDate().join("<br>"), "<br />"
@@ -588,7 +588,7 @@ export class CalendarItem {
 		if(this.categories.length) {
 			const cats = [];
 			for (const cat of this.categories) {
-				cats.push(`<span><i class="cat" style="color: #${cat.color};"></i> ${cat.name.htmlEncode()}</span>`);
+				cats.push(`<span><i class="cat" style="color: #${Format.htmlEncode(cat.color)};"></i> ${cat.name.htmlEncode()}</span>`);
 			}
 
 			lines.push('<div class="categories">' + cats.join("") + '</div>');
@@ -613,13 +613,13 @@ export class CalendarItem {
 	}
 
 	private formatLocation(l:string) {
-		l = l.htmlEncode();
-		const withUris = Format.convertUrisToAnchors(l);
+		const encoded = l.htmlEncode(),
+			withUris = Format.convertUrisToAnchors(l);
 
-		if(withUris != l) {
+		if(withUris != encoded) {
 			return withUris;
 		} else {
-			return `<a rel="noopener noreferrer" href="maps:q=${l}">${l}</a>`;
+			return `<a rel="noopener noreferrer" href="maps:q=${encoded}">${encoded}</a>`;
 		}
 	}
 

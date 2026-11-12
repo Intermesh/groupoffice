@@ -53,10 +53,11 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	 * A folder has just been moved to Trash. Create a fs_trash record if it does not exist yet
 	 *
 	 * @param \GO\Files\Model\Folder $folder
+	 * @param \GO\Files\Model\Folder $originalParent The folder it was in before it was moved to trash
 	 * @return void
 	 * @throws GO\Base\Exception\AccessDenied
 	 */
-	public function saveForFolder(Folder $folder): void
+	public function saveForFolder(Folder $folder, Folder $originalParent): void
 	{
 		$entityType = EntityType::findByName('Folder');
 
@@ -65,21 +66,26 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 			return;
 		}
 		$t = new self;
-		$t->aclId = $folder->acl_id;
-		$t->parentId = $folder->parent_id;
+		// the folder's own ACL or the one it inherited in its original place
+		$t->aclId = $folder->acl_id > 0 ? $folder->acl_id : $originalParent->findAclId();
+		$t->parentId = $originalParent->id;
 		$t->entityTypeId = $entityType->getId();
 		$t->entityId = $folder->id;
 		$t->deletedAt = gmdate('Y-m-d H:i:s');
 		$t->deletedBy = GO()->getUserId();
 		$t->name = $folder->name;
-		$t->fullPath = $folder->parent->path;
+		$t->fullPath = $originalParent->path;
 		$t->save(true);
 
 		$this->touchAcl($folder);
 	}
 
 	private function touchAcl(Folder $folder) {
-		$acl = $this->acl;
+		// The ACL of the folder itself. $this is the static model in saveForFolder(), which has no ACL.
+		if(empty($folder->acl_id)) {
+			return;
+		}
+		$acl = \GO\Base\Model\Acl::model()->findByPk($folder->acl_id, false, true);
 		if(!empty($acl)) {
 			//quick hack so that shares folder is rebuilt in SHaredRootFolder::rebuildCache()
 			$acl->mtime = time();
@@ -91,12 +97,13 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	 * A file has just been trashed. Create as fs_trash record if it does not exist
 	 *
 	 * @param \GO\Files\Model\File $file
+	 * @param \GO\Files\Model\Folder $folder The folder it was in before it was moved to trash
 	 * @return void
 	 * @throws GO\Base\Exception\AccessDenied
 	 * @throws \go\core\db\DbException
 	 */
 
-	public function saveForFile(File $file): void
+	public function saveForFile(File $file, Folder $folder): void
 	{
 		$entityType = EntityType::findByName('File');
 
@@ -104,9 +111,8 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 		if ($t) {
 			return;
 		}
-		$folder = Folder::model()->findByPk($file->folder_id);
 		$t = new self;
-		$t->aclId = $folder->acl_id;
+		$t->aclId = $folder->findAclId();
 		$t->parentId = $folder->id;
 		$t->entityTypeId = $entityType->getId();
 		$t->entityId = $file->id;
@@ -129,7 +135,10 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	 */
 	public function restore(): void
 	{
-		$parentFolder = Folder::model()->findByPath($this->fullPath, true);
+		$this->checkMayRemoveFromTrash();
+
+		// The user must be allowed to write in the folder it's restored to
+		$parentFolder = Folder::model()->findOrCreateByPathWithPermission($this->fullPath, \GO\Base\Model\Acl::WRITE_PERMISSION);
 
 		$entityType = EntityType::findById($this->entityTypeId);
 		if ($entityType->getName() == 'File') {
@@ -144,14 +153,25 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 			}
 
 			$this->touchAcl($f);
+			// a system folder may be put back in its original place
+			$f->systemSave = true;
 		}
-		if ($f->move($parentFolder, true, true)) {
-			$this->delete();
+		if (!$f->move($parentFolder, true, true)) {
+			throw new Exception(500, \GO::t("Could not restore the item", "files"));
 		}
+		$this->delete(true);
 	}
 
+	/**
+	 * Delete the file or folder permanently
+	 *
+	 * @return void
+	 * @throws GO\Base\Exception\AccessDenied
+	 */
 	public function deletePermanently(): void
 	{
+		$this->checkMayRemoveFromTrash();
+
 		$entityType = EntityType::findById($this->entityTypeId);
 		if ($entityType->getName() == 'File') {
 			$f = \GO\Files\Model\File::model()->findByPk($this->entityId, false, true, true);
@@ -162,6 +182,41 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 			$f->delete(true);
 		}
 		$this->delete(true);
+	}
+
+	/**
+	 * Restoring and deleting a trashed item requires the same permission as deleting it in its original place
+	 *
+	 * @return void
+	 * @throws GO\Base\Exception\AccessDenied
+	 */
+	private function checkMayRemoveFromTrash(): void
+	{
+		if (GO::$ignoreAclPermissions || GO::user()?->isAdmin()) {
+			return;
+		}
+
+		$isFile = EntityType::findById($this->entityTypeId)->getName() == 'File';
+
+		if ($this->aclId > 0) {
+			// The ACL the item had in its original place
+			$level = \GO\Base\Model\Acl::getUserPermissionLevel($this->aclId);
+			$required = \GO\Base\Model\Acl::DELETE_PERMISSION;
+			// Like File::checkPermissionLevel(): write permission is enough to delete a file of a contact, project etc.
+			$acl = \GO\Base\Model\Acl::model()->findByPk($this->aclId, false, true);
+			if ($isFile && $acl && $acl->usedIn != 'fs_folders.acl_id') {
+				$required = \GO\Base\Model\Acl::WRITE_PERMISSION;
+			}
+			$allowed = $level >= $required;
+		} else {
+			// Older records without ACL: use the original parent folder. When it's gone only an administrator may do this.
+			$folder = Folder::model()->findByPk($this->parentId, false, true);
+			$allowed = $folder && $folder->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION);
+		}
+
+		if (!$allowed) {
+			throw new GO\Base\Exception\AccessDenied();
+		}
 	}
 
 }

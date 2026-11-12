@@ -14,7 +14,13 @@ class SieveController extends \GO\Base\Controller\AbstractModelController{
 	
 	private function _sieveConnect($accountId) {		
 		$accountModel = \GO\Email\Model\Account::model()->findByPk($accountId);
-		
+		if (empty($accountModel)) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		// Filters and the out of office reply are part of the account settings
+		$accountModel->requirePermissionLevel(\GO\Base\Model\Acl::MANAGE_PERMISSION);
+
 		if (!empty($accountModel))
 		$connectResponse = $this->_sieve->connect(
 				$accountModel->username,
