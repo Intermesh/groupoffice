@@ -1,5 +1,6 @@
 <?php
 use go\core\App;
+use go\core\jmap\MethodSchema;
 use go\core\jmap\Router;
 use go\core\jmap\State;
 use go\core\orm\EntityType;
@@ -34,18 +35,22 @@ function description(?string $text): string {
 
 /**
  * Short type notation of a JSON schema as HTML. For example "string | string[]". References to other types link to
- * their table, which has the id "$anchorPrefix.$name".
+ * their table, which has the id "$anchorPrefix.$name", or to the anchor in $anchors. An anchor of null shows the name
+ * without a link.
+ *
+ * @param array<string, string|null> $anchors Definition name => anchor
  */
-function schemaType(array $schema, string $anchorPrefix = ''): string {
+function schemaType(array $schema, string $anchorPrefix = '', array $anchors = []): string {
 	if (isset($schema['$ref'])) {
 		$name = substr($schema['$ref'], strlen('#/$defs/'));
-		return "<a href='#" . e($anchorPrefix . '.' . $name) . "'>" . e($name) . "</a>";
+		$anchor = array_key_exists($name, $anchors) ? $anchors[$name] : $anchorPrefix . '.' . $name;
+		return isset($anchor) ? "<a href='#" . e($anchor) . "'>" . e($name) . "</a>" : e($name);
 	}
 	if (isset($schema['enum'])) {
 		return e(implode(' | ', array_map('json_encode', $schema['enum'])));
 	}
 	if (isset($schema['anyOf'])) {
-		return implode(' | ', array_map(fn($s) => schemaType($s, $anchorPrefix), $schema['anyOf']));
+		return implode(' | ', array_map(fn($s) => schemaType($s, $anchorPrefix, $anchors), $schema['anyOf']));
 	}
 	if (isset($schema['x-phpType'])) {
 		return e($schema['x-phpType']);
@@ -56,14 +61,14 @@ function schemaType(array $schema, string $anchorPrefix = ''): string {
 	$types = array_values(array_diff($types, $nullable ? ['null'] : []));
 
 	if ($types === ['array']) {
-		$items = schemaType($schema['items'] ?? [], $anchorPrefix);
+		$items = schemaType($schema['items'] ?? [], $anchorPrefix, $anchors);
 		$str = (str_contains($items, '|') ? '(' . $items . ')' : $items) . '[]';
 	} else if ($types === ['object'] && isset($schema['additionalProperties']) && is_array($schema['additionalProperties'])) {
-		$str = '{id: ' . schemaType($schema['additionalProperties'], $anchorPrefix) . '}';
+		$str = '{id: ' . schemaType($schema['additionalProperties'], $anchorPrefix, $anchors) . '}';
 	} else if ($types === ['object'] && !empty((array) ($schema['properties'] ?? []))) {
 		$props = [];
 		foreach ($schema['properties'] as $name => $prop) {
-			$props[] = e($name) . (in_array($name, $schema['required'] ?? []) ? '' : '?') . ': ' . schemaType($prop, $anchorPrefix);
+			$props[] = e($name) . (in_array($name, $schema['required'] ?? []) ? '' : '?') . ': ' . schemaType($prop, $anchorPrefix, $anchors);
 		}
 		$str = '{' . implode(', ', $props) . '}';
 	} else {
@@ -94,6 +99,36 @@ function propertiesTable(array $schema, string $anchorPrefix): string {
 	return $html . "</table>";
 }
 
+/**
+ * Table with the parameters or response properties of a method
+ *
+ * @param array<string, string|null> $anchors See {@see schemaType()}
+ */
+function methodTable(array $schema, array $anchors, bool $isResponse = false): string {
+	$html = "";
+	if (!empty($schema['description'])) {
+		$html .= "<p>" . description($schema['description']) . "</p>";
+	}
+	if (empty($schema['properties'])) {
+		return $html . "<p>Type: " . schemaType($schema, '', $anchors) . "</p>";
+	}
+
+	$html .= "<table><tr><th>Name</th><th>Type</th>" . ($isResponse ? "" : "<th>Required</th><th>Default</th>") . "<th>Description</th></tr>";
+	foreach ($schema['properties'] as $name => $prop) {
+		$html .= "<tr><td>" . e($name) . "</td>" .
+			"<td>" . schemaType($prop, '', $anchors) . "</td>" .
+			($isResponse ? "" :
+				"<td>" . (in_array($name, $schema['required'] ?? [], true) ? 'yes' : '') . "</td>" .
+				"<td>" . (array_key_exists('default', $prop) ? e(json_encode($prop['default'])) : '') . "</td>"
+			) .
+			"<td>" . description($prop['description'] ?? '') . "</td></tr>";
+	}
+	return $html . "</table>";
+}
+
+$standardMethods = MethodSchema::standard('Foo');
+$standardAnchors = ['Foo' => null, 'Filter' => 'filters', 'SetError' => 'SetError'];
+
 $types = EntityType::findAll();
 usort($types, function($a, $b) {
 	return strcmp($a->getName(), $b->getName());
@@ -118,8 +153,17 @@ foreach($types as $type) {
 	}
 
 	$html .= "<h4>Methods</h4><table><tr><th>Method</th><th>Description</th></tr>";
+	$standardNames = array_change_key_case(array_combine(array_keys($standardMethods), array_keys($standardMethods)));
 	foreach(Router::getEntityMethods($type) as $method => $description) {
-		$html .= "<tr><td>" . e($entityName . '/' . $method) . "</td><td>" . description($description) . "</td></tr>";
+		$standardName = $standardNames[strtolower($method)] ?? null;
+		if(isset($standardName)) {
+			// Parameters and response are documented once in the "Standard methods" section
+			$name = "<a href='#method-" . e($standardName) . "'>" . e($entityName . '/' . $method) . "</a>";
+		} else {
+			$name = e($entityName . '/' . $method);
+			$description = trim($description . "\nThe parameters of this method are not documented.");
+		}
+		$html .= "<tr><td>" . $name . "</td><td>" . description($description) . "</td></tr>";
 	}
 	$html .= "</table>";
 
@@ -270,6 +314,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 		<li><a href="#introduction">Introduction</a></li>
 		<li><a href="#properties">Methods and properties</a></li>
 		<li><a href="#filters">Filters</a></li>
+		<li><a href="#methods">Standard methods</a></li>
 	</ul>
 	<?php foreach($mods as $modName => $entities): ?>
 	<div class="module">
@@ -358,6 +403,26 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
   }
 }, "r1"]
 </code>
+
+<h2 id="methods">Standard methods</h2>
+
+<p>
+	Most entities support these methods. Replace "Foo" with the entity name, for example Note/get. "Foo" in a type is the
+	entity itself. The methods each entity supports are listed with the entity.
+</p>
+
+<?php foreach($standardMethods as $method => $methodSchema): ?>
+<h3 id="method-<?= e($method) ?>">Foo/<?= e($method) ?></h3>
+<p><?= description(Router::STANDARD_METHODS[$method] ?? '') ?></p>
+<h4>Parameters</h4>
+<?= methodTable($methodSchema['params'], $standardAnchors) ?>
+<h4>Response</h4>
+<?= methodTable($methodSchema['response'], $standardAnchors, true) ?>
+<?php endforeach; ?>
+
+<h3 id="SetError">SetError</h3>
+<p>An error in the notCreated, notUpdated or notDestroyed response of Foo/set.</p>
+<?= methodTable(MethodSchema::setError(), $standardAnchors) ?>
 
 <?php
 foreach($mods as $modName => $entities) {
