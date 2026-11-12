@@ -120,11 +120,7 @@ class Filters {
 	 */
 	private static function columnSchema(Column $col): array
 	{
-		$type = match ($col->dbType) {
-			'int', 'tinyint', 'smallint', 'mediumint', 'bigint' => $col->length === 1 ? 'boolean' : 'integer',
-			'decimal', 'float', 'double' => 'number',
-			default => 'string'
-		};
+		$type = $col->getJsonType() ?? 'string';
 
 		$single = ['type' => $col->nullAllowed ? [$type, 'null'] : $type];
 
