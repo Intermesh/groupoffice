@@ -871,9 +871,11 @@ abstract class Entity extends Property {
 			->add("permissionLevelUserId", function() {
 				//dummy used in permissionLevel filter.
 			})
+			->describe("Admins only. Use with permissionLevel to check the permissions of this user instead of the current user.", ['type' => 'integer'])
 			->add("permissionLevelGroups", function() {
 				//dummy used in permissionLevel filter.
 			})
+			->describe("Admins only. Use with permissionLevel to check the permissions of these group IDs instead of the current user.", ['type' => 'array', 'items' => ['type' => 'integer']])
 			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
 
 				// security check. Only admins may query on behalf of others permissions
@@ -894,6 +896,7 @@ abstract class Entity extends Property {
 				//Permission level is always added to the main query so that it's always applied with AND
 				static::applyAclToQuery($query, $value, $filterCondition['permissionLevelUserId'] ?? null, $filterCondition['permissionLevelGroups'] ?? null);
 			})
+			->describe("Only entities the current user has at least this permission level for: 10 = read, 20 = create, 30 = write, 40 = delete, 50 = manage.", ['type' => 'integer', 'enum' => [10, 20, 30, 40, 50]])
 
 			->add('text', function (Criteria $criteria, $value, Query $query) {
 				if (!is_array($value)) {
@@ -906,29 +909,34 @@ abstract class Entity extends Property {
 					}
 				}
 			})
+			->describe("Free text search in the main text fields of the entity. Words match anywhere in the text and a number also matches the ID. An array of search terms must all match.", ['anyOf' => [['type' => 'string'], ['type' => 'array', 'items' => ['type' => 'string']]]])
 			->add('exclude', function (Criteria $criteria, $value) {
 				if (!empty($value)) {
 					$criteria->andWhere('id', 'NOT IN', $value);
 				}
-			});
+			})
+			->describe("Entity IDs to leave out of the result.", ['type' => 'array', 'items' => ['type' => 'integer']]);
 
 		if (static::getMapping()->getColumn('modifiedAt')) {
 			$filters->addDateTime("modifiedAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('modifiedAt', $comparator, $value);
-			});
+			})
+				->describe("Last modification date.");
 		}
 
 
 		if (static::getMapping()->getColumn('modifiedBy')) {
 			$filters->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
 				self::applyUserFilter($criteria, $comparator, $value, $query, 'modifiedBy', 'modifier');
-			});
+			})
+				->describe("Users who last modified the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
 		}
 
 		if (static::getMapping()->getColumn('createdAt')) {
 			$filters->addDateTime("createdAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('createdAt', $comparator, $value);
-			});
+			})
+				->describe("Creation date.");
 		}
 
 
@@ -936,10 +944,12 @@ abstract class Entity extends Property {
 			$filters->add("createdByMe", function (Criteria $criteria, $value, Query $query) {
 				//operator must always be = as this filter is also used in conjunction with permission queries
 				$criteria->where('createdBy', '=', go()->getAuthState()->getUserId());
-			});
+			})
+				->describe("Only entities created by the current user. The value is ignored.", ['type' => 'boolean']);
 			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
 				self::applyUserFilter($criteria, $comparator, $value, $query, 'createdBy', 'creator');
-			});
+			})
+				->describe("Users who created the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
 		}
 
 		self::defineLegacyFilters($filters);
@@ -963,7 +973,8 @@ abstract class Entity extends Property {
 			$tag = ':' . $criteria->bindTag();
 			$criteria->where($lastCommentDate . ' ' . $comparator . ' ' . $tag)
 				->bind($tag, $value->format(Column::DATETIME_FORMAT));
-		});
+		})
+			->describe("Date of the last comment. Null finds entities without comments.");
 
 		$filters->addText('comment', function (Criteria $criteria, $comparator, $value, Query $query) {
 			$sub = (new DbQuery())
@@ -973,7 +984,8 @@ abstract class Entity extends Property {
 				->andWhere('commentFilter.text', $comparator, $value);
 
 			$criteria->whereExists($sub);
-		});
+		})
+			->describe("Entities with a comment that contains this text.");
 
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
 
@@ -998,7 +1010,16 @@ abstract class Entity extends Property {
 			}
 
 			$criteria->whereExists($sub);
-		});
+		})
+			->describe("Entities linked to an entity of the given type, for example {\"entity\": \"Contact\", \"id\": 1}. Without \"id\" any entity of that type matches.", [
+				'type' => 'object',
+				'properties' => [
+					'entity' => ['type' => 'string', 'description' => 'Entity name'],
+					'id' => ['type' => 'integer', 'description' => 'Entity ID']
+				],
+				'required' => ['entity'],
+				'additionalProperties' => false
+			]);
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
 
@@ -1022,29 +1043,43 @@ abstract class Entity extends Property {
 	 * @param Filters $filters
 	 * @throws Exception
 	 */
+	/**
+	 * JSON schema for the createdBy and modifiedBy filter values
+	 */
+	private const USER_FILTER_SCHEMA = [
+		'anyOf' => [
+			['type' => ['string', 'integer']],
+			['type' => 'array', 'items' => ['type' => ['string', 'integer']]]
+		]
+	];
+
 	private static function defineLegacyFilters(Filters $filters) {
 		if (static::getMapping()->getColumn('ctime')) {
 			$filters->addDateTime('createdAt', function (Criteria $criteria, $comparator, ?DateTime $value) {
 				$criteria->andWhere('ctime', $comparator, $value?->format("U"));
-			});
+			})
+				->describe("Creation date.");
 		}
 
 		if (static::getMapping()->getColumn('mtime')) {
 			$filters->addDateTime('modifiedAt', function (Criteria $criteria, $comparator, ?DateTime $value) {
 				$criteria->andWhere('mtime', $comparator, $value?->format("U"));
-			});
+			})
+				->describe("Last modification date.");
 		}
 
 		if (static::getMapping()->getColumn('user_id')) {
 			$filters->addText('createdBy', function (Criteria $criteria, $comparator, $value, Query $query) {
 				self::applyUserFilter($criteria, $comparator, $value, $query, 'user_id', 'creator');
-			});
+			})
+				->describe("Users who created the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
 		}
 
 		if (static::getMapping()->getColumn('muser_id')) {
 			$filters->addText('modifiedBy', function (Criteria $criteria, $comparator, $value, Query $query) {
 				self::applyUserFilter($criteria, $comparator, $value, $query, 'muser_id', 'modifier');
-			});
+			})
+				->describe("Users who last modified the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
 		}
 	}
 

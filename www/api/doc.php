@@ -23,6 +23,31 @@ $html = '';
 
 $mods = [];
 
+/**
+ * Short type notation of a JSON schema for the docs table. For example "string|string[]".
+ */
+function schemaType(array $schema): string {
+	if (isset($schema['enum'])) {
+		return implode(' | ', array_map('json_encode', $schema['enum']));
+	}
+	if (isset($schema['anyOf'])) {
+		return implode(' | ', array_map('schemaType', $schema['anyOf']));
+	}
+	$type = $schema['type'] ?? 'mixed';
+	if ($type === 'array') {
+		$items = schemaType($schema['items'] ?? []);
+		return (str_contains($items, '|') ? '(' . $items . ')' : $items) . '[]';
+	}
+	if ($type === 'object' && isset($schema['properties'])) {
+		$props = [];
+		foreach ($schema['properties'] as $name => $prop) {
+			$props[] = $name . (in_array($name, $schema['required'] ?? []) ? '' : '?') . ': ' . schemaType($prop);
+		}
+		return '{' . implode(', ', $props) . '}';
+	}
+	return is_array($type) ? implode(' | ', $type) : $type;
+}
+
 $types = \go\core\orm\EntityType::findAll();
 usort($types, function($a, $b) {
 	return strcmp($a->getName(), $b->getName());
@@ -62,6 +87,23 @@ foreach($types as $type) {
 			$html .= "<tr><td>" . $name . "</td><td>".($property['type'] ?? "")."</td><td>".($property['description'] ?? "")."</td></tr>";
 		}
 
+		$html .= "</table>";
+
+		// Custom fields are installation specific and this page is public, so leave them out.
+		$customFieldNames = method_exists($cls, 'getCustomFieldModels') ? array_keys($cls::getCustomFieldModels()) : [];
+		$filterProperties = (array) $cls::getFilters()->toJsonSchema()['$defs']['FilterCondition']['properties'];
+
+		$html .= "<h4>Filters</h4><table><tr><th>Filter</th><th>Type</th><th>Value</th><th>Description</th><th>Default</th></tr>";
+		foreach($filterProperties as $name => $schema) {
+			if(in_array($name, $customFieldNames, true)) {
+				continue;
+			}
+			$html .= "<tr><td>" . htmlspecialchars($name) . "</td>" .
+				"<td>" . htmlspecialchars($schema['x-filterType']) . "</td>" .
+				"<td>" . htmlspecialchars(schemaType($schema)) . "</td>" .
+				"<td>" . htmlspecialchars($schema['description'] ?? "") . "</td>" .
+				"<td>" . (array_key_exists('default', $schema) ? htmlspecialchars(json_encode($schema['default'])) : "") . "</td></tr>";
+		}
 		$html .= "</table>";
 
 		$mods[$mod][$type->getName()] = $html;
@@ -122,6 +164,25 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 <p>
 	More examples and information about getting an API bearer token can be found in the <a href="https://groupoffice.readthedocs.io/en/latest/developer/jmap.html">online Group-Office documentation</a>.
 </p>
+
+<h2>Filters</h2>
+
+<p>
+	The "filter" argument of Foo/query is either a filter condition object with the filters listed for each entity, or a
+	filter operator that combines conditions with AND, OR or NOT. Operators can be nested.
+	Custom fields can be filtered on by their database name.
+</p>
+
+<code>["Note/query", {
+  "filter": {
+    "operator": "AND",
+    "conditions": [
+      {"text": "invoice", "createdAt": "-1 month..now"},
+      {"operator": "NOT", "conditions": [{"createdBy": "{{me}}"}]}
+    ]
+  }
+}, "r1"]
+</code>
 
 <h2>Available entities</h2>
 
