@@ -2,6 +2,7 @@
 require('../vendor/autoload.php');
 use go\core\App;
 use go\core\fs\Folder;
+use go\core\http\Response;
 use go\core\util\IniFile;
 
 
@@ -40,12 +41,40 @@ function dbConnect($config){
 
 
 
+/**
+ * Check if the database in the config already has a GroupOffice installation.
+ *
+ * It doesn't use dbConnect() because that keeps the connection for the values that are posted.
+ */
+function isInstalled(array $config): bool
+{
+	try {
+		$installedPdo = new PDO(go()->createDsn($config['db_name'] ?? "groupoffice", $config), $config['db_user'] ?? "groupoffice", $config['db_pass'] ?? "");
+		$stmt = $installedPdo->query("SHOW TABLES LIKE 'core_module'");
+		return $stmt !== false && $stmt->fetch() !== false;
+	} catch (Throwable $e) {
+		return false;
+	}
+}
+
 $configFile = App::findConfigFile();
 if(!$configFile) {
     $configFile = '/etc/groupoffice/config.php';
 } else
 {
 	require($configFile);
+
+	// Once Group-Office is installed the config may not be changed from the web. Anyone could point it to another
+	// database otherwise.
+	if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($config) && isInstalled($config)) {
+		Response::get()->setStatus(403);
+		require('header.php');
+		echo "<section><div class=\"card\"><h2>" . go()->t("Config file") . "</h2><p>" .
+			go()->t("GroupOffice is already installed. Change the config file on the server instead.") .
+			"</p></div></section>";
+		require('footer.php');
+		exit();
+	}
 }
 
 $mustSave = false;

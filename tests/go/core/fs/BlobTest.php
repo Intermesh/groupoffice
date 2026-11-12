@@ -1,6 +1,7 @@
 <?php
 namespace go\core\fs;
 
+use DateTimeZone;
 use go\core\db\Query;
 use go\core\model\User;
 use go\core\util\DateTime;
@@ -10,6 +11,8 @@ class BlobTest extends TestCase
 {
 	public function testGarbageCollection() {
 
+		date_default_timezone_set("UTC");
+
 		$blobsQuery = Blob::findStale();
 		$blobsStmt = $blobsQuery->execute();
 
@@ -17,17 +20,27 @@ class BlobTest extends TestCase
 		$staleCountAtStart = $blobsStmt->rowCount();
 
 		//create unused blob
+
 		$blob = Blob::fromString("test blob text " . uniqid());
 		$blob->type = 'text/plain';
 		$blob->name = 'test.txt';
-		$blob->staleAt = new DateTime("-1 min");
+		$blob->staleAt = new DateTime("-10 min", new DateTimeZone('UTC'));
+//		go()->getDbConnection()->debug = true;
 		$success = $blob->save();
+
+
+//		echo $blob->staleAt->format('Y-m-d H:i:s')."\n\n";
+//
+//		echo go()->getDbConnection()->query("SELECT NOW()")->fetchColumn() . "\n\n";
+
+
 		$this->assertEquals(true, $success);
 
 		$this->assertEquals(true, $blob->getFile()->exists());
 
 		$blobsStmt = $blobsQuery->execute();
-//		echo $blobsQuery;
+
+//		echo $blobsQuery ."\n\n";
 //		var_dump($blobsStmt->fetchAll());
 		$this->assertEquals($staleCountAtStart + 1, $blobsStmt->rowCount());
 
@@ -51,7 +64,7 @@ class BlobTest extends TestCase
 		$blob = Blob::fromString(base64_decode($blackPixel));
 		$blob->type = 'image/gif';
 		$blob->name = 'black-pixel.gif';
-		$blob->staleAt = new DateTime("-1 min");
+		$blob->staleAt = new DateTime("-1 min", new DateTimeZone('UTC'));
 		$success = $blob->save();
 		$this->assertEquals(true, $success);
 

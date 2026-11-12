@@ -479,6 +479,7 @@ class Installer {
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		GO::session()->runAsRoot();
+		$oldIgnoreAcl = GO::$ignoreAclPermissions;
 		GO::$ignoreAclPermissions = true;
 
 		go()->disableEvents();
@@ -567,6 +568,7 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
+		GO::$ignoreAclPermissions = $oldIgnoreAcl;
 
 
 

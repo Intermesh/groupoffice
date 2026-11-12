@@ -15,6 +15,7 @@ use GO\Base\Mail\SmimeMessage;
 use GO\Base\Model\Acl;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\fs\FileSystemObject;
@@ -495,22 +496,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	}
 
 
-	protected function actionSaveToFile(array $params)
-	{
-		$message = new \GO\Base\Mail\Message();
-		$alias = Alias::model()->findByPk($params['alias_id']);
-		$message->handleEmailFormInput($params);
-		$message->setFrom($alias->email, $alias->name);
-
-		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$params['save_to_path']);
-
-		$file->putContents($message->toStream());
-
-		$response['success']=$file->exists();
-
-		return $response;
-	}
-
 	private function _createAutoLinkTagFromParams(array $params, $account)
 	{
 		$tag = '';
@@ -926,7 +911,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$message->createTempFilesForAttachments();
 			$response['sendParams']['draft_uid'] = $message->uid;
 		} else {
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($params['path']);
+			$message = \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($params['path']);
 		}
 		$response['data'] = $message->toOutputArray($params['content_type'] == 'html', true,false,false);
 
@@ -962,7 +947,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		} else {
 			$account=false;
-			$message =  \GO\Email\Model\SavedMessage::model()->createFromMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
+			$message =  \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
 		}
 
 		return $this->_messageToReplyResponse($params, $message, $account);
@@ -1203,7 +1188,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$account = Account::model()->findByPk($params['account_id']);
 			$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
 		} else {
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
+			$message = \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($params['path'], !empty($params['is_tmp_file']) && $params['is_tmp_file']!='false');
 		}
 
 		return $this->_messageToForwardResponse($params, $message);
@@ -1603,7 +1588,22 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		if (empty($params['unblock'])){// && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
 			$blockUrl = 'about:blank';
-			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
+			$blocked = 0;
+			$response['htmlbody'] = preg_replace_callback(
+				'/<(?!a[\s>\/])[a-z][^>]*+>/iu',
+				function ($m) use ($blockUrl, &$blocked) {
+					// skip tags that can't contain a URL; cheap check avoids regex on big data: blobs
+					if (stripos($m[0], 'http') === false) {
+						return $m[0];
+					}
+					$count = 0;
+					$out = preg_replace('/https?:[^\s>\'"]*+/i', $blockUrl, $m[0], -1, $count);
+					$blocked += $count;
+					return $out;
+				},
+				$response['htmlbody']
+			);
+			$response['blocked_images'] = $blocked;
 			if($response['htmlbody'] === null) {
 				$response['htmlbody'] ="Could not block images: ". preg_last_error_msg() . " you can only view without blocking external resources";
 			}
@@ -1724,8 +1724,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new NotFound("Specified folder not found");
 		}
 
+		if(!$folder->hasPermissionLevel(Acl::WRITE_PERMISSION)) {
+			throw new Forbidden("You do not have permission to write this folder");
+		}
+
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);		
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$folder->path.'/'.$params['filename']);
+		$file->checkFileStoragePath();
 
 		if(empty($params['tmp_file'])){
 			$account = Account::model()->findByPk($params['account_id']);
@@ -1826,7 +1831,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		
 		if(!empty($filepath)) {
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($filepath);
+			$message = \GO\Email\Model\SavedMessage::model()->createFromReadableMimeFile($filepath);
 		} else {
 			// Search message from imap
 			$account = Account::model()->findByPk($account_id);
@@ -1857,6 +1862,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					$fileName = $file->name();
 				}
 				
+				// don't write through a link to a file elsewhere on the server
+				$fsFolder->createChild($fileName ?? $att->name)->checkFileStoragePath();
+
 				if(!$att->saveToFile($fsFolder,$fileName)){
 					$response['success'] = false;
 				}

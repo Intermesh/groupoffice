@@ -1106,6 +1106,7 @@ class Imap extends ImapBodyStruct
 //		\GO::debug("server_side_sort($sort, $reverse, $filter)");
 
 		$this->clean($sort, 'keyword');
+		$this->clean(trim($filter), 'search_str');
 
 		$charset = $forceAscii || !\GO\Base\Util\StringHelper::isUtf8($filter) ? 'US-ASCII' : 'UTF-8';
 

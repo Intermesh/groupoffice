@@ -9,8 +9,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 	setSiteId: function(siteId) {
 		this.form.baseParams.site_id = siteId;
 		
-		
-		this.paster.model_id=siteId;
+
 
 		if (this.fileBrowseButton) {
 			this.fileBrowseButton.setId(siteId);
@@ -205,19 +204,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			listeners: {
 				render: function() {
 					
-					this.paster = new GO.base.upload.Paster({
-						pasteEl: this.editor.getEl(),
-						model_name:'GO\\Site\\Model\\Site',
-						model_id:0, //will be updated in this.setSiteId
-						scope:this,
-						callback:function(paster, result, xhr){
-						
-							var tag;
-							tag = "{site:thumb path=\"" + result.path + "\" lw=\"300\" ph=\"300\"}";
 
-							this.editor.insertAtCursor(tag);
-						}
-					});
 
 					var editor = this.editor;
 

@@ -105,6 +105,9 @@ class ExportView extends AbstractView{
 		\GO::setMaxExecutionTime(0);
 		
 		$className = $data['savedExportModel']->class_name;
+		if(!\GO\Base\Model\SavedExport::isExportClass($className)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		$class = new $className($data['savedExportModel']->export_columns);
 
 		// Get the model for this export

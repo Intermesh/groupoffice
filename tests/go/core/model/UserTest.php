@@ -47,7 +47,13 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
 		$success = $user->save();
 
+		if(!empty($user->getValidationErrors())) {
+			var_dump($user->getValidationErrors());
+		}
+
 		$this->assertEmpty($user->getValidationErrors());
+
+
 		$this->assertEquals(true, $success);
 
 		$user = new User();
@@ -120,7 +126,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 	}
 
 	public function testDelete() {
-		$success  = User::delete(['username' => ['test1', 'test2']]);
+		$success  = User::delete(['username' => ['test2', 'test1']]);
 		$this->assertEquals(true, $success);
 	}
 }

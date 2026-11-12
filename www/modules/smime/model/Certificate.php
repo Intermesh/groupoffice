@@ -47,6 +47,26 @@ class Certificate extends \GO\Base\Db\ActiveRecord {
 		return 'smi_pkcs12';
 	}
 
+	/**
+	 * Certificates have the permissions of their e-mail account. Reading the key is needed to use the account, so read
+	 * permission is enough for that. Adding, changing and deleting certificates requires write permission.
+	 *
+	 * Finding certificates with find() is not checked because system messages are signed with them too.
+	 *
+	 * @param int $level
+	 * @return bool
+	 */
+	public function checkPermissionLevel($level) {
+		if(\GO::$ignoreAclPermissions) {
+			return true;
+		}
+		$account = \GO\Email\Model\Account::model()->findByPk($this->account_id, false, true);
+		if(!$account) {
+			return false;
+		}
+		return $account->checkPermissionLevel($level <= \GO\Base\Model\Acl::READ_PERMISSION ? \GO\Base\Model\Acl::READ_PERMISSION : \GO\Base\Model\Acl::WRITE_PERMISSION);
+	}
+
 	protected function init()
 	{
 		parent::init();

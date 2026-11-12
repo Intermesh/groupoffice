@@ -1,3 +1,57 @@
+- Files: fix error at file upload
+- - Files: Security: after Group-Office looked up a folder path that doesn't exist, it ignored all permissions for the rest of that request. A request that first named a non-existing path could then read or change items the user has no access to, if the same request checked permissions afterwards. Permissions are now always checked again after the lookup. No configuration changes are needed.
+- Files: Security: a user with write access to a folder could decompress a tar archive with symbolic links to folders or files elsewhere on the server. Through such a link the user could read, overwrite and delete any file the web server user may access, outside the file storage too, for example config.php. If a directory served by the web server was writable, this could be used to run arbitrary PHP code on the server. Links, hard links and other special files are no longer extracted from archives (a tar archive that contains them is refused), and links in the file storage are no longer added to Group-Office or followed when downloading, writing, copying, moving, compressing or deleting files. Links that were added earlier disappear from Group-Office at the next folder sync, together with the sharing settings of linked folders. Before upgrading, run "find <file_storage_path> -type l" to list the links. Delete links that you don't know, because they may have been planted through this issue. If you placed links in file_storage_path on purpose, for example to share a folder from another disk, they no longer work: move the data into file_storage_path or mount it there instead before upgrading, otherwise the sharing settings of those folders are lost. We also recommend making sure the web server user can't write to the Group-Office program files, config.php or any directory the web server executes PHP from.
+- Email: Security: a user with access to the e-mail module who knew the path of another user's saved e-mail message (.eml) in the file storage could read its subject, body and attachments by opening it as a draft, replying to it, forwarding it or saving its attachments. Read permission on the file is now required, or for a linked e-mail ("Save mail as" module) read permission on an item it's linked to. The same applies to opening saved messages in the "Save mail as" module. No configuration changes are needed.
+- Core: Security: a logged in user could find out if a file exists in the file storage and get its name, size and type, also for files of other users, by adding its path to the upload queue. Only files the user may read can be added now. No configuration changes are needed.
+- Core: Security: a user with the "Change users" permission, who is not an administrator, could create a new user in the Admins group, or in any other group, with a password of their choice and then log in as an administrator. These user managers can now only put new users in the default groups for new users (System settings > Users > User defaults). Only administrators can add users to other groups. If your user managers create users in other groups, an administrator must now add them to those groups, or make those groups default groups.
+- Files: Security: when decompressing archives, read permission on the archive was not checked. A user who knew the path of another user's zip or tar file could extract it into a folder of their own and read its contents. Every archive must now be readable by the user. No configuration changes are needed.
+- Core: Security: the RSS feed proxy of the start page could be used to make the server request any URL, including internal addresses such as localhost, the local network or a cloud metadata service, and return the response when it looked like an RSS feed. RSS feeds, bookmark descriptions and webcal calendars also followed redirects from a public address to an internal one. These requests are now refused, also after a redirect, and RSS and bookmark responses are limited in size. No configuration changes are needed.
+
+09-11-2026: 6.8.182
+- Fixed: Security: Expired access tokens are re-validated instead of rejected
+- Files: Security: any logged in user could upload a file to any path the web server can write to, outside their own folder and outside file_storage_path, by putting "../" in the file name or sub folder name of an upload. If a directory served by the web server was writable, this could be used to run arbitrary PHP code on the server.
+- Email: Security: a logged-in user with read-only access to a shared email account could run any IMAP command on that account, for example to delete messages or folders, by putting a line break in the message search query. No configuration changes are needed.
+- Core: Security: language overrides are no longer loaded. These were PHP files in the admin's home folder (<file_storage_path>/users/admin/language/<package>/<module>/<lang>.php) that the server executed, so anyone who could write to that folder, for example through a share or WebDAV, could run code on the server. If you used them to change texts, those changes are no longer applied and the files can be deleted.
+
+03-11-2026: 6.8.181
+- Email: Security: a logged in user with access to the e-mail module could write an e-mail message to any path in the data directory (file_storage_path, usually /var/lib/groupoffice), overwriting files of other users. This came from an old, unused "save to file" function in the e-mail composer, which has been removed. No configuration changes are needed.
+- Email: Security: Check write permission when saving file to folder. Only read permission was checked.
+- Files: Security: Check read permission when reading file meta data
+- File: Security: Check write permission in replace() method before overwriting data on disk
+- Email: Security: Check write permission when saving file to folder. Only read permission was checked.
+- Files: Security: Check read permission when reading file meta data
+- Calendar: Security: Check write permissions before reloading an external calendar
+- File: Security: Check write permission in replace() method before overwriting data on disk
+- Forms: Security: Missing ACL check on download spreadsheet.
+- Email: Security: Stored XSS fixed
+
+03-11-2026: 6.8.180
+- Files: Fixed security issue where logged in user could read any contact name
+- Core: permissionLevel filter: the admin-only guard on permissionLevelUserId / permissionLevelGroups never fires #1593
+- API keys: mask the key in the history log
+- Core: Fixed security issue where static methods could be called from the web
+- Core: fix Entity/export with ids exports records the user may not read
+- Core: Security: on installations that log in users with LDAP, anyone who knew a username could log in as that user over CalDAV, CardDAV and WebDAV with an empty password if the LDAP server allows "unauthenticated binds". This gave access to the user's calendars, address books and files, also when the user has two-factor authentication. Active Directory may allow these binds by default; OpenLDAP doesn't unless configured to. The web login and ActiveSync were not affected. Empty passwords are now always rejected. We also recommend disabling unauthenticated binds on your LDAP server. If you can't update right away, enable "Force app passwords" in System settings > Authentication to block this.
+- Core: Don't use eval() in export columns
+- Core: Security: a logged-in user could use batch edit, merge and link requests, to change records that have no permissions of their own. Batch edit is now limited to records that are protected by permissions, except for admins.
+- Site: Security: a user with access to the site module could run PHP code on the server by giving site content a crafted title.
+- Pr2analyzer: Security: a user with access to the project time report could run PHP code on the server.
+- Billing: Security: a user with access to billing could run PHP code on the server when adding products as items.
+- Legacy calendar time tracking: Security: a user who can name projects or tasks could run PHP code on the server when time tracking of an event was opened.
+- Savemailas: Security: a logged-in user could download any folder on the server as a zip file, including other users' files, through the "zip of attachments" link of a saved e-mail. Attachment names starting with "-" could also be passed to the zip command as options.
+- Core: Security: file names starting with "-", like e-mail attachment names, could be passed to the zip command as options when PHP's ZipArchive is not installed.
+- Core: Security: templates (labels, e-mail, PDF and newsletter templates) could read any database table, including password hashes, and could show items the user has no permission to see. The "selectTable", "select" and "where" template filters have been removed, so templates that use them must be changed. "find", "entity" and "findEntity" now only return items the user may read.
+- Core: Security: exports and saved exports accepted any PHP class name from the client, so a logged-in user could make the server create objects of any class.
+- Core: Security: legacy forms accepted an unused "importController" option that a logged-in user could use to run other controllers, for example to start a projects migration.
+- Site: Security: removed file uploads on the website ticket pages. The upload address was open to anyone without logging in.
+- Core: Security: legacy imports could read and change any file on the server that the web server may write, for example other users' files. Over the web only uploaded files can be imported now.
+- Core: Security: the JMAP API could call constructors and classes that are not API controllers, in some cases without logging in.
+- Documenttemplates: Security: file names inside an uploaded template could be passed to the zip command as options.
+- Core: zipping a folder left out hidden files in subfolders when PHP's ZipArchive was used.
+- Core: Security: files and folders created by GroupOffice in the data directory (/var/lib/groupoffice), such as ActiveSync state, cached scripts and user files, could be world-writable (0666/0777) because Group-Office set the umask to 0. Other local accounts on the server could modify them. Group-Office now uses the umask of the web server or PHP-FPM (usually 0022). file_create_mode and folder_create_mode in config.php still apply to the files module. Existing files keep their permissions; fix them with: find /var/lib/groupoffice -xdev -perm -o+w ! -type l -exec chmod o-w {} +
+
+28-09-2026: 6.8.179
+- Email: fixed backtrack limit exhausted error in emails external resource blocker
 - Core: unset token if CSRF check fails (cherry pick from 26.0)
 
 24-08-2026: 6.8.178

@@ -181,6 +181,13 @@ class Directory extends \Sabre\DAV\FS\Directory{
 
 		\GO::debug("FSD:getChild($path)");
 
+		// Links can point anywhere on the server. They're not part of the file storage.
+		try {
+			\GO\Base\Fs\Base::createFromPath($path)->checkFileStoragePath();
+		} catch (\GO\Base\Exception\AccessDenied $e) {
+			throw new Sabre\DAV\Exception\NotFound('File with name ' . $path . ' could not be located');
+		}
+
 		if (is_dir($path)) {
 			return new Directory($this->relpath . '/' . $name);
 		} else if (file_exists($path)) {
@@ -242,7 +249,11 @@ class Directory extends \Sabre\DAV\FS\Directory{
 			while ($folder = $stmt->fetch()) {
 				// UTF8 must be form D for mac os
 				$folder->checkNormalization();
-				$nodes[] = $this->getChild($folder->name);
+				try {
+					$nodes[] = $this->getChild($folder->name);
+				} catch (Sabre\DAV\Exception\NotFound $e) {
+					// missing on disk or a link
+				}
 			}
 
 			$stmt = $f->files();
@@ -252,7 +263,11 @@ class Directory extends \Sabre\DAV\FS\Directory{
 			while ($file = $stmt->fetch()) {
 				// UTF8 must be form D for mac os
 				$file->checkNormalization();
-				$nodes[] = $this->getChild($file->name);
+				try {
+					$nodes[] = $this->getChild($file->name);
+				} catch (Sabre\DAV\Exception\NotFound $e) {
+					// missing on disk or a link
+				}
 			}
 		}
 		catch(\Exception $e) {

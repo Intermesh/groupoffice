@@ -89,6 +89,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController {
 			$path .= '.'.$template->extension;
 		
 		$fsFile = new \GO\Base\Fs\File($path);
+		$fsFile->checkFileStoragePath();
 		$fsFile->putContents($template->content);
 		
 		$fileModel = \GO\Files\Model\File::importFromFilesystem($fsFile);

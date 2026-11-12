@@ -290,11 +290,6 @@ class Language {
 				}
 			}
 
-			$file = $this->findLangOverride($isoCode, $package, $module);
-			if ($file && $file->exists()) {
-				$langData->mergeRecursive($this->loadFile($file));
-			}
-
 			foreach ($langData as $key => $translation) {
 				
 				if(!is_string($translation)) {
@@ -366,25 +361,6 @@ class Language {
 			$folder = Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $module .'/language');
 		}
 
-		return $folder->getFile($lang . '.php');
-	}
-
-	/**
-	 * 
-	 * @param string $lang
-	 * @param string $module
-	 * @param string $basesection
-	 * @return File
-	 */
-	private function findLangOverride($lang, $package, $module) {
-
-		if(Installer::isInProgress()) {
-			return false;
-		}
-		$admin = User::findById(1, ['homeDir']);
-
-		$folder = go()->getDataFolder()->getFolder($admin->homeDir. '/language/' . $package . '/' .$module);
-		
 		return $folder->getFile($lang . '.php');
 	}
 

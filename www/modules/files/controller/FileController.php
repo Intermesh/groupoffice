@@ -5,10 +5,10 @@ namespace GO\Files\Controller;
 
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
-use go\core\exception\Forbidden;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\http\Response;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
 use GO\Files\Model\File;
@@ -427,6 +427,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		if(!$file){
 			throw new \Exception("File not found");
 		}
+
+		if(!$file->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new AccessDenied();
+		}
 		
 		$response = [
 				'success' => true,
@@ -489,6 +493,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			}
 
 //			\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
+			// Also refuses a link in one of the parent folders
+			$file->fsFile->checkFileStoragePath();
+
 			$file->open();
 
 			$this->fireEvent('beforedownload', array(
@@ -503,9 +510,6 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 			//Supports range download
 			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
-
-			if($coreFsFile->isLink())
-				throw new Forbidden("Symlinks are forbidden");
 
 			// prevent html to render on same domain having access to all global JS stuff
 			if($coreFsFile->getContentType() == 'text/html' || $coreFsFile->getContentType() == 'image/svg+xml') {

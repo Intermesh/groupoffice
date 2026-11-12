@@ -62,6 +62,12 @@ class User extends AclItemEntity {
 	const ID_SUPER_ADMIN = 1;
 
 	/**
+	 * Properties only admins and users with the "mayChangeUsers" right may change. Users may not change them on their own
+	 * account.
+	 */
+	const MANAGER_PROPERTIES = ['enabled', 'forcePasswordChange', 'disk_quota', 'disk_usage', 'homeDir', 'loginCount', 'lastLogin'];
+
+	/**
 	 * Fires when the password is verified during login via the web only.
 	 * Login might not be complete.
 	 *
@@ -413,7 +419,19 @@ public function historyLog(): bool|array
 	/**
 	 * @throws Exception
 	 */
+	/**
+	 * Only admins may change the personal group. Users with the "mayChangeUsers" right may only change who can see the
+	 * user (the ACL). Members of the personal group get access to everything that is shared with the user.
+	 *
+	 * @throws Forbidden
+	 */
 	public function setPersonalGroup($values) {
+		$state = go()->getAuthState();
+		if($state && !$state->isAdmin()) {
+			if(!go()->getModel()->getUserRights()->mayChangeUsers || !empty(array_diff(array_keys($values), ['acl']))) {
+				throw new Forbidden();
+			}
+		}
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
@@ -437,7 +455,36 @@ public function historyLog(): bool|array
 
 	protected function canCreate(): bool
 	{
-		return go()->getModel()->getUserRights()->mayChangeUsers;
+		return go()->getModel()->getUserRights()->mayChangeUsers && $this->currentUserMayAssignGroups();
+	}
+
+	/**
+	 * Check if the logged-in user may add this user to the groups that were added to it.
+	 *
+	 * Only administrators may add users to any group. Others, like users with the "mayChangeUsers" right, may only use the
+	 * default groups for new users and group "Everyone". Otherwise they could create an administrator or give users
+	 * permissions they don't have themselves.
+	 *
+	 * Saves without a logged-in user, like the installer, LDAP sync or auto registration on login, are not restricted.
+	 *
+	 * @return bool
+	 */
+	public function currentUserMayAssignGroups(): bool
+	{
+		if(!$this->isModified('groups')) {
+			return true;
+		}
+
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin()) {
+			return true;
+		}
+
+		$oldGroups = $this->isNew() ? [] : ($this->getOldValue('groups') ?? []);
+		$added = array_diff(array_map('intval', $this->groups), array_map('intval', $oldGroups));
+		$allowed = array_map('intval', array_merge(Settings::get()->getDefaultGroups(), [Group::ID_EVERYONE]));
+
+		return empty(array_diff($added, $allowed));
 	}
 
 	/** @noinspection PhpCastIsUnnecessaryInspection */
@@ -634,6 +681,10 @@ public function historyLog(): bool|array
 
 			if($this->id == 1 && !in_array(Group::ID_ADMINS, $this->groups)) {
 				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group Admins from the primary admin user"));
+			}
+
+			if(!$this->currentUserMayAssignGroups()) {
+				$this->setValidationError('groups', ErrorCode::FORBIDDEN, go()->t("Only administrators may add users to groups other than the default groups"));
 			}
 		}
 

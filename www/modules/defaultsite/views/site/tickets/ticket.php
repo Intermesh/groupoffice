@@ -115,12 +115,9 @@
 			<?php $form = new \GO\Site\Widget\Form(); ?>
 			<?php echo $form->beginForm(false,false,array('enctype'=>'multipart/form-data')); ?>
 		
-			<?php $uploader = new \GO\Site\Widget\Plupload\Widget(); ?>
-		
 			<h3><?php echo \GO::t("Your message", "defaultsite"); ?></h3>
 
 			<?php echo $form->textArea($new_message,'content',array('required'=>true)); ?>
-			<?php echo $uploader->render(); ?>
 			<div class="button-bar">
 				<?php echo $form->submitButton(\GO::t("Add Comment", "defaultsite"),array('id'=>'submit-ticket-button', 'class'=>'button')); ?>
 			</div>

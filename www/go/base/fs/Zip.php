@@ -73,10 +73,12 @@ class Zip {
 
 			$cmdSources = array();
 			for ($i = 0; $i < count($sources); $i++) {
-				$cmdSources[$i] = escapeshellarg(str_replace($workingFolder->path() . '/', '', $sources[$i]->path()));
+				// "./" so names starting with "-" are not read as options
+				$cmdSources[$i] = escapeshellarg('./' . str_replace($workingFolder->path() . '/', '', $sources[$i]->path()));
 			}
 
-			$cmd = \GO::config()->cmd_zip . ' -r ' . escapeshellarg($archiveFile->path()) . ' ' . implode(' ', $cmdSources);
+			// -y stores links as links instead of adding what they point to
+			$cmd = \GO::config()->cmd_zip . ' -r -y ' . escapeshellarg($archiveFile->path()) . ' ' . implode(' ', $cmdSources);
 
 			exec($cmd, $output, $ret);
 
@@ -89,10 +91,15 @@ class Zip {
 	}
 
 	private static function _zipDir(Folder $dir, \ZipArchive $zip, $relative_path) {
-		
-		$items = $dir->ls();
+
+		// Include hidden files like the zip command does. Office documents need _rels/.rels
+		$items = $dir->ls(true);
 		if(count($items)){
 			foreach($items as $item){
+				// Don't add what a link points to. It can be anywhere on the server.
+				if ($item->isLink()) {
+					continue;
+				}
 				if ($item->isFile()) {
 					$name = $relative_path . $item->name();
 					//$name = @iconv('UTF-8', 'CP850//TRANSLIT//IGNORE', $name);					

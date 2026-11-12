@@ -178,6 +178,8 @@ try {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
 				if ($token && $token->isAuthenticated()) {
 					$token->refresh();
+				} else {
+					$token = null;
 				}
 			} else if(isset($data['rememberMeToken'])) {
 				// Process remember me persistent cookie. This is not used by the browser. The browser verifies the remember me token in index.php with a cookie.

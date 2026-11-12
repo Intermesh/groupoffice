@@ -112,7 +112,7 @@ class Listeners extends Singleton {
 	 * @param string $traitUser
 	 * @param string $event
 	 * @param array $args
-	 * @return mixed Returns the last listener return value or false if one of the listeners explicitly returns false
+	 * @return mixed Returns the last listener return value or false if one of the listeners explicitly returns false. Returns null if listeners didn't return anything.
 	 */
 	public function fireEvent(string $calledClass, string $traitUser, string $event, array $args)
 	{

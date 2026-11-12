@@ -48,6 +48,24 @@ class PortletController extends \GO\Base\Controller\AbstractMultiSelectModelCont
 	}
 	
 	/**
+	 * The portlet calendars are per user. Always use the current user, not the one from the client.
+	 */
+	protected function actionSelectedStore($params) {
+		$params['model_id'] = \GO::user()->id;
+		return parent::actionSelectedStore($params);
+	}
+
+	protected function actionSelectNewStore($params) {
+		$params['model_id'] = \GO::user()->id;
+		return parent::actionSelectNewStore($params);
+	}
+
+	public function actionUpdateRecord($params) {
+		$params['model_id'] = \GO::user()->id;
+		return parent::actionUpdateRecord($params);
+	}
+
+	/**
 	 * Get the data for the grid that shows all the tasks from the selected calendars.
 	 * 
 	 * @param Array $params

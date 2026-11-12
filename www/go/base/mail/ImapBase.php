@@ -320,6 +320,23 @@ abstract class ImapBase {
 		return $this->command_count;
 	}
 	/**
+	 * Make sure a command is exactly one line terminated by CRLF.
+	 *
+	 * Values like search queries and mailbox names are concatenated into commands. A CR, LF or NUL
+	 * inside such a value would end the command and start a new one on the authenticated
+	 * connection (IMAP command injection), so they are rejected.
+	 *
+	 * @param string $command
+	 * @throws \Exception
+	 */
+	private function assertSingleLineCommand(string $command): void
+	{
+		if (substr($command, -2) !== "\r\n" || strpbrk(substr($command, 0, -2), "\r\n\0") !== false) {
+			throw new \Exception("INVALID IMAP INPUT DETECTED: command contains line breaks");
+		}
+	}
+
+	/**
 	 * put a prefix on a command and send it to the server
 	 *
 	 * @param string $command
@@ -328,14 +345,15 @@ abstract class ImapBase {
 	 */
 	function send_command(string $command, ?bool $piped=false)
 	{
-		stream_set_timeout($this->handle, 30);
 		if ($piped) {
 			$final_command = '';
 			foreach ($command as $v) {
+				$this->assertSingleLineCommand($v);
 				$final_command .= 'A'.$this->command_number().' '.$v;
 			}
 			$command = $final_command;
 		} else {
+			$this->assertSingleLineCommand($command);
 			$command = 'A'.$this->command_number().' '.$command;
 		}
 		if (!is_resource($this->handle)){
@@ -343,6 +361,8 @@ abstract class ImapBase {
 		}
 		
 		$this->lastCommand=$command;
+
+		stream_set_timeout($this->handle, 30);
 
 		if(!fputs($this->handle, $command)){
 			throw new \Exception("Lost connection to ".$this->server);

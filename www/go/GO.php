@@ -543,9 +543,6 @@ class GO{
 
 		if(!defined('GO_LOADED')){ //check if old Group-Office.php was loaded
 
-			//set umask to 0 so we can create new files with mask defined in \GO::config()->file_create_mode
-			umask(0);
-			
 			//We use UTF8 by default.
 			mb_internal_encoding("UTF-8");
 		}

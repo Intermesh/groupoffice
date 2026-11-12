@@ -793,11 +793,18 @@ abstract class Module extends Singleton {
 	 */
 	public function getModel(array $props = []): ?model\Module
 	{
-		if(!$this->model) {
-			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null, $props);
+		if($this->model) {
+			return $this->model;
 		}
 
-		return $this->model;
+		$model = model\Module::findByName($this->getPackage(), $this->getName(), null, $props);
+
+		// Only cache a fully loaded model. A partial one (e.g. ['id']) would be returned to later callers that need all props.
+		if(empty($props)) {
+			$this->model = $model;
+		}
+
+		return $model;
 	}
 
 	/**

@@ -40,7 +40,30 @@ class ReminderController extends \GO\Base\Controller\AbstractModelController{
 						->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('manual','1'));
 	}
 		
+	/**
+	 * This module manages manual reminders. The reminders of events and tasks of other users must not be read or changed.
+	 *
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function checkManual($model): void {
+		if(!$model || (!$model->isNew && !$model->manual)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
+
+	protected function beforeDisplay(&$response, &$model, &$params) {
+		$this->checkManual($model);
+		return parent::beforeDisplay($response, $model, $params);
+	}
+
+	protected function beforeDelete(&$response, &$model, &$params) {
+		$this->checkManual($model);
+		return parent::beforeDelete($response, $model, $params);
+	}
+
 	protected function beforeSubmit(&$response, &$model, &$params) {
+		$this->checkManual($model);
+
 		if(!empty($params['link']))
 		{
 			$link = explode(':', $params['link']);
@@ -69,6 +92,7 @@ class ReminderController extends \GO\Base\Controller\AbstractModelController{
 		\GO::setIgnoreAclPermissions();
 		
 		$reminderModel = \GO\Base\Model\Reminder::model()->findByPk($params['reminder_id']);
+		$this->checkManual($reminderModel);
 		$response['success'] = true;
 		$response['total'] = 0;
 		$response['results'] = array();
@@ -130,6 +154,8 @@ class ReminderController extends \GO\Base\Controller\AbstractModelController{
 	}
 
 	protected function beforeLoad(&$response, &$model, &$params) {
+		$this->checkManual($model);
+
 		if($model->model_id>0){
 			$modelType = \GO\Base\Model\ModelType::model()->findByPk($model->model_type_id);
 			

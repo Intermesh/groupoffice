@@ -48,7 +48,7 @@ class Router
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function run(?array $requests = null) {
+	public function run(?array $requests = null, bool $output = true) {
 
 		if(!isset($requests)) {
 			$requests = Request::get()->getBody();
@@ -58,8 +58,10 @@ class Router
 			$this->callMethod($method);
 		}
 
-		Response::get()->sendHeaders();
-		Response::get()->output();
+		if($output) {
+			Response::get()->sendHeaders();
+			Response::get()->output();
+		}
 	}
 
 	/**
@@ -95,6 +97,11 @@ class Router
 			go()->getDebugger()->debug($params, 0, false);
 		}
 		
+		// A method may not change the authenticated user for the next methods in this request. For example the WOPI
+		// controller authenticates with a token from the query string.
+		$authState = go()->getAuthState();
+		$legacyUserId = $_SESSION['GO_SESSION']['user_id'] ?? null;
+
 		try {
 			$response = $this->callAction($method, $params);
 			
@@ -140,8 +147,36 @@ class Router
 			
 			Response::get()->addError($error);
 		} finally {
+			if(go()->getAuthState() !== $authState) {
+				$this->restoreAuthState($authState, $legacyUserId);
+			}
+
 			if($method != "community/dev/Debugger/get") {
 				go()->getDebugger()->groupEnd();
+			}
+		}
+	}
+
+	/**
+	 * Restore the auth state after a method replaced it
+	 *
+	 * The legacy session copies the user ID from the auth state into the PHP session. Restore that too, otherwise the
+	 * user would stay logged in on the next requests.
+	 *
+	 * @param \go\core\auth\State|null $authState The state before the method was called
+	 * @param int|string|null $legacyUserId The legacy session user ID before the method was called
+	 */
+	private function restoreAuthState(?\go\core\auth\State $authState, int|string|null $legacyUserId): void
+	{
+		ErrorHandler::log("JMAP method changed the authenticated user. Restored the previous state.");
+
+		go()->setAuthState($authState ?? new State());
+
+		if(isset($_SESSION['GO_SESSION'])) {
+			if(isset($legacyUserId)) {
+				$_SESSION['GO_SESSION']['user_id'] = $legacyUserId;
+			} else {
+				unset($_SESSION['GO_SESSION']['user_id']);
 			}
 		}
 	}
@@ -153,6 +188,13 @@ class Router
 	private function findControllerAction(string $method): array
 	{
 		$parts = explode('/', $method);
+
+		// The parts are used for the class name, so a "\" could route to any class
+		foreach ($parts as $part) {
+			if (!preg_match('/^[a-z0-9_]+$/i', $part)) {
+				throw new Exception(400, 'Bad request. Invalid method "' . $method . '"');
+			}
+		}
 
 		if (count($parts) == 2) {
 			//eg. "note/query"
@@ -195,11 +237,18 @@ class Router
 			$controllerClass = 'go\\modules\\' . implode('\\', $parts);
 		}
 
-		if (!class_exists($controllerClass)) {
+		// Controllers in a "cli" namespace are for the command line only and are run by the CLI router. Never route to them here.
+		if (stripos('\\' . $controllerClass . '\\', '\\cli\\') !== false) {
 			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
 		}
 
-		if (!method_exists($controllerClass, $controllerMethod)) {
+		// Only JMAP controllers authenticate the user in their constructor
+		if (!class_exists($controllerClass) || !is_subclass_of($controllerClass, \go\core\Controller::class)) {
+			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
+		}
+
+		// Magic methods like __construct are public too
+		if (str_starts_with($controllerMethod, '__') || !method_exists($controllerClass, $controllerMethod)) {
 			throw new Exception(400, 'Bad request. Method "' . $controllerMethod . '" not found in controller "' . $controllerClass . '".');
 		}
 
@@ -316,11 +365,11 @@ class Router
 				}
 				return $ret;
 			}
-			
+
 			if(is_object($result)) {
 				$result = $result->jsonSerialize();
 			}
-			
+
 			if (!is_array($result) || !array_key_exists($part, $result)) {
 				throw new InvalidResultReference("Could not resolve path part " . $part);
 			}

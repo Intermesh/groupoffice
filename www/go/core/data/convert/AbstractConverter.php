@@ -4,6 +4,7 @@ namespace go\core\data\convert;
 use Exception;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
@@ -258,13 +259,13 @@ abstract class AbstractConverter {
 		$this->notifyStart();
 
 		$this->index = 0;
-		
+
 		while($this->nextImportRecord()) {
 
 			try {
 
 				$entity = $this->importEntity();
-				
+
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if (is_null($entity)) {
 					$this->index++;
@@ -316,7 +317,7 @@ abstract class AbstractConverter {
 		$this->finishImport();
 
 		$this->notifyEnd($response['count'], count($response['errors']));
-		
+
 		return $response;
 	}
 
@@ -406,6 +407,11 @@ abstract class AbstractConverter {
 
 		$this->index = 0;
 		foreach($stmt as $entity) {
+
+			if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+				throw new Forbidden();
+			}
+
 			$this->exportEntity($entity);
 			$this->index++;
 		}

@@ -61,4 +61,13 @@ class Filter extends \GO\Base\Db\ActiveRecord {
 				'account' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Email\Model\Account', 'field'=>'account_id')
 		);
 	}
+
+	/**
+	 * Filters are protected by the permissions of their e-mail account
+	 *
+	 * @return string
+	 */
+	public function aclField() {
+		return 'account.acl_id';
+	}
 }
