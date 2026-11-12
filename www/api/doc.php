@@ -112,32 +112,134 @@ foreach($types as $type) {
 
 uksort($mods, function($a, $b) {return strcmp($a, $b);})
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JMAP API</title>
 <style>
+	* {
+		box-sizing: border-box;
+	}
+
+	html, body {
+		height: 100%;
+		margin: 0;
+	}
+
 	body {
-			padding: 16px;
-      font: 16px/24px Helvetica, serif;
-  }
+		font: 16px/24px Helvetica, sans-serif;
+		display: flex;
+	}
+
+	nav {
+		width: 280px;
+		flex-shrink: 0;
+		overflow-y: auto;
+		border-right: 1px solid #ccc;
+		background-color: #f7f7f7;
+		padding: 16px;
+	}
+
+	nav input {
+		width: 100%;
+		padding: 4px 8px;
+		margin-bottom: 8px;
+		font: inherit;
+	}
+
+	nav h4 {
+		margin: 16px 0 4px;
+	}
+
+	nav ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	nav a {
+		display: block;
+		padding: 0 8px;
+		color: inherit;
+		text-decoration: none;
+		border-radius: 4px;
+	}
+
+	nav a:hover, nav a.active {
+		background-color: #e2e2e2;
+	}
+
+	main {
+		flex: 1;
+		min-width: 0;
+		overflow-y: auto;
+		padding: 16px 32px;
+	}
 
 	table {
-			border-collapse: collapse;
-			td,th {
-					border: 1px solid black;
-					padding: 4px;
-					align: left;
-			}
+		border-collapse: collapse;
+		margin-bottom: 16px;
 	}
-	code {
-			display:block;
-			background-color: #f1f1f1;
-      font-family: "Courier New", Courier, serif;
-			padding: 8px;
-			white-space: pre;
 
+	td, th {
+		border: 1px solid black;
+		padding: 4px;
+		text-align: left;
+		vertical-align: top;
+	}
+
+	code {
+		display: block;
+		background-color: #f1f1f1;
+		font-family: "Courier New", Courier, monospace;
+		padding: 8px;
+		white-space: pre;
+		overflow-x: auto;
+	}
+
+	@media (max-width: 700px) {
+		body {
+			display: block;
+		}
+
+		nav {
+			width: auto;
+			max-height: 40vh;
+			border-right: none;
+			border-bottom: 1px solid #ccc;
+		}
+
+		main {
+			padding: 16px;
+		}
 	}
 </style>
+</head>
+<body>
 
-<h1>JMAP API</h1>
+<nav>
+	<input type="search" id="search" placeholder="Search entities" aria-label="Search entities">
+	<ul>
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#filters">Filters</a></li>
+	</ul>
+	<?php foreach($mods as $modName => $entities): ?>
+	<div class="module">
+		<h4><?= htmlspecialchars($modName) ?></h4>
+		<ul>
+			<?php foreach($entities as $entityName => $html): ?>
+			<li><a href="#<?= htmlspecialchars($entityName) ?>"><?= htmlspecialchars($entityName) ?></a></li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+	<?php endforeach; ?>
+</nav>
+
+<main>
+
+<h1 id="introduction">JMAP API</h1>
 
 <h2>API endpoints</h2>
 <table>
@@ -165,7 +267,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 	More examples and information about getting an API bearer token can be found in the <a href="https://groupoffice.readthedocs.io/en/latest/developer/jmap.html">online Group-Office documentation</a>.
 </p>
 
-<h2>Filters</h2>
+<h2 id="filters">Filters</h2>
 
 <p>
 	The "filter" argument of Foo/query is either a filter condition object with the filters listed for each entity, or a
@@ -194,33 +296,40 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 }, "r1"]
 </code>
 
-<h2>Available entities</h2>
-
 <?php
-
-
 foreach($mods as $modName => $entities) {
-
-	echo "<h4>".$modName."</h4>";
-	foreach($entities as $entityName => $html) {
-//
-//		echo "<ul>";
-		echo "<li><a href='#$entityName'>" . $entityName . "</a></li>";
-		echo "</ul>";
-	}
-
-}
-
-
-foreach($mods as $modName => $entities) {
-
-	echo "<h2>".$modName."</h2>";
+	echo "<h2>" . htmlspecialchars($modName) . "</h2>";
 	foreach($entities as $entityName => $html) {
 		echo $html;
 	}
-
 }
+?>
 
-//echo "<pre>";
-//
-//echo json_encode($entities, JSON_PRETTY_PRINT);
+</main>
+
+<script>
+	// Filter the entity menu
+	const search = document.getElementById('search');
+	search.addEventListener('input', () => {
+		const q = search.value.trim().toLowerCase();
+		document.querySelectorAll('nav .module').forEach(module => {
+			let visible = 0;
+			module.querySelectorAll('li').forEach(li => {
+				const match = !q || li.textContent.toLowerCase().includes(q);
+				li.hidden = !match;
+				if (match) visible++;
+			});
+			module.hidden = visible === 0;
+		});
+	});
+
+	// Highlight the menu item of the selected entity
+	function markActive() {
+		document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === location.hash));
+	}
+	window.addEventListener('hashchange', markActive);
+	markActive();
+</script>
+
+</body>
+</html>
