@@ -79,4 +79,13 @@ class ProjectTest extends TestCase
 		$ids = (new \ReflectionMethod(Project::class, 'readableTaskListIds'))->invoke($this->controller(), [$readable->id, $private->id]);
 		$this->assertEquals([$readable->id], array_map('strval', $ids));
 	}
+
+	public function testHoursOverviewOfUnreadableProject(): void
+	{
+		$project = $this->createProject($this->createType(0));
+
+		$this->actAs($this->user->id);
+		$this->expectException(Forbidden::class);
+		$this->controller()->hoursOverview(['projectId' => $project->id]);
+	}
 }
