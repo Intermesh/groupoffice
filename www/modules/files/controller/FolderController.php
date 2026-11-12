@@ -1079,8 +1079,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (isset($params['trash_keys'])) {
 			$ids = $this->_splitFolderAndFileIds(json_decode($params['trash_keys'], true));
 
-				// Moving to trash is deleting, so it requires the same permission. All items are checked before
-				// anything is moved, so nothing is trashed when one of them may not be deleted.
+				// moveToTrash() checks the delete permission. All items are checked before anything is moved too, so
+				// nothing is trashed when one of them may not be deleted.
 				$items = [];
 				foreach ($ids['folders'] as $folderId) {
 					$items[] = Folder::model()->findByPk($folderId);

@@ -1009,6 +1009,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 */
 	public function moveToTrash(): void
 	{
+		// Moving to the trash is deleting, so it requires delete permission
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		$trashFolder = Folder::model()->findByPath('trash');
 		if ($this->folder_id == $trashFolder->id) {
 			throw new Exception("File is already in trash");
