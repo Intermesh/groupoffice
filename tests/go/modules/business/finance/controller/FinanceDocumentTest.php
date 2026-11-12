@@ -207,4 +207,26 @@ class FinanceDocumentTest extends TestCase
 		$this->actAs($this->user->id);
 		$this->assertEquals(['ids' => []], $this->controller()->createPurchaseOrders(['id' => $this->document->id]));
 	}
+
+	public static function documentMethods(): array
+	{
+		return [['pdf'], ['email'], ['savePdf'], ['createPurchaseOrders']];
+	}
+
+	#[DataProvider('documentMethods')]
+	public function testUnknownDocument(string $method): void
+	{
+		$this->expectException(\go\core\exception\NotFound::class);
+		$this->controller()->$method(['id' => 999999999]);
+	}
+
+	public function testSavePdfNeedsWritePermission(): void
+	{
+		$this->createDocument();
+		$this->grant($this->orderBook, Acl::LEVEL_READ);
+
+		$this->actAs($this->user->id);
+		$this->expectException(Forbidden::class);
+		$this->controller()->savePdf(['id' => $this->document->id]);
+	}
 }
