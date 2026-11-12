@@ -92,10 +92,11 @@ try {
 		}
 		//left over are params
 
-		$ctrlCls = "go\\modules\\" . $package . "\\" . $module . "\\Module";
-		if (!class_exists($ctrlCls)) {
+		// only installed and enabled modules
+		$ctrlCls = \go\core\Module::findClassForRequest((string) $package, (string) $module);
+		if (!isset($ctrlCls)) {
 			Response::get()->setStatus(404);
-			Response::get()->output("Class '$ctrlCls' not found");
+			Response::get()->output("Not found");
 			exit();
 		}
 
