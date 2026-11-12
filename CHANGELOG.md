@@ -1,3 +1,5 @@
+- Core: the API documentation at /api/doc.php now lists the methods of every entity, the type of each property including nested types like addresses, which properties are read only, and the filters with their value type, description and default. The entities are in a searchable menu on the left.
+- Core: the "Created by" and "Modified by" filters now work with a mix of user IDs and names. Filtering on links to two different items at the same time now returns the right results.
 - Calendar: new preference "Show event in category color". When enabled, an event is shown in the color of its category if one calendar is selected and the event has exactly one category.
 - Newsletters: users with only read permission on a list can no longer use the add and delete recipient buttons. A failed change now shows an error instead of doing nothing.
 - Security: this release fixes a large number of security issues that were found in an extensive security review. Some were critical. We advise everyone to update. Please check the points below after updating.
