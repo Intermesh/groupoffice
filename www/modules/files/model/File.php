@@ -578,9 +578,17 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * The link that can be send in an e-mail as download link.
 	 *
+	 * Anyone who may read the file may create or extend the link. Deleting the file when the link expires requires
+	 * delete permission.
+	 *
 	 * @return string
+	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	public function getEmailDownloadURL($html=true, $newExpireTime=false, $deleteWhenExpired=false) {
+
+		if(!$this->checkPermissionLevel($deleteWhenExpired ? \GO\Base\Model\Acl::DELETE_PERMISSION : \GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		if($newExpireTime && $this->expire_time < $newExpireTime){
 			if($this->expire_time <= time() || empty($this->random_code)) {
@@ -588,7 +596,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			}
 			$this->expire_time = $newExpireTime;
 			$this->delete_when_expired = $deleteWhenExpired;
-			$this->save();
+			// The link fields may be changed with read permission, which is checked above
+			$this->save(true);
 		}
 
 		if (!empty($this->expire_time) && !empty($this->random_code)) {

@@ -563,8 +563,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	}	
 
 	/**
-	 * Anyone with the download link can download the file without logging in, so creating one or getting an existing
-	 * link requires write permission on the file.
+	 * Creating a download link or getting an existing one requires read permission on the file.
 	 *
 	 * @param mixed $id
 	 * @return File
@@ -577,7 +576,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		if(!$file) {
 			throw new NotFound();
 		}
-		if(!$file->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+		if(!$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 			throw new AccessDenied();
 		}
 		return $file;

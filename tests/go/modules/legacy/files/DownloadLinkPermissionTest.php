@@ -12,8 +12,8 @@ use GO\Files\Model\Folder;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Anyone with a download link can download the file without logging in. Creating a link or getting an existing one
- * requires write permission on the file.
+ * Anyone who may read a file may create a download link for it or get the existing one. Deleting the file when the link
+ * expires requires delete permission.
  */
 class DownloadLinkPermissionTest extends TestCase
 {
@@ -84,7 +84,7 @@ class DownloadLinkPermissionTest extends TestCase
 		\GO::session()->setCurrentUser($userId);
 	}
 
-	private function createDownloadLink(int $expireTime): array
+	private function createDownloadLink(int $expireTime, int $deleteWhenExpired = 0): array
 	{
 		$controller = new FileController();
 		$method = new \ReflectionMethod($controller, 'actionCreateDownloadLink');
@@ -93,29 +93,11 @@ class DownloadLinkPermissionTest extends TestCase
 		return $method->invoke($controller, [
 			'id' => $this->file->id,
 			'expire_time' => $expireTime,
-			'delete_when_expired' => 0
+			'delete_when_expired' => $deleteWhenExpired
 		]);
 	}
 
-	public function testReaderCannotGetExistingDownloadLink(): void
-	{
-		$this->actAs($this->owner->id);
-		$response = $this->createDownloadLink(time() + 5 * 86400);
-		$randomCode = File::model()->findByPk($this->file->id, false, true, true)->random_code;
-		$this->assertNotEmpty($randomCode);
-		$this->assertStringContainsString($randomCode, $response['url']);
-
-		$this->actAs($this->reader->id);
-		try {
-			// an expiry date that isn't later than the existing one returns the existing link
-			$response = $this->createDownloadLink(time());
-			$this->fail('A user with read permission got the download link: ' . var_export($response, true));
-		} catch (AccessDenied $e) {
-			$this->assertTrue(true);
-		}
-	}
-
-	private function emailDownloadLink(int $expireTime): array
+	private function emailDownloadLink(int $expireTime, int $deleteWhenExpired = 0): array
 	{
 		$controller = new FileController();
 		$method = new \ReflectionMethod($controller, 'actionEmailDownloadLink');
@@ -124,26 +106,82 @@ class DownloadLinkPermissionTest extends TestCase
 		return $method->invoke($controller, [
 			'ids' => json_encode([$this->file->id]),
 			'expire_time' => $expireTime,
-			'delete_when_expired' => 0,
+			'delete_when_expired' => $deleteWhenExpired,
 			'content_type' => 'html',
 			'template_id' => 0
 		]);
 	}
 
-	public function testReaderCannotGetExistingDownloadLinkByEmail(): void
+	private function reloadFile(): File
 	{
-		$this->actAs($this->owner->id);
+		return File::model()->findByPk($this->file->id, false, true, true);
+	}
+
+	public function testReaderCanCreateDownloadLink(): void
+	{
+		$this->actAs($this->reader->id);
+		$response = $this->createDownloadLink(time() + 5 * 86400);
+
+		$randomCode = $this->reloadFile()->random_code;
+		$this->assertNotEmpty($randomCode);
+		$this->assertStringContainsString($randomCode, $response['url']);
+	}
+
+	public function testReaderCanEmailDownloadLink(): void
+	{
+		$this->actAs($this->reader->id);
 		$response = $this->emailDownloadLink(time() + 5 * 86400);
-		$randomCode = File::model()->findByPk($this->file->id, false, true, true)->random_code;
+
+		$randomCode = $this->reloadFile()->random_code;
 		$this->assertNotEmpty($randomCode);
 		$this->assertStringContainsString($randomCode, $response['data']['htmlbody']);
+	}
 
+	public function testReaderCannotDeleteFileWhenLinkExpires(): void
+	{
 		$this->actAs($this->reader->id);
 		try {
-			$response = $this->emailDownloadLink(time());
-			$this->fail('A user with read permission got the download link: ' . var_export($response, true));
+			$this->createDownloadLink(time() + 5 * 86400, 1);
+			$this->fail('A user with read permission made the file delete itself when the link expires');
 		} catch (AccessDenied $e) {
-			$this->assertTrue(true);
+			$this->assertFalse((bool) $this->reloadFile()->delete_when_expired);
+		}
+
+		try {
+			$this->emailDownloadLink(time() + 5 * 86400, 1);
+			$this->fail('A user with read permission made the file delete itself when the link expires');
+		} catch (AccessDenied $e) {
+			$this->assertFalse((bool) $this->reloadFile()->delete_when_expired);
+		}
+	}
+
+	public function testOwnerCanDeleteFileWhenLinkExpires(): void
+	{
+		$this->actAs($this->owner->id);
+		$this->createDownloadLink(time() + 5 * 86400, 1);
+
+		$this->assertTrue((bool) $this->reloadFile()->delete_when_expired);
+	}
+
+	public function testUserWithoutAccessCannotCreateDownloadLink(): void
+	{
+		$stranger = $this->createUser('linkstranger');
+		try {
+			$this->actAs($stranger->id);
+			$this->createDownloadLink(time() + 5 * 86400);
+			$this->fail('A user without access created a download link');
+		} catch (AccessDenied $e) {
+			$this->assertEmpty($this->reloadFile()->random_code);
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			\GO::session()->setCurrentUser(User::ID_SUPER_ADMIN);
+			\GO::$ignoreAclPermissions = true;
+			$home = Folder::model()->findByPath('users/' . $stranger->username);
+			if ($home) {
+				$home->delete(true);
+			}
+			User::delete(['id' => $stranger->id]);
+			\GO::$ignoreAclPermissions = false;
 		}
 	}
 
@@ -157,13 +195,5 @@ class DownloadLinkPermissionTest extends TestCase
 
 		$this->assertStringNotContainsString('<img', $response['data']['htmlbody']);
 		$this->assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;.txt', $response['data']['htmlbody']);
-	}
-
-	public function testReaderCannotCreateDownloadLink(): void
-	{
-		$this->actAs($this->reader->id);
-
-		$this->expectException(AccessDenied::class);
-		$this->createDownloadLink(time() + 5 * 86400);
 	}
 }
