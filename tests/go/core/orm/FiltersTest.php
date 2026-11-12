@@ -8,6 +8,8 @@ use go\core\jmap\exception\InvalidArguments;
 use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\exception\SaveException;
+use go\core\util\DateTime;
+use go\modules\community\comments\model\Comment;
 use go\modules\community\notes\model\Note;
 use go\modules\community\notes\model\NoteBook;
 use go\modules\community\test\model\A;
@@ -42,6 +44,7 @@ class FiltersTest extends TestCase
 				->orWhere((new Criteria())->where('toEntityTypeId', '=', $typeId)->andWhere('toId', 'IN', $ids))
 			)->execute();
 
+			Comment::delete(['entityTypeId' => $typeId, 'entityId' => $ids]);
 			Note::delete(['id' => $ids]);
 		}
 
@@ -66,7 +69,8 @@ class FiltersTest extends TestCase
 	 */
 	private function findNoteIds(array $filter): array
 	{
-		$filter['noteBookId'] = $this->noteBook->id;
+		// Wrapped so that it also restricts filters with an operator
+		$filter = ['operator' => 'AND', 'conditions' => [['noteBookId' => $this->noteBook->id], $filter]];
 		return array_map('intval', Note::find()->selectSingleValue('n.id')->filter($filter)->orderBy(['n.id' => 'ASC'])->all());
 	}
 
@@ -117,6 +121,97 @@ class FiltersTest extends TestCase
 				['link' => ['entity' => 'Note', 'id' => $a->id]],
 				['link' => ['entity' => 'Note', 'id' => $c->id]]
 			]
+		]));
+	}
+
+	public function testLinkFilterWithNot(): void
+	{
+		$a = $this->createNote("a");
+		$b = $this->createNote("b");
+		$c = $this->createNote("c");
+
+		Link::create($a, $b);
+		Link::create($c, $b);
+
+		// b is linked to a and c, so it must be excluded even though it also has a link to c
+		$this->assertEquals([$a->id, $c->id], $this->findNoteIds([
+			'operator' => 'NOT',
+			'conditions' => [['link' => ['entity' => 'Note', 'id' => $a->id]]]
+		]));
+	}
+
+	private function addComment(Note $note, string $text): void
+	{
+		$comment = new Comment();
+		$comment->setEntity($note);
+		$comment->text = $text;
+		$comment->date = new DateTime();
+		if (!$comment->save()) {
+			throw new SaveException($comment);
+		}
+	}
+
+	/**
+	 * Creates notes: a with "apple", b without comments, c with "apple" and "pear" and d with "pear"
+	 *
+	 * @return Note[]
+	 */
+	private function createCommentedNotes(): array
+	{
+		$a = $this->createNote("a");
+		$b = $this->createNote("b");
+		$c = $this->createNote("c");
+		$d = $this->createNote("d");
+
+		$this->addComment($a, "apple");
+		$this->addComment($c, "apple");
+		$this->addComment($c, "pear");
+		$this->addComment($d, "pear");
+
+		return [$a, $b, $c, $d];
+	}
+
+	public function testCommentFilter(): void
+	{
+		[$a, $b, $c, $d] = $this->createCommentedNotes();
+
+		$this->assertEquals([$a->id, $c->id], $this->findNoteIds(['comment' => '%apple%']));
+
+		// A note without comments must still match the other condition
+		$this->assertEquals([$a->id, $b->id, $c->id], $this->findNoteIds([
+			'operator' => 'OR',
+			'conditions' => [['comment' => '%apple%'], ['exclude' => [$a->id, $c->id, $d->id]]]
+		]));
+
+		// c has a pear comment too but must be excluded because it has an apple comment
+		$this->assertEquals([$b->id, $d->id], $this->findNoteIds([
+			'operator' => 'NOT',
+			'conditions' => [['comment' => '%apple%']]
+		]));
+	}
+
+	public function testCommentedAtFilter(): void
+	{
+		[$a, $b, $c, $d] = $this->createCommentedNotes();
+
+		$this->assertEquals([$a->id, $c->id, $d->id], $this->findNoteIds(['commentedAt' => '>2000-01-01']));
+		$this->assertEquals([], $this->findNoteIds(['commentedAt' => '<2000-01-01']));
+
+		$this->assertEquals([$a->id, $b->id], $this->findNoteIds([
+			'operator' => 'OR',
+			'conditions' => [['commentedAt' => '<2000-01-01'], ['exclude' => [$c->id, $d->id]]]
+		]));
+
+		$this->assertEquals([$b->id], $this->findNoteIds([
+			'operator' => 'NOT',
+			'conditions' => [['commentedAt' => '>2000-01-01']]
+		]));
+
+		// null finds entities without comments
+		$this->assertEquals([$b->id], $this->findNoteIds(['commentedAt' => null]));
+		$this->assertEquals([$a->id, $c->id, $d->id], $this->findNoteIds([
+			'operator' => 'NOT',
+			'conditions' => [['commentedAt' => null]]
 		]));
 	}
 

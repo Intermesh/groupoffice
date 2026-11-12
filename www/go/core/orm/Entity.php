@@ -948,27 +948,31 @@ abstract class Entity extends Property {
 			static::defineCustomFieldFilters($filters);
 		}
 
-		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+		// Filters on related rows use sub queries instead of joins so that they can be combined with OR and NOT
 
-			if (!$query->isJoined('comments_comment', 'comment')) {
-				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
+		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+			// Compares the date of the last comment. Entities without comments get NULL, so they only match inside NOT.
+			$lastCommentDate = '(SELECT MAX(commentFilter.date) FROM comments_comment commentFilter WHERE ' . self::commentsCorrelation($query) . ')';
+
+			if ($value === null) {
+				// A null filter value finds entities without comments
+				$criteria->where($lastCommentDate . ($comparator == '=' ? ' IS NULL' : ' IS NOT NULL'));
+				return;
 			}
 
-			$tag = ":commentedAt" . uniqid();
-
-			$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
-				->bind($tag, $value->format(Column::DATETIME_FORMAT))
-				->groupBy(['id']);
-
+			$tag = ':' . $criteria->bindTag();
+			$criteria->where($lastCommentDate . ' ' . $comparator . ' ' . $tag)
+				->bind($tag, $value->format(Column::DATETIME_FORMAT));
 		});
 
 		$filters->addText('comment', function (Criteria $criteria, $comparator, $value, Query $query) {
-			if (!$query->isJoined('comments_comment', 'comment')) {
-				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
-			}
+			$sub = (new DbQuery())
+				->select('commentFilter.id')
+				->from('comments_comment', 'commentFilter')
+				->where(self::commentsCorrelation($query))
+				->andWhere('commentFilter.text', $comparator, $value);
 
-			$query->groupBy(['id']);
-			$criteria->where('comment.text ', $comparator, $value);
+			$criteria->whereExists($sub);
 		});
 
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
@@ -982,22 +986,34 @@ abstract class Entity extends Property {
 			}
 
 
-			$linkAlias = 'link_' . uniqid();
-			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
-
-			$query->join('core_link', $linkAlias, $on, "LEFT");
-			$criteria->where($linkAlias . '.toId', '!=');
+			$sub = (new DbQuery())
+				->select('linkFilter.toId')
+				->from('core_link', 'linkFilter')
+				->where('linkFilter.toId = ' . $query->getTableAlias() . '.id')
+				->andWhere('linkFilter.toEntityTypeId', '=', static::entityType()->getId())
+				->andWhere('linkFilter.fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());
 
 			if (!empty($value['id'])) {
-				$criteria->andWhere($linkAlias . '.fromId', '=', $value['id']);
+				$sub->andWhere('linkFilter.fromId', '=', $value['id']);
 			}
 
-			$query->groupBy([$query->getTableAlias() . '.id']);
+			$criteria->whereExists($sub);
 		});
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
 
 		return $filters;
+	}
+
+	/**
+	 * SQL condition that correlates the "commentFilter" alias of comments_comment with the entity in the main query.
+	 *
+	 * @param Query $query The main query
+	 * @return string
+	 */
+	private static function commentsCorrelation(Query $query): string
+	{
+		return 'commentFilter.entityId = ' . $query->getTableAlias() . '.id AND commentFilter.entityTypeId = ' . static::entityType()->getId();
 	}
 
 	/**
