@@ -22,4 +22,6 @@ return array (
   'Client Id' => 'Client Id',
   'API Project Id' => 'API Project-id',
   'Use this connection for single signon with OpenID Connect' => 'Deze verbinding gebruiken voor single signon met OpenID Connect',
+  'OAuth2 connection' => 'OAuth2-verbinding',
+  'Project Id' => 'Project-ID',
 );

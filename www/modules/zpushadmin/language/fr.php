@@ -35,4 +35,5 @@ return array (
   'Status' => 'Statut',
   'Imei' => 'Imei',
   'SMS' => 'SMS',
+  'Resync' => 'Resynchroniser',
 );

@@ -161,4 +161,6 @@ The following changes were made by %s:
   'Are you sure you want to delete the selected item permanently?' => 'Sind Sie sicher, dass Sie das ausgewählte Element dauerhaft löschen möchten?',
   'Are you sure you want to delete the {count} items permanently?' => 'Sind Sie sicher, dass Sie die {count} Elemente dauerhaft löschen möchten?',
   'Move to trash' => 'In den Papierkorb verschieben',
+  'Send an email to the user when a folder is changed' => 'Dem Benutzer eine E-Mail senden, wenn ein Ordner geändert wird',
+  'Send notification email when something changes in subscribed files folder' => 'Benachrichtigungs-E-Mail senden, wenn sich etwas in einem abonnierten Dateiordner ändert',
 );

@@ -22,4 +22,5 @@ return array (
   'Modules' => 'Módulos',
   'Allowed' => 'Permitido',
   'Multi instance' => 'Multi instancia',
+  'Is trial' => 'Es de prueba',
 );

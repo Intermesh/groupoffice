@@ -29,4 +29,5 @@ return array (
   'Notebooks' => 'Notitieboeken',
   'Address books' => 'Adresboeken',
   'Tasklists' => 'Taaklijsten',
+  '** 2-Factor authentication **' => '** Tweestapsverificatie **',
 );

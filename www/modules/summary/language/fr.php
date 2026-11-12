@@ -28,5 +28,6 @@ return array (
   "welcomeTitle" => "Bienvenue sur Group-Office !",
   "welcomeContent" => "<p>Merci d'avoir installé Group-Office !</p>
 <p>Voici un lien pour vous aider à démarrer : {{link}}</p>
-<p>Nous espérons que vous apprécierez Group-Office !</p>"
+<p>Nous espérons que vous apprécierez Group-Office !</p>",
+  'note' => 'note',
 );

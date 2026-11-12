@@ -23,4 +23,8 @@ return array (
   'Start in' => 'Empezar en',
   'Remember last selected note book' => 'Recordar la última libreta seleccionada',
   'Content' => 'Contenido',
+  'Cannot decrypt' => 'No se puede descifrar',
+  'Encrypt' => 'Cifrar',
+  'Passwords do not match' => 'Las contraseñas no coinciden',
+  'notes' => 'notas',
 );

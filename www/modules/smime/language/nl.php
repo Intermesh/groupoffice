@@ -46,4 +46,11 @@ return array (
   'Issuer' => 'Uitgever',
   'Valid from' => 'Geldig van',
   'Valid to' => 'Geldig voor',
+  'Could not read p12 file:' => 'Kon p12-bestand niet lezen:',
+  'No OCSP URI found' => 'Geen OCSP-URI gevonden',
+  'No issuer URI found' => 'Geen URI van uitgever gevonden',
+  'The SMIME password was incorrect.' => 'Het SMIME-wachtwoord was onjuist.',
+  'The certificate has been revoked!' => 'Het certificaat is ingetrokken!',
+  'The certificate must be in PEM format' => 'Het certificaat moet in PEM-formaat zijn',
+  'This certificate already exists' => 'Dit certificaat bestaat al',
 );

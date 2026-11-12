@@ -13,4 +13,11 @@ return array (
   'Please press the button "Refresh token" to finish the OAuth2 connection' => 'Por favor, pulse el botón "Actualizar token" para finalizar la conexión OAuth2',
   'OAuth2 client' => 'Cliente OAuth2',
   'Use this connection for single signon with OpenID Connect' => 'Usar esta conexión para un único OpenID Connect',
+  'Click here' => 'Haga clic aquí',
+  'Hello' => 'Hola',
+  'OAuth2 authentication was successful.' => 'La autenticación OAuth2 se ha realizado correctamente.',
+  'OAuth2 connection' => 'Conexión OAuth2',
+  'Project Id' => 'ID del proyecto',
+  'Request or update a refresh token in a separate window.' => 'Solicitar o actualizar un token de actualización en una ventana aparte.',
+  'to close this window.' => 'para cerrar esta ventana.',
 );

@@ -14,4 +14,5 @@ return array (
   'Entity' => 'Entidad',
   'Item was never modified' => 'El elemento nunca se modificó',
   'Entity ID' => 'ID de entidad',
+  'Datum' => 'Fecha',
 );

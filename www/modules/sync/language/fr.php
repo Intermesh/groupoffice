@@ -26,4 +26,7 @@ return array (
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>Serveur SyncML {product_name}</h1><br><p>Veuillez utiliser un appareil ou un logiciel compatible et connecter vous à cette adresse pour synchroniser vos données {product_name}.</p>',
   'Notebooks' => 'Carnets de notes',
   'Address books' => 'Carnets d\'adresses',
+  '** 2-Factor authentication **' => '** Authentification à deux facteurs **',
+  'Allow delete via synchronization' => 'Autoriser la suppression via la synchronisation',
+  'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Par défaut, les appareils ne sont pas autorisés à supprimer des éléments. Ceci a été ajouté en raison d\'un bug d\'Android 12 qui supprimait les contacts après une mise à jour.',
 );

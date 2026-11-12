@@ -146,4 +146,10 @@ return array (
   'Last contact at' => 'Último contacto en',
   'Has phone numbers' => 'Tiene números de teléfono',
   'Has organizations' => 'Tiene organizaciones',
+  'Automatic e-mail linking' => 'Vinculación automática de correo electrónico',
+  'ICD' => 'ICD',
+  'Index character' => 'Carácter de índice',
+  'Please select a company' => 'Seleccione una empresa',
+  'Please select at least two items to merge.' => 'Seleccione al menos dos elementos para combinar.',
+  'vCard importer' => 'Importador de vCard',
 );

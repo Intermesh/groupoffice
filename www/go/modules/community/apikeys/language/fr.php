@@ -5,4 +5,7 @@ return array (
   'API Key' => 'Clé API',
   'Add key' => 'Ajouter une clé',
   'View access token' => 'Voir le jeton d\'accès',
+  'API key' => 'Clé API',
+  'API keys' => 'Clés API',
+  'Access token' => 'Jeton d\'accès',
 );

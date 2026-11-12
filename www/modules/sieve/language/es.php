@@ -144,4 +144,7 @@ return array (
   'Activate' => 'Activar',
   'Senders will only be notified periodically. You can set the number of days below.' => 'Los remitentes sólo recibirán notificaciones periódicamente. Puede establecer el número de días a continuación.',
   'Mailing list' => 'Lista de correo',
+  'Is from mailing list' => 'Es de una lista de correo',
+  'Set a custom subject' => 'Establecer un asunto personalizado',
+  'exist' => 'existe',
 );

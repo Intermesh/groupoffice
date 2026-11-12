@@ -264,4 +264,11 @@ return array (
   'Paste at original time ({time})' => 'Mit der Originalzeit ({time}) einfügen',
   'Paste at original time' => 'Mit der Originalzeit einfügen',
   'Close views' => 'Ansichten schließen',
+  'Decline entire series' => 'Gesamte Serie ablehnen',
+  'Do you want to decline this occurrence or the entire series?' => 'Möchten Sie diesen Einzeltermin oder die gesamte Serie ablehnen?',
+  'Invitees' => 'Eingeladene',
+  'No appointments to display' => 'Keine Termine vorhanden',
+  'W ' => 'KW ',
+  'iCalendar importer' => 'iCalendar-Import',
+  'updated' => 'aktualisiert',
 );

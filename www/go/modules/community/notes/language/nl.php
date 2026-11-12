@@ -20,4 +20,8 @@ return array (
   'Remember last selected note book' => 'Onthoud mijn laatst geselecteerde notitieblokken ',
   'Start in' => 'Beginnen',
   'Web page' => 'Webpagina',
+  'Cannot decrypt' => 'Kan niet ontsleutelen',
+  'Encrypt' => 'Versleutelen',
+  'Passwords do not match' => 'Wachtwoorden komen niet overeen',
+  'notes' => 'notities',
 );

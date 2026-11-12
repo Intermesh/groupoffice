@@ -67,4 +67,8 @@ return array (
   'Open' => 'Open',
   'Filter' => 'Filter',
   'Ticket' => 'Ticket',
+  'Default site' => 'Standaardsite',
+  'Go to ticket' => 'Naar ticket',
+  'Thank you, we received your ticket and we will keep you informed about the status per e-mail.' => 'Bedankt, we hebben uw ticket ontvangen en houden u per e-mail op de hoogte van de status.',
+  'We received your ticket' => 'We hebben uw ticket ontvangen',
 );

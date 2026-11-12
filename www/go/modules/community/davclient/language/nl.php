@@ -22,5 +22,7 @@ return array (
 	'If only the account is deleted the calendars can still be deleted manually' => 'Als alleen het account verwijderd wordt kunnen de agenda\'s nog steeds handmatig verwijderd worden',
 	'Keep calendar data' => 'Agendagegevens bewaren',
 	'Delete all' => 'Alles verwijderen',
-	'Verify SSL certificate' => 'SSL certificaat verifiëren'
+	'Verify SSL certificate' => 'SSL certificaat verifiëren',
+	'Every 15 minutes' => 'Elke 15 minuten',
+	'Sync' => 'Synchroniseren',
 );

@@ -147,4 +147,5 @@ return array (
   'Is from mailing list' => 'Is van mailinglijst',
   'exist' => 'bestaan',
   'Senders will only be notified periodically. You can set the number of days below.' => 'Afzenders worden slechts periodiek op de hoogte gebracht. U kunt het aantal dagen hieronder instellen.',
+  'Set a custom subject' => 'Aangepast onderwerp instellen',
 );

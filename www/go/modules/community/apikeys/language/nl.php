@@ -6,4 +6,7 @@ return array (
   'Add key' => 'Sleutel toevoegen',
   'View access token' => 'Bekijk access token',
   'Copy token to clipboard' => 'Token naar klembord kopiëren',
+  'API key' => 'API-sleutel',
+  'API keys' => 'API-sleutels',
+  'Access token' => 'Toegangstoken',
 );
