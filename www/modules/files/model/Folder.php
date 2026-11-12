@@ -1638,6 +1638,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			throw new Exception(\GO::t("You can't delete this system folder", "files"));
 		}
 
+		// Moving to the trash is deleting, so it requires delete permission
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		$this->fsFolder->checkFileStoragePath();
 
 		$trashFolder = Folder::model()->findByPath('trash');

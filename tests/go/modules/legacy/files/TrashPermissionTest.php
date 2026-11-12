@@ -155,6 +155,33 @@ class TrashPermissionTest extends TestCase
 		}
 	}
 
+	/**
+	 * moveToTrash() checks the permission itself, so callers other than the controller are covered too
+	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('itemsToTrash')]
+	public function testReaderCannotMoveToTrashWithModel(string $prefix, string $entity): void
+	{
+		$id = $entity == 'File' ? $this->file->id : $this->subFolder->id;
+
+		$this->actAs($this->reader->id);
+		$item = $entity == 'File' ? File::model()->findByPk($id) : Folder::model()->findByPk($id);
+		$error = null;
+		try {
+			$item->moveToTrash();
+		} catch (\Exception $e) {
+			$error = $e;
+		}
+
+		\GO::$ignoreAclPermissions = true;
+		$this->assertInstanceOf(AccessDenied::class, $error);
+		$this->assertFalse($this->findTrashedItem($id, $entity), 'A trash record was created for an item that was not moved to trash');
+		if ($entity == 'File') {
+			$this->assertEquals($this->ownerFolder->id, $this->reloadFile()->folder_id);
+		} else {
+			$this->assertEquals($this->ownerFolder->id, Folder::model()->findByPk($id, false, true, true)->parent_id);
+		}
+	}
+
 	public function testReaderCannotDeleteFromTrash(): void
 	{
 		$this->actAs($this->owner->id);
