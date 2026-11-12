@@ -12,6 +12,12 @@ use go\modules\community\oidc\model;
 final class Client extends EntityController
 {
 
+	/**
+	 * The class name of the entity this controller is for
+	 *
+	 * @noapi
+	 * @return string
+	 */
 	public function entityClass(): string
 	{
 		return model\Client::class;

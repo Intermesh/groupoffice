@@ -35,6 +35,18 @@ class DavAccount extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
+	/**
+	 * Synchronize a CalDAV / CardDAV account, or one collection of it
+	 *
+	 * @apiParam string accountId Required. ID of the account. Requires read permission.
+	 * @apiParam string collectionId ID of the collection to synchronize. Without it, the whole account is synchronized,
+	 * including the home set.
+	 * @apiResponse {accountId: string, collection: ?object, success: bool, error: ?string} "collection" is null when
+	 * the whole account is synchronized or the collection was not found
+	 * @param array $params
+	 * @return array
+	 * @throws NotFound
+	 */
 	public function sync($params) {
 		// getEntity() returns false when the user may not read the account
 		$account = $this->getEntity($params['accountId']);

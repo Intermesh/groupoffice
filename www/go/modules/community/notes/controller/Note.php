@@ -31,6 +31,11 @@ class Note extends EntityController {
 	}
 
 	/**
+	 * Decrypt the content of an encrypted note
+	 *
+	 * @apiParam string data Required. The encrypted content
+	 * @apiParam string password Required. The password the content was encrypted with
+	 * @apiResponse {content: string} The decrypted content. An error is returned when the password is wrong.
 	 * @param array $params
 	 * @throws Exception
 	 */

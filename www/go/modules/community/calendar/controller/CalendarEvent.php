@@ -91,6 +91,22 @@ class CalendarEvent extends EntityController {
 	}
 
 
+	/**
+	 * Read an event from an ICS file or e-mail attachment without saving it
+	 *
+	 * Reads the ICS data from a file, or else from a part of an e-mail message. The event is put in the personal
+	 * calendar of the user, when the user has one.
+	 *
+	 * @apiParam int fileId ID of a file with the ICS data
+	 * @apiParam int account_id E-mail account ID, when no fileId is given
+	 * @apiParam string mailbox Mailbox of the message
+	 * @apiParam int uid UID of the message
+	 * @apiParam string number Number of the message part with the ICS data
+	 * @apiParam string encoding Encoding of the message part
+	 * @apiResponse {success: bool, data: CalendarEvent} The event. It is not saved.
+	 * @param array $params
+	 * @return array
+	 */
 	public function loadICS( array $params) :array
 	{
 		if(!empty($params['fileId'])) {
@@ -132,6 +148,13 @@ class CalendarEvent extends EntityController {
 		);
 	}
 
+	/**
+	 * Count the upcoming invitations in the calendars of the user that still need a response. Used for the counter
+	 * badge.
+	 *
+	 * @apiNoParams
+	 * @apiResponse int
+	 */
 	public function countMine(): int
 	{
 

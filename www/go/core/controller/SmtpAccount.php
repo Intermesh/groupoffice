@@ -76,6 +76,19 @@ class SmtpAccount extends EntityController
 
 
 	/**
+	 * Send a test message with the given SMTP settings to the from address. Only for administrators.
+	 *
+	 * @apiParam string id ID of an existing SMTP account. The given properties override its settings.
+	 * @apiParam string hostname SMTP server host name. Required when no id is given.
+	 * @apiParam int port SMTP server port
+	 * @apiParam ?string username User name to authenticate with
+	 * @apiParam string password Password to authenticate with. When empty the saved password of the account is used.
+	 * @apiParam ?string encryption null, "tls" or "ssl"
+	 * @apiParam bool verifyCertificate Verify the certificate of the server
+	 * @apiParam string fromName Name of the sender. Required when no id is given.
+	 * @apiParam string fromEmail E-mail address of the sender and recipient. Required when no id is given.
+	 * @apiParam int maxMessagesPerMinute Maximum number of messages per minute
+	 * @apiResponse {success: bool} An error is returned when sending fails.
 	 * @param array $params
 	 * @throws Exception
 	 */

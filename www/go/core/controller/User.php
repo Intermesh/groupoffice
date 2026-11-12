@@ -88,6 +88,10 @@ class User extends EntityController {
 	}
 
 	/**
+	 * Switch the current session to another user. Only for administrators.
+	 *
+	 * @apiParam string userId Required. ID of the user to log in as. The user must be enabled.
+	 * @apiResponse {success: bool}
 	 * @throws InvalidArguments
 	 * @throws Forbidden
 	 */

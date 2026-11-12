@@ -70,6 +70,15 @@ class Bookmark extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
+	/**
+	 * Fetch the title, description and icon of a web page to fill in a bookmark
+	 *
+	 * @apiParam string url Required. URL of the web page
+	 * @apiResponse {url: string, title: string, description: string, logo: string} The URL after a redirect, the title
+	 * and the description of the page, and the blob ID of the icon. Values that can't be fetched are empty.
+	 * @param array $params
+	 * @return array
+	 */
 	public function description($params) {
 		//$url = $params['url'];
 

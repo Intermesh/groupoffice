@@ -99,6 +99,9 @@ class FieldSet extends EntityController {
 	 * Export all customfields for the chosen Fieldsets to a json-file with the ability to import in on other instance of GroupOffice
 	 * The JSON file is saved in a blob which will be downloaded in the browser.
 	 *
+	 * @apiParam string entity Required. Name of the entity the field sets belong to. Also used as the file name.
+	 * @apiParam string[] fieldSetIds Required. IDs of the field sets to export
+	 * @apiResponse {success: bool, blobId: string} The blob ID of the JSON file. Requires the "mayChangeCustomFields" permission.
 	 * @param $params
 	 * @return array
 	 * @throws \ReflectionException
@@ -175,6 +178,9 @@ class FieldSet extends EntityController {
 	 *
 	 * For fields which you the multiselect options they are also imported with new ID's
 	 *
+	 * @apiParam string blobId Required. ID of the uploaded JSON file
+	 * @apiParam string entity Required. Name of the entity to import the field sets for
+	 * @apiResponse {success: bool, feedback: string} Feedback lists the imported, merged and skipped fields. Requires the "mayChangeCustomFields" permission.
 	 * @param $params
 	 * @return array
 	 */

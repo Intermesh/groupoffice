@@ -31,6 +31,12 @@ class EmailTemplate extends EntityController {
 	}
 
 	/**
+	 * Create an unsaved e-mail template from an uploaded ZIP file
+	 *
+	 * @apiParam string blobId Required. ID of the uploaded ZIP file
+	 * @apiParam string module Required. Name of the module the template is for
+	 * @apiParam string package Required. Package of the module the template is for
+	 * @apiParam string subject Subject to set on the template
 	 * @param array $params
 	 * @return false|model\EmailTemplate
 	 * @throws InvalidArguments

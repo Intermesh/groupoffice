@@ -94,8 +94,11 @@ class Task extends EntityController {
 	}
 
 	/**
-	 * Used to show counter badge for support.
+	 * Count the open tasks in the default task list of the user that are due today or have no due date. Used for the
+	 * counter badge.
 	 *
+	 * @apiNoParams
+	 * @apiResponse int
 	 */
 	public function countMine(): int
 	{
