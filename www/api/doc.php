@@ -117,7 +117,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JMAP API</title>
+<title>GroupOffice JMAP API</title>
 <style>
 	* {
 		box-sizing: border-box;
@@ -239,7 +239,7 @@ uksort($mods, function($a, $b) {return strcmp($a, $b);})
 
 <main>
 
-<h1 id="introduction">JMAP API</h1>
+<h1 id="introduction">GroupOffice JMAP API</h1>
 
 <h2>API endpoints</h2>
 <table>
