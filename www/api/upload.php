@@ -51,23 +51,19 @@ try {
 		exit();
 	}
 
-	$blob = Blob::fromTmp($tmpFile);
-	$blob->name = $filename;
 	if (Request::get()->getHeader('X-File-LastModified') == null) {
-		$blob->modifiedAt = new \go\core\util\DateTime();
+		$modifiedAt = new \go\core\util\DateTime();
 	} else {
-		$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
+		$modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
 	}
 
-	if ($blob->save()) {
-		Response::get()->setStatus(201, 'Created');
-		$response = $blob->toArray();
-		$response['blobId'] = $blob->id; //deprecated
-		Response::get()->output($response);
-	} else {
+	// Doesn't rename an existing blob with the same content, like someone else's attachment
+	$blob = Blob::fromUpload($tmpFile, $filename, $modifiedAt);
 
-		throw new Exception("Could not save file: ". $blob->getValidationErrorsAsString());
-	}
+	Response::get()->setStatus(201, 'Created');
+	$response = $blob->toArray();
+	$response['blobId'] = $blob->id; //deprecated
+	Response::get()->output($response);
 }
 catch(\Exception $e) {
 

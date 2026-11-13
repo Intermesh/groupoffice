@@ -243,6 +243,42 @@ class Blob extends orm\Entity {
 	}
 
 	/**
+	 * Store an uploaded file
+	 *
+	 * A blob with the same content may exist already, like someone else's attachment. It keeps its name, type and date:
+	 * the returned blob has the name and type of this upload, but they're only saved for a new blob. The temporary file is
+	 * removed.
+	 *
+	 * @param File $tmpFile The uploaded temporary file
+	 * @param string $name File name given by the client
+	 * @param DateTime $modifiedAt Modification time given by the client
+	 * @return self
+	 * @throws Exception
+	 */
+	public static function fromUpload(File $tmpFile, string $name, DateTime $modifiedAt): Blob
+	{
+		$blob = self::fromTmp($tmpFile);
+		$blob->name = $name;
+		$blob->modifiedAt = $modifiedAt;
+
+		if ($blob->isNew()) {
+			if (!$blob->save()) {
+				throw new Exception("Could not save file: " . $blob->getValidationErrorsAsString());
+			}
+		} else if (!file_exists($blob->path())) {
+			// Restore the missing file of the existing blob
+			if (!is_dir(dirname($blob->path()))) {
+				mkdir(dirname($blob->path()), 0775, true);
+			}
+			$tmpFile->move(new File($blob->path()));
+		} else {
+			$tmpFile->delete();
+		}
+
+		return $blob;
+	}
+
+	/**
 	 * Create from string
 	 *
 	 * @example
