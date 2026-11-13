@@ -212,6 +212,35 @@ class CalendarEventExpandTest extends TestCase
 		$this->assertEquals('2030-03-05T09:00:00', $normalArr['start']);
 	}
 
+	/**
+	 * Set by testGetOccurrenceWithListenerObjects() to add an object to the list, like the leavedays module does
+	 */
+	private static bool $addObjectOnGet = false;
+
+	public static function onGetAddObject($controller, $params, $result): void
+	{
+		if (self::$addObjectOnGet) {
+			$result['list'][] = (object) ['id' => 'L1', 'title' => 'Leave'];
+		}
+	}
+
+	/**
+	 * A listener of CalendarEvent/get may add objects to the list. Sorting the occurrences between them crashed.
+	 */
+	public function testGetOccurrenceWithListenerObjects(): void
+	{
+		CalendarEvent::on(CalendarEvent::EVENT_GET, self::class, 'onGetAddObject');
+		self::$addObjectOnGet = true;
+		try {
+			$normal = self::$daily->id . '/2030-03-05T09:00:00';
+			$response = $this->controller()->get(['ids' => [(string) self::$single->id, $normal, 'L1']]);
+			$ids = array_map(fn($item) => (string) (is_array($item) ? $item['id'] : $item->id), $response['list']);
+			$this->assertSame([(string) self::$single->id, $normal, 'L1'], $ids);
+		} finally {
+			self::$addObjectOnGet = false;
+		}
+	}
+
 	public function testGetOccurrenceWithProperties(): void
 	{
 		$id = self::$daily->id . '/2030-03-05T09:00:00';

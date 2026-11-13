@@ -218,9 +218,10 @@ class CalendarEvent extends EntityController {
 			}
 		}
 
-		// In the order of the given IDs
+		// In the order of the given IDs. Listeners may add objects, like the leave days of the leavedays module.
 		$order = array_flip(array_map('strval', $ids));
-		usort($list, fn($a, $b) => ($order[(string) $a['id']] ?? PHP_INT_MAX) <=> ($order[(string) $b['id']] ?? PHP_INT_MAX));
+		$position = fn($item) => $order[(string) (is_array($item) ? $item['id'] : $item->id)] ?? PHP_INT_MAX;
+		usort($list, fn($a, $b) => $position($a) <=> $position($b));
 
 		$response['list'] = $list;
 		$response['notFound'] = array_values($notFound);
