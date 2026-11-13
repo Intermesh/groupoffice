@@ -21,50 +21,73 @@ class UserTest extends TestCase
 {
 	private $authState;
 
-	private Group $managerGroup;
-	private UserModel $manager;
+	/*
+	 * The users that only act or are only read, and the user manager group, are created once for the class. Tests
+	 * change $user, so every test gets a new one.
+	 */
+	private static Group $managerGroup;
+	private static UserModel $manager;
+	private static UserModel $otherUser;
+	private static UserModel $admin;
 	private UserModel $user;
-	private UserModel $otherUser;
-	private UserModel $admin;
 
-	protected function setUp(): void
+	public static function setUpBeforeClass(): void
 	{
-		$this->authState = go()->getAuthState();
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		$authState = go()->getAuthState();
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 
-		$this->manager = $this->newUser();
-		$this->user = $this->newUser();
-		$this->otherUser = $this->newUser();
-		$this->admin = $this->newUser([Group::ID_ADMINS]);
+		self::$manager = self::newUser();
+		self::$otherUser = self::newUser();
+		self::$admin = self::newUser([Group::ID_ADMINS]);
 
 		// A group with the "mayChangeUsers" right on the core module
-		$this->managerGroup = new Group();
-		$this->managerGroup->name = uniqid('usermanagers');
-		$this->managerGroup->users = [$this->manager->id];
-		$this->assertTrue($this->managerGroup->save());
+		self::$managerGroup = new Group();
+		self::$managerGroup->name = uniqid('usermanagers');
+		self::$managerGroup->users = [self::$manager->id];
+		self::assertTrue(self::$managerGroup->save());
 
 		$core = Module::findByName('core', 'core');
 		$permission = new Permission($core);
 		$permission->setRights(['mayChangeUsers' => true]);
-		$core->permissions[$this->managerGroup->id] = $permission;
-		$this->assertTrue($core->save());
+		$core->permissions[self::$managerGroup->id] = $permission;
+		self::assertTrue($core->save());
+
+		go()->setAuthState($authState);
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		$authState = go()->getAuthState();
+		self::actAs(UserModel::ID_SUPER_ADMIN);
+
+		$core = Module::findByName('core', 'core');
+		unset($core->permissions[self::$managerGroup->id]);
+		$core->save();
+
+		Group::delete(['id' => self::$managerGroup->id]);
+		UserModel::delete(['id' => [self::$manager->id, self::$otherUser->id, self::$admin->id]]);
+
+		go()->setAuthState($authState);
+	}
+
+	protected function setUp(): void
+	{
+		$this->authState = go()->getAuthState();
+		self::actAs(UserModel::ID_SUPER_ADMIN);
+
+		$this->user = self::newUser();
 	}
 
 	protected function tearDown(): void
 	{
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 
-		$core = Module::findByName('core', 'core');
-		unset($core->permissions[$this->managerGroup->id]);
-		$core->save();
-
-		Group::delete(['id' => $this->managerGroup->id]);
-		UserModel::delete(['id' => array_merge([$this->manager->id, $this->user->id, $this->otherUser->id, $this->admin->id], $this->createdIds)]);
+		UserModel::delete(['id' => array_merge([$this->user->id], $this->createdIds)]);
 
 		go()->setAuthState($this->authState);
 	}
 
-	private function newUser(array $groups = []): UserModel
+	private static function newUser(array $groups = []): UserModel
 	{
 		$name = uniqid('ctrluser');
 		$user = new UserModel();
@@ -77,19 +100,19 @@ class UserTest extends TestCase
 		if ($groups) {
 			$user->groups = array_merge([Group::ID_EVERYONE], $groups);
 		}
-		$this->assertTrue($user->save(), var_export($user->getValidationErrors(), true));
+		self::assertTrue($user->save(), var_export($user->getValidationErrors(), true));
 
 		return $user;
 	}
 
-	private function actAs(int $userId): void
+	private static function actAs(int $userId): void
 	{
 		go()->setAuthState(new TemporaryState($userId));
 	}
 
 	private function update(int $actingUserId, int $id, array $properties): array
 	{
-		$this->actAs($actingUserId);
+		self::actAs($actingUserId);
 		$result = (new User())->set(['update' => [$id => $properties]]);
 
 		return $result->getArray();
@@ -97,7 +120,7 @@ class UserTest extends TestCase
 
 	/*
 	 * The "created" and "updated" lists of a set result also contain the entities that were saved earlier in the same
-	 * process, like the users created in setUp(). So check "notUpdated" and the stored data.
+	 * process, like the users created in setUp() and setUpBeforeClass(). So check "notUpdated" and the stored data.
 	 */
 	private function assertUpdated(array $result, int $id): void
 	{
@@ -112,15 +135,15 @@ class UserTest extends TestCase
 
 	public function testUserManagerMayNotChangeAnAdministrator()
 	{
-		$result = $this->update($this->manager->id, $this->admin->id, ['recoveryEmail' => 'attacker@example.com']);
+		$result = $this->update(self::$manager->id, self::$admin->id, ['recoveryEmail' => 'attacker@example.com']);
 
-		$this->assertForbidden($result, $this->admin->id);
-		$this->assertNotSame('attacker@example.com', UserModel::findById($this->admin->id)->recoveryEmail);
+		$this->assertForbidden($result, self::$admin->id);
+		$this->assertNotSame('attacker@example.com', UserModel::findById(self::$admin->id)->recoveryEmail);
 	}
 
 	public function testUserManagerMayChangeAUser()
 	{
-		$result = $this->update($this->manager->id, $this->user->id, ['recoveryEmail' => 'new@example.com', 'disk_quota' => 1000]);
+		$result = $this->update(self::$manager->id, $this->user->id, ['recoveryEmail' => 'new@example.com', 'disk_quota' => 1000]);
 
 		$this->assertUpdated($result, $this->user->id);
 		$user = UserModel::findById($this->user->id);
@@ -162,31 +185,31 @@ class UserTest extends TestCase
 
 	public function testUserMayNotChangeAnotherUser()
 	{
-		$result = $this->update($this->user->id, $this->otherUser->id, ['displayName' => 'Changed name']);
+		$result = $this->update($this->user->id, self::$otherUser->id, ['displayName' => 'Changed name']);
 
-		$this->assertForbidden($result, $this->otherUser->id);
-		$this->assertNotSame('Changed name', UserModel::findById($this->otherUser->id)->displayName);
+		$this->assertForbidden($result, self::$otherUser->id);
+		$this->assertNotSame('Changed name', UserModel::findById(self::$otherUser->id)->displayName);
 	}
 
 	public function testUserMayNotChangeOwnPersonalGroupMembers()
 	{
 		$this->expectException(Forbidden::class);
-		$this->update($this->user->id, $this->user->id, ['personalGroup' => ['users' => [$this->user->id, $this->otherUser->id]]]);
+		$this->update($this->user->id, $this->user->id, ['personalGroup' => ['users' => [$this->user->id, self::$otherUser->id]]]);
 	}
 
 	public function testUserManagerMayNotChangePersonalGroupMembers()
 	{
 		$this->expectException(Forbidden::class);
-		$this->update($this->manager->id, $this->user->id, ['personalGroup' => ['users' => [$this->user->id, $this->manager->id]]]);
+		$this->update(self::$manager->id, $this->user->id, ['personalGroup' => ['users' => [$this->user->id, self::$manager->id]]]);
 	}
 
 	public function testUserManagerMayChangeWhoCanSeeAUser()
 	{
 		// The personal group must stay in its own ACL
 		$groupId = UserModel::findById($this->user->id)->getPersonalGroup()->id;
-		$acl = [$groupId => Acl::LEVEL_MANAGE, $this->otherUser->getPersonalGroup()->id => Acl::LEVEL_READ];
+		$acl = [$groupId => Acl::LEVEL_MANAGE, self::$otherUser->getPersonalGroup()->id => Acl::LEVEL_READ];
 
-		$result = $this->update($this->manager->id, $this->user->id, ['personalGroup' => ['acl' => $acl]]);
+		$result = $this->update(self::$manager->id, $this->user->id, ['personalGroup' => ['acl' => $acl]]);
 
 		$this->assertUpdated($result, $this->user->id);
 		$stored = Group::findById($groupId)->toArray(['acl'])['acl'];
@@ -205,7 +228,7 @@ class UserTest extends TestCase
 			'password' => 'Pa55word!!xyz'
 		], $properties);
 
-		$this->actAs($actingUserId);
+		self::actAs($actingUserId);
 		$result = (new User())->set(['create' => ['new' => $properties]])->getArray();
 
 		if(isset($result['created']['new'])) {
@@ -227,7 +250,7 @@ class UserTest extends TestCase
 	#[DataProvider('privilegedGroups')]
 	public function testUserManagerMayNotCreateUserInOtherGroups(array $groups)
 	{
-		$result = $this->create($this->manager->id, ['groups' => $groups]);
+		$result = $this->create(self::$manager->id, ['groups' => $groups]);
 
 		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
 		$this->assertSame('forbidden', $result['notCreated']['new']->type ?? null);
@@ -236,17 +259,17 @@ class UserTest extends TestCase
 	public function testUserManagerMayNotCreateUserInManagerGroup()
 	{
 		// Even a group the manager is in may grant more than the default groups
-		$result = $this->create($this->manager->id, ['groups' => [Group::ID_EVERYONE, $this->managerGroup->id]]);
+		$result = $this->create(self::$manager->id, ['groups' => [Group::ID_EVERYONE, self::$managerGroup->id]]);
 
 		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
 	}
 
 	public function testUserManagerMayCreateUserInDefaultGroups()
 	{
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$defaultGroups = \go\core\model\Settings::get()->getDefaultGroups();
 
-		$result = $this->create($this->manager->id, ['groups' => array_merge([Group::ID_EVERYONE], $defaultGroups)]);
+		$result = $this->create(self::$manager->id, ['groups' => array_merge([Group::ID_EVERYONE], $defaultGroups)]);
 
 		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
 		$user = UserModel::findById($result['created']['new']['id']);
@@ -255,7 +278,7 @@ class UserTest extends TestCase
 
 	public function testUserManagerMayCreateUserWithoutGroups()
 	{
-		$result = $this->create($this->manager->id, []);
+		$result = $this->create(self::$manager->id, []);
 
 		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
 	}
@@ -263,7 +286,7 @@ class UserTest extends TestCase
 	public function testUserManagerMayNotAddAdminGroupOnSaveOutsideController()
 	{
 		// Other paths, like imports, save the model without the controller's canCreate()
-		$this->actAs($this->manager->id);
+		self::actAs(self::$manager->id);
 		$name = uniqid('ctrlmodel');
 		$user = new UserModel();
 		$user->setValues([
@@ -288,27 +311,27 @@ class UserTest extends TestCase
 
 	public function testAdminMayChangeAnAdministrator()
 	{
-		$result = $this->update(UserModel::ID_SUPER_ADMIN, $this->admin->id, ['recoveryEmail' => 'admin@example.com', 'disk_quota' => 1000]);
+		$result = $this->update(UserModel::ID_SUPER_ADMIN, self::$admin->id, ['recoveryEmail' => 'admin@example.com', 'disk_quota' => 1000]);
 
-		$this->assertUpdated($result, $this->admin->id);
+		$this->assertUpdated($result, self::$admin->id);
 	}
 
 	public function testUserManagerMayNotUseProfileOfAnotherUser()
 	{
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
-		$adminProfile = Contact::findForUser($this->admin->id);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
+		$adminProfile = Contact::findForUser(self::$admin->id);
 		$this->assertNotEmpty($adminProfile);
 
-		$result = $this->create($this->manager->id, ['profile' => ['id' => $adminProfile->id]]);
+		$result = $this->create(self::$manager->id, ['profile' => ['id' => $adminProfile->id]]);
 
 		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
-		$this->assertEquals($adminProfile->id, Contact::findForUser($this->admin->id)->id);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
+		$this->assertEquals($adminProfile->id, Contact::findForUser(self::$admin->id)->id);
 	}
 
 	public function testUserManagerMayNotUseContactWithoutWritePermissionAsProfile()
 	{
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$addressBook = new AddressBook();
 		$addressBook->name = uniqid('profiletest');
 		$this->assertTrue($addressBook->save());
@@ -318,23 +341,23 @@ class UserTest extends TestCase
 		$this->assertTrue($contact->save());
 
 		try {
-			$result = $this->create($this->manager->id, ['profile' => ['id' => $contact->id]]);
+			$result = $this->create(self::$manager->id, ['profile' => ['id' => $contact->id]]);
 
 			$this->assertArrayNotHasKey('new', $result['created'] ?? []);
-			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			self::actAs(UserModel::ID_SUPER_ADMIN);
 			$this->assertNull(Contact::findById($contact->id)->goUserId);
 		} finally {
-			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			self::actAs(UserModel::ID_SUPER_ADMIN);
 			AddressBook::delete(['id' => $addressBook->id]);
 		}
 	}
 
 	public function testUserManagerMayUseUnlinkedContactAsProfile()
 	{
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$addressBook = new AddressBook();
 		$addressBook->name = uniqid('profiletest');
-		$addressBook->setAcl([$this->managerGroup->id => Acl::LEVEL_WRITE]);
+		$addressBook->setAcl([self::$managerGroup->id => Acl::LEVEL_WRITE]);
 		$this->assertTrue($addressBook->save());
 		$contact = new Contact();
 		$contact->addressBookId = $addressBook->id;
@@ -342,13 +365,13 @@ class UserTest extends TestCase
 		$this->assertTrue($contact->save());
 
 		try {
-			$result = $this->create($this->manager->id, ['profile' => ['id' => $contact->id]]);
+			$result = $this->create(self::$manager->id, ['profile' => ['id' => $contact->id]]);
 
 			$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
-			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			self::actAs(UserModel::ID_SUPER_ADMIN);
 			$this->assertEquals($result['created']['new']['id'], Contact::findById($contact->id)->goUserId);
 		} finally {
-			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			self::actAs(UserModel::ID_SUPER_ADMIN);
 			AddressBook::delete(['id' => $addressBook->id]);
 		}
 	}
@@ -397,16 +420,16 @@ class UserTest extends TestCase
 
 	public function testUserManagerNeedsPasswordForOwnEmail()
 	{
-		$result = $this->update($this->manager->id, $this->manager->id, ['email' => uniqid('attacker') . '@example.com']);
+		$result = $this->update(self::$manager->id, self::$manager->id, ['email' => uniqid('attacker') . '@example.com']);
 
-		$this->assertArrayHasKey($this->manager->id, $result['notUpdated'] ?? []);
+		$this->assertArrayHasKey(self::$manager->id, $result['notUpdated'] ?? []);
 	}
 
 	public function testUserManagerMayChangeEmailOfAUserWithoutPassword()
 	{
 		$email = uniqid('new') . '@example.com';
 
-		$result = $this->update($this->manager->id, $this->user->id, ['email' => $email]);
+		$result = $this->update(self::$manager->id, $this->user->id, ['email' => $email]);
 
 		$this->assertUpdated($result, $this->user->id);
 		$this->assertSame($email, UserModel::findById($this->user->id)->email);
@@ -415,7 +438,7 @@ class UserTest extends TestCase
 	public function testUserMayNotChangeOwnEmailThroughProfileWithoutPassword()
 	{
 		// Put the profile in an address book the user may write
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$addressBook = new AddressBook();
 		$addressBook->name = uniqid('profiletest');
 		$addressBook->setAcl([$this->user->getPersonalGroup()->id => Acl::LEVEL_WRITE]);
@@ -427,7 +450,7 @@ class UserTest extends TestCase
 		$before = UserModel::findById($this->user->id)->email;
 
 		try {
-			$this->actAs($this->user->id);
+			self::actAs($this->user->id);
 			$result = (new \go\modules\community\addressbook\controller\Contact())->set(['update' => [$profile->id => [
 				'emailAddresses' => [['email' => uniqid('attacker') . '@example.com']]
 			]]])->getArray();
@@ -435,17 +458,17 @@ class UserTest extends TestCase
 			$this->assertArrayHasKey($profile->id, $result['notUpdated'] ?? []);
 			$this->assertSame($before, UserModel::findById($this->user->id)->email);
 		} finally {
-			$this->actAs(UserModel::ID_SUPER_ADMIN);
+			self::actAs(UserModel::ID_SUPER_ADMIN);
 			AddressBook::delete(['id' => $addressBook->id]);
 		}
 	}
 
 	public function testUserManagerCreatesUserWithProfile()
 	{
-		$result = $this->create($this->manager->id, []);
+		$result = $this->create(self::$manager->id, []);
 
 		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$this->assertNotEmpty(Contact::findForUser($result['created']['new']['id']));
 	}
 
@@ -456,20 +479,20 @@ class UserTest extends TestCase
 		$result = $this->update($this->user->id, $this->user->id, ['email' => $email, 'currentPassword' => 'Pa55word!!xyz']);
 
 		$this->assertUpdated($result, $this->user->id);
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$profile = Contact::findForUser($this->user->id);
 		$this->assertContains($email, array_map(fn($e) => $e->email, $profile->emailAddresses));
 	}
 
 	public function testUserMayChangeOwnProfileWithItsId()
 	{
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$profile = Contact::findForUser($this->user->id);
 
 		$result = $this->update($this->user->id, $this->user->id, ['profile' => ['id' => $profile->id]]);
 
 		$this->assertUpdated($result, $this->user->id);
-		$this->actAs(UserModel::ID_SUPER_ADMIN);
+		self::actAs(UserModel::ID_SUPER_ADMIN);
 		$this->assertEquals($profile->id, Contact::findForUser($this->user->id)->id);
 	}
 }
