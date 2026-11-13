@@ -118,8 +118,9 @@ class ToolsTest extends TestCase
 		$result = $this->callTool('list_entities');
 
 		$this->assertFalse($result['isError']);
-		$this->assertEquals(['Note', 'NoteBook'], array_column($result['structuredContent']['entities'], 'name'));
-		$this->assertFalse($result['structuredContent']['entities'][0]['mayWrite']);
+		// Principal is readable with every key, to find people
+		$entities = array_column($result['structuredContent']['entities'], 'mayWrite', 'name');
+		$this->assertEquals(['Note' => false, 'NoteBook' => false, 'Principal' => false], $entities);
 	}
 
 	public function testDescribeEntity(): void
@@ -191,6 +192,40 @@ class ToolsTest extends TestCase
 
 		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
 		$this->assertNotNull(Note::findById(self::$sharedNote->id));
+	}
+
+	public function testPrincipalIsReadableWithoutPicking(): void
+	{
+		$result = $this->read([['Principal/query', ['limit' => 5], 'p']]);
+
+		$this->assertFalse($result['isError'], json_encode($result));
+		$this->assertEquals('Principal/query', $result['structuredContent']['responses'][0][0]);
+	}
+
+	public function testOnlyIdsMayReferToAnotherCall(): void
+	{
+		$reference = ['resultOf' => 'q', 'name' => 'Note/query', 'path' => '/total'];
+		$calls = [
+			['Note/query', ['#limit' => $reference], 'a'],
+			['Note/query', ['filter' => ['#text' => $reference]], 'b'],
+			['Note/get', ['ids' => [], 'x' => ['#ids' => $reference]], 'c']
+		];
+		foreach ($calls as $call) {
+			$result = $this->read([['Note/query', ['calculateTotal' => true], 'q'], $call]);
+			$this->assertTrue($result['isError'], json_encode($call));
+			$this->assertStringContainsString('only "#ids"', $result['structuredContent']['error']);
+		}
+	}
+
+	public function testReadWorksAfterThePageCreatedTheHttpResponse(): void
+	{
+		// api/page.php creates the HTTP response before it calls the module
+		\go\core\http\Response::get();
+
+		$result = $this->read([['Note/get', ['ids' => [self::$sharedNote->id]], 'g']]);
+
+		$this->assertFalse($result['isError'], json_encode($result));
+		$this->assertEquals(self::$sharedNote->id, $result['structuredContent']['responses'][0][1]['list'][0]['id']);
 	}
 
 	public function testGetNeedsIds(): void

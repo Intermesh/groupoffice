@@ -172,6 +172,34 @@ class McpKeyTest extends TestCase
 		}
 	}
 
+	public function testTokenIsReturnedOnceThroughJmap(): void
+	{
+		go()->setAuthState(new TemporaryState(self::$owner->id));
+		$created = $this->controller()->set(['create' => ['k' => [
+			'name' => 'Through JMAP',
+			'entities' => [['entityTypeId' => (string) Note::entityType()->getId()]]
+		]]])['created']['k'] ?? null;
+
+		$this->assertNotNull($created);
+		$this->assertMatchesRegularExpression('/^gomcp_\d+_[a-f0-9]{64}$/', $created['token']);
+		$this->assertArrayNotHasKey('secretHash', $created);
+
+		$got = $this->controller()->get(['ids' => [$created['id']]])['list'][0];
+		$this->assertEmpty($got['token'] ?? null);
+		$this->assertArrayNotHasKey('secretHash', $got);
+	}
+
+	public function testExpiryDateIsRequired(): void
+	{
+		$key = $this->createKey();
+
+		go()->setAuthState(new TemporaryState(self::$owner->id));
+		$response = $this->controller()->set(['update' => [$key->id => ['expiresAt' => null]]]);
+
+		$this->assertEquals('invalidProperties', $response['notUpdated'][$key->id]['type'] ?? null, json_encode($response));
+		$this->assertContains('expiresAt', $response['notUpdated'][$key->id]['properties']);
+	}
+
 	public function testUserCanNotCreateAKeyForSomeoneElse(): void
 	{
 		$key = $this->createKey([Note::class], ['userId' => self::$other->id]);

@@ -177,7 +177,7 @@ class ServerTest extends TestCase
 
 		$this->assertFalse($result['isError']);
 		$this->assertEquals(self::$mcpUser->id, $result['structuredContent']['user']['id']);
-		$this->assertEqualsCanonicalizing(['Note', 'NoteBook'], array_column($result['structuredContent']['entities'], 'name'));
+		$this->assertEqualsCanonicalizing(['Note', 'NoteBook', 'Principal'], array_column($result['structuredContent']['entities'], 'name'));
 		$this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}$/', $result['structuredContent']['today']);
 		$this->assertEquals($result['structuredContent'], json_decode($result['content'][0]['text'], true));
 	}
