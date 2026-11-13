@@ -4,15 +4,18 @@ namespace go\modules\business;
 /**
  * Licensed modules can't be installed in the tests because there's no license. This creates the tables and the module
  * record of such a module without the license check when it's not installed yet, and removes them again afterwards.
+ *
+ * The methods are static so a test class can create the tables once in setUpBeforeClass() and drop them in
+ * tearDownAfterClass(), instead of for every test in setUp() and tearDown().
  */
 trait ModuleTablesTrait
 {
 	/** @var string[] Tables created by installModuleTables() */
-	private array $createdModuleTables = [];
+	private static array $createdModuleTables = [];
 	/** @var int[] Ids of module records created by installModuleTables() */
-	private array $createdModuleIds = [];
+	private static array $createdModuleIds = [];
 	/** @var array[] [package, name] of the modules created by installModuleTables() */
-	private array $createdModuleNames = [];
+	private static array $createdModuleNames = [];
 
 	/**
 	 * Create the tables and module record of a module that isn't installed
@@ -22,7 +25,7 @@ trait ModuleTablesTrait
 	 * @param string $installSql Path of the install.sql file of the module
 	 * @param string[] $onlyTables Run only the CREATE TABLE statements of these tables
 	 */
-	private function installModuleTables(?string $package, string $name, string $installSql, array $onlyTables = []): void
+	private static function installModuleTables(?string $package, string $name, string $installSql, array $onlyTables = []): void
 	{
 		$exists = go()->getDbConnection()->selectSingleValue('id')->from('core_module')
 			->where(['package' => $package, 'name' => $name])->single();
@@ -31,21 +34,21 @@ trait ModuleTablesTrait
 		}
 
 		if (!is_file($installSql)) {
-			$this->markTestSkipped('The ' . $name . ' module is not available');
+			self::markTestSkipped('The ' . $name . ' module is not available');
 		}
 
 		go()->getDbConnection()->insert('core_module', ['name' => $name, 'package' => $package, 'version' => 0, 'enabled' => 1])->execute();
-		$this->createdModuleIds[] = (int) go()->getDbConnection()->getPDO()->lastInsertId();
-		$this->createdModuleNames[] = [$package, $name];
+		self::$createdModuleIds[] = (int) go()->getDbConnection()->getPDO()->lastInsertId();
+		self::$createdModuleNames[] = [$package, $name];
 
 		try {
-			$this->createTables($installSql, $onlyTables);
+			self::createTables($installSql, $onlyTables);
 		} catch (\Throwable $e) {
 			// tearDown() isn't called when setUp() fails
-			$this->uninstallModuleTables();
+			self::uninstallModuleTables();
 			throw $e;
 		}
-		$this->clearModuleCaches($package, $name);
+		self::clearModuleCaches($package, $name);
 	}
 
 	/**
@@ -54,9 +57,9 @@ trait ModuleTablesTrait
 	 * @param string $installSql
 	 * @param string[] $onlyTables Run only the CREATE TABLE statements of these tables
 	 */
-	private function createTables(string $installSql, array $onlyTables = []): void
+	private static function createTables(string $installSql, array $onlyTables = []): void
 	{
-		$tables = $this->findAllTables();
+		$tables = self::findAllTables();
 		if (!empty($onlyTables) && empty(array_diff($onlyTables, $tables))) {
 			return;
 		}
@@ -74,18 +77,18 @@ trait ModuleTablesTrait
 			if ($oldFKchecks) {
 				go()->getDbConnection()->foreignKeyChecks(true);
 			}
-			$this->createdModuleTables = array_merge($this->createdModuleTables, array_diff($this->findAllTables(), $tables));
+			self::$createdModuleTables = array_merge(self::$createdModuleTables, array_diff(self::findAllTables(), $tables));
 		}
 	}
 
 	/**
 	 * Drop the tables and module records created by installModuleTables() and createTables()
 	 */
-	private function uninstallModuleTables(): void
+	private static function uninstallModuleTables(): void
 	{
 		$oldFKchecks = go()->getDbConnection()->foreignKeyChecks(false);
 		try {
-			foreach (array_reverse($this->createdModuleTables) as $table) {
+			foreach (array_reverse(self::$createdModuleTables) as $table) {
 				go()->getDbConnection()->exec('DROP TABLE IF EXISTS `' . $table . '`');
 			}
 		} finally {
@@ -93,21 +96,21 @@ trait ModuleTablesTrait
 				go()->getDbConnection()->foreignKeyChecks(true);
 			}
 		}
-		$this->createdModuleTables = [];
+		self::$createdModuleTables = [];
 
-		if (!empty($this->createdModuleIds)) {
-			go()->getDbConnection()->delete('core_email_template', ['moduleId' => $this->createdModuleIds])->execute();
-			go()->getDbConnection()->delete('core_module', ['id' => $this->createdModuleIds])->execute();
-			$this->createdModuleIds = [];
+		if (!empty(self::$createdModuleIds)) {
+			go()->getDbConnection()->delete('core_email_template', ['moduleId' => self::$createdModuleIds])->execute();
+			go()->getDbConnection()->delete('core_module', ['id' => self::$createdModuleIds])->execute();
+			self::$createdModuleIds = [];
 		}
-		foreach ($this->createdModuleNames as [$package, $name]) {
-			$this->clearModuleCaches($package, $name);
+		foreach (self::$createdModuleNames as [$package, $name]) {
+			self::clearModuleCaches($package, $name);
 		}
-		$this->createdModuleNames = [];
-		$this->clearModuleCaches();
+		self::$createdModuleNames = [];
+		self::clearModuleCaches();
 	}
 
-	private function clearModuleCaches(?string $package = null, ?string $name = null): void
+	private static function clearModuleCaches(?string $package = null, ?string $name = null): void
 	{
 		go()->getCache()->delete('entity-types');
 		// Listeners and entity references of the module would otherwise still be used after it's gone
@@ -119,7 +122,7 @@ trait ModuleTablesTrait
 		\go\core\orm\Entity::clearCache();
 	}
 
-	private function findAllTables(): array
+	private static function findAllTables(): array
 	{
 		return go()->getDbConnection()->query('SHOW TABLES')->fetchAll(\PDO::FETCH_COLUMN);
 	}

@@ -91,7 +91,7 @@ class ProjectDirectoryPermissionTest extends TestCase
 		if (isset($this->user)) {
 			User::delete(['id' => $this->user->id]);
 		}
-		if (in_array('business_projects3_project3', $this->createdModuleTables)) {
+		if (in_array('business_projects3_project3', self::$createdModuleTables)) {
 			// install.sql adds these to the tasks table, which isn't dropped
 			foreach (['tasks_task_business_projects3_project3_id_fk', 'tasks_task_business_projects3_project3_milestone_id_fk'] as $fk) {
 				if (go()->getDbConnection()->query("SELECT 1 FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'tasks_task' AND CONSTRAINT_NAME = '" . $fk . "'")->fetch()) {
