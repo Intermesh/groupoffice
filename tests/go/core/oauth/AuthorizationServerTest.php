@@ -25,6 +25,9 @@ class AuthorizationServerTest extends TestCase
 	/** Hashing the secret of a client takes a while, and the tests don't change the client, so they share one */
 	private static ?OauthClient $client = null;
 
+	/** A client without a secret, like an AI assistant or an app */
+	private static ?OauthClient $publicClient = null;
+
 	private array $userIds = [];
 	private ?string $httpHost = null;
 
@@ -38,14 +41,25 @@ class AuthorizationServerTest extends TestCase
 		$client->setSecret(self::CLIENT_SECRET);
 		self::assertTrue($client->save(), var_export($client->getValidationErrors(), true));
 		self::$client = $client;
+
+		$public = new OauthClient();
+		$public->setIdentifier(uniqid('public'));
+		$public->setName('Public test application');
+		$public->setRedirectUri(self::REDIRECT_URI);
+		$public->setIsConfidential(false);
+		self::assertTrue($public->save(), var_export($public->getValidationErrors(), true));
+		self::$publicClient = $public;
 	}
 
 	public static function tearDownAfterClass(): void
 	{
-		if (isset(self::$client->id)) {
-			OauthClient::delete(['id' => self::$client->id]);
+		foreach ([self::$client, self::$publicClient] as $client) {
+			if (isset($client->id)) {
+				OauthClient::delete(['id' => $client->id]);
+			}
 		}
 		self::$client = null;
+		self::$publicClient = null;
 	}
 
 	protected function setUp(): void
@@ -161,6 +175,59 @@ class AuthorizationServerTest extends TestCase
 		}
 
 		$this->fail('Expected the server to refuse this. ' . $message);
+	}
+
+	public function testMetadataAdvertisesPkceAndPublicClients(): void
+	{
+		$metadata = OAuthServer::metadata();
+
+		// MCP clients refuse an authorization server without code_challenge_methods_supported
+		$this->assertSame(['S256'], $metadata['code_challenge_methods_supported']);
+		$this->assertContains('none', $metadata['token_endpoint_auth_methods_supported']);
+	}
+
+	private function publicAuthorizationRequest(array $params): ServerRequest
+	{
+		return (new ServerRequest('GET', 'https://localhost/api/oauth.php/authorize'))->withQueryParams(array_merge([
+			'response_type' => 'code',
+			'client_id' => self::$publicClient->getIdentifier(),
+			'redirect_uri' => self::REDIRECT_URI,
+			'scope' => 'openid',
+			'state' => 'abc'
+		], $params));
+	}
+
+	public function testPublicClientMustUsePkceWithS256(): void
+	{
+		$server = $this->server();
+		$challenge = rtrim(strtr(base64_encode(hash('sha256', 'a-verifier-of-at-least-43-characters-long-123', true)), '+/', '-_'), '=');
+
+		$this->assertRefused(fn() => OAuthServer::validateAuthorizationRequest($server, $this->publicAuthorizationRequest([])), 'no PKCE');
+		$this->assertRefused(fn() => OAuthServer::validateAuthorizationRequest($server, $this->publicAuthorizationRequest([
+			'code_challenge' => 'a-verifier-of-at-least-43-characters-long-123',
+			'code_challenge_method' => 'plain'
+		])), 'plain PKCE');
+
+		$authRequest = OAuthServer::validateAuthorizationRequest($server, $this->publicAuthorizationRequest([
+			'code_challenge' => $challenge,
+			'code_challenge_method' => 'S256'
+		]));
+		$user = $this->newUser();
+		$authRequest->setUser(new OauthUser(User::findById($user->id, ['username', 'displayName', 'id', 'email', 'modifiedAt'])));
+		$authRequest->setAuthorizationApproved(true);
+		$response = $server->completeAuthorizationRequest($authRequest, new Response());
+		parse_str(parse_url($response->getHeaderLine('Location'), PHP_URL_QUERY), $query);
+
+		// A public client exchanges the code without a secret, with the code verifier
+		$request = (new ServerRequest('POST', 'https://localhost/api/oauth.php/token'))->withParsedBody([
+			'grant_type' => 'authorization_code',
+			'client_id' => self::$publicClient->getIdentifier(),
+			'redirect_uri' => self::REDIRECT_URI,
+			'code' => $query['code'],
+			'code_verifier' => 'a-verifier-of-at-least-43-characters-long-123'
+		]);
+		$tokens = json_decode((string) $server->respondToAccessTokenRequest($request, new Response())->getBody(), true);
+		$this->assertNotEmpty($tokens['access_token']);
 	}
 
 	public function testNormalFlowWorks()

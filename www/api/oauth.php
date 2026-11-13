@@ -51,7 +51,7 @@ class OAuthController {
 			// Validate the HTTP request and return an AuthorizationRequest object.
 			// The auth request object can be serialized into a user's session
 			// Only resumed when the user returns from the login page
-			$authRequest = PendingAuthorization::take($request->getQueryParams()) ?? $server->validateAuthorizationRequest($request);
+			$authRequest = PendingAuthorization::take($request->getQueryParams()) ?? OAuthServer::validateAuthorizationRequest($server, $request);
 
 			if(!go()->getAuthState()->isAuthenticated()) {
 				PendingAuthorization::save($authRequest);

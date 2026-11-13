@@ -8,10 +8,13 @@ use go\core\fs\File;
 use go\core\oauth\server\repositories;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
+use League\OAuth2\Server\RequestTypes\AuthorizationRequest;
 use OpenIDConnectServer\ClaimExtractor;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * The OAuth 2.0 / OpenID Connect server of GroupOffice
@@ -73,6 +76,25 @@ final class OAuthServer
 		$server->enableGrantType($refreshGrant, new DateInterval(self::ACCESS_TOKEN_TTL));
 
 		return $server;
+	}
+
+	/**
+	 * Validate an authorization request
+	 *
+	 * Public clients, like AI assistants and apps without a secret, must use PKCE with the S256 method. The "plain"
+	 * method sends the secret code verifier in the clear, so it's refused.
+	 *
+	 * @throws OAuthServerException When the request is invalid
+	 */
+	public static function validateAuthorizationRequest(AuthorizationServer $server, ServerRequestInterface $request): AuthorizationRequest
+	{
+		$authRequest = $server->validateAuthorizationRequest($request);
+
+		if (!$authRequest->getClient()->isConfidential() && $authRequest->getCodeChallengeMethod() !== 'S256') {
+			throw OAuthServerException::invalidRequest('code_challenge_method', 'Public clients must use PKCE with code_challenge_method S256');
+		}
+
+		return $authRequest;
 	}
 
 	/**
@@ -146,7 +168,7 @@ final class OAuthServer
 	 */
 	public static function endpoint(string $name): string
 	{
-		return rtrim(go()->getSettings()->URL, '/') . '/api/oauth.php/' . $name;
+		return rtrim((string) go()->getSettings()->URL, '/') . '/api/oauth.php/' . $name;
 	}
 
 	/**
@@ -171,7 +193,9 @@ final class OAuthServer
 			'subject_types_supported' => ['pairwise'],
 			'userinfo_signing_alg_values_supported' => $signing_alg_values_supported,
 			'id_token_signing_alg_values_supported' => $signing_alg_values_supported,
-			'token_endpoint_auth_methods_supported' => ['client_secret_post', 'client_secret_basic', 'client_secret_jwt', 'private_key_jwt'],
+			// "none" for public clients without a secret, which must use PKCE
+			'token_endpoint_auth_methods_supported' => ['client_secret_post', 'client_secret_basic', 'client_secret_jwt', 'private_key_jwt', 'none'],
+			'code_challenge_methods_supported' => ['S256'],
 			'token_endpoint_auth_signing_alg_values_supported' => $signing_alg_values_supported,
 			'display_values_supported' => ['page'],
 			'claim_types_supported' => ['normal'],
