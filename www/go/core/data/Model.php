@@ -8,6 +8,7 @@ use go\core\ErrorHandler;
 use go\core\util\ArrayObject;
 use go\core\util\DateTime;
 use InvalidArgumentException;
+use go\core\util\DocBlock;
 use Jasny\PhpdocParser\PhpdocParser;
 use Jasny\PhpdocParser\Set\PhpDocumentor;
 use Jasny\PhpdocParser\Tag\Summery;
@@ -94,7 +95,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 					}
 
 					$meta = $parser->parse($method->getDocComment());
-					$arr[$propName]['description'] = $meta['description'] ?? null;
+					$arr[$propName]['description'] = DocBlock::description($method->getDocComment());
 					if(!isset($arr[$propName]['type']) && isset($meta['return']['type'])) {
 						$arr[$propName]['type'] = $meta['return']['type'];
 					}
@@ -143,8 +144,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 					}
 					try {
 						if(!isset($arr[$propName]['description'])) {
-							$meta = $parser->parse($method->getDocComment());
-							$arr[$propName]['description'] = $meta['description'] ?? null;
+							$arr[$propName]['description'] = DocBlock::description($method->getDocComment());
 						}
 					}catch(\Throwable $e) {
 						$arr[$propName]['error'] = $e->getMessage();
@@ -184,7 +184,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable, ArrayAcces
 					}
 					try {
 						$meta = $parser->parse($prop->getDocComment());
-						$arr[$propName]['description'] = $meta['description'] ?? null;
+						$arr[$propName]['description'] = DocBlock::description($prop->getDocComment());
 						if (isset($meta['var']['type'])) {
 							$arr[$propName]['type'] = $meta['var']['type'];
 						}

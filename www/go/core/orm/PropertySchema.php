@@ -4,9 +4,7 @@ namespace go\core\orm;
 
 use go\core\data\Model;
 use go\core\db\Table;
-use Jasny\PhpdocParser\PhpdocParser;
-use Jasny\PhpdocParser\Set\PhpDocumentor;
-use Jasny\PhpdocParser\Tag\Summery;
+use go\core\util\DocBlock;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -195,17 +193,7 @@ final class PropertySchema
 	 */
 	private function docDescription(string|false $docComment): ?string
 	{
-		if (!$docComment) {
-			return null;
-		}
-
-		try {
-			$meta = (new PhpdocParser(PhpDocumentor::tags()->with([new Summery()])))->parse($docComment);
-		} catch (Throwable) {
-			return null;
-		}
-
-		return $meta['description'] ?? null;
+		return DocBlock::description($docComment);
 	}
 
 	/**
