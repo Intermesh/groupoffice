@@ -100,8 +100,24 @@ class Language extends Controller {
 				continue;
 			}
 
+			// "Text[key]" is an item of an array translation, like the names of the months. Only when the English
+			// translation is an array: other texts can contain brackets too.
+			$arrayKey = null;
+			$englishText = null;
+			if (preg_match("/(.*)\[(.*)\]$/", $en, $matches)) {
+				$englishArray = $english->getTranslation($matches[1], $package, $module) ?? $english->getTranslation($matches[1]);
+				if (is_array($englishArray)) {
+					$arrayKey = $matches;
+					$englishText = $englishArray[$matches[2]] ?? $en;
+				}
+			}
+			if (!isset($arrayKey)) {
+				// Old keys like "recoveryMailBody" have their English text in en.php
+				$englishText = $english->getTranslation($en, $package, $module) ?? $english->getTranslation($en) ?? $en;
+			}
+
 			// The placeholders, tags and line breaks must be kept, or the text breaks in the user interface
-			if (!LanguageFile::hasSameTokens(preg_replace('/\[[^\]]*\]$/', '', $en), $translation) && !LanguageFile::hasSameTokens($en, $translation)) {
+			if (!is_string($englishText) || !LanguageFile::hasSameTokens($englishText, $translation)) {
 				echo "SKIPPED: placeholders differ: " . $package . "/" . $module . ": " . $en . " => " . $translation . "\n";
 				continue;
 			}
@@ -114,10 +130,8 @@ class Language extends Controller {
 				$data[$package][$module] = [];
 			}
 
-			// "Text[key]" is an item of an array translation, like the names of the months. Only when the English
-			// translation is an array: other texts can contain brackets too.
-			if (preg_match("/(.*)\[(.*)\]$/", $en, $matches) && is_array($english->getTranslation($matches[1], $package, $module) ?? $english->getTranslation($matches[1]))) {
-				$data[$package][$module][$matches[1]][$matches[2]] = $translation;
+			if (isset($arrayKey)) {
+				$data[$package][$module][$arrayKey[1]][$arrayKey[2]] = $translation;
 			} else {
 				$data[$package][$module][$en] = $translation;
 			}

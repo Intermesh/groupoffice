@@ -82,6 +82,27 @@ class LanguageFileTest extends TestCase
 		$this->assertEquals('CC', $data['CC']);
 	}
 
+	public function testAddsMissingItemsToExistingArray(): void
+	{
+		$this->write("<?php\nreturn array (\n  'countries' => array (\n    'CC' => 'Isole Cocos',\n    'XX' => 'Paese (con) [parentesi]'\n  ),\n  'short_months' => [1 => 'Gen'],\n  'Save' => 'Salva',\n);\n");
+
+		$data = $this->update([
+			'countries' => ['CC' => 'Cocos', 'TP' => 'Timor Est'],
+			'short_months' => [1 => 'Jan', 5 => 'Mag'],
+			'dateTypes' => ['birthday' => 'Compleanno']
+		]);
+
+		// Existing items stay, missing ones are added
+		$this->assertEquals(['CC' => 'Isole Cocos', 'XX' => 'Paese (con) [parentesi]', 'TP' => 'Timor Est'], $data['countries']);
+		$this->assertEquals([1 => 'Gen', 5 => 'Mag'], $data['short_months']);
+		$this->assertEquals('Salva', $data['Save']);
+		$this->assertStringContainsString("    'TP' => 'Timor Est',\n  ),", file_get_contents($this->path));
+
+		// A new array is indented like the rest of the file
+		$this->assertEquals(['birthday' => 'Compleanno'], $data['dateTypes']);
+		$this->assertStringContainsString("  'dateTypes' => array (\n    'birthday' => 'Compleanno',\n  ),\n", file_get_contents($this->path));
+	}
+
 	public function testQuotesAndCreatesNewFile(): void
 	{
 		$data = $this->update(["Don't" => "Non c'è", 'Back\\slash' => 'a\\b']);

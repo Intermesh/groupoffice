@@ -70,10 +70,14 @@ class LanguageFile
 			$existing = '/^(' . $indent . preg_quote(self::quote($key), '/') . '\s*=>\s*)\'(?:\\\\.|[^\'\\\\])*\'/m';
 
 			if (is_array($value)) {
-				if (preg_match('/^' . $indent . preg_quote(self::quote($key), '/') . '\s*=>/m', $this->content)) {
-					$this->warnings[] = "Not changed, change the array by hand: " . $key;
+				if (preg_match('/^' . $indent . preg_quote(self::quote($key), '/') . '\s*=>/m', $this->content, $m, PREG_OFFSET_CAPTURE)) {
+					$this->addArrayItems($key, $m[0][1] + strlen($m[0][0]), $value);
 				} else {
-					$new .= $this->indent() . self::quote($key) . ' => ' . var_export($value, true) . ",\n";
+					$new .= $this->indent() . self::quote($key) . " => array (\n";
+					foreach ($value as $k => $v) {
+						$new .= $this->indent() . $this->indent() . (is_int($k) ? $k : self::quote((string) $k)) . ' => ' . self::quote((string) $v) . ",\n";
+					}
+					$new .= $this->indent() . "),\n";
 				}
 				continue;
 			}
@@ -88,6 +92,66 @@ class LanguageFile
 		if ($new !== '') {
 			$this->append($new);
 		}
+	}
+
+	/**
+	 * Add the missing items to an existing array entry, like the countries. Existing items aren't changed.
+	 *
+	 * @param string $key The entry, for the warnings
+	 * @param int $offset Position in the content after "'key' =>"
+	 * @param array<string|int, string> $items
+	 */
+	private function addArrayItems(string $key, int $offset, array $items): void
+	{
+		// PHP's tokenizer finds the closing bracket, also when items contain brackets or quotes
+		$tokens = token_get_all("<?php " . substr($this->content, $offset));
+		$pos = $offset - strlen("<?php ");
+		$depth = 0;
+		$existing = [];
+		$lastString = null;
+		$close = null;
+		foreach ($tokens as $token) {
+			$text = is_array($token) ? $token[1] : $token;
+			if ($text === '(' || $text === '[') {
+				$depth++;
+			} else if ($text === ')' || $text === ']') {
+				if (--$depth === 0) {
+					$close = $pos;
+					break;
+				}
+			} else if ($depth === 1 && is_array($token) && in_array($token[0], [T_CONSTANT_ENCAPSED_STRING, T_LNUMBER], true)) {
+				$lastString = $token[0] === T_LNUMBER ? (int) $text : stripcslashes(substr($text, 1, -1));
+			} else if ($depth === 1 && is_array($token) && $token[0] === T_DOUBLE_ARROW && isset($lastString)) {
+				$existing[(string) $lastString] = true;
+			}
+			$pos += strlen($text);
+		}
+
+		if (!isset($close)) {
+			$this->warnings[] = "Not changed, could not find the end of the array: " . $key;
+			return;
+		}
+
+		$new = array_filter($items, fn($k) => !isset($existing[(string) $k]), ARRAY_FILTER_USE_KEY);
+		if (empty($new)) {
+			return;
+		}
+
+		// Use the indentation of the existing items
+		$body = substr($this->content, $offset, $close - $offset);
+		$itemIndent = preg_match('/\n([ \t]+)[\'"\d]/', $body, $m) ? $m[1] : $this->indent() . $this->indent();
+		$closeIndent = preg_match('/\n([ \t]*)$/', $body, $m) ? $m[1] : $this->indent();
+
+		$lines = '';
+		foreach ($new as $k => $v) {
+			$lines .= $itemIndent . (is_int($k) ? $k : self::quote((string) $k)) . ' => ' . self::quote((string) $v) . ",\n";
+		}
+
+		$head = rtrim(substr($this->content, 0, $close));
+		if (!str_ends_with($head, ',') && !str_ends_with($head, '(') && !str_ends_with($head, '[')) {
+			$head .= ',';
+		}
+		$this->content = $head . "\n" . $lines . $closeIndent . substr($this->content, $close);
 	}
 
 	/**
