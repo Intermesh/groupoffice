@@ -5,6 +5,7 @@ namespace go\modules\community\calendar\controller;
 use go\core\fs\Blob;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\util\StringUtil;
@@ -44,10 +45,123 @@ class CalendarEvent extends EntityController {
 	 * @param bool $expandRecurrences: Boolean (default: false) If true, the server will expand any recurring event.
 	 * 	If true, the filter MUST be just a FilterCondition (not a FilterOperator) and MUST include both a before
 	 * 	and after property. This ensures the server is not asked to return an infinite number of results.
-	 *	@param string $timeZone: String The time zone for before/after filter conditions (default: “Etc/UTC”)
+	 *	@param string $timeZone: String The time zone for before/after filter conditions (default: the user's time zone)
+	 *
+	 * With "expandRecurrences" the IDs are the occurrences within the period, sorted by start. An occurrence of a
+	 * recurring event has the ID "<event id>/<recurrence id>", which CalendarEvent/get accepts. Without it, the query
+	 * works as before and returns the IDs of the events.
 	 */
 	public function query($params) {
-		return $this->defaultQuery($params);
+		if (empty($params['expandRecurrences'])) {
+			return $this->defaultQuery($params);
+		}
+		return $this->expandedQuery($params);
+	}
+
+	/**
+	 * Occurrences can't be counted without computing them, so a query with a long period is refused
+	 */
+	const MAX_OCCURRENCES = 1000;
+
+	/**
+	 * CalendarEvent/query with "expandRecurrences"
+	 *
+	 * The events in the period are found with the normal query and expanded here, so the filters and permissions are
+	 * the same as without expanding.
+	 *
+	 * @throws InvalidArguments
+	 */
+	private function expandedQuery(array $params): \go\core\util\ArrayObject
+	{
+		$filter = $params['filter'] ?? null;
+		if (!is_array($filter) || isset($filter['operator']) || isset($filter['conditions']) || !isset($filter['after'], $filter['before'])) {
+			throw new InvalidArguments('With expandRecurrences the filter must be a single condition with "after" and "before"');
+		}
+
+		$timeZone = $this->queryTimeZone($params['timeZone'] ?? null);
+		try {
+			$from = new \DateTime($filter['after'], $timeZone);
+			$until = new \DateTime($filter['before'], $timeZone);
+		} catch (\Exception $e) {
+			throw new InvalidArguments('Invalid "after" or "before": ' . $e->getMessage());
+		}
+		if ($until <= $from) {
+			throw new InvalidArguments('"before" must be later than "after"');
+		}
+
+		$descending = false;
+		foreach ($params['sort'] ?? [] as $sort) {
+			if (($sort['property'] ?? null) !== 'start') {
+				throw new InvalidArguments('With expandRecurrences the results can only be sorted by "start"');
+			}
+			$descending = isset($sort['isAscending']) && !$sort['isAscending'];
+		}
+
+		// The events in the period. A day wider, because the filters may read the dates in another time zone. The
+		// occurrences are checked exactly below.
+		$candidateParams = [
+			'filter' => array_merge($filter, [
+				'after' => (clone $from)->modify('-1 day')->format('Y-m-d\TH:i:s'),
+				'before' => (clone $until)->modify('+1 day')->format('Y-m-d\TH:i:s')
+			]),
+			'accountId' => $params['accountId'] ?? null
+		];
+		$candidates = $this->defaultQuery($candidateParams);
+
+		$occurrences = [];
+		foreach ($candidates['ids'] as $id) {
+			$event = model\CalendarEvent::findById($id);
+			if (!$event) {
+				continue;
+			}
+			$left = self::MAX_OCCURRENCES + 1 - count($occurrences);
+			foreach (model\Occurrences::between($event, $from, $until, $timeZone, $left) as $occurrence) {
+				$occurrences[] = $occurrence;
+			}
+			if (count($occurrences) > self::MAX_OCCURRENCES) {
+				throw new InvalidArguments('The period has more than ' . self::MAX_OCCURRENCES . ' occurrences. Use a shorter period.');
+			}
+		}
+
+		usort($occurrences, fn($a, $b) => $descending ? $b['start'] <=> $a['start'] : $a['start'] <=> $b['start']);
+
+		$ids = array_column($occurrences, 'id');
+		$total = count($ids);
+		$position = max(0, (int) ($params['position'] ?? 0));
+		$limit = max(0, (int) ($params['limit'] ?? 0));
+		$ids = array_slice($ids, $position, $limit ?: null);
+
+		$response = new \go\core\util\ArrayObject([
+			'accountId' => $candidates['accountId'],
+			'state' => $candidates['queryState'],
+			'queryState' => $candidates['queryState'],
+			'ids' => $ids,
+			'notfound' => [],
+			'canCalculateUpdates' => false,
+			'position' => $position
+		]);
+		if (!empty($params['calculateTotal'])) {
+			$response['total'] = $total;
+		}
+		if (!empty($params['calculateHasMore']) && $limit > 0) {
+			$response['hasMore'] = $position + $limit < $total;
+		}
+		return $response;
+	}
+
+	/**
+	 * The time zone of the "after" and "before" filter of an expanded query, and of events without a time zone
+	 *
+	 * @throws InvalidArguments
+	 */
+	private function queryTimeZone(?string $name): \DateTimeZone
+	{
+		$name = $name ?: (go()->getAuthState()->getUser(['timezone'])->timezone ?? 'UTC');
+		try {
+			return new \DateTimeZone($name);
+		} catch (\Exception $e) {
+			throw new InvalidArguments('Invalid timeZone: ' . $name);
+		}
 	}
 	
 	/**
@@ -61,9 +175,54 @@ class CalendarEvent extends EntityController {
 	 * 	of the base event and any recurrence overrides. If false, all participants will be returned.
 	 *	@param string $timeZone: String (default “Etc/UTC”) The time zone to use when calculating the utcStart/utcEnd
 	 * 	property of floating events. This argument has no effect if those properties are not requested.
+	 *
+	 * Also accepts the occurrence IDs "<event id>/<recurrence id>" of CalendarEvent/query with "expandRecurrences". An
+	 * occurrence is returned as a single event, with "recurrenceId" and without "recurrenceRule" and
+	 * "recurrenceOverrides". Read permission is checked on the event.
 	 */
 	public function get($params) {
-		return $this->defaultGet($params);
+		$ids = $params['ids'] ?? null;
+		if (!is_array($ids) || empty(array_filter($ids, fn($id) => is_string($id) && str_contains($id, '/')))) {
+			return $this->defaultGet($params);
+		}
+		return $this->getWithOccurrences($params, $ids);
+	}
+
+	private function getWithOccurrences(array $params, array $ids): \go\core\util\ArrayObject
+	{
+		$eventIds = [];
+		$occurrenceIds = [];
+		foreach ($ids as $id) {
+			if (is_string($id) && str_contains($id, '/')) {
+				$occurrenceIds[] = $id;
+			} else {
+				$eventIds[] = $id;
+			}
+		}
+
+		$response = $this->defaultGet(array_merge($params, ['ids' => $eventIds]));
+		$properties = $params['properties'] ?? null;
+
+		$list = $response['list'];
+		$notFound = $response['notFound'];
+		foreach ($occurrenceIds as $id) {
+			[$eventId, $recurrenceId] = explode('/', $id, 2);
+			$event = ctype_digit($eventId) ? $this->getEntity($eventId) : false;
+			$occurrence = $event ? model\Occurrences::toArray($event, $recurrenceId, $properties) : null;
+			if ($occurrence === null) {
+				$notFound[] = $id;
+			} else {
+				$list[] = $occurrence;
+			}
+		}
+
+		// In the order of the given IDs
+		$order = array_flip(array_map('strval', $ids));
+		usort($list, fn($a, $b) => ($order[(string) $a['id']] ?? PHP_INT_MAX) <=> ($order[(string) $b['id']] ?? PHP_INT_MAX));
+
+		$response['list'] = $list;
+		$response['notFound'] = array_values($notFound);
+		return $response;
 	}
 	
 	/**
