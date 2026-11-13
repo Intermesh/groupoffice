@@ -15,7 +15,7 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
-use League\OAuth2\Server\RequestTypes\AuthorizationRequest;
+use League\OAuth2\Server\RequestTypes\AuthorizationRequestInterface;
 use OpenIDConnectServer\ClaimExtractor;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -148,7 +148,7 @@ final class OAuthServer
 	 *
 	 * @throws OAuthServerException When the request is invalid
 	 */
-	public static function validateAuthorizationRequest(AuthorizationServer $server, ServerRequestInterface $request): AuthorizationRequest
+	public static function validateAuthorizationRequest(AuthorizationServer $server, ServerRequestInterface $request): AuthorizationRequestInterface
 	{
 		$authRequest = $server->validateAuthorizationRequest($request);
 
