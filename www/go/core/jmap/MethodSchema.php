@@ -373,7 +373,14 @@ final class MethodSchema
 
 		$methods = [];
 		foreach (Router::getEntityMethods($entityType) as $name => $description) {
-			$schema = $standard[strtolower($name)] ?? self::fromDocComment((new \ReflectionMethod($controllerClass, $name))->getDocComment(), $entityName);
+			$docSchema = self::fromDocComment((new \ReflectionMethod($controllerClass, $name))->getDocComment(), $entityName);
+			$schema = $standard[strtolower($name)] ?? null;
+			if (!isset($schema)) {
+				$schema = $docSchema;
+			} else if (!empty($docSchema['params']['properties'])) {
+				// A controller can document extra arguments of a standard method, like "expandRecurrences" of CalendarEvent/query
+				$schema['params']['properties'] = array_merge((array) $schema['params']['properties'], $docSchema['params']['properties']);
+			}
 			$methods[$name] = ['description' => $description] + ($schema ?? []);
 		}
 

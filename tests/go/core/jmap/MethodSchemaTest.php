@@ -56,6 +56,21 @@ class MethodSchemaTest extends TestCase
 		$this->assertEquals(['data', 'password'], $schema['methods']['decrypt']['params']['required']);
 	}
 
+	public function testForEntityAddsDocumentedArgumentsOfStandardMethods(): void
+	{
+		$schema = MethodSchema::forEntity(EntityType::findByName('CalendarEvent'));
+		$params = (array) $schema['methods']['query']['params']['properties'];
+
+		// The standard arguments stay
+		$this->assertArrayHasKey('filter', $params);
+		$this->assertArrayHasKey('limit', $params);
+
+		// CalendarEvent/query documents its own arguments with @apiParam
+		$this->assertEquals('boolean', $params['expandRecurrences']['type']);
+		$this->assertStringContainsString('after', $params['expandRecurrences']['description']);
+		$this->assertEquals('string', $params['timeZone']['type']);
+	}
+
 	public function testForEntityReferencesExistingDefinitions(): void
 	{
 		foreach (EntityType::findAll() as $type) {

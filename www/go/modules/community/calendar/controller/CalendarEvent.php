@@ -42,14 +42,16 @@ class CalendarEvent extends EntityController {
 	
 	/**
 	 * @param array $params
-	 * @param bool $expandRecurrences: Boolean (default: false) If true, the server will expand any recurring event.
-	 * 	If true, the filter MUST be just a FilterCondition (not a FilterOperator) and MUST include both a before
-	 * 	and after property. This ensures the server is not asked to return an infinite number of results.
-	 *	@param string $timeZone: String The time zone for before/after filter conditions (default: the user's time zone)
 	 *
 	 * With "expandRecurrences" the IDs are the occurrences within the period, sorted by start. An occurrence of a
 	 * recurring event has the ID "<event id>/<recurrence id>", which CalendarEvent/get accepts. Without it, the query
 	 * works as before and returns the IDs of the events.
+	 *
+	 * @apiParam bool expandRecurrences Return an ID per occurrence of recurring events instead of one per event. The
+	 *   filter must then be a single condition with both "after" and "before", and only "start" can be sorted on.
+	 *   Occurrence IDs look like "<event id>/<recurrence id>" and work in CalendarEvent/get. Defaults to false.
+	 * @apiParam string timeZone Time zone of the "after" and "before" filter conditions, like "Europe/Amsterdam".
+	 *   Defaults to the user's time zone.
 	 */
 	public function query($params) {
 		if (empty($params['expandRecurrences'])) {
