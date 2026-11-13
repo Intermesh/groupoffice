@@ -99,6 +99,13 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 
 Every module with a GOUI UI has its own `package.json` in its `views/goui` folder (e.g. `www/go/modules/community/calendar/views/goui`), and so does core (`www/views/goui`). Build from that folder with `npm run build`, or `npm run watch` while developing.
 
+### Styling
+
+- Don't use inline styles (`el.style.…`, `style: {…}` in a component config). Use GOUI's classes where they fit (`pad`, `flow`, `fit`, …), otherwise a class in the module stylesheet.
+- The module stylesheet is `views/goui/style/style.scss`. `npm run build` compiles it to `dist/style.css`, which the web client loads for every module. The `build:sass` and `start:sass` scripts in `package.json` do this (see the apikeys or approval module).
+- Use GOUI's sass helpers for sizes, like `util.dp()`, instead of pixels: `@use '../../../../../../../views/goui/goui/style/util';` and then `padding: util.dp(12) util.dp(16);`.
+- GOUI's utility classes like `pad` are styled as `.goui.pad`, so they only work on GOUI components, not on an element made with `E()`. Give such an element its own class in the module stylesheet.
+
 ## Static analysis
 
 - PHPStan (level 3, config `tests/phpstan.neon`, covers `www/api` and `www/go`): from `www/` run `composer go:analyse` (inside the container). New code should not add errors.
