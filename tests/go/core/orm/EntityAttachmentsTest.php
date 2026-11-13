@@ -197,6 +197,40 @@ class EntityAttachmentsTest extends TestCase
 		$this->assertNotOnDiskOrRecorded('first.md');
 	}
 
+	public function testCreateWithAttachments(): void
+	{
+		$content = uniqid('# Created ');
+		$blob = $this->createBlob('created.md', $content);
+
+		self::actAs(self::$writer->id);
+		$contact = new Contact();
+		$contact->addressBookId = self::$addressBook->id;
+		$contact->firstName = 'Created';
+		$contact->lastName = uniqid('WithAttachments');
+		$contact->setAttachments([['blobId' => $blob->id]]);
+		$saved = $contact->save();
+
+		self::actAs(User::ID_SUPER_ADMIN);
+		$old = \GO::setIgnoreAclPermissions(true);
+		try {
+			$this->assertTrue($saved, $contact->getValidationErrorsAsString());
+			$folder = Folder::model()->findByPk(Contact::findById($contact->id)->filesFolderId);
+			$this->assertNotEmpty($folder);
+			$file = $folder->hasFile('created.md');
+			$this->assertNotEmpty($file, 'The file has no record in fs_files');
+			$this->assertEquals($content, $file->fsFile->getContents());
+		} finally {
+			$folder = isset($contact->id) ? Folder::model()->findByPath(Contact::findById($contact->id)->buildFilesPath()) : null;
+			if ($folder) {
+				$folder->delete(true);
+			}
+			\GO::setIgnoreAclPermissions($old);
+			if (isset($contact->id)) {
+				Contact::delete(['id' => $contact->id]);
+			}
+		}
+	}
+
 	/**
 	 * A failed save rolls back the database, but not the disk. So check both.
 	 */

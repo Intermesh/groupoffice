@@ -452,13 +452,13 @@ abstract class Entity extends Property {
 	 */
 	protected function internalSave(): bool
 	{
-		if (count($this->attachments) && !$this->saveAttachments()) {
+		if(!parent::internalSave()) {
+			App::get()->debug(static::class."::internalSave() returned false");
 			return false;
 		}
 
-
-		if(!parent::internalSave()) {
-			App::get()->debug(static::class."::internalSave() returned false");
+		// After the save, because the path of the files folder of a new entity contains its ID
+		if (count($this->attachments) && !$this->saveAttachments()) {
 			return false;
 		}
 
@@ -1710,9 +1710,16 @@ abstract class Entity extends Property {
 			$size += $blob->size;
 		}
 
+		// findForEntity() sets the folder ID on the entity, but doesn't save it
+		$oldFolderId = $this->filesFolderId ?? null;
 		$folder = Folder::model()->findForEntity($this, false);
-		if (!isset($this->filesFolderId)) {
+		if ($oldFolderId != $folder->id) {
+			// The entity is already saved, so the folder ID is written to its row
 			$this->filesFolderId = $folder->id;
+			$column = $this->getMapping()->getColumn('filesFolderId');
+			go()->getDbConnection()
+				->update($column->table->getName(), ['filesFolderId' => $folder->id], $this->primaryKeyValues())
+				->execute();
 		}
 
 		if (!$folder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
