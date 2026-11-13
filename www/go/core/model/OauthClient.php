@@ -2,6 +2,7 @@
 namespace go\core\model;
 
 use go\core\orm\Mapping;
+use go\core\util\Password;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\Traits\ClientTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
@@ -23,7 +24,7 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 
 	public function setSecret(string|null $secret): void
 	{
-		$this->secret = isset($secret) ? password_hash($secret, CRYPT_BLOWFISH) : null;
+		$this->secret = isset($secret) ? Password::hash($secret) : null;
 	}
 
 	public function checkSecret(string $secret): bool

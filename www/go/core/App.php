@@ -471,7 +471,7 @@ namespace go\core {
 				"trustedProxies" => [],
 				"wopiAllowInternal" => false, // Allow WOPI service URLs that resolve to private/loopback addresses
 				"davclientAllowInternal" => false, // Allow DAV client accounts on servers that resolve to private/loopback addresses
-				"passwordHashCost" => null, // bcrypt cost of user passwords. Null uses the PHP default. Only lower it for tests.
+				"passwordHashCost" => null, // bcrypt cost of user passwords and OAuth client secrets. Null uses the PHP default. Only lower it for tests.
 				"theme" => "Paper",
 				"allow_themes" => true,
 				"file_storage_path" => '/var/lib/groupoffice',
