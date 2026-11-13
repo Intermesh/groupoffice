@@ -15,7 +15,7 @@ use RecursiveIteratorIterator;
  * Strings are found in:
  *
  * - ExtJS (.js): t("Text"), or t("Text", "module", "package") for another module
- * - GOUI (.ts): t("Text"), or t("Text", "package", "module") for another module
+ * - GOUI (.ts that imports t): t("Text"), or t("Text", "package", "module") for another module
  * - PHP: go()->t("Text", "package", "module") and legacy GO::t("Text", "module", "package")
  *
  * Translations fall back from the module to core. So a string goes to the core language file when core uses it, when
@@ -158,7 +158,8 @@ class LanguageScanner
 
 		// t("Text") in this module, or another module: t("Text", "module", "package") in ExtJS and t("Text", "package",
 		// "module") in GOUI
-		$goui = str_ends_with($file, '.ts');
+		// Some .ts files contain ExtJS code that uses the global t(). GOUI code imports t().
+		$goui = str_ends_with($file, '.ts') && preg_match('/import\s*\{[^}]*\bt\b[^}]*\}\s*from/', $src);
 		preg_match_all('/[\s\+\(\[:=,!]t\s*\(\s*(["\'])((?:\\\\.|(?!\1).)*?)\1\s*(?:,\s*(["\'])(\w*)\3\s*(?:,\s*(["\'])(\w*)\5)?)?\s*[\),]/', $src, $m, PREG_SET_ORDER);
 		foreach ($m as $x) {
 			if (!empty($x[4]) && $goui) {

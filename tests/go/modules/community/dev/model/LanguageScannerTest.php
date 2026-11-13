@@ -51,8 +51,12 @@ class LanguageScannerTest extends TestCase
 		$this->assertSame(['legacy/billing'], $this->scan('js', 'x = t("Order", "billing");')['Order']);
 
 		// GOUI: t(text, package, module)
-		$this->assertSame(['community/tasks'], $this->scan('ts', 'x = t("Task", "community", "tasks");')['Task']);
-		$this->assertSame(['community/notes'], $this->scan('ts', 'x = t("Note");')['Note']);
+		$goui = 'import {btn, t} from "@intermesh/goui";' . "\n";
+		$this->assertSame(['community/tasks'], $this->scan('ts', $goui . 'x = t("Task", "community", "tasks");')['Task']);
+		$this->assertSame(['community/notes'], $this->scan('ts', $goui . 'x = t("Note");')['Note']);
+
+		// ExtJS code in a .ts file uses the global t()
+		$this->assertSame(['legacy/projects2'], $this->scan('ts', 'declare global { var t: any }' . "\n" . 'x = t("Travel distance", "projects2");')['Travel distance']);
 	}
 
 	public function testScansGouiCoreAndReportsUnknownModules(): void
