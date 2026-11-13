@@ -78,6 +78,13 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - For ORM and JMAP behaviour, follow `tests/go/core/orm/EntityTest.php` and `tests/go/core/jmap/`. Test entities live in the `community/test` module.
 - Suggest creating tests when they will benefit security and stability of the system
 - Leave the database as you found it: delete the entities you create.
+- Write tests with performance in mind; the whole suite runs often. `setUp()` runs before every test and every data provider row:
+  - Create fixtures that tests only read (users that act, groups, permissions, books, module tables of `ModuleTablesTrait`) once per class in `setUpBeforeClass()` and remove them in `tearDownAfterClass()`. Create what a test changes in the test itself or in `setUp()`. See `tests/go/core/controller/UserTest.php` and `tests/go/modules/business/finance/controller/FinanceDocumentTest.php`.
+  - PHPUnit doesn't call `tearDownAfterClass()` when `setUpBeforeClass()` fails, so catch the exception there, clean up and throw it again.
+  - Check a class with shared fixtures with `--order-by=random`: a test must not depend on what another test changed.
+  - Hash passwords and secrets with `go\core\util\Password::hash()`, not `password_hash()`. The tests set a low cost with `passwordHashCost` in `tests/config.php`; the default cost takes 0.2 seconds per hash.
+  - Don't call external services. The test bootstrap disables the pwned module for that reason.
+  - Find slow tests with `--log-junit <file>`, which records the time of every test.
 - Run a single test: `tools/phpunit <path>` (see "Running tests").
 
 ## Converting ExtJS 3.4 to GOUI
