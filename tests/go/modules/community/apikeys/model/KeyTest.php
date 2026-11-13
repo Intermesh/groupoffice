@@ -12,8 +12,8 @@ use go\modules\community\apikeys\Module;
 use PHPUnit\Framework\TestCase;
 
 /**
- * API keys contain an access token of a user. Managers of the module may only create keys for themselves, the token is
- * only returned when the key is created and the client can't change it.
+ * API keys contain an access token of a user. In 6.8 only administrators may create keys, the token is only returned
+ * when the key is created and the client can't change it.
  */
 class KeyTest extends TestCase
 {
@@ -40,6 +40,8 @@ class KeyTest extends TestCase
 			// Module::uninstall() switches off change tracking and history without switching them on again
 			$trackChanges = \go\core\jmap\Entity::$trackChanges;
 			$history = \go\modules\community\history\Module::$enabled;
+			// Write the changes of the keys while their entity type still exists
+			\go\core\orm\EntityType::push();
 			Module::get()->uninstall();
 			\go\core\jmap\Entity::$trackChanges = $trackChanges;
 			\go\modules\community\history\Module::$enabled = $history;
@@ -142,13 +144,12 @@ class KeyTest extends TestCase
 		$this->assertArrayHasKey('new', $result['notCreated'] ?? []);
 	}
 
-	public function testManagerMayCreateKeyForThemselves(): void
+	public function testManagerMayNotCreateKeyForThemselves(): void
 	{
 		$result = $this->createKey($this->manager->id, $this->manager->id);
 
-		$this->assertArrayHasKey('new', $result['created'] ?? [], var_export($result['notCreated'] ?? null, true));
-		$keyId = $result['created']['new']['id'];
-		$this->assertSame((int) $this->manager->id, $this->tokenUserId($this->storedToken($keyId)));
+		$this->assertArrayNotHasKey('new', $result['created'] ?? []);
+		$this->assertArrayHasKey('new', $result['notCreated'] ?? []);
 	}
 
 	public function testAdminMayCreateKeyForAnotherUser(): void
@@ -161,11 +162,11 @@ class KeyTest extends TestCase
 
 	public function testAccessTokenIsOnlyReturnedOnCreate(): void
 	{
-		$result = $this->createKey($this->manager->id);
+		$result = $this->createKey(User::ID_SUPER_ADMIN, $this->manager->id);
 		$keyId = $result['created']['new']['id'];
 		$this->assertSame($this->storedToken($keyId), $result['created']['new']['accessToken'] ?? null);
 
-		$this->actAs($this->manager->id);
+		$this->actAs(User::ID_SUPER_ADMIN);
 		$get = (new KeyController())->get(['ids' => [$keyId]])->getArray();
 		$this->assertNull($get['list'][0]['accessToken'] ?? null);
 		$this->assertSame((int) $this->manager->id, (int) $get['list'][0]['userId']);
@@ -176,23 +177,23 @@ class KeyTest extends TestCase
 		$admin = $this->createKey(User::ID_SUPER_ADMIN, User::ID_SUPER_ADMIN);
 		$adminToken = $this->storedToken($admin['created']['new']['id']);
 
-		$own = $this->createKey($this->manager->id);
+		$own = $this->createKey(User::ID_SUPER_ADMIN, $this->manager->id);
 		$keyId = $own['created']['new']['id'];
 		$ownToken = $this->storedToken($keyId);
 
-		$this->set($this->manager->id, ['update' => [$keyId => ['accessToken' => $adminToken]]]);
+		$this->set(User::ID_SUPER_ADMIN, ['update' => [$keyId => ['accessToken' => $adminToken]]]);
 		$this->assertSame($ownToken, $this->storedToken($keyId));
 
 		// Destroying the key deletes its own token, not the administrator's
-		$this->set($this->manager->id, ['destroy' => [$keyId]]);
+		$this->set(User::ID_SUPER_ADMIN, ['destroy' => [$keyId]]);
 		$this->assertNull($this->tokenUserId($ownToken));
 		$this->assertSame(User::ID_SUPER_ADMIN, $this->tokenUserId($adminToken));
 	}
 
 	public function testDestroyingKeysDeletesAllTheirTokens(): void
 	{
-		$a = $this->createKey($this->manager->id)['created']['new']['id'];
-		$b = $this->createKey($this->manager->id)['created']['new']['id'];
+		$a = $this->createKey(User::ID_SUPER_ADMIN, $this->manager->id)['created']['new']['id'];
+		$b = $this->createKey(User::ID_SUPER_ADMIN, $this->manager->id)['created']['new']['id'];
 		$tokenA = $this->storedToken($a);
 		$tokenB = $this->storedToken($b);
 

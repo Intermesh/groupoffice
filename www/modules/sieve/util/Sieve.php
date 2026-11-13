@@ -636,7 +636,7 @@ class go_sieve_script
      * @param  StringHelper  Script's text content
      * @param  array   List of capabilities supported by server
      */
-    public function __construct($script, $capabilities=array(), GO\Sieve\Util\Sieve $sieve, $getCapabilitiesFromServer=false)
+    public function __construct($script, $capabilities, GO\Sieve\Util\Sieve $sieve, $getCapabilitiesFromServer=false)
     {
 			
 			$this->sieve = $sieve;

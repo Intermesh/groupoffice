@@ -1,7 +1,6 @@
 <?php
 namespace go\core\auth;
 
-use go\core\db\Column;
 use go\core\model\User;
 use go\core\util\DateTime;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,7 +32,7 @@ class RecoveryHashTest extends TestCase
 		$this->hash = '12ab' . bin2hex(random_bytes(18));
 		go()->getDbConnection()->update('core_user', [
 			'recoveryHash' => $this->hash,
-			'recoverySendAt' => (new DateTime())->format(Column::DATETIME_FORMAT)
+			'recoverySendAt' => new DateTime()
 		], ['id' => $this->user->id])->execute();
 	}
 
@@ -76,7 +75,7 @@ class RecoveryHashTest extends TestCase
 	public function testExpiredHashFindsNoUser(): void
 	{
 		go()->getDbConnection()->update('core_user', [
-			'recoverySendAt' => (new DateTime('-2 hours'))->format(Column::DATETIME_FORMAT)
+			'recoverySendAt' => new DateTime('-2 hours')
 		], ['id' => $this->user->id])->execute();
 
 		$this->assertFalse((new Authenticate())->recovery($this->hash));

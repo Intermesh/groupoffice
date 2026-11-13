@@ -1007,8 +1007,6 @@ public function historyLog(): bool|array
 			return false;
 		}
 
-		$this->saveContact();
-
 		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
 			if(!$this->personalGroup->save()) {
 				$this->setValidationError('personalGroup', ErrorCode::RELATIONAL, "Couldn't save personal group");
@@ -1016,6 +1014,10 @@ public function historyLog(): bool|array
 			}
 		}
 		$this->checkPersonalGroup();
+
+		// After the personal group exists. Saving the contact checks the permissions on this user, which are in the ACL
+		// of the personal group.
+		$this->saveContact();
 
 		if($this->isNew()) {
 			$this->legacyOnSave();	

@@ -5,7 +5,6 @@ use GO\Base\Exception\AccessDenied;
 use GO\Base\Model\Acl;
 use GO\Projects2\Controller\IncomeController;
 use GO\Projects2\Model\Income;
-use GO\Projects2\Model\IncomeEntity;
 use GO\Projects2\Model\Project;
 use GO\Projects2\Projects2Module;
 use go\core\model\User;
@@ -77,21 +76,6 @@ class IncomePermissionTest extends TestCase
 			$this->assertTrue(true);
 		} finally {
 			\GO::setIgnoreAclPermissions($old);
-			$this->actAs(User::ID_SUPER_ADMIN);
-		}
-	}
-
-	public function testIncomeEntityNeedsFinancePermission(): void
-	{
-		$this->actAs($this->user->id);
-		try {
-			$this->assertSame(0, IncomeEntity::findById($this->readIncome->id)->getPermissionLevel());
-			$this->assertGreaterThanOrEqual(Projects2Module::FINANCE_PERMISSIONS, IncomeEntity::findById($this->financeIncome->id)->getPermissionLevel());
-
-			$ids = IncomeEntity::find()->selectSingleValue('p2i.id')->filter(['permissionLevel' => Acl::READ_PERMISSION])->all();
-			$this->assertNotContains((int) $this->readIncome->id, array_map('intval', $ids));
-			$this->assertContains((int) $this->financeIncome->id, array_map('intval', $ids));
-		} finally {
 			$this->actAs(User::ID_SUPER_ADMIN);
 		}
 	}

@@ -130,7 +130,16 @@ class ModuleTest extends TestCase
 		$this->assertSame($this->groupDefaultAcl, Group::entityType()->getDefaultAcl());
 	}
 
-	#[DataProvider('defaultGroupPatches')]
+	/**
+	 * 6.8 doesn't support JSON pointer patches like "settings/defaultGroups" in Module/set. They are refused for users
+	 * above, but an administrator can only use the nested form.
+	 */
+	public static function adminDefaultGroupPatches(): array
+	{
+		return array_intersect_key(self::defaultGroupPatches(), ['nested' => true]);
+	}
+
+	#[DataProvider('adminDefaultGroupPatches')]
 	public function testAdminMayChangeCoreSettings(array $patch)
 	{
 		$result = $this->update(UserModel::ID_SUPER_ADMIN, $patch);
