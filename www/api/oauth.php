@@ -3,24 +3,17 @@ require('../vendor/autoload.php');
 
 use go\core\App;
 use go\core\ErrorHandler;
-use go\core\fs\File;
 use go\core\http\Router;
 use go\core\jmap\State;
 use go\core\model\OauthUser;
-use go\core\oauth\server\EncryptionKey;
 use go\core\oauth\server\repositories;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream;
 use League\OAuth2\Server\AuthorizationServer;
-use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\OAuthServerException;
-use League\OAuth2\Server\Grant\AuthCodeGrant;
-use League\OAuth2\Server\Grant\RefreshTokenGrant;
-use League\OAuth2\Server\ResourceServer;
-use go\core\oauth\server\IdTokenResponse;
+use go\core\oauth\server\OAuthServer;
 use go\core\oauth\server\PendingAuthorization;
-use OpenIDConnectServer\ClaimExtractor;
 use Psr\Http\Message\ResponseInterface;
 
 App::get();
@@ -39,49 +32,8 @@ class OAuthController {
 	 */
 	private function getServer(): AuthorizationServer
 	{
-
 		if(!isset($this->server)) {
-			// Init our repositories
-			$clientRepository = new repositories\ClientRepository();
-			$scopeRepository = new repositories\ScopeRepository();
-			$accessTokenRepository = new repositories\AccessTokenRepository();
-			$authCodeRepository = new repositories\AuthCodeRepository();
-			$refreshTokenRepository = new repositories\RefreshTokenRepository();
-
-			$privateKeyPath = 'file://' . $this->getPrivateKeyFile()->getPath();
-
-			// OpenID Connect Response Type
-			$responseType = new IdTokenResponse(new repositories\UserRepository(), new ClaimExtractor(), $this->getKid());
-
-			$this->server = new AuthorizationServer(
-				$clientRepository,
-				$accessTokenRepository,
-				$scopeRepository,
-				$privateKeyPath,
-				// Encrypts the authorization codes and refresh tokens. Random for each installation. Never put a fixed
-				// key in the source: everybody could then create codes and tokens that this server accepts.
-				EncryptionKey::get(),
-				$responseType
-			);
-
-			// Enable the authentication code grant on the server with a token TTL of 1 hour
-			$this->server->enableGrantType(
-				new  AuthCodeGrant(
-					$authCodeRepository,
-					$refreshTokenRepository,
-					new DateInterval('PT10M')
-				),
-				new DateInterval('PT1H')
-			);
-
-			// Enable the refresh token grant on the server
-			$refreshGrant = new RefreshTokenGrant($refreshTokenRepository);
-			$refreshGrant->setRefreshTokenTTL(new DateInterval('P1M'));
-
-			$this->server->enableGrantType(
-				$refreshGrant,
-				new DateInterval('PT1H')
-			);
+			$this->server = OAuthServer::authorizationServer();
 		}
 
 		return $this->server;
@@ -132,49 +84,6 @@ class OAuthController {
 	}
 
 	/**
-	 * @return File
-	 * @throws Exception
-	 */
-	private function getPrivateKeyFile(): File
-	{
-		$file = go()->getDataFolder()->getFile('oauth2/private.key');
-		if(!$file->exists()) {
-
-			$file->getFolder()->create();
-
-			$private = openssl_pkey_new();
-			if(!openssl_pkey_export_to_file($private, $file->getPath())) {
-				throw new Exception ("Could not create private key file");
-			}
-			$file->chmod(0600);
-
-			$details = openssl_pkey_get_details($private);
-
-			$pubkey = $details["key"];
-			$pubKeyFile = go()->getDataFolder()->getFile('oauth2/public.key');
-			if(!$pubKeyFile->putContents($pubkey)) {
-				throw new Exception ("Could not create public key file");
-			}
-			$pubKeyFile->chmod(0600);
-		}
-		return $file;
-	}
-
-	/**
-	 * @return File
-	 * @throws Exception
-	 */
-	private function getPublicKeyFile(): File
-	{
-		$file = go()->getDataFolder()->getFile('oauth2/public.key');
-		if(!$file->exists()) {
-			$this->getPrivateKeyFile();
-		}
-		return $file;
-	}
-
-
-	/**
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
@@ -183,14 +92,7 @@ class OAuthController {
 		$request = ServerRequest::fromGlobals();
 		$response = new Response();
 
-		$accessTokenRepository = new repositories\AccessTokenRepository();
-
-		$publicKey = new CryptKey($this->getPublicKeyFile()->getPath());
-
-		$server = new ResourceServer(
-			$accessTokenRepository,
-			$publicKey
-		);
+		$server = OAuthServer::resourceServer();
 
 		try {
 			$request = $server->validateAuthenticatedRequest($request);
@@ -250,40 +152,7 @@ class OAuthController {
 	 */
 	public function openIdConfiguration(): Response
 	{
-		$goUrl = rtrim(go()->getSettings()->URL, '/') . '/';
-		$endpointBase = $goUrl . 'api/oauth.php';
-
-		$signing_alg_values_supported = array('HS256', 'RS256');
-
-		$discovery = array(
-			'issuer' => IdTokenResponse::issuer(),
-			'authorization_endpoint' => $endpointBase . '/authorize',
-			'token_endpoint' => $endpointBase . '/token',
-			'userinfo_endpoint' => $endpointBase . '/userinfo',
-			'jwks_uri' => $endpointBase . '/certs',
-			'scopes_supported' => array('openid'),
-			'response_types_supported' => array('code', 'code token', 'code id_token', 'token', 'id_token token', 'code id_token token', 'id_token'),
-			'grant_types_supported' => array('authorization_code', "refresh_token"), //TODO - get enabled grant types from server
-			'acr_values_supported' => array(),
-			'subject_types_supported' => array('pairwise'),
-
-			'userinfo_signing_alg_values_supported' => $signing_alg_values_supported,
-
-			'id_token_signing_alg_values_supported' => $signing_alg_values_supported,
-
-			'token_endpoint_auth_methods_supported' => array('client_secret_post', 'client_secret_basic', 'client_secret_jwt', 'private_key_jwt'),
-			'token_endpoint_auth_signing_alg_values_supported' => $signing_alg_values_supported,
-
-			'display_values_supported' => array('page'),
-			'claim_types_supported' => array('normal'),
-			'claims_supported' => array(
-				'aud',
-				'iss',
-				'iat',
-				'exp',
-				'nonce',
-			),
-		);
+		$discovery = OAuthServer::metadata();
 
 		$response = new Response();
 
@@ -294,16 +163,6 @@ class OAuthController {
 		return $response
 			->withStatus(200)
 			->withHeader('content-type', 'application/json; charset=UTF-8');
-	}
-
-	/**
-	 * @return string
-	 * @throws \Exception
-	 */
-	private function getKid()
-	{
-		$pubKey = $this->getPublicKeyFile()->getContents();
-		return md5($pubKey);
 	}
 
 	/**
@@ -319,7 +178,7 @@ class OAuthController {
 			];
 
 			//create jwk from public key
-			$pubKey = $this->getPublicKeyFile()->getContents();
+			$pubKey = OAuthServer::publicKeyFile()->getContents();
 			$keyInfo = openssl_pkey_get_details(openssl_pkey_get_public($pubKey));
 
 			//get public key
@@ -329,7 +188,7 @@ class OAuthController {
 				'use' => 'sig',
 				'alg' => 'RS256',
 				'kty' => 'RSA',
-				'kid' => $this->getKid(),
+				'kid' => OAuthServer::kid(),
 			];
 
 			//write to body

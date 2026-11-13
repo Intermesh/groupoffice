@@ -6,18 +6,11 @@ use go\core\model\OauthUser;
 use go\core\model\User;
 use go\core\oauth\server\repositories\AccessTokenRepository;
 use go\core\oauth\server\repositories\AuthCodeRepository;
-use go\core\oauth\server\repositories\ClientRepository;
 use go\core\oauth\server\repositories\RefreshTokenRepository;
-use go\core\oauth\server\repositories\ScopeRepository;
-use go\core\oauth\server\repositories\UserRepository;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
-use League\OAuth2\Server\Grant\AuthCodeGrant;
-use League\OAuth2\Server\Grant\RefreshTokenGrant;
-use OpenIDConnectServer\ClaimExtractor;
-use OpenIDConnectServer\IdTokenResponse;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -91,7 +84,7 @@ class AuthorizationServerTest extends TestCase
 	}
 
 	/**
-	 * The same setup as api/oauth.php, with a key of its own for the tokens
+	 * The server of api/oauth.php, with a key of its own for the tokens
 	 */
 	private function server(): AuthorizationServer
 	{
@@ -100,20 +93,7 @@ class AuthorizationServerTest extends TestCase
 		$this->assertTrue(openssl_pkey_export_to_file(openssl_pkey_new(['private_key_bits' => 2048]), $keyFile->getPath()));
 		$keyFile->chmod(0600);
 
-		$server = new AuthorizationServer(
-			new ClientRepository(),
-			new AccessTokenRepository(),
-			new ScopeRepository(),
-			'file://' . $keyFile->getPath(),
-			EncryptionKey::get(),
-			new IdTokenResponse(new UserRepository(), new ClaimExtractor(), 'test')
-		);
-
-		$server->enableGrantType(new AuthCodeGrant(new AuthCodeRepository(), new RefreshTokenRepository(), new \DateInterval('PT10M')), new \DateInterval('PT1H'));
-
-		$refreshGrant = new RefreshTokenGrant(new RefreshTokenRepository());
-		$refreshGrant->setRefreshTokenTTL(new \DateInterval('P1M'));
-		$server->enableGrantType($refreshGrant, new \DateInterval('PT1H'));
+		$server = OAuthServer::authorizationServer($keyFile->getPath());
 
 		$keyFile->delete();
 
