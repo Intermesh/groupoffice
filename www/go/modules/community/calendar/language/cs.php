@@ -171,4 +171,5 @@ return array (
   'Enter webcal address' => 'Zadejte adresu webcal',
   'Change organizer' => 'Změnit organizátora',
   'No appointments to display' => 'Žádné události k zobrazení',
+  'Import ICS file' => 'Importovat soubor ICS',
 );

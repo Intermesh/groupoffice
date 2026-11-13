@@ -24,4 +24,7 @@ return array (
   'Cannot decrypt' => 'Nie można odszyfrować',
   'Encrypt' => 'Zaszyfruj',
   'Passwords do not match' => 'Hasła nie są zgodne',
+  'Switch between HTML and Markdown editor' => 'Przełącz między edytorem HTML i Markdown',
+  'Switching the editor will clear the content. Are you sure?' => 'Zmiana edytora wyczyści zawartość. Czy na pewno?',
+  'Default editor for new notes' => 'Domyślny edytor nowych notatek',
 );

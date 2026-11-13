@@ -215,4 +215,5 @@ return array (
   'Auto-accept available resources' => 'Automatycznie akceptuj dostępne zasoby',
   'Change organizer' => 'Zmień organizatora',
   'No appointments to display' => 'Brak spotkań do wyświetlenia',
+  'Import ICS file' => 'Importuj plik ICS',
 );

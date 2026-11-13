@@ -27,4 +27,7 @@ return array (
   'Encrypt' => 'Cifrar',
   'Passwords do not match' => 'Las contraseñas no coinciden',
   'notes' => 'notas',
+  'Switch between HTML and Markdown editor' => 'Cambiar entre el editor HTML y Markdown',
+  'Switching the editor will clear the content. Are you sure?' => 'Al cambiar de editor se borrará el contenido. ¿Está seguro?',
+  'Default editor for new notes' => 'Editor predeterminado para notas nuevas',
 );

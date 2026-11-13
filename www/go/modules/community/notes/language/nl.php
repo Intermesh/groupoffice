@@ -24,4 +24,7 @@ return array (
   'Encrypt' => 'Versleutelen',
   'Passwords do not match' => 'Wachtwoorden komen niet overeen',
   'notes' => 'notities',
+  'Switch between HTML and Markdown editor' => 'Wisselen tussen HTML- en Markdown-editor',
+  'Switching the editor will clear the content. Are you sure?' => 'Bij het wisselen van editor wordt de inhoud gewist. Weet u het zeker?',
+  'Default editor for new notes' => 'Standaardeditor voor nieuwe notities',
 );

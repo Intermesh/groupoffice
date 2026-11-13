@@ -1292,4 +1292,5 @@ return array (
   'Personal' => '個人',
   'hour' => '時間',
   'Encrypt content' => '内容を暗号化',
+  'Attach files by dropping or pasting them' => 'ファイルをドラッグ＆ドロップまたは貼り付けで添付',
 );

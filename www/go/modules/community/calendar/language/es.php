@@ -141,4 +141,5 @@ return array (
   'minutes' => 'minutos',
   'updated' => 'actualizado',
   '{name}\'s birthday' => 'Cumpleaños de {name}',
+  'Import ICS file' => 'Importar archivo ICS',
 );

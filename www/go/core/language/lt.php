@@ -1230,4 +1230,5 @@ return array (
   'Select files' => 'Pasirinkite dokumentai',
   'Authorized users' => 'Įgalioti vartotojai',
   'Authorized groups' => 'Įgaliotos grupės',
+  'Attach files by dropping or pasting them' => 'Pridėkite dokumentus vilkdami arba įklijuodami juos čia.',
 );

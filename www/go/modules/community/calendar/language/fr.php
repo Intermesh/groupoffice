@@ -265,4 +265,5 @@ return [
 	'minute' => 'minute',
 	'minutes' => 'minutes',
 	'updated' => 'mis à jour',
+	'Import ICS file' => 'Importer un fichier ICS',
 ];

@@ -172,4 +172,5 @@ return array (
   'Decline entire series' => 'Rifiuta l\'intera serie',
   'Invitees' => 'Invitati',
   'No appointments to display' => 'Nessun appuntamento da visualizzare',
+  'Import ICS file' => 'Importa file ICS',
 );

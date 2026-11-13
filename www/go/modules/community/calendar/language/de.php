@@ -271,4 +271,5 @@ return array (
   'W ' => 'KW ',
   'iCalendar importer' => 'iCalendar-Import',
   'updated' => 'aktualisiert',
+  'Import ICS file' => 'ICS-Datei importieren',
 );

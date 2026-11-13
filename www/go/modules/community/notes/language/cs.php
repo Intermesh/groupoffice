@@ -30,4 +30,7 @@ return array (
   'Start in' => 'Začátek v',
   'Remember last selected note book' => 'Zapamatovat si poslední vybrané poznámky',
   'notes' => 'poznámky',
+  'Switch between HTML and Markdown editor' => 'Přepnout mezi editorem HTML a Markdown',
+  'Switching the editor will clear the content. Are you sure?' => 'Přepnutím editoru se obsah vymaže. Jste si jisti?',
+  'Default editor for new notes' => 'Výchozí editor pro nové poznámky',
 );
