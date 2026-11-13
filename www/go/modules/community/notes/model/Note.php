@@ -27,13 +27,16 @@ class Note extends AclItemEntity {
 	 */
 	public ?string $id;
 
+	/** Title of the note */
 	public string $name;
+	/** Text of the note, in the format of "type". Content that starts with "{ENCRYPTED}" is encrypted in the browser and can't be read without the user's password. */
 	public string $content;
 
 	/**
 	 * Content type. "html" or "markdown". Markdown is rendered by the client. It can't be changed for existing notes.
 	 */
 	public string $type = self::TYPE_HTML;
+	/** ID of the note book the note is in. Use NoteBook/query to find the note books. */
 	public string $noteBookId;
 
 	public ?\DateTimeInterface $createdAt;

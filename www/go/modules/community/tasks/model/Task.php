@@ -62,6 +62,7 @@ class Task extends AclItemEntity {
 	/** @var ?int used for the kanban groups */
 	public ?int $groupId = null;
 
+	/** ID of the project the task is for, if any */
 	public ?int $projectId = null ;
 	public ?int $mileStoneId= null;
 
@@ -90,10 +91,13 @@ class Task extends AclItemEntity {
 
 	/** @var ?DateTimeInterface When the "progress" of either the task or a specific participant was last updated. */
 	public ?DateTimeInterface $progressUpdated;
+	/** Short description of what has to be done */
 	public string $title;
 
+	/** Details of the task */
 	public ?string $description = null;
 
+	/** Where the task takes place */
 	public ?string $location = null;
 
 	//public $keywords; // only in jmap
@@ -211,6 +215,9 @@ class Task extends AclItemEntity {
 		$this->recurrenceRule = $rrule;
 	}
 
+	/**
+	 * "needs-action", "in-progress", "completed", "failed" or "cancelled"
+	 */
 	public function getProgress(): string
 	{
 		return Progress::$db[$this->progress] ?? Progress::$db[1];

@@ -85,6 +85,7 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	static bool $fromClient = false;
 
+	/** ID of the calendar the event is in. Use Calendar/query to find the calendars of the user. */
 	public string $calendarId;
 	protected ?int $eventId = null;
 	/**
@@ -100,10 +101,15 @@ class CalendarEvent extends AclItemEntity {
 
 	public ?string $id = null;
 	public ?string $prodId = null;
+	/** IANA time zone of "start", like "Europe/Amsterdam". Null for a floating event, which happens at the same local time in every time zone. */
 	public ?string $timeZone;
+	/** Language of the text of the event, like "en" or "nl-NL" */
 	public ?string $locale;
+	/** 0 is undefined, 1 is the highest and 9 the lowest priority */
 	public int $priority = 0;
+	/** Color of the event for this user, as a CSS color. Overrides the color of the calendar. */
 	public ?string $color;
+	/** Use the default alerts of the calendar instead of "alerts" */
 	public ?bool $useDefaultAlerts = true;
 
 	/**
@@ -224,6 +230,7 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $alerts = [];
 
+	/** @var string[] IDs of the categories of the event. See Category/query. */
 	public $categoryIds = [];
 	public $links = [];
 
@@ -439,6 +446,9 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
+	 * How the event repeats, as a JSCalendar RecurrenceRule like {"frequency": "weekly", "byDay": [{"day": "mo"}]}. Null when it doesn't repeat.
+	 *
+	 * @link https://www.rfc-editor.org/rfc/rfc8984.html#name-recurrencerules
 	 * @return RecurrenceRule | null
 	 */
 	public function getRecurrenceRule() {
