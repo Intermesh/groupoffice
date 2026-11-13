@@ -69,6 +69,11 @@ class MethodSchemaTest extends TestCase
 		$this->assertEquals('boolean', $params['expandRecurrences']['type']);
 		$this->assertStringContainsString('after', $params['expandRecurrences']['description']);
 		$this->assertEquals('string', $params['timeZone']['type']);
+
+		// Also on Foo/set, next to create, update and destroy
+		$setParams = (array) $schema['methods']['set']['params']['properties'];
+		$this->assertArrayHasKey('create', $setParams);
+		$this->assertEquals('boolean', $setParams['sendSchedulingMessages']['type']);
 	}
 
 	public function testForEntityReferencesExistingDefinitions(): void

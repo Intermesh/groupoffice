@@ -229,9 +229,11 @@ class CalendarEvent extends EntityController {
 	
 	/**
 	 * @param array $params
-	 * @param bool $sendSchedulingMessages (default: false) If true then any changes to scheduled events will be sent
-	 * to all the participants (if the user is an owner of the event) or back to the owners (otherwise). If false, the
-	 * changes only affect this account and no scheduling messages will be sent.
+	 *
+	 * @apiParam bool sendSchedulingMessages Send the changes of events with participants by e-mail (iTIP): invitations,
+	 *   updates and cancellations to the participants when the user is the organizer, or a reply to the organizer
+	 *   when the user is a participant. Without it, the changes are only saved and nobody is notified. Only send
+	 *   messages after the user confirmed that they may go to the other people. Defaults to false.
 	 */
 	public function set($params) {
 		if(!empty($params['sendSchedulingMessages'])) {
