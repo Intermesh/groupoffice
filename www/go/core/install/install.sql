@@ -977,7 +977,8 @@ CREATE TABLE `core_oauth_client` (
   `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `redirectUri` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `secret` varchar(128) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-  `registration` varchar(16) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
+  `registration` varchar(16) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `modifiedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

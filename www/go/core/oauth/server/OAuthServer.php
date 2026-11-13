@@ -165,6 +165,16 @@ final class OAuthServer
 
 		self::validateResource($request->getQueryParams()['resource'] ?? null);
 
+		// A client that registered itself may only ask for the scopes of modules, like "mcp"
+		if (self::needsConsent($authRequest->getClient())) {
+			$moduleScopes = self::moduleScopes();
+			foreach ($authRequest->getScopes() as $scope) {
+				if (!isset($moduleScopes[$scope->getIdentifier()])) {
+					throw OAuthServerException::invalidScope($scope->getIdentifier());
+				}
+			}
+		}
+
 		if (!$authRequest->getClient()->isConfidential() && $authRequest->getCodeChallengeMethod() !== 'S256') {
 			throw OAuthServerException::invalidRequest('code_challenge_method', 'Public clients must use PKCE with code_challenge_method S256');
 		}
@@ -375,6 +385,9 @@ final class OAuthServer
 			'display_values_supported' => ['page'],
 			'claim_types_supported' => ['normal'],
 			'claims_supported' => ['aud', 'iss', 'iat', 'exp', 'nonce']
-		];
+		] + (ClientRegistration::isAllowed() ? [
+			'registration_endpoint' => self::endpoint('register'),
+			'client_id_metadata_document_supported' => true
+		] : []);
 	}
 }

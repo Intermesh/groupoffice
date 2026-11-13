@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use go\core\oauth\server\ClientRegistration;
 use go\core\oauth\server\OAuthServer;
 use go\core\oauth\server\PendingAuthorization;
 use Psr\Http\Message\ResponseInterface;
@@ -120,6 +121,40 @@ class OAuthController {
 			->withHeader('content-type', 'application/json; charset=UTF-8');
 	}
 
+	/**
+	 * Dynamic client registration (RFC 7591)
+	 */
+	public function register(): ResponseInterface
+	{
+		$response = new Response();
+		if (!ClientRegistration::isAllowed()) {
+			return $response->withStatus(404);
+		}
+
+		if (!ClientRegistration::mayRegister(\go\core\http\Request::get()->getRemoteIpAddress())) {
+			return $this->json($response, 429, ['error' => 'too_many_requests']);
+		}
+
+		$metadata = json_decode((string) ServerRequest::fromGlobals()->getBody(), true);
+		if (!is_array($metadata)) {
+			return $this->json($response, 400, ['error' => 'invalid_client_metadata']);
+		}
+
+		try {
+			return $this->json($response, 201, ClientRegistration::register($metadata));
+		} catch (InvalidArgumentException $e) {
+			return $this->json($response, 400, ['error' => $e->getMessage()]);
+		}
+	}
+
+	private function json(Response $response, int $status, array $data): ResponseInterface
+	{
+		$response->getBody()->write(json_encode($data, JSON_UNESCAPED_SLASHES));
+		return $response->withStatus($status)
+			->withHeader('cache-control', 'no-store')
+			->withHeader('content-type', 'application/json; charset=UTF-8');
+	}
+
 	public function userinfo(): ResponseInterface
 	{
 		return OAuthServer::userInfo(ServerRequest::fromGlobals(), OAuthServer::resourceServer());
@@ -219,6 +254,7 @@ class OAuthController {
 	->addRoute('/authorize/', 'GET', OAuthController::class, 'authorize')
 	->addRoute('/authorize/', 'POST', OAuthController::class, 'authorize')
 	->addRoute('/consent/', 'GET', OAuthController::class, 'consent')
+	->addRoute('/register/', 'POST', OAuthController::class, 'register')
 	->addRoute('/userinfo/', 'GET', OAuthController::class, 'userinfo')
 	->addRoute('/token/', 'POST', OAuthController::class, 'token')
 	->addRoute('/\.well-known\/openid-configuration/', 'GET', OAuthController::class, 'openIdConfiguration')

@@ -1900,3 +1900,6 @@ $updates['202611091340'][] = "ALTER TABLE core_change_user
 
 // OAuth clients that registered themselves, like AI assistants, need the user's consent
 $updates['202611131400'][] = "ALTER TABLE core_oauth_client ADD registration VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL";
+
+// A client ID metadata document is fetched again a day after it was saved
+$updates['202611131500'][] = "ALTER TABLE core_oauth_client ADD modifiedAt DATETIME NULL DEFAULT NULL";

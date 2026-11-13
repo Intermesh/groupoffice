@@ -21,6 +21,8 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 	 */
 	protected ?string $registration = null;
 
+	public ?\DateTimeInterface $modifiedAt = null;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -43,13 +45,22 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 		$this->name = $name;
 	}
 
+	/**
+	 * @param string|string[] $uri Several URIs are stored as a JSON array
+	 */
 	public function setRedirectUri(string|array $uri): void
 	{
-		$this->redirectUri = $uri;
+		$this->redirectUri = is_array($uri) ? json_encode(array_values($uri), JSON_UNESCAPED_SLASHES) : $uri;
 	}
 
 	public function getRedirectUri(): array|string
 	{
+		if (is_string($this->redirectUri) && str_starts_with($this->redirectUri, '[')) {
+			$uris = json_decode($this->redirectUri, true);
+			if (is_array($uris)) {
+				return $uris;
+			}
+		}
 		return $this->redirectUri;
 	}
 
