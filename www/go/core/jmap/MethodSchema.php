@@ -181,6 +181,7 @@ final class MethodSchema
 	 * - "@apiResponse <type> <description>": the response.
 	 * - "@apiNoParams": the method has no parameters.
 	 * - "@apiPermission <text>": the permission the method requires. See {@see permission()}.
+	 * - "@apiReadOnly": the method only reads. See {@see isReadOnly()}.
 	 *
 	 * The types are described in {@see ApiType}. A tag continues on the next lines until the next tag.
 	 *
@@ -197,7 +198,7 @@ final class MethodSchema
 	 *
 	 * @param string|false $docComment The doc block of the method
 	 * @param string $entityName The entity of the method. See {@see ApiType::toJsonSchema()}
-	 * @return array{params?: array, response?: array, permission?: string}|null Null when the doc block has none of these
+	 * @return array{params?: array, response?: array, permission?: string, readOnly?: bool}|null Null when the doc block has none of these
 	 *   tags. "params" is only set when the parameters are documented.
 	 * @throws \InvalidArgumentException When a tag is invalid
 	 */
@@ -250,6 +251,10 @@ final class MethodSchema
 				case 'apiPermission':
 					$permission = $text;
 					break;
+
+				case 'apiReadOnly':
+					$readOnly = true;
+					break;
 			}
 		}
 
@@ -263,8 +268,32 @@ final class MethodSchema
 		if (isset($permission)) {
 			$result['permission'] = $permission;
 		}
+		if (isset($readOnly)) {
+			$result['readOnly'] = true;
+		}
 
 		return empty($result) ? null : $result;
+	}
+
+	/**
+	 * Whether a custom method only reads, by the "@apiReadOnly" tag of its doc block
+	 *
+	 * Clients that may only read, like an AI assistant with read access, may call such a method. A method without the
+	 * tag counts as one that changes data.
+	 *
+	 * @param string|false $docComment
+	 */
+	public static function isReadOnly(string|false $docComment): bool
+	{
+		if (!$docComment) {
+			return false;
+		}
+		foreach (self::docTags($docComment) as [$tag]) {
+			if ($tag === 'apiReadOnly') {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

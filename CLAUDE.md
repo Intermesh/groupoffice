@@ -68,7 +68,7 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - In controller methods, load entities with `$this->getEntity()` or `findEntity()`, which check read permission, not `Model::findById($params[...])`, which checks nothing. Methods that change data or send mail need a write or manage check on the entity or its container.
 - Don't override `checkModulePermissions()` to return true without another guard, don't pass `$params` straight to `setValues()`, and don't return SQL in responses unless the debugger is enabled.
 - When you change a public controller method, check its permission guard first. Every public method of a JMAP controller can be called by any user with access to the module.
-- Document the permission of every custom controller method with `@apiPermission` (shown in `/api/doc.php`). `tests/go/core/jmap/ControllerPermissionTest.php` fails when a public controller method has no recognisable permission check. When access to the module is really enough, start the text with `Module access:` and give the reason; when the check is elsewhere, start with `Checked in <Class::method()>:`.
+- Document the permission of every custom controller method with `@apiPermission` (shown in `/api/doc.php`). `tests/go/core/jmap/ControllerPermissionTest.php` fails when a public controller method has no recognisable permission check. When access to the module is really enough, start the text with `Module access:` and give the reason; when the check is elsewhere, start with `Checked in <Class::method()>:`. Tag a custom method that only reads with `@apiReadOnly`: clients that may only read, like AI assistants with read access, can then call it. A method without the tag counts as one that changes data.
 
 ## Writing tests
 

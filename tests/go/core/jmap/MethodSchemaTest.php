@@ -101,6 +101,21 @@ class MethodSchemaTest extends TestCase
 		$this->assertEquals('The notes', $schema['response']['description']);
 	}
 
+	/**
+	 * Only methods tagged "@apiReadOnly" may be called by clients that may only read
+	 */
+	public function testReadOnly(): void
+	{
+		$tagged = "/**\n * Count the tasks\n *\n * @apiReadOnly\n * @apiPermission Module access: only counts\n */";
+		$this->assertTrue(MethodSchema::isReadOnly($tagged));
+		$this->assertTrue(MethodSchema::fromDocComment($tagged, 'Task')['readOnly']);
+
+		$untagged = "/**\n * Move the tasks\n *\n * @apiPermission Checked in Task::move()\n */";
+		$this->assertFalse(MethodSchema::isReadOnly($untagged));
+		$this->assertArrayNotHasKey('readOnly', MethodSchema::fromDocComment($untagged, 'Task'));
+		$this->assertFalse(MethodSchema::isReadOnly(false));
+	}
+
 	public function testPermission(): void
 	{
 		$doc = "/**\n * @apiParam string id Required. The ID\n * @apiPermission Write permission on the\n *   book.\n */";
