@@ -227,7 +227,8 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 		$mailbox = Mailbox::find()->where(['username' => $params['username']])->single();
 
 		if(!$mailbox) {
-			throw new NotFound();
+			//ignore if not found.
+			return;
 		}
 
 		$mailbox->setPassword($params['password']);
