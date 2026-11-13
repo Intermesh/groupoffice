@@ -26,13 +26,27 @@ class NewsletterTest extends TestCase
 	private ?AddressList $addressList = null;
 	private ?SmtpAccount $smtpAccount = null;
 
+	public static function setUpBeforeClass(): void
+	{
+		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
+		try {
+			self::installModuleTables('business', 'newsletters', $path . 'newsletters/install/install.sql');
+		} catch (\Throwable $e) {
+			// PHPUnit doesn't call tearDownAfterClass() when this fails, and the module tables would stay behind
+			self::uninstallModuleTables();
+			throw $e;
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		self::uninstallModuleTables();
+	}
+
 	protected function setUp(): void
 	{
 		$this->authState = go()->getAuthState();
 		$this->actAs(User::ID_SUPER_ADMIN);
-
-		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
-		$this->installModuleTables('business', 'newsletters', $path . 'newsletters/install/install.sql');
 
 		$name = uniqid('nluser');
 		$this->user = new User();
@@ -70,7 +84,6 @@ class NewsletterTest extends TestCase
 		}
 		User::delete(['id' => $this->user->id]);
 
-		$this->uninstallModuleTables();
 		go()->setAuthState($this->authState);
 	}
 

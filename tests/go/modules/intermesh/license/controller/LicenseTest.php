@@ -31,6 +31,29 @@ class LicenseTest extends TestCase
 	private ?Contact $customer = null;
 	private ?Contract $contract = null;
 
+	public static function setUpBeforeClass(): void
+	{
+		if (!class_exists(License::class)) {
+			self::markTestSkipped('The intermesh license module is not available');
+		}
+
+		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
+		try {
+			self::installModuleTables('business', 'business', $path . 'business/install/install.sql');
+			self::installModuleTables('business', 'finance', $path . 'finance/install/install.sql');
+			self::installModuleTables('business', 'contracts', $path . 'contracts/install/install.sql');
+		} catch (\Throwable $e) {
+			// PHPUnit doesn't call tearDownAfterClass() when this fails, and the module tables would stay behind
+			self::uninstallModuleTables();
+			throw $e;
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		self::uninstallModuleTables();
+	}
+
 	protected function setUp(): void
 	{
 		if (!class_exists(License::class)) {
@@ -39,11 +62,6 @@ class LicenseTest extends TestCase
 
 		$this->authState = go()->getAuthState();
 		$this->actAs(User::ID_SUPER_ADMIN);
-
-		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
-		$this->installModuleTables('business', 'business', $path . 'business/install/install.sql');
-		$this->installModuleTables('business', 'finance', $path . 'finance/install/install.sql');
-		$this->installModuleTables('business', 'contracts', $path . 'contracts/install/install.sql');
 
 		$this->owner = $this->createUser('licenseowner');
 		$this->other = $this->createUser('licenseother');
@@ -107,7 +125,6 @@ class LicenseTest extends TestCase
 		}
 		User::delete(['id' => [$this->owner->id, $this->other->id]]);
 
-		$this->uninstallModuleTables();
 		go()->setAuthState($this->authState);
 	}
 

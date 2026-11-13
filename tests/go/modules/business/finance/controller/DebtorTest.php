@@ -23,14 +23,28 @@ class DebtorTest extends TestCase
 	private User $user;
 	private ?Business $business = null;
 
+	public static function setUpBeforeClass(): void
+	{
+		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
+		try {
+			self::installModuleTables('business', 'business', $path . 'business/install/install.sql');
+			self::installModuleTables('business', 'finance', $path . 'finance/install/install.sql');
+		} catch (\Throwable $e) {
+			// PHPUnit doesn't call tearDownAfterClass() when this fails, and the module tables would stay behind
+			self::uninstallModuleTables();
+			throw $e;
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		self::uninstallModuleTables();
+	}
+
 	protected function setUp(): void
 	{
 		$this->authState = go()->getAuthState();
 		$this->actAs(User::ID_SUPER_ADMIN);
-
-		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
-		$this->installModuleTables('business', 'business', $path . 'business/install/install.sql');
-		$this->installModuleTables('business', 'finance', $path . 'finance/install/install.sql');
 
 		$name = uniqid('debtoruser');
 		$this->user = new User();
@@ -55,7 +69,6 @@ class DebtorTest extends TestCase
 		}
 		User::delete(['id' => $this->user->id]);
 
-		$this->uninstallModuleTables();
 		go()->setAuthState($this->authState);
 	}
 

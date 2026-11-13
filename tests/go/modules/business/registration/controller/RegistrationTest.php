@@ -21,14 +21,28 @@ class RegistrationTest extends TestCase
 	private $authState;
 	private User $user;
 
+	public static function setUpBeforeClass(): void
+	{
+		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
+		try {
+			self::installModuleTables('business', 'business', $path . 'business/install/install.sql');
+			self::installModuleTables('business', 'registration', $path . 'registration/install/install.sql');
+		} catch (\Throwable $e) {
+			// PHPUnit doesn't call tearDownAfterClass() when this fails, and the module tables would stay behind
+			self::uninstallModuleTables();
+			throw $e;
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		self::uninstallModuleTables();
+	}
+
 	protected function setUp(): void
 	{
 		$this->authState = go()->getAuthState();
 		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
-
-		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
-		$this->installModuleTables('business', 'business', $path . 'business/install/install.sql');
-		$this->installModuleTables('business', 'registration', $path . 'registration/install/install.sql');
 
 		$name = uniqid('reguser');
 		$this->user = new User();
@@ -45,7 +59,6 @@ class RegistrationTest extends TestCase
 	{
 		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
 		User::delete(['id' => $this->user->id]);
-		$this->uninstallModuleTables();
 		go()->setAuthState($this->authState);
 	}
 
