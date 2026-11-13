@@ -229,4 +229,44 @@ class BlobTest extends TestCase
 			Blob::delete(['id' => $blob->id]);
 		}
 	}
+	/**
+	 * Like File::getBlob() for a file in an item's folder: the blob of the same content keeps its stored name
+	 */
+	public function testFromFileDoesNotRenameExistingBlob()
+	{
+		$content = "from file test " . uniqid();
+		$existing = Blob::fromString($content);
+		$existing->type = 'text/plain';
+		$existing->name = 'original.txt';
+		$this->assertTrue($existing->save());
+
+		$file = File::tempFile('other.txt');
+		try {
+			$file->putContents($content);
+			$blob = Blob::fromFile($file);
+			$this->assertTrue($blob->save());
+			// The caller still sees the name of its own file
+			$this->assertSame($file->getName(), $blob->name);
+			$this->assertSame('original.txt', $this->storedName($existing->id));
+
+			$again = Blob::fromString($content);
+			$again->name = 'renamed.txt';
+			$this->assertTrue($again->save());
+			$this->assertSame('original.txt', $this->storedName($existing->id));
+
+			// Renaming a blob that was loaded on purpose still works
+			$loaded = Blob::findById($existing->id);
+			$loaded->name = 'renamed.txt';
+			$this->assertTrue($loaded->save());
+			$this->assertSame('renamed.txt', $this->storedName($existing->id));
+		} finally {
+			$file->delete();
+			Blob::delete(['id' => $existing->id]);
+		}
+	}
+
+	private function storedName(string $id): string
+	{
+		return go()->getDbConnection()->selectSingleValue('name')->from('core_blob')->where('id', '=', $id)->single();
+	}
 }

@@ -99,6 +99,12 @@ class Blob extends orm\Entity {
 
 	private $strContent;
 
+	/**
+	 * Set when a factory like fromFile() found an existing blob with the same content. It may be someone else's
+	 * attachment, so saving must not rename it.
+	 */
+	private bool $keepStoredMetaData = false;
+
 
 	protected function init()
 	{
@@ -208,6 +214,8 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = $file->getSize();
 
+		} else {
+			$blob->keepStoredMetaData = true;
 		}
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
@@ -301,6 +309,8 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = mb_strlen($string, '8bit');
 			$blob->strContent = $string;
+		} else {
+			$blob->keepStoredMetaData = true;
 		}
 		return $blob;
 	}
@@ -352,8 +362,24 @@ class Blob extends orm\Entity {
 				file_put_contents($this->path(), $this->strContent);
 			}
 		}
-		
-		return parent::internalSave();
+
+		if (!$this->keepStoredMetaData || $this->isNew()) {
+			return parent::internalSave();
+		}
+
+		// An existing blob found by its content keeps its stored name, type and date. The caller still sees its own.
+		$own = [];
+		foreach (['name', 'type', 'modifiedAt'] as $prop) {
+			if ($this->isModified($prop)) {
+				$own[$prop] = $this->$prop;
+				$this->$prop = $this->getOldValue($prop);
+			}
+		}
+		$success = parent::internalSave();
+		foreach ($own as $prop => $value) {
+			$this->$prop = $value;
+		}
+		return $success;
 	}
 
 	/**
