@@ -145,4 +145,5 @@ return array (
   'Mailing list' => 'Mailing list',
   'Sieve' => 'Sieve',
   'I am away' => 'Sono assente',
+  'The filter contains an invalid value' => 'Il filtro contiene un valore non valido',
 );

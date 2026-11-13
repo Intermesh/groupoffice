@@ -126,4 +126,5 @@ return array (
   'Stop needs to be on the end!' => 'Stop musi być na końcu!',
   'Reject with message:' => 'Odrzuć z wiadomością:',
   'Set a custom subject' => 'Ustaw własny temat',
+  'The filter contains an invalid value' => 'Filtr zawiera nieprawidłową wartość',
 );

@@ -26,4 +26,13 @@ return array (
   'Tasklists' => 'Listy zadań',
   'The following attachments were too big to synchronize' => 'Następujące załączniki były zbyt duże, aby je zsynchronizować',
   '** 2-Factor authentication **' => '** Uwierzytelnianie dwuskładnikowe **',
+  '2fa-body' => 'Witaj,
+
+Zaloguj się do {product_name}, aby dokończyć konfigurację konta:
+
+{URL}
+
+Z pozdrowieniami,
+
+{TITLE}',
 );

@@ -29,4 +29,13 @@ return array (
   '** 2-Factor authentication **' => '** Authentification à deux facteurs **',
   'Allow delete via synchronization' => 'Autoriser la suppression via la synchronisation',
   'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Par défaut, les appareils ne sont pas autorisés à supprimer des éléments. Ceci a été ajouté en raison d\'un bug d\'Android 12 qui supprimait les contacts après une mise à jour.',
+  '2fa-body' => 'Bonjour,
+
+Veuillez vous connecter à {product_name} pour terminer la configuration de votre compte :
+
+{URL}
+
+Cordialement,
+
+{TITLE}',
 );

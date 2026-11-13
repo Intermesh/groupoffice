@@ -147,4 +147,5 @@ return array (
   'Is from mailing list' => 'Es de una lista de correo',
   'Set a custom subject' => 'Establecer un asunto personalizado',
   'exist' => 'existe',
+  'The filter contains an invalid value' => 'El filtro contiene un valor no válido',
 );

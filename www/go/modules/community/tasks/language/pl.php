@@ -83,4 +83,5 @@ return array (
   'Percent Complete' => 'Procent ukończenia',
   'List: None' => 'Lista: brak',
   'Tasklists' => 'Listy zadań',
+  'This task already has booked hours or progress' => 'To zadanie ma już zarejestrowane godziny lub postęp',
 );

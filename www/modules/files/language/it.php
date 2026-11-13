@@ -157,4 +157,7 @@ Le seguenti modifiche sono state effettuate da %s:
   'Delete download link files that are no longer valid' => 'Elimina i file dei link di download non più validi',
   'Send notification email when something changes in subscribed files folder' => 'Invia un\'e-mail di notifica quando qualcosa cambia in una cartella di file a cui sei iscritto',
   'Send an email to the user when a folder is changed' => 'Invia un\'e-mail all\'utente quando una cartella viene modificata',
+  'The archive contains links or other special files and can\'t be decompressed' => 'L\'archivio contiene collegamenti o altri file speciali e non può essere decompresso',
+  'Invalid file or folder name' => 'Nome di file o cartella non valido',
+  'Could not restore the item' => 'Impossibile ripristinare l\'elemento',
 );

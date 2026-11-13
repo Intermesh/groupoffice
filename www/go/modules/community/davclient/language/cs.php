@@ -21,4 +21,6 @@ return array (
   'Delete all' => 'Smazat vše',
   'Every 15 minutes' => 'Každých 15 minut',
   'Sync' => 'Synchronizovat',
+  'Fetch data from caldav servers' => 'Načítat data ze serverů CalDAV',
+  'Auto refresh' => 'Automatická aktualizace',
 );

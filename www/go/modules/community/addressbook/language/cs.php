@@ -32,11 +32,13 @@ return array (
     'postal' => 'Poštovní adresa',
     'work' => 'Pracovní adresa',
     'home' => 'Soukromá adresa',
+    'delivery' => 'Doručovací',
   ),
   'dateTypes' => 
   array (
     'birthday' => 'Narozeniny',
     'anniversary' => 'Výročí',
+    'action' => 'Akce',
   ),
   'VAT number' => 'VAT číslo',
   'Reverse charge VAT' => 'Zpětný poplate VAT',

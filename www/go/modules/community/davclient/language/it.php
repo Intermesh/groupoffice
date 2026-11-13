@@ -21,4 +21,6 @@ return array (
   'Calendar' => 'Calendario',
   'Every 15 minutes' => 'Ogni 15 minuti',
   'Sync' => 'Sincronizza',
+  'Fetch data from caldav servers' => 'Recupera i dati dai server CalDAV',
+  'Auto refresh' => 'Aggiornamento automatico',
 );

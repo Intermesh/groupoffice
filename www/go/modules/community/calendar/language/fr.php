@@ -266,4 +266,12 @@ return [
 	'minutes' => 'minutes',
 	'updated' => 'mis à jour',
 	'Import ICS file' => 'Importer un fichier ICS',
+	'Event not found' => 'Événement introuvable',
+	'You are not invited to this event' => 'Vous n\'êtes pas invité à cet événement',
+	'Show event in category color' => 'Afficher l\'événement dans la couleur de la catégorie',
+	'Only when one calendar is selected and the event has one category' => 'Uniquement lorsqu\'un seul agenda est sélectionné et que l\'événement a une seule catégorie',
+	'Scan e-mail for invites' => 'Analyser les e-mails pour trouver des invitations',
+	'Auto add invites and updates to calendar when enabled' => 'Ajouter automatiquement les invitations et mises à jour à l\'agenda lorsque cette option est activée',
+	'Import calendar from ICS file.' => 'Importer un agenda depuis un fichier ICS.',
+	'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Faire une copie exacte de l\'agenda d\'un fichier ICS externe dans les agendas GroupOffice sélectionnés. Sélectionnez les agendas de destination dans les paramètres d\'administration de l\'agenda.',
 ];

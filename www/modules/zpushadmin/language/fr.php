@@ -36,4 +36,5 @@ return array (
   'Imei' => 'Imei',
   'SMS' => 'SMS',
   'Resync' => 'Resynchroniser',
+  'ActiveSync' => 'ActiveSync',
 );

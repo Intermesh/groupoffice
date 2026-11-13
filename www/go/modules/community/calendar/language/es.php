@@ -142,4 +142,23 @@ return array (
   'updated' => 'actualizado',
   '{name}\'s birthday' => 'Cumpleaños de {name}',
   'Import ICS file' => 'Importar archivo ICS',
+  'Event not found' => 'Evento no encontrado',
+  'You are not invited to this event' => 'No está invitado a este evento',
+  'replyPageMessage' => array (
+    'accepted' => 'Ha aceptado el evento',
+    'declined' => 'Ha rechazado el evento',
+    'tentative' => 'Ha respondido provisionalmente al evento',
+  ),
+  'Show event in category color' => 'Mostrar el evento en el color de la categoría',
+  'Only when one calendar is selected and the event has one category' => 'Solo cuando hay un calendario seleccionado y el evento tiene una categoría',
+  'Scan e-mail for invites' => 'Buscar invitaciones en el correo electrónico',
+  'Auto add invites and updates to calendar when enabled' => 'Si está activado, se añaden automáticamente las invitaciones y actualizaciones al calendario',
+  'Import calendar from ICS file.' => 'Importar calendario desde un archivo ICS.',
+  'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Crea una copia exacta del calendario de un archivo ICS externo en los calendarios de GroupOffice seleccionados. Seleccione los calendarios de destino en la configuración de administración del calendario.',
+  'replyImipBody' => array (
+    'needs-action' => '{name} aún no ha decidido sobre "{title}" {date}.',
+    'accepted' => '{name} ha aceptado el evento "{title}" {date}',
+    'declined' => '{name} ha rechazado el evento "{title}" {date}',
+    'tentative' => '{name} ha respondido provisionalmente al evento "{title}" {date}',
+  ),
 );

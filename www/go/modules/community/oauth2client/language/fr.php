@@ -17,4 +17,5 @@ return array (
   'Request or update a refresh token in a separate window.' => 'Demander ou mettre à jour un jeton d\'actualisation dans une fenêtre séparée.',
   'Use this connection for single signon with OpenID Connect' => 'Utiliser cette connexion pour l\'authentification unique avec OpenID Connect',
   'to close this window.' => 'pour fermer cette fenêtre.',
+  'OAuth2 Client Settings' => 'Paramètres du client OAuth2',
 );

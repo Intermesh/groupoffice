@@ -79,4 +79,5 @@ return array (
   'Task list' => 'Lista de tareas',
   'Tasklists' => 'Listas de tareas',
   'Tasks in this list will be shown in the calendar' => 'Las tareas de esta lista se mostrarán en el calendario',
+  'This task already has booked hours or progress' => 'Esta tarea ya tiene horas registradas o progreso',
 );

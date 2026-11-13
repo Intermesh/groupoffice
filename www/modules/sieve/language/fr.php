@@ -149,4 +149,5 @@ return array (
   'doesn\'t match' => 'ne correspond pas à',
   'exist' => 'existe',
   'matches' => 'correspond à',
+  'The filter contains an invalid value' => 'Le filtre contient une valeur invalide',
 );

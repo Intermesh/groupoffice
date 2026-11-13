@@ -172,4 +172,23 @@ return array (
   'Change organizer' => 'Změnit organizátora',
   'No appointments to display' => 'Žádné události k zobrazení',
   'Import ICS file' => 'Importovat soubor ICS',
+  'Event not found' => 'Událost nebyla nalezena',
+  'You are not invited to this event' => 'Na tuto událost nejste pozváni',
+  'replyPageMessage' => array (
+    'accepted' => 'Událost jste přijali',
+    'declined' => 'Událost jste odmítli',
+    'tentative' => 'Účastí na události si nejste jisti',
+  ),
+  'Show event in category color' => 'Zobrazit událost v barvě kategorie',
+  'Only when one calendar is selected and the event has one category' => 'Pouze pokud je vybrán jeden kalendář a událost má jednu kategorii',
+  'Scan e-mail for invites' => 'Vyhledávat pozvánky v e-mailech',
+  'Auto add invites and updates to calendar when enabled' => 'Je-li povoleno, pozvánky a jejich aktualizace se automaticky přidají do kalendáře',
+  'Import calendar from ICS file.' => 'Importovat kalendář ze souboru ICS.',
+  'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Vytvoří přesnou kopii externího kalendáře ze souboru ICS ve vybraných kalendářích GroupOffice. Kalendáře, do kterých se má importovat, vyberte v nastavení správy kalendáře.',
+  'replyImipBody' => array (
+    'needs-action' => '{name} se zatím nerozhodl(a) ohledně „{title}“ {date}.',
+    'accepted' => '{name} přijal(a) událost „{title}“ {date}',
+    'declined' => '{name} odmítl(a) událost „{title}“ {date}',
+    'tentative' => '{name} si není jistý/á účastí na události „{title}“ {date}',
+  ),
 );

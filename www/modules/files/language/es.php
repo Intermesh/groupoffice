@@ -160,4 +160,7 @@ Los siguientes cambios fueron realizados por %s:
   'Send notification email when something changes in subscribed files folder' => 'Enviar un correo de notificación cuando cambie algo en una carpeta de archivos suscrita',
   'The upload failed! Ask the server manager for what wrong' => '¡La subida ha fallado! Consulte al administrador del servidor qué ha fallado',
   'id' => 'id',
+  'The archive contains links or other special files and can\'t be decompressed' => 'El archivo comprimido contiene enlaces u otros archivos especiales y no se puede descomprimir',
+  'Invalid file or folder name' => 'Nombre de archivo o carpeta no válido',
+  'Could not restore the item' => 'No se pudo restaurar el elemento',
 );

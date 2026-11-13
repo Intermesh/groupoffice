@@ -108,4 +108,5 @@ return array (
   'Tasks in this list will be shown in the calendar' => 'Aufgaben aus dieser Liste werden im Kalender angezeigt',
   'Task list' => 'Aufgabenliste',
   'Tasklists' => 'Aufgabenlisten',
+  'This task already has booked hours or progress' => 'Für diese Aufgabe wurden bereits Stunden gebucht oder ein Fortschritt erfasst',
 );

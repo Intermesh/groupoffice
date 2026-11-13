@@ -80,4 +80,7 @@ return array (
   'Your MX record is not set to this mailserver' => 'Votre enregistrement MX ne pointe pas vers ce serveur de messagerie',
   'Your SPF record does not allow \'{mailhost}\'' => 'Votre enregistrement SPF n\'autorise pas \'{mailhost}\'',
   'Your SPF record is not set' => 'Votre enregistrement SPF n\'est pas défini',
+  'DKIM keys' => 'Clés DKIM',
+  'Allow external SMTP usage' => 'Autoriser l\'utilisation SMTP externe',
+  'Enable Full Text Search' => 'Activer la recherche en texte intégral',
 );

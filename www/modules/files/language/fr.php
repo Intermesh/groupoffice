@@ -158,4 +158,7 @@ Les changements suivants ont été effectués par %s :
   'Sorry, something went wrong' => 'Désolé, une erreur s\'est produite',
   'The upload failed! Ask the server manager for what wrong' => 'L\'envoi a échoué ! Demandez à l\'administrateur du serveur ce qui ne va pas',
   'id' => 'id',
+  'The archive contains links or other special files and can\'t be decompressed' => 'L\'archive contient des liens ou d\'autres fichiers spéciaux et ne peut pas être décompressée',
+  'Invalid file or folder name' => 'Nom de fichier ou de dossier invalide',
+  'Could not restore the item' => 'Impossible de restaurer l\'élément',
 );

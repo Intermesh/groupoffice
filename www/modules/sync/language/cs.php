@@ -30,4 +30,13 @@ return array (
   'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Ve výchozím nastavení nemají zařízení povoleno mazat položky. Přidáno kvůli chybě v Androidu 12, který po aktualizaci smazal všechny kontakty',
   'Tasklists' => 'Seznam úkolů',
   '** 2-Factor authentication **' => '** Dvoufázové ověření **',
+  '2fa-body' => 'Dobrý den,
+
+přihlaste se prosím do {product_name} a dokončete nastavení svého účtu na adrese:
+
+{URL}
+
+S pozdravem
+
+{TITLE}',
 );

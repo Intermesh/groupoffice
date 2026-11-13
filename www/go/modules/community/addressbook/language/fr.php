@@ -65,11 +65,13 @@ return array (
     'postal' => 'Postale',
     'work' => 'Professionnelle',
     'home' => 'Personnelle',
+    'delivery' => 'Livraison',
   ),
   'dateTypes' => 
   array (
     'birthday' => 'Anniversaire',
     'anniversary' => 'Autre anniversaire',
+    'action' => 'Action',
   ),
   'Star' => 'Etoile',
   'Middle' => 'Milieu',

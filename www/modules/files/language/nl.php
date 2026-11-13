@@ -161,4 +161,7 @@ De volgende wijzigingen zijn aangebracht door %s:
 	'Send an email to the user when a folder is changed' => 'Stuur een e-mail naar de gebruiker wanneer een map wordt gewijzigd',
 	'Send notification email when something changes in subscribed files folder' => 'Stuur een e-mailmelding wanneer er iets wijzigt in een map waarop u geabonneerd bent',
 	'id' => 'id',
+	'The archive contains links or other special files and can\'t be decompressed' => 'Het archief bevat links of andere speciale bestanden en kan niet worden uitgepakt',
+	'Invalid file or folder name' => 'Ongeldige bestands- of mapnaam',
+	'Could not restore the item' => 'Het item kon niet worden hersteld',
 );

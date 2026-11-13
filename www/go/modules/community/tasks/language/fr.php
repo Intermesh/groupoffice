@@ -46,4 +46,5 @@ return array(
 	'priority' => 'priorité',
 	'start' => 'début',
 	'status' => 'statut',
+	'This task already has booked hours or progress' => 'Cette tâche a déjà des heures imputées ou un avancement',
 );

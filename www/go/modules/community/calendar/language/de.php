@@ -272,4 +272,9 @@ return array (
   'iCalendar importer' => 'iCalendar-Import',
   'updated' => 'aktualisiert',
   'Import ICS file' => 'ICS-Datei importieren',
+  'Event not found' => 'Termin nicht gefunden',
+  'Scan e-mail for invites' => 'E-Mails nach Einladungen durchsuchen',
+  'Auto add invites and updates to calendar when enabled' => 'Einladungen und Aktualisierungen automatisch zum Kalender hinzufügen, wenn aktiviert',
+  'Import calendar from ICS file.' => 'Kalender aus ICS-Datei importieren.',
+  'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Exakte Kopie eines externen ICS-Kalenders in die ausgewählten GroupOffice-Kalender erstellen. Wählen Sie die Zielkalender in den Verwaltungseinstellungen des Kalenders aus.',
 );

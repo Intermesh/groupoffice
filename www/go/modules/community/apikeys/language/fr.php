@@ -8,4 +8,5 @@ return array (
   'API key' => 'Clé API',
   'API keys' => 'Clés API',
   'Access token' => 'Jeton d\'accès',
+  'Copy the access token now. It\'s not possible to view it again.' => 'Copiez le jeton d\'accès maintenant. Il ne sera plus possible de l\'afficher.',
 );

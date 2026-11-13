@@ -53,4 +53,6 @@ return array (
   'Your MX record is not set to this mailserver' => 'Su registro MX no apunta a este servidor de correo',
   'Your SPF record does not allow \'{mailhost}\'' => 'Su registro SPF no permite \'{mailhost}\'',
   'Your SPF record is not set' => 'Su registro SPF no está configurado',
+  'DKIM keys' => 'Claves DKIM',
+  'Enable Full Text Search' => 'Activar búsqueda de texto completo',
 );

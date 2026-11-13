@@ -15,4 +15,6 @@ return array (
   'Remove from sync' => 'Retirer de la synchronisation',
   'Sync' => 'Synchroniser',
   'Sync now' => 'Synchroniser maintenant',
+  'Fetch data from caldav servers' => 'Récupérer les données des serveurs CalDAV',
+  'Auto refresh' => 'Actualisation automatique',
 );

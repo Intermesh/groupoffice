@@ -7,4 +7,5 @@ return array (
   'Entity ID' => 'ID de l\'entité',
   'Old' => 'Ancien',
   'Request ID' => 'ID de la requête',
+  'Item was never modified' => 'L\'élément n\'a jamais été modifié',
 );

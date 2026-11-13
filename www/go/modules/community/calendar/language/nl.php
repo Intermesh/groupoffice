@@ -267,4 +267,10 @@ return array (
   'Wk' => 'Wk',
   'iCalendar importer' => 'iCalendar-importeerder',
   'Import ICS file' => 'ICS-bestand importeren',
+  'Event not found' => 'Afspraak niet gevonden',
+  'You are not invited to this event' => 'U bent niet uitgenodigd voor deze afspraak',
+  'Scan e-mail for invites' => 'E-mail scannen op uitnodigingen',
+  'Auto add invites and updates to calendar when enabled' => 'Indien ingeschakeld worden uitnodigingen en updates automatisch aan de agenda toegevoegd',
+  'Import calendar from ICS file.' => 'Agenda importeren uit ICS-bestand.',
+  'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Maak een exacte kopie van de agenda uit een extern ICS-bestand in de geselecteerde GroupOffice-agenda\'s. Selecteer de agenda\'s waarin geïmporteerd moet worden in de beheerinstellingen van de agenda.',
 );

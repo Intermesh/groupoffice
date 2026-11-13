@@ -25,4 +25,6 @@ return array (
 	'Verify SSL certificate' => 'SSL certificaat verifiëren',
 	'Every 15 minutes' => 'Elke 15 minuten',
 	'Sync' => 'Synchroniseren',
+	'Fetch data from caldav servers' => 'Gegevens ophalen van CalDAV-servers',
+	'Auto refresh' => 'Automatisch vernieuwen',
 );

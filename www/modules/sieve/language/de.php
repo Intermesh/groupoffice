@@ -165,4 +165,5 @@ return array (
   '\'"Please click \'\'add\'\' to add a criterium"\'' => '\'"Klicken Sie bitte \'\'Hinzufügen\'\', um eine Bedingung hinzuzufügen"\'',
   'Sieve' => 'Sieve',
   'Set a custom subject' => 'Einen benutzerdefinierten Betreff setzen',
+  'The filter contains an invalid value' => 'Der Filter enthält einen ungültigen Wert',
 );

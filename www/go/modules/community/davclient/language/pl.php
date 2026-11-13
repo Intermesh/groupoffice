@@ -21,4 +21,6 @@ return array (
   'Remove from sync' => 'Usuń z synchronizacji',
   'Every 15 minutes' => 'Co 15 minut',
   'Sync' => 'Synchronizuj',
+  'Fetch data from caldav servers' => 'Pobieraj dane z serwerów CalDAV',
+  'Auto refresh' => 'Automatyczne odświeżanie',
 );

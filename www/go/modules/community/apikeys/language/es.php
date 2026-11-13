@@ -9,4 +9,5 @@ return array (
   'API key' => 'Clave API',
   'API keys' => 'Claves API',
   'Access token' => 'Token de acceso',
+  'Copy the access token now. It\'s not possible to view it again.' => 'Copie ahora el token de acceso. No será posible volver a verlo.',
 );

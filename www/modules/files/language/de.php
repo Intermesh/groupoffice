@@ -163,4 +163,7 @@ The following changes were made by %s:
   'Move to trash' => 'In den Papierkorb verschieben',
   'Send an email to the user when a folder is changed' => 'Dem Benutzer eine E-Mail senden, wenn ein Ordner geändert wird',
   'Send notification email when something changes in subscribed files folder' => 'Benachrichtigungs-E-Mail senden, wenn sich etwas in einem abonnierten Dateiordner ändert',
+  'The archive contains links or other special files and can\'t be decompressed' => 'Das Archiv enthält Links oder andere spezielle Dateien und kann nicht entpackt werden',
+  'Invalid file or folder name' => 'Ungültiger Datei- oder Ordnername',
+  'Could not restore the item' => 'Das Element konnte nicht wiederhergestellt werden',
 );

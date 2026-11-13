@@ -216,4 +216,11 @@ return array (
   'Change organizer' => 'Zmień organizatora',
   'No appointments to display' => 'Brak spotkań do wyświetlenia',
   'Import ICS file' => 'Importuj plik ICS',
+  'Event not found' => 'Nie znaleziono wydarzenia',
+  'Show event in category color' => 'Pokaż wydarzenie w kolorze kategorii',
+  'Only when one calendar is selected and the event has one category' => 'Tylko gdy wybrany jest jeden kalendarz, a wydarzenie ma jedną kategorię',
+  'Scan e-mail for invites' => 'Skanuj e-maile w poszukiwaniu zaproszeń',
+  'Auto add invites and updates to calendar when enabled' => 'Po włączeniu zaproszenia i aktualizacje są automatycznie dodawane do kalendarza',
+  'Import calendar from ICS file.' => 'Importuj kalendarz z pliku ICS.',
+  'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Twórz dokładną kopię zewnętrznego kalendarza z pliku ICS w wybranych kalendarzach GroupOffice. Kalendarze docelowe wybierz w ustawieniach administracyjnych kalendarza.',
 );
