@@ -1,7 +1,6 @@
 GO.mainLayout.onReady(function(){
-	const fmur= go.Modules.get("legacy", "files").userRights;
 
-	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "files") && fmur.mayAccessMainPanel) {
+	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "files") &&  go.Modules.get("legacy", "files").userRights.mayAccessMainPanel) {
 		GO.summary.portlets['portlet-expired-files']={
 			multiple:true,
 			portletType: 'portlet-expired-files',
