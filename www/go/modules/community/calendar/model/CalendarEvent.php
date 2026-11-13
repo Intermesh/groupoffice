@@ -1278,6 +1278,15 @@ class CalendarEvent extends AclItemEntity {
 		return Calendar::class;
 	}
 
+	/**
+	 * toArray() hides the details of private events of others with these, also when a client asks for other
+	 * properties only. The calendar owner is always selected by the mapping.
+	 */
+	protected static function internalRequiredProperties(): array
+	{
+		return array_merge(parent::internalRequiredProperties(), ['privacy', 'createdBy']);
+	}
+
 	protected static function aclEntityKeys(): array
 	{
 		return ['calendarId' => 'id'];

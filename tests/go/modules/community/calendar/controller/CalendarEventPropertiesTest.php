@@ -94,4 +94,11 @@ class CalendarEventPropertiesTest extends TestCase
 
 		$this->assertEquals('Private plan', $event['title']);
 	}
+
+	public function testPrivateTitleIsHiddenWhenOnlyTheTitleIsAsked(): void
+	{
+		$event = $this->get(self::$viewer->id, ['title']);
+
+		$this->assertSame('', $event['title']);
+	}
 }
