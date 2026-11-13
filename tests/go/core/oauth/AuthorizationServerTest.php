@@ -356,6 +356,29 @@ class AuthorizationServerTest extends TestCase
 		return new OauthUser(User::findById($user->id, ['username', 'displayName', 'id', 'email', 'modifiedAt']));
 	}
 
+	/**
+	 * Like Claude Code: registered "localhost", redirects to localhost on a random port
+	 */
+	public function testLocalhostRedirectOnAnotherPortIsAccepted(): void
+	{
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+		$server = $this->server();
+		$request = (new ServerRequest('GET', 'https://localhost/api/oauth.php/authorize'))->withQueryParams([
+			'response_type' => 'code',
+			'client_id' => self::$selfRegisteredClient->getIdentifier(),
+			'redirect_uri' => 'http://localhost:56710/callback',
+			'scope' => self::MODULE_SCOPE,
+			'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', 'a-verifier-of-at-least-43-characters-long-123', true)), '+/', '-_'), '='),
+			'code_challenge_method' => 'S256'
+		]);
+
+		$this->assertSame('http://localhost:56710/callback', OAuthServer::validateAuthorizationRequest($server, $request)->getRedirectUri());
+
+		$this->assertRefused(fn() => OAuthServer::validateAuthorizationRequest($server, $request->withQueryParams(
+			['redirect_uri' => 'http://localhost:56710/other'] + $request->getQueryParams()
+		)), 'another path');
+	}
+
 	public function testOnlySelfRegisteredClientsNeedConsent(): void
 	{
 		$this->assertFalse(OAuthServer::needsConsent(self::$client));

@@ -15,7 +15,6 @@ use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\UserEntityInterface;
 use League\OAuth2\Server\Exception\OAuthServerException;
-use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use League\OAuth2\Server\RequestTypes\AuthorizationRequestInterface;
@@ -89,6 +88,7 @@ final class OAuthServer
 		);
 
 		$server->enableGrantType(
+			// Allows any port for redirects to localhost
 			new AuthCodeGrant(
 				new repositories\AuthCodeRepository(),
 				new repositories\RefreshTokenRepository(),
