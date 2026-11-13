@@ -157,6 +157,19 @@ class EndpointTest extends TestCase
 		$this->assertEquals(405, $response['status']);
 	}
 
+	public function testRequestsPerKeyAreLimited(): void
+	{
+		$key = self::createMcpKey(['Note' => false]);
+		for ($i = 0; $i < Endpoint::MAX_REQUESTS_PER_MINUTE; $i++) {
+			Endpoint::countRequest($key);
+		}
+
+		$response = $this->initialize($this->endpoint(), $key->getToken());
+
+		$this->assertSame(429, $response['status']);
+		$this->assertSame('60', $response['headers']['Retry-After']);
+	}
+
 	public function testInvalidJsonIsAParseError(): void
 	{
 		$response = $this->endpoint()->handle('POST', ['authorization' => 'Bearer ' . self::$token], '{invalid');

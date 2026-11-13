@@ -182,7 +182,7 @@ class ToolsTest extends TestCase
 			[['Note/export', ['ids' => [self::$sharedNote->id], 'extension' => 'csv'], 'e'], 'only get, query, changes'],
 			[['community/notes/Note/get', ['ids' => [self::$sharedNote->id]], 'n'], 'must be like'],
 			[['core/System/echo', [], 'x'], 'must be like'],
-			[['Core/echo', [], 'y'], 'only get, query, changes']
+			[['Core/echo', [], 'y'], 'not allowed for this key']
 		];
 		foreach ($calls as [$call, $message]) {
 			$result = $this->read([$call]);
