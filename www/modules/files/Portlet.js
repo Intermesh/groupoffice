@@ -1,7 +1,6 @@
 GO.mainLayout.onReady(function(){
-	const fmur= go.Modules.get("legacy", "files").userRights;
 
-	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "files") && fmur.mayAccessMainPanel) {
+	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "files") &&  go.Modules.get("legacy", "files").mayAccessMainPanel) {
 		var recentFilesGrid = new GO.files.RecentFilesGrid();
 
 		GO.summary.portlets['portlet-files']=new GO.summary.Portlet({
