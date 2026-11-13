@@ -33,8 +33,19 @@ class IdTokenResponseTest extends TestCase
 
 	public function testIssuerKeepsPort(): void
 	{
-		go()->getSettings()->URL = 'http://localhost:8080/';
+		go()->getSettings()->URL = 'https://localhost:8443/';
 
-		$this->assertSame('https://localhost:8080', IdTokenResponse::issuer());
+		$this->assertSame('https://localhost:8443', IdTokenResponse::issuer());
+	}
+
+	/**
+	 * MCP clients fetch the server metadata from the issuer, so an https issuer on an http installation can't be reached
+	 */
+	public function testIssuerKeepsHttpScheme(): void
+	{
+		go()->getSettings()->URL = 'http://localhost:8080/';
+		$_SERVER['HTTPS'] = 'on';
+
+		$this->assertSame('http://localhost:8080', IdTokenResponse::issuer());
 	}
 }
