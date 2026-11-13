@@ -182,4 +182,45 @@ class WriteTest extends TestCase
 		}
 		$this->assertNotEmpty($custom, 'Note has custom methods to test with');
 	}
+
+	public function testRecipeIsDescribed(): void
+	{
+		$result = $this->callTool('describe_entity', ['entity' => 'Note'])['result'];
+
+		$this->assertStringContainsString('noteBookId', $result['structuredContent']['recipe']);
+		$this->assertContains('set', array_keys($result['structuredContent']['methods']));
+	}
+
+	/**
+	 * Like storing a functional design at a project: upload the document, then attach it to the item
+	 */
+	public function testUploadAndAttachAFile(): void
+	{
+		$id = $this->createNote(self::$writableBook, 'Project X')['structuredContent']['responses'][0][1]['created']['n']['id'];
+
+		$blob = $this->callTool('create_blob', ['name' => 'functional-design.md', 'type' => 'text/markdown', 'content' => '# Functional design'])['result'];
+		$this->assertFalse($blob['isError'], json_encode($blob));
+		$blobId = $blob['structuredContent']['blobId'];
+
+		$result = $this->write([['Note/set', ['update' => [$id => ['attachments' => [['blobId' => $blobId]]]]], 'a']]);
+		$this->assertArrayHasKey($id, $result['structuredContent']['responses'][0][1]['updated'], json_encode($result));
+
+		$folderId = Note::findById($id)->filesFolderId;
+		$this->assertNotEmpty($folderId);
+		$old = \GO::setIgnoreAclPermissions(true);
+		try {
+			$folder = \GO\Files\Model\Folder::model()->findByPk($folderId);
+			$this->assertNotEmpty($folder->hasFile('functional-design.md'));
+			$folder->delete(true);
+		} finally {
+			\GO::setIgnoreAclPermissions($old);
+		}
+	}
+
+	public function testInvalidUpload(): void
+	{
+		$this->assertTrue($this->callTool('create_blob', ['name' => 'x.bin', 'contentBase64' => '***'])['result']['isError']);
+		$this->assertTrue($this->callTool('create_blob', ['name' => '../x.md', 'content' => 'x'])['result']['isError']);
+		$this->assertTrue($this->callTool('create_blob', ['name' => 'x.md'])['result']['isError']);
+	}
 }
