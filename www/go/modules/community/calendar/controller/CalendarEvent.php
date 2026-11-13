@@ -232,8 +232,8 @@ class CalendarEvent extends EntityController {
 	 *
 	 * @apiParam bool sendSchedulingMessages Send the changes of events with participants by e-mail (iTIP): invitations,
 	 *   updates and cancellations to the participants when the user is the organizer, or a reply to the organizer
-	 *   when the user is a participant. Without it, the changes are only saved and nobody is notified. Only send
-	 *   messages after the user confirmed that they may go to the other people. Defaults to false.
+	 *   when the user is a participant. Without it, the changes are only saved and nobody is notified. Defaults to
+	 *   false.
 	 */
 	public function set($params) {
 		if(!empty($params['sendSchedulingMessages'])) {
