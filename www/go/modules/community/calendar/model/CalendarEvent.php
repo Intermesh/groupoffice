@@ -33,6 +33,7 @@ use go\core\orm\SearchableTrait;
 use go\core\util\JSON;
 use go\core\util\UUID;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 
 class CalendarEvent extends AclItemEntity {
 
@@ -78,6 +79,18 @@ class CalendarEvent extends AclItemEntity {
 
 
 	static bool $sendSchedulingMessages = false;
+
+	/**
+	 * Fired when an online meeting is requested with {@see setOnlineMeeting()}. Listeners get the event and the name of
+	 * the service, like "jitsi". The listener of that service returns the URL to join the meeting, other listeners
+	 * return null.
+	 */
+	const EVENT_ONLINE_MEETING = 'onlinemeeting';
+
+	/**
+	 * Service of the online meeting to add on save
+	 */
+	private ?string $onlineMeetingService = null;
 
 	/**
 	 * Only true when saving from JMAP controller
@@ -638,6 +651,54 @@ class CalendarEvent extends AclItemEntity {
 
 	public function isInstance() {
 		return !empty($this->recurrenceId);
+	}
+
+	/**
+	 * Add an online meeting on save, like "jitsi". The link to join it becomes the location and is added to the
+	 * description. A meeting added earlier is replaced. Which services are available depends on the installed modules.
+	 *
+	 * @apiWriteOnly
+	 * @param string|null $service
+	 */
+	public function setOnlineMeeting(?string $service): void
+	{
+		$this->onlineMeetingService = $service;
+	}
+
+	protected function internalValidate()
+	{
+		parent::internalValidate();
+
+		if (isset($this->onlineMeetingService) && !$this->hasValidationErrors()) {
+			$this->addOnlineMeeting($this->onlineMeetingService);
+			$this->onlineMeetingService = null;
+		}
+	}
+
+	/**
+	 * Ask the service for a link to join a new meeting and put it in the location and description
+	 */
+	private function addOnlineMeeting(string $service): void
+	{
+		$uri = static::fireEvent(self::EVENT_ONLINE_MEETING, $this, $service);
+		if (!is_string($uri) || $uri === '') {
+			$this->setValidationError('onlineMeeting', ErrorCode::INVALID_INPUT,
+				"The online meeting service '" . $service . "' isn't available");
+			return;
+		}
+
+		$separator = "--------------------------------";
+		$label = go()->t("Join the online meeting now");
+
+		// Replace a meeting that was added before, so the description doesn't get several links
+		$description = preg_replace('/\n*' . $separator . '\n' . preg_quote($label, '/') . ':\n\n.*?\n' . $separator . '\n*/s', '', $this->description ?? '');
+		$description = trim($description);
+		if ($description !== '') {
+			$description .= "\n\n";
+		}
+
+		$this->description = $description . $separator . "\n" . $label . ":\n\n" . $uri . "\n" . $separator . "\n";
+		$this->location = $uri;
 	}
 
 	protected function internalSave() : bool {

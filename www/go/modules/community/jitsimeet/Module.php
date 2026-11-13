@@ -3,6 +3,7 @@
 namespace go\modules\community\jitsimeet;
 
 use go\core;
+use go\modules\community\calendar\model\CalendarEvent;
 use go\modules\community\jitsimeet\model\Settings;
 
 /**
@@ -35,5 +36,26 @@ class Module extends core\Module
 	public function autoInstall(): bool
 	{
 		return true;
+	}
+
+	public function defineListeners()
+	{
+		parent::defineListeners();
+		CalendarEvent::on(CalendarEvent::EVENT_ONLINE_MEETING, static::class, 'onOnlineMeeting');
+	}
+
+	/**
+	 * Create a Jitsi Meet link for an event saved with "onlineMeeting": "jitsi"
+	 *
+	 * Only for users with access to this module, so others can't get a JWT signed by the server.
+	 *
+	 * @return string|null The link, or null for another service or a user without access
+	 */
+	public static function onOnlineMeeting(CalendarEvent $event, string $service): ?string
+	{
+		if (strtolower($service) !== 'jitsi' || !core\model\Module::isAvailableFor('community', 'jitsimeet')) {
+			return null;
+		}
+		return Settings::get()->createMeetingUri();
 	}
 }

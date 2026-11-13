@@ -110,6 +110,21 @@ class PropertySchemaTest extends TestCase
 		$this->assertEquals('integer', $props['permissionLevel']['type']);
 	}
 
+	/**
+	 * A setter without a getter is only a property when it's tagged "@apiWriteOnly". Most are internal, like setValues().
+	 */
+	public function testOnlyTaggedSettersAreWriteOnlyProperties(): void
+	{
+		$props = $this->properties(PropertySchema::build(\go\modules\community\calendar\model\CalendarEvent::class), 'CalendarEvent');
+		$this->assertTrue($props['onlineMeeting']['writeOnly']);
+		$this->assertArrayNotHasKey('readOnly', $props['onlineMeeting']);
+
+		$this->assertArrayNotHasKey('customFieldsJSON', $props);
+
+		$userProps = $this->properties(PropertySchema::build(\go\core\model\User::class), 'User');
+		$this->assertArrayNotHasKey('values', $userProps);
+	}
+
 	public function testAllEntitiesHaveValidSchemas(): void
 	{
 		foreach (EntityType::findAll() as $type) {

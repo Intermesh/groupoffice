@@ -139,6 +139,9 @@ final class PropertySchema
 
 			if ($name === 'id' || $meta['access'] === Model::PROP_PUBLIC_READONLY) {
 				$schema['readOnly'] = true;
+			} else if ($meta['access'] === Model::PROP_PUBLIC_WRITEONLY) {
+				// Can be set, but isn't returned, like "onlineMeeting" of a calendar event
+				$schema['writeOnly'] = true;
 			}
 
 			$properties[$name] = $schema;
@@ -185,6 +188,36 @@ final class PropertySchema
 			];
 		}
 
+		return $props + $this->writeOnlyProperties($cls);
+	}
+
+	/**
+	 * Properties with a public setter and no getter whose setter is tagged "@apiWriteOnly", like "onlineMeeting" of a
+	 * calendar event. The docs mode of buildApiProperties() drops write-only properties, because most setters without a
+	 * getter are internal, like setValues().
+	 *
+	 * @param class-string<Property> $cls
+	 */
+	private function writeOnlyProperties(string $cls): array
+	{
+		$props = [];
+		foreach ($cls::buildApiProperties() as $name => $meta) {
+			if (($meta['access'] ?? null) !== Model::PROP_PUBLIC_WRITEONLY) {
+				continue;
+			}
+
+			$setter = new ReflectionMethod($cls, 'set' . ucfirst($name));
+			if (!str_contains((string) $setter->getDocComment(), '@apiWriteOnly')) {
+				continue;
+			}
+
+			$type = $setter->getParameters()[0]->getType();
+			$props[$name] = [
+				'access' => Model::PROP_PUBLIC_WRITEONLY,
+				'type' => $type instanceof ReflectionNamedType ? ($type->allowsNull() ? '?' : '') . $type->getName() : null,
+				'description' => $this->docDescription($setter->getDocComment())
+			];
+		}
 		return $props;
 	}
 
