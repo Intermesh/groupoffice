@@ -24,15 +24,42 @@ class FsPermissionsTest extends TestCase
 	private bool $ignoreAcl;
 	private bool $disableModelCache;
 
-	private User $reader;
-	private User $writer;
-	private User $nobody;
+	/** The users only act, so they are created once for the class. The folders and files are created for every test. */
+	private static ?User $reader = null;
+	private static ?User $writer = null;
+	private static ?User $nobody = null;
 
 	private Folder $folder;
 	private Folder $restricted;
 	private array $acls = [];
 	private string $relPath;
 	private string $restrictedRelPath;
+
+	public static function setUpBeforeClass(): void
+	{
+		if (!\GO::modules()->isInstalled('files')) {
+			return;
+		}
+		try {
+			self::$reader = self::newUser();
+			self::$writer = self::newUser();
+			self::$nobody = self::newUser();
+		} catch (\Throwable $e) {
+			// PHPUnit doesn't call tearDownAfterClass() when this fails
+			self::tearDownAfterClass();
+			throw $e;
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		foreach ([self::$reader, self::$writer, self::$nobody] as $user) {
+			if ($user) {
+				User::delete(['id' => $user->id]);
+			}
+		}
+		self::$reader = self::$writer = self::$nobody = null;
+	}
 
 	protected function setUp(): void
 	{
@@ -47,18 +74,14 @@ class FsPermissionsTest extends TestCase
 		// Models remember the permission level of the user they were first used by. The users change in this test.
 		\GO::$disableModelCache = true;
 
-		$this->reader = $this->newUser();
-		$this->writer = $this->newUser();
-		$this->nobody = $this->newUser();
-
 		$this->actAs(User::findById(User::ID_SUPER_ADMIN));
 		\GO::$ignoreAclPermissions = true;
 
 		$home = Folder::model()->findHomeFolder(\GO::user());
 		$this->folder = $home->addFolder('dav-permissions-' . uniqid());
 		$this->shareWith($this->folder, [
-			$this->reader->getPersonalGroup()->id => Acl::READ_PERMISSION,
-			$this->writer->getPersonalGroup()->id => Acl::WRITE_PERMISSION
+			self::$reader->getPersonalGroup()->id => Acl::READ_PERMISSION,
+			self::$writer->getPersonalGroup()->id => Acl::WRITE_PERMISSION
 		]);
 
 		$this->relPath = $this->folder->path;
@@ -90,13 +113,9 @@ class FsPermissionsTest extends TestCase
 
 		\GO::$ignoreAclPermissions = $this->ignoreAcl;
 		\GO::$disableModelCache = $this->disableModelCache;
-
-		foreach ([$this->reader, $this->writer, $this->nobody] as $user) {
-			User::delete(['id' => $user->id]);
-		}
 	}
 
-	private function newUser(): User
+	private static function newUser(): User
 	{
 		$name = uniqid('dav');
 		$user = new User();
@@ -106,7 +125,7 @@ class FsPermissionsTest extends TestCase
 			'email' => $name . '@example.com',
 			'password' => 'Pa55word!!xyz'
 		]);
-		$this->assertTrue($user->save(), var_export($user->getValidationErrors(), true));
+		self::assertTrue($user->save(), var_export($user->getValidationErrors(), true));
 
 		return $user;
 	}
@@ -165,7 +184,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testReaderCannotOverwriteAFile()
 	{
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 
 		try {
 			$this->secret()->put($this->stream('OVERWRITTEN BY THE READER'));
@@ -179,7 +198,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testFileModelChecksThePermissionBeforeWriting()
 	{
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 
 		$file = \GO\Files\Model\File::model()->findByPath($this->relPath . '/secret.txt');
 		$this->assertNotFalse($file);
@@ -197,7 +216,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testReaderCannotRenameAFile()
 	{
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 
 		try {
 			$this->secret()->setName('renamed.txt');
@@ -212,7 +231,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testWriterCanOverwriteAFile()
 	{
-		$this->actAs($this->writer);
+		$this->actAs(self::$writer);
 
 		$this->secret()->put($this->stream('WRITTEN BY THE WRITER'));
 
@@ -221,7 +240,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testDeletingTakesTheDeletePermission()
 	{
-		$this->actAs($this->writer);
+		$this->actAs(self::$writer);
 
 		try {
 			$this->secret()->delete();
@@ -235,7 +254,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testUserWithoutAccessCannotChangeAFile()
 	{
-		$this->actAs($this->nobody);
+		$this->actAs(self::$nobody);
 
 		$this->expectException(Forbidden::class);
 		$this->secret()->put($this->stream('NOBODY WROTE THIS'));
@@ -245,7 +264,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testReaderCannotLockAFile()
 	{
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 
 		$this->expectException(Forbidden::class);
 		$this->secret()->lock('reader-lock');
@@ -253,7 +272,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testUserWithoutAccessCannotLockAFile()
 	{
-		$this->actAs($this->nobody);
+		$this->actAs(self::$nobody);
 
 		try {
 			$this->secret()->lock('nobody-lock');
@@ -262,7 +281,7 @@ class FsPermissionsTest extends TestCase
 			$this->assertTrue(true);
 		}
 
-		$this->actAs($this->writer);
+		$this->actAs(self::$writer);
 		// it would throw FileLocked if the lock of the user without access was saved
 		$this->secret()->lock('writer-lock');
 		$this->secret()->unlock();
@@ -270,10 +289,10 @@ class FsPermissionsTest extends TestCase
 
 	public function testReaderCannotUnlockAFile()
 	{
-		$this->actAs($this->writer);
+		$this->actAs(self::$writer);
 		$this->secret()->lock('writer-lock');
 
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 		try {
 			$this->secret()->unlock();
 			$this->fail('A user with only the read permission could unlock the file');
@@ -281,7 +300,7 @@ class FsPermissionsTest extends TestCase
 			$this->assertTrue(true);
 		}
 
-		$this->actAs($this->writer);
+		$this->actAs(self::$writer);
 		$this->secret()->unlock();
 	}
 
@@ -289,7 +308,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testReaderCanReadAndList()
 	{
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 
 		$directory = new Directory($this->relPath);
 
@@ -303,7 +322,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testUserWithoutAccessCannotReadAFile()
 	{
-		$this->actAs($this->nobody);
+		$this->actAs(self::$nobody);
 
 		$this->expectException(Forbidden::class);
 		$this->secret()->get();
@@ -311,7 +330,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testUserWithoutAccessCannotListOrOpenAFolder()
 	{
-		$this->actAs($this->nobody);
+		$this->actAs(self::$nobody);
 		$directory = new Directory($this->relPath);
 
 		try {
@@ -333,7 +352,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testFolderWithPermissionsOfItsOwnIsNotReachableByName()
 	{
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 		$directory = new Directory($this->relPath);
 
 		// the listing hides it
@@ -352,7 +371,7 @@ class FsPermissionsTest extends TestCase
 
 	public function testFilesInAFolderWithPermissionsOfItsOwnCannotBeRead()
 	{
-		$this->actAs($this->reader);
+		$this->actAs(self::$reader);
 
 		$inner = new File($this->restrictedRelPath . '/inner.txt');
 		try {

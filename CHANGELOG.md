@@ -1,3 +1,13 @@
+12-11-2026: 26.0.60
+- Core: relative times like "5 minutes ago" read naturally in other languages, like "vor 5 Minuten" and "il y a 5 minutes".
+- Core: Several translation errors fixed
+- Core: imported CSV files with only a few accented characters could get garbled characters, like "ﾃ､" instead of "ä".
+- Core: the API documentation at /api/doc.php now shows the parameters and response of all methods, the standard ones like Foo/get, Foo/query and Foo/set and the custom ones of each entity.
+- Calendar: events you participate in another calendar now count as busy in your availability.
+- Core: the API documentation at /api/doc.php now lists the methods of every entity, the type of each property including nested types like addresses, which properties are read only, and the filters with their value type, description and default. The entities are in a searchable menu on the left.
+- Core: the "Created by" and "Modified by" filters now work with a mix of user IDs and names. Filtering on links to two different items at the same time now returns the right results.
+- Calendar: new preference "Show event in category color". When enabled, an event is shown in the color of its category if one calendar is selected and the event has exactly one category.
+- Newsletters: users with only read permission on a list can no longer use the add and delete recipient buttons. A failed change now shows an error instead of doing nothing.
 - Security: this release fixes a large number of security issues that were found in an extensive security review. Some were critical. We advise everyone to update. Please check the points below after updating.
 - Core: If debugging was enabled, remove old debug logs (data/log/debug.log), because they could contain IMAP passwords.
 - OpenID Connect, OAuth2 client: logins are now linked to the user ID at the identity provider. Users who logged in this way before keep working. Other existing users are only linked automatically when the provider says their e-mail address is verified and they are not an administrator and have no GroupOffice password. An administrator can link other users by adding a row with the user ID and client ID to the table "oidc_user" or "oauth2client_openid_user", or by removing the user's password. Microsoft Entra doesn't say whether an address is verified, so this applies to all its users who didn't log in before.

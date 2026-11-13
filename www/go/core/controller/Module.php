@@ -90,6 +90,13 @@ class Module extends EntityController {
 		return $this->filterPermissions(parent::getGetQuery($params));
 	}
 
+	/**
+	 * Install all modules of the license. Only for administrators.
+	 *
+	 * @apiNoParams
+	 * @apiResponse {success: bool}
+	 * @apiPermission Only administrators.
+	 */
 	public function installLicensed(): array
 	{
 		if(!go()->getAuthState()->isAdmin()) {
@@ -101,8 +108,14 @@ class Module extends EntityController {
 		return ['success' => true];
 	}
 
-
-
+	/**
+	 * Install a module. Only for administrators.
+	 *
+	 * @apiParam string package Required. Package of the module, like "community"
+	 * @apiParam string name Required. Name of the module
+	 * @apiResponse {list: Module[]} The Module/get response for the installed module
+	 * @apiPermission Only administrators.
+	 */
 	public function install($params) {
 
 		if(!go()->getAuthState()->isAdmin()) {
@@ -134,6 +147,14 @@ class Module extends EntityController {
     return $this->get(['ids' => [$model->id]]);
 	}
 	
+	/**
+	 * Uninstall a module. Only for administrators.
+	 *
+	 * @apiParam string package Required. Package of the module, like "community". "legacy" for legacy modules.
+	 * @apiParam string name Required. Name of the module
+	 * @apiResponse {success: bool}
+	 * @apiPermission Only administrators.
+	 */
 	public function uninstall($params) {
 		if(!go()->getAuthState()->isAdmin()) {
 			throw new Forbidden();

@@ -91,13 +91,36 @@ class CalendarEvent extends EntityController {
 	}
 
 
+	/**
+	 * Read an event from an ICS file or e-mail attachment without saving it
+	 *
+	 * Reads the ICS data from a file, or else from a part of an e-mail message. The event is put in the personal
+	 * calendar of the user, when the user has one.
+	 *
+	 * @apiParam int fileId ID of a file with the ICS data
+	 * @apiParam int account_id E-mail account ID, when no fileId is given
+	 * @apiParam string mailbox Mailbox of the message
+	 * @apiParam int uid UID of the message
+	 * @apiParam string number Number of the message part with the ICS data
+	 * @apiParam string encoding Encoding of the message part
+	 * @apiResponse {success: bool, data: CalendarEvent} The event. It is not saved.
+	 * @apiPermission Checked in ActiveRecord::findByPk(): read permission on the folder of the file, or on the e-mail account. The event is parsed but not saved.
+	 * @param array $params
+	 * @return array
+	 */
 	public function loadICS( array $params) :array
 	{
 		if(!empty($params['fileId'])) {
 			$file = \GO\Files\Model\File::model()->findByPk($params['fileId']);
+			if(!$file) {
+				throw new \go\core\exception\NotFound();
+			}
 			$data = $file->fsFile->getContents();
 		} else {
-			$account = Account::model()->findByPk($params['account_id']);
+			$account = Account::model()->findByPk($params['account_id'] ?? 0);
+			if(!$account) {
+				throw new \go\core\exception\NotFound();
+			}
 			$imap = $account->openImapConnection($params['mailbox']);
 			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
 		}
@@ -132,6 +155,14 @@ class CalendarEvent extends EntityController {
 		);
 	}
 
+	/**
+	 * Count the upcoming invitations in the calendars of the user that still need a response. Used for the counter
+	 * badge.
+	 *
+	 * @apiNoParams
+	 * @apiResponse int
+	 * @apiPermission Module access: the "inbox" filter only counts events in calendars owned by the user.
+	 */
 	public function countMine(): int
 	{
 

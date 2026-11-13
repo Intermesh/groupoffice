@@ -164,6 +164,59 @@ class Column {
 	const DATE_FORMAT = "Y-m-d";
 
 	/**
+	 * Get the JSON type of the values of this column in the API.
+	 *
+	 * @return string|null "integer", "boolean", "number" or "string", or null for JSON columns that can hold any value
+	 */
+	public function getJsonType(): ?string
+	{
+		return match ($this->dbType) {
+			'int', 'tinyint', 'smallint', 'mediumint', 'bigint' => $this->length === 1 ? 'boolean' : 'integer',
+			'decimal', 'float', 'double' => 'number',
+			'json' => null,
+			default => 'string'
+		};
+	}
+
+	/**
+	 * Get the JSON schema (draft 2020-12) of the values of this column in the API.
+	 *
+	 * Dates are strings: "datetime" columns are in ISO 8601 with time zone (UTC), "localdatetime" columns have no time
+	 * zone and "date" columns have no time.
+	 *
+	 * @return array
+	 */
+	public function toJsonSchema(): array
+	{
+		$type = $this->getJsonType();
+		if (!isset($type)) {
+			return [];
+		}
+
+		$schema = ['type' => $this->nullAllowed ? [$type, 'null'] : $type];
+
+		switch ($this->dbType) {
+			case 'datetime':
+				$schema['format'] = 'date-time';
+				break;
+			case 'localdatetime':
+				$schema['format'] = 'local-date-time';
+				break;
+			case 'date':
+				$schema['format'] = 'date';
+				break;
+			case 'varchar':
+			case 'char':
+				if (!empty($this->length)) {
+					$schema['maxLength'] = (int) $this->length;
+				}
+				break;
+		}
+
+		return $schema;
+	}
+
+	/**
 	 * Get the SQL string to add / alter this field.
 	 * 
 	 * eg. "tinyint(1) NOT NULL DEFAULT '0'"

@@ -132,6 +132,32 @@ class Contact extends EntityController {
 		return $this->defaultMerge($params);
 	}
 
+	/**
+	 * Create a PDF with address labels of contacts
+	 *
+	 * Only the contacts the user can read are printed.
+	 *
+	 * @apiParam string[] ids Required. IDs of the contacts
+	 * @apiParam string tpl Template of a label. Defaults to the name and the postal address of the contact.
+	 * @apiParam string unit Unit of the sizes and margins. Defaults to "mm".
+	 * @apiParam string pageFormat Page format. Defaults to "A4".
+	 * @apiParam int rows Number of labels per column. Defaults to 8.
+	 * @apiParam int columns Number of labels per row. Defaults to 2.
+	 * @apiParam float labelTopMargin Top margin inside a label. Defaults to 10.
+	 * @apiParam float labelRightMargin Right margin inside a label. Defaults to 10.
+	 * @apiParam float labelBottomMargin Bottom margin inside a label. Defaults to 10.
+	 * @apiParam float labelLeftMargin Left margin inside a label. Defaults to 10.
+	 * @apiParam float pageTopMargin Top margin of the page. Defaults to 10.
+	 * @apiParam float pageRightMargin Right margin of the page. Defaults to 10.
+	 * @apiParam float pageBottomMargin Bottom margin of the page. Defaults to 10.
+	 * @apiParam float pageLeftMargin Left margin of the page. Defaults to 10.
+	 * @apiParam string font Font name. Defaults to "dejavusans".
+	 * @apiParam float fontSize Font size in points. Defaults to 10.
+	 * @apiResponse {blobId: string} ID of the PDF file
+	 * @apiPermission Checked in Labels::render(): only contacts the user can read are rendered (permissionLevel filter with Acl::LEVEL_READ).
+	 * @param array $params
+	 * @return array
+	 */
 	public function labels($params): array
 	{
 		$tpl = <<<EOT
@@ -170,17 +196,39 @@ EOT;
 
 	/**
 	 * Import one or more VCards from an email attachment
+	 *
+	 * Reads the VCard from a file, or else from a part of an e-mail message, and saves it in the default address book
+	 * of the user.
+	 *
+	 * @apiParam int fileId ID of a file with the VCard
+	 * @apiParam int account_id E-mail account ID, when no fileId is given
+	 * @apiParam string mailbox Mailbox of the message
+	 * @apiParam int uid UID of the message
+	 * @apiParam string number Number of the message part with the VCard
+	 * @apiParam string encoding Encoding of the message part
+	 * @apiResponse {success: bool, contactId: string} The ID of the imported contact
+	 * @apiPermission Read permission on the file or e-mail account, and create permission on the default address book of the user.
 	 * @param array $params
 	 * @return array
 	 * @throws \Exception
 	 */
 	public function loadVCF( array $params) :array
 	{
+		// The default address book is a setting of the user, which may point to any address book
+		$addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
+		$this->checkPermissionsForAddressBook(['values' => ['addressBookId' => $addressBookId]]);
+
 		if(!empty($params['fileId'])) {
 			$file = \GO\Files\Model\File::model()->findByPk($params['fileId']);
+			if(!$file) {
+				throw new \go\core\exception\NotFound();
+			}
 			$data = $file->fsFile->getContents();
 		} else {
-			$account = Account::model()->findByPk($params['account_id']);
+			$account = Account::model()->findByPk($params['account_id'] ?? 0);
+			if(!$account) {
+				throw new \go\core\exception\NotFound();
+			}
 			$imap = $account->openImapConnection($params['mailbox']);
 			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
 		}
@@ -188,7 +236,7 @@ EOT;
 		$vcard = \GO\Base\VObject\Reader::read($data);
 		$importer = new VCard();
 		$contact = new model\Contact();
-		$contact->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();;
+		$contact->addressBookId = $addressBookId;
 		$contact = $importer->import($vcard, $contact);
 		return ['success' => true, 'contactId' => $contact->id];
 

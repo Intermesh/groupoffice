@@ -4,12 +4,12 @@ namespace go\modules\community\dev\controller;
 
 use go\core\cache\None;
 use go\core\Controller;
-use go\core\Environment;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\http\Client;
 use go\core\jmap\Response;
 use go\core\Language as LangModel;
+use go\modules\community\dev\model\LanguageScanner;
 use function GO;
 
 /**
@@ -19,7 +19,6 @@ class Language extends Controller {
 
 	private $handle;
 	private $en;
-	private $nl;
 	
 	const DELIMITER = ';';
 	const ENCLOSURE = '"';
@@ -37,11 +36,6 @@ class Language extends Controller {
 		$this->en = new LangModel();
 		$this->en->initExport();
 		$this->en->setLanguage("en");
-
-		//to check if intermesh has defined it as a core translation
-		$this->nl = new LangModel();
-		$this->nl->initExport();
-		$this->nl->setLanguage("nl");
 	}
 
 	/**
@@ -54,11 +48,19 @@ class Language extends Controller {
 	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=nl --translate --missingOnly | tee nl-missing.csv
 	 * ```
 	 *
+	 * Leave out the modules of customers with "skipPackages", a comma separated list of packages. For legacy modules that
+	 * link to another repository, use the name of that folder:
+	 *
+	 * ```
+	 * docker compose exec groupoffice php www/cli.php community/dev/Language/export --language=it --missingOnly --skipPackages=agya,udo,duurzaamgebouw > it-missing.csv
+	 * ```
+	 *
 	 * Import language file:
 	 * ```
 	 * docker compose exec groupoffice php www/cli.php community/dev/Language/import --path=lang.csv
 	 * ```
 	 *
+	 * @apiPermission Module access: exports the translatable strings from the source files and their translations. No user data is read.
 	 * @param $params
 	 * @return void
 	 * @throws \Exception
@@ -70,11 +72,6 @@ class Language extends Controller {
 
 		go()->getLanguage()->initExport();
 		go()->getLanguage()->setLanguage($params['language']);
-
-		$rootFolder = Environment::get()->getInstallFolder();
-
-		$coreFiles = $rootFolder->getFolder("views/Extjs3/javascript")->find('/.*\.js/', false);
-		$coreFiles = array_merge($coreFiles, $rootFolder->getFolder("go/core/views/extjs3")->find('/.*\.js/', false));
 
 		if(empty($params['output'])) {
 			$csvFile = File::tempFile('csv');
@@ -96,53 +93,18 @@ class Language extends Controller {
 		""
 		);
 
-		$core = [];
-		foreach ($coreFiles as $file) {
-			$core = array_merge($core, $this->getStringsFromJS($file));
+		// Strings from JS, TS and PHP. Strings that core or more than one module uses go to core.
+		$skipPackages = empty($params['skipPackages']) ? [] : array_map('trim', explode(',', $params['skipPackages']));
+		$scanner = new LanguageScanner($skipPackages);
+		foreach ($scanner->getStrings() as $target => $strings) {
+			[$package, $module] = explode('/', $target);
+			$this->writeStrings($package, $module, $strings);
 		}
 
-		$core = array_unique($core);
-
-		$packageFolders = $rootFolder->getFolder("go/modules")->getFolders();
-		$packageFolders[] = $rootFolder->getFolder("modules");
-
-		foreach ($packageFolders as $packageFolder) {
-			foreach ($packageFolder->getFolders() as $moduleFolder) {
-				
-				if($moduleFolder->isLink() && !$moduleFolder->getLinkTarget()){
-					//broken symlink
-					continue;
-				}
-				
-				$files = $moduleFolder->find(['regex' => "/^.*(\.js|\.ts)$/", "exclude" => '(node_modules|vendor)'], false, true );
-				$strings = [];
-				foreach ($files as $file) {
-					$strings = array_merge($strings, $this->getStringsFromJS($file));
-				}
-
-				$strings = array_unique($strings);
-				$package = $packageFolder->getName();
-				if ($package == "modules") {
-					$package = "legacy";
-				}
-				$modStrings = [];
-				foreach ($strings as $string) {
-					if ($this->nl->translationExists($string)) {
-
-						//save core strings for later.
-						if (!in_array($string, $core)) {
-							$core[] = $string;
-						}
-					} else {
-						$modStrings[] = $string;
-					}
-				}
-
-				$this->writeStrings($package, $moduleFolder->getName(), $modStrings);
-			}
+		// Not exported, usually because the package and module arguments of t() are swapped
+		if (!empty($scanner->unknownTargets) && defined('STDERR')) {
+			fwrite(STDERR, "Unknown package/module:\n" . implode("\n", array_unique($scanner->unknownTargets)) . "\n");
 		}
-
-		$this->writeStrings("core", "core", $core);
 
 		if(empty($params['output'])) {
 			$blob = Blob::fromTmp($csvFile);
@@ -155,26 +117,32 @@ class Language extends Controller {
 	}
 
 	/**
-	 * This will parse t("Some text") function calls to find new strings to translate
-	 *
-	 * @param File $file
-	 * @return array
+	 * @var array<string, array> "package/module" => translations of the language file
 	 */
-	private function getStringsFromJS(File $file) {
-		$content = $file->getContents();
+	private array $fileTranslations = [];
 
-		preg_match_all('/[\s\+\(\[:=]t\s*\(\s*[\'"](.+?)[\'"]\s*[\),]/', $content, $matches);
-//		if(!empty($matches[1]))
-//var_dump($matches);
-		return array_map('stripslashes', $matches[1]);
+	private function fileTranslations(string $package, string $module): array
+	{
+		return $this->fileTranslations[$package . '/' . $module] ??= go()->getLanguage()->getFileTranslations(go()->getLanguage()->getIsoCode(), $package, $module);
 	}
 
+	/**
+	 * Write the strings of a module with their translations to the export file
+	 *
+	 * @apiPermission Module access: helper of export() that only writes translations of the given strings. No user data is read.
+	 */
 	function writeStrings($package, $module, $strings) {
 
 		foreach ($strings as $string) {
 			$enTranslation = $this->en->t($string, $package, $module);
 
-			$translated = go()->getLanguage()->getTranslation($string, $package, $module);
+			// The language file itself, because getTranslation() returns the English text when the file has none
+			$translated = $this->fileTranslations($package, $module)[$string] ?? null;
+
+			// Lookup falls back to core, so a string that core translates is not missing in a module
+			if ($this->missingOnly && !isset($translated) && $package !== 'core' && isset($this->fileTranslations('core', 'core')[$string])) {
+				continue;
+			}
 			if (is_array($enTranslation)) {
 				foreach ($enTranslation as $key => $stringItem) {
 					$translatedItem = isset($translated) ? $translated[$key] ?? null : null;
@@ -209,6 +177,11 @@ class Language extends Controller {
 	}
 
 
+	/**
+	 * Machine translate a string with LibreTranslate when export() is called with "translate"
+	 *
+	 * @apiPermission Module access: called directly it returns the given string, because only export() enables translation on its own controller instance.
+	 */
 	function translateAPI($string) {
 
 		if(!$this->translate) {

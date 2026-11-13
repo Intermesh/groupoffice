@@ -9,4 +9,5 @@ return array (
   'API keys' => 'API klíče',
   'Access token' => 'Přístupový token',
   'API key' => 'API klíč',
+  'Copy the access token now. It\'s not possible to view it again.' => 'Zkopírujte si přístupový token nyní. Později jej již nebude možné zobrazit.',
 );

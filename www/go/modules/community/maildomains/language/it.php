@@ -45,7 +45,6 @@ return array (
   'Mail hostname' => 'Mail hostname',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'l\'hostname del sistema email. Usato per controlli PTR, SPF MX.',
   'Mail domains' => 'Domini di posta',
-  'The minimum length for this field is {max}' => 'La lunghezza minima di questo campo è {max}',
   'The passwords do not match' => 'le password non corrispondono',
   'Domain owner' => 'Intestatario dominio',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com*thisuser@example.com' => 'Se abilitato questo utente può accedere a tutte le caselle con user@exampe.com*thisuser@example.com',

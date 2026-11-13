@@ -9,5 +9,11 @@ STATUS=$?
 # findings at random.
 semgrep scan -j 1 --config "$DIR/semgrep/groupoffice.yml" "$DIR/../www" || STATUS=$?
 
+# Modules in their own git repository, like www/go/modules/business, are not part of the scan above because Semgrep
+# only scans the files of the git repository it runs in.
+for REPO in $(find "$DIR/../www" -mindepth 2 -name .git -not -path "*/node_modules/*" -not -path "*/vendor/*" -prune | xargs -n1 dirname); do
+	semgrep scan -j 1 --config "$DIR/semgrep/groupoffice.yml" "$REPO" || STATUS=$?
+done
+
 exit $STATUS
 

@@ -75,7 +75,13 @@ export class PreferencesPanel extends AppSettingsPanel {
 					checkbox({name:'showTooltips', label:t('Show pop-up info when hovering over appointments')}),
 					checkbox({name:'showDeclined', label: t('Show events that you have declined')}),
 					checkbox({name:'multiLine', label: t('Show multiline event blocks')+' (beta)'}),
+					checkbox({name:'showCategoryColor', label: t('Show event in category color'),
+						hint: t('Only when one calendar is selected and the event has one category')}),
 
+					select({name:'defaultCalendarId', label: t('Default calendar'), store: this.calendarStore, valueField: 'id',
+						hint: t('Start with this calendar selected')}),
+					select({name:'personalCalendarId', label: t('Personal calendar'), store: this.personalCalendarStore, valueField: 'id',
+						hint: t('Invitation to event will be added into this calendar')}),
 					select({name:'weekViewGridSnap', label: t('Raster size for day/week view'),
 						hint: t('The duration adjustment when resizing an event'),options: [
 							{value:'5', name: '5 '+t('minutes')},

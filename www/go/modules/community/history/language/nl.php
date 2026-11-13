@@ -21,4 +21,5 @@ return array (
   'Retention period of entries in days' => 'Bewaartermijn van records in dagen',
   'Request ID' => 'ID aanvragen',
   'Entity ID' => 'Identiteit van de entiteit',
+  'Datum' => 'Datum',
 );

@@ -60,4 +60,19 @@ class LanguageTest extends \PHPUnit\Framework\TestCase
 			unset($GLOBALS['languageOverrideLoaded']);
 		}
 	}
+
+	/**
+	 * getTranslation() returns the English text when a language file has no translation, so finding missing translations
+	 * needs the language file itself
+	 */
+	public function testGetFileTranslationsLeavesOutEnglish() {
+		$nl = new Language();
+		$nl->setLanguage('nl');
+
+		// The test module only has an English language file
+		$this->assertSame('Unit testing', $nl->getTranslation('name', 'community', 'test'));
+		$this->assertSame([], $nl->getFileTranslations('nl', 'community', 'test'));
+
+		$this->assertSame('Opslaan', $nl->getFileTranslations('nl')['Save']);
+	}
 }

@@ -24,4 +24,15 @@ return array (
   'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Domyślnie urządzenia nie mogą usuwać elementów. Zostało to dodane z powodu błędu w Androidzie 12, który usuwał kontakty po aktualizacji.',
   'Notebooks' => 'Notesy',
   'Tasklists' => 'Listy zadań',
+  'The following attachments were too big to synchronize' => 'Następujące załączniki były zbyt duże, aby je zsynchronizować',
+  '** 2-Factor authentication **' => '** Uwierzytelnianie dwuskładnikowe **',
+  '2fa-body' => 'Witaj,
+
+Zaloguj się do {product_name}, aby dokończyć konfigurację konta:
+
+{URL}
+
+Z pozdrowieniami,
+
+{TITLE}',
 );

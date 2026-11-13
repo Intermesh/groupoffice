@@ -235,4 +235,34 @@ class ContactTest extends TestCase
 		$this->assertArrayNotHasKey($profile->id, $result['notUpdated'] ?? [], var_export($result['notUpdated'][$profile->id] ?? null, true));
 		$this->assertSame('Changed Name', $this->storedUser($this->attacker)->displayName);
 	}
+
+	public function testLoadVcfFromUnknownFile(): void
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		$this->expectException(\go\core\exception\NotFound::class);
+		(new Contact())->loadVCF(['fileId' => 999999999]);
+	}
+
+	public function testLoadVcfNeedsCreatePermissionOnTheDefaultAddressBook(): void
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		$private = new AddressBook();
+		$private->name = uniqid('private');
+		$private->setAcl([Group::ID_INTERNAL => null, Group::ID_EVERYONE => null, Group::ID_ADMINS => Acl::LEVEL_MANAGE]);
+		$this->assertTrue($private->save());
+
+		try {
+			// The user points the default address book to a book they can't write
+			$user = User::findById($this->attacker->id, ['addressBookSettings']);
+			$user->addressBookSettings->setDefaultAddressBookId($private->id);
+			$this->assertTrue($user->save(), $user->getValidationErrorsAsString());
+
+			go()->setAuthState(new TemporaryState($this->attacker->id));
+			$this->expectExceptionMessage('You do not have create permissions for this address book');
+			(new Contact())->loadVCF(['fileId' => 1]);
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			AddressBook::delete(['id' => $private->id]);
+		}
+	}
 }

@@ -29,9 +29,31 @@ class AuthorizationServerTest extends TestCase
 	private const REDIRECT_URI = 'https://rp.example.com/callback';
 	private const CLIENT_SECRET = 'client-secret-for-tests';
 
+	/** Hashing the secret of a client takes a while, and the tests don't change the client, so they share one */
+	private static ?OauthClient $client = null;
+
 	private array $userIds = [];
-	private array $clientIds = [];
 	private ?string $httpHost = null;
+
+	public static function setUpBeforeClass(): void
+	{
+		$client = new OauthClient();
+		$client->setIdentifier(uniqid('client'));
+		$client->setName('Test application');
+		$client->setRedirectUri(self::REDIRECT_URI);
+		$client->setIsConfidential(true);
+		$client->setSecret(self::CLIENT_SECRET);
+		self::assertTrue($client->save(), var_export($client->getValidationErrors(), true));
+		self::$client = $client;
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		if (isset(self::$client->id)) {
+			OauthClient::delete(['id' => self::$client->id]);
+		}
+		self::$client = null;
+	}
 
 	protected function setUp(): void
 	{
@@ -47,9 +69,6 @@ class AuthorizationServerTest extends TestCase
 			$_SERVER['HTTP_HOST'] = $this->httpHost;
 		}
 
-		foreach ($this->clientIds as $id) {
-			OauthClient::delete(['id' => $id]);
-		}
 		foreach ($this->userIds as $id) {
 			User::delete(['id' => $id]);
 		}
@@ -69,20 +88,6 @@ class AuthorizationServerTest extends TestCase
 		$this->userIds[] = $user->id;
 
 		return $user;
-	}
-
-	private function newClient(): OauthClient
-	{
-		$client = new OauthClient();
-		$client->setIdentifier(uniqid('client'));
-		$client->setName('Test application');
-		$client->setRedirectUri(self::REDIRECT_URI);
-		$client->setIsConfidential(true);
-		$client->setSecret(self::CLIENT_SECRET);
-		$this->assertTrue($client->save(), var_export($client->getValidationErrors(), true));
-		$this->clientIds[] = $client->id;
-
-		return $client;
 	}
 
 	/**
@@ -181,7 +186,7 @@ class AuthorizationServerTest extends TestCase
 	public function testNormalFlowWorks()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$user = $this->newUser();
 
 		$tokens = $this->exchangeCode($server, $client, $this->authorize($server, $client, $user));
@@ -197,7 +202,7 @@ class AuthorizationServerTest extends TestCase
 	public function testAuthorizationCodeCanOnlyBeUsedOnce()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$code = $this->authorize($server, $client, $this->newUser());
 
 		$this->exchangeCode($server, $client, $code);
@@ -208,7 +213,7 @@ class AuthorizationServerTest extends TestCase
 	public function testRefreshTokenIsReplacedEveryTimeItIsUsed()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$first = $this->exchangeCode($server, $client, $this->authorize($server, $client, $this->newUser()));
 
 		$second = $this->refresh($server, $client, $first['refresh_token']);
@@ -223,7 +228,7 @@ class AuthorizationServerTest extends TestCase
 	public function testRefreshTokenIsRefusedWhileTheUserIsDisabled()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$user = $this->newUser();
 		$tokens = $this->exchangeCode($server, $client, $this->authorize($server, $client, $user));
 
@@ -236,7 +241,7 @@ class AuthorizationServerTest extends TestCase
 	public function testAuthorizationCodeIsRefusedWhileTheUserIsDisabled()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$user = $this->newUser();
 		$code = $this->authorize($server, $client, $user);
 
@@ -248,7 +253,7 @@ class AuthorizationServerTest extends TestCase
 	public function testDisablingTheUserRevokesWhatWasIssued()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$user = $this->newUser();
 		$tokens = $this->exchangeCode($server, $client, $this->authorize($server, $client, $user));
 
@@ -267,7 +272,7 @@ class AuthorizationServerTest extends TestCase
 	public function testChangingThePasswordRevokesWhatWasIssued()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$user = $this->newUser();
 		$tokens = $this->exchangeCode($server, $client, $this->authorize($server, $client, $user));
 
@@ -290,7 +295,7 @@ class AuthorizationServerTest extends TestCase
 	public function testAccessTokenIsRefusedWhileTheUserIsDisabled()
 	{
 		$server = $this->server();
-		$client = $this->newClient();
+		$client = self::$client;
 		$user = $this->newUser();
 		$this->exchangeCode($server, $client, $this->authorize($server, $client, $user));
 

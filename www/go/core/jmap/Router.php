@@ -16,7 +16,11 @@ use go\core\util\JSON;
 use InvalidArgumentException;
 use JsonException;
 use JsonSerializable;
+use Jasny\PhpdocParser\PhpdocParser;
+use Jasny\PhpdocParser\Set\PhpDocumentor;
+use Jasny\PhpdocParser\Tag\Summery;
 use ReflectionClass;
+use ReflectionMethod;
 use Throwable;
 
 /**
@@ -192,6 +196,119 @@ class Router
 	}
 
 	/**
+	 * Descriptions of the methods that most entities implement. Their doc blocks are generic, like "Handles the Foo entity's Foo/get command".
+	 */
+	const STANDARD_METHODS = [
+		'get' => 'Get entities by ID. Standard JMAP method, see https://jmap.io/spec-core.html#get',
+		'query' => 'Search entities with a filter and sort. Returns IDs. Standard JMAP method, see https://jmap.io/spec-core.html#query',
+		'set' => 'Create, update and destroy entities. Updates are patches. Standard JMAP method, see https://jmap.io/spec-core.html#set',
+		'changes' => 'Get the IDs of entities that were created, updated or destroyed since a state. Standard JMAP method, see https://jmap.io/spec-core.html#changes',
+		'export' => 'Export entities to a file. Takes the parameters of Foo/get and an "extension" like "csv". Returns the file in "blob".',
+		'import' => 'Import a file that was uploaded as a blob. Takes "blobId" and optional "values" to set on each entity. Runs in the background and returns "pid".',
+		'exportColumns' => 'Get the columns that can be exported for an "extension" like "csv".',
+		'importCSVMapping' => 'Get the column mapping for importing the CSV file of "blobId", or a saved mapping by "id".',
+		'merge' => 'Merge the entities of "ids" into the first one. The others are destroyed.'
+	];
+
+	/**
+	 * Get the controller class that handles the JMAP methods of an entity, like Note/get.
+	 *
+	 * @param EntityType $entityType
+	 * @return string The class name. It may not exist.
+	 */
+	public static function entityControllerClass(EntityType $entityType): string
+	{
+		// Slightly less ugly hack - more and more old style ActiveRecord models need JMAP treatment.
+		switch ($entityType->getName()) {
+			case "Project":
+				if (go()->getModule('business', 'projects')) {
+					return "go\\modules\\business\\projects\\controller\\Project";
+				} else {
+					return 'GO\\Projects2\\Controller\\ProjectEntityController';
+				}
+			case "Account":
+				return "go\\modules\\community\\email\\controller\\Account";
+			case "Income":
+				return 'GO\\Projects2\\Controller\\IncomeEntityController';
+			case "TimeEntry":
+				return 'GO\\Projects2\\Controller\\TimeEntryEntityController';
+			default:
+				return str_ireplace("model", "controller", $entityType->getClassName());
+		}
+	}
+
+	/**
+	 * Check if a class may be routed to as a JMAP controller
+	 *
+	 * Controllers in a "cli" namespace are for the command line only and only JMAP controllers authenticate the user
+	 * in their constructor.
+	 *
+	 * @param string $controllerClass
+	 * @return bool
+	 */
+	public static function isRoutableController(string $controllerClass): bool
+	{
+		if (stripos('\\' . $controllerClass . '\\', '\\cli\\') !== false) {
+			return false;
+		}
+
+		return class_exists($controllerClass) && is_subclass_of($controllerClass, \go\core\Controller::class);
+	}
+
+	/**
+	 * Get the JMAP methods of an entity, for example "get", "query" and "set" for Note/get, Note/query and Note/set.
+	 *
+	 * These are the public methods of the controller from {@see entityControllerClass()}, except the ones tagged "@noapi".
+	 * The standard methods are described by {@see STANDARD_METHODS}, others by their doc block.
+	 *
+	 * @param EntityType $entityType
+	 * @return array<string, string> Method name => description
+	 */
+	public static function getEntityMethods(EntityType $entityType): array
+	{
+		$controllerClass = self::entityControllerClass($entityType);
+		if (!self::isRoutableController($controllerClass)) {
+			return [];
+		}
+
+		$parser = new PhpdocParser(PhpDocumentor::tags()->with([new Summery()]));
+
+		$methods = [];
+		foreach ((new ReflectionClass($controllerClass))->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+			if ($method->isStatic() || str_starts_with($method->getName(), '__') || $method->getDeclaringClass()->getName() === \go\core\Controller::class) {
+				continue;
+			}
+
+			// Like Model::buildApiProperties(), "@noapi" hides a method from the API documentation. It can still be called.
+			$doc = $method->getDocComment();
+			if ($doc && str_contains($doc, '@noapi')) {
+				continue;
+			}
+
+			$name = $method->getName();
+
+			// Method names are case insensitive in PHP. For example User has importCsvMapping.
+			$standard = array_change_key_case(self::STANDARD_METHODS)[strtolower($name)] ?? null;
+			if (isset($standard)) {
+				$methods[$name] = $standard;
+				continue;
+			}
+
+			try {
+				$meta = $doc ? $parser->parse($doc) : [];
+			} catch (Throwable) {
+				$meta = [];
+			}
+			// Join wrapped lines but keep paragraphs
+			$methods[$name] = preg_replace('/(?<!\n)\n(?!\n)/', ' ', trim($meta['description'] ?? ''));
+		}
+
+		ksort($methods);
+
+		return $methods;
+	}
+
+	/**
 	 * @throws Exception
 	 * @throws CoreException
 	 */
@@ -213,45 +330,7 @@ class Router
 				throw new Exception(400, 'Bad request. Entity type "' . $parts[0] . '"  not found');
 			}
 
-			//Very ugly hack
-			/*
-			if($entityType->getName() == "Project") {
-				// JH Added to the ugly hack. Need a bit of JMAP for the old projects as well
-				if (go()->getModule('business', 'projects')) {
-					$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
-				} else {
-					$controllerClass = 'GO\\Projects2\\Controller\\ProjectEntityController';
-				}
-			} elseif ($entityType->getName() == "Account") {
-				$controllerClass = "go\\modules\\community\\email\\controller\\Account";
-			} else {
-				$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
-			}
-			*/
-
-			// Slightly less ugly hack - more and more old style ActiveRecord models need JMAP treatment.
-			switch ($entityType->getName()) {
-				case "Project":
-					if (go()->getModule('business', 'projects')) {
-						$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
-					} else {
-						$controllerClass = 'GO\\Projects2\\Controller\\ProjectEntityController';
-					}
-				break;
-				case "Account":
-					$controllerClass = "go\\modules\\community\\email\\controller\\Account";
-					break;
-				case "Income":
-					$controllerClass = 'GO\\Projects2\\Controller\\IncomeEntityController';
-					break;
-				case "TimeEntry":
-					$controllerClass = 'GO\\Projects2\\Controller\\TimeEntryEntityController';
-					break;
-
-				default:
-					$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
-
-			}
+			$controllerClass = self::entityControllerClass($entityType);
 			$controllerMethod = $parts[1];
 		} else if($parts[0] == "core") {
 			$controllerMethod = array_pop($parts);
@@ -267,13 +346,7 @@ class Router
 			$controllerClass = 'go\\modules\\' . implode('\\', $parts);
 		}
 
-		// Controllers in a "cli" namespace are for the command line only and are run by the CLI router. Never route to them here.
-		if (stripos('\\' . $controllerClass . '\\', '\\cli\\') !== false) {
-			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
-		}
-
-		// Only JMAP controllers authenticate the user in their constructor
-		if (!class_exists($controllerClass) || !is_subclass_of($controllerClass, \go\core\Controller::class)) {
+		if (!self::isRoutableController($controllerClass)) {
 			throw new Exception(400, 'Bad request. Controller "' . $controllerClass . '"  not found');
 		}
 

@@ -27,10 +27,13 @@ class RecoveryThrottleTest extends TestCase
 {
 	private array $server;
 	private array $singletons;
+	private string|false $language;
 
 	protected function setUp(): void
 	{
 		$this->server = $_SERVER;
+		// the messages are checked in English, whatever language an earlier test left behind
+		$this->language = go()->getLanguage()->setLanguage('en');
 
 		$property = new ReflectionProperty(Singleton::class, 'instances');
 		$this->singletons = $property->getValue();
@@ -42,6 +45,9 @@ class RecoveryThrottleTest extends TestCase
 	protected function tearDown(): void
 	{
 		$_SERVER = $this->server;
+		if ($this->language !== false) {
+			go()->getLanguage()->setLanguage($this->language);
+		}
 		(new ReflectionProperty(Singleton::class, 'instances'))->setValue(null, $this->singletons);
 	}
 

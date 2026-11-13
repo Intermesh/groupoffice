@@ -46,4 +46,11 @@ return array (
   'PKCS12 certificates' => 'Certificados PKCS12',
   'valid' => 'válido',
   'since' => 'desde',
+  'Could not read p12 file:' => 'No se pudo leer el archivo p12:',
+  'No OCSP URI found' => 'No se encontró ninguna URI de OCSP',
+  'No issuer URI found' => 'No se encontró ninguna URI del emisor',
+  'The SMIME password was incorrect.' => 'La contraseña SMIME era incorrecta.',
+  'The certificate has been revoked!' => '¡El certificado ha sido revocado!',
+  'The certificate must be in PEM format' => 'El certificado debe estar en formato PEM',
+  'This certificate already exists' => 'Este certificado ya existe',
 );

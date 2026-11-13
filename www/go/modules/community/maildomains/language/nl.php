@@ -74,7 +74,6 @@ return array (
   'DNS check completed' => 'DNS-controle voltooid',
   'Mail hostname' => 'E-mailhostnaam',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'De hostnaam van het mailsysteem. Gebruikt voor PTR, SPF en MX controles.',
-  'The minimum length for this field is {max}' => 'De minimale lengte voor dit veld is {max}',
   'The passwords do not match' => 'De wachtwoorden komen niet overeen',
   'Domain owner' => 'Domeineigenaar',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => 'Wanneer ingeschakeld kan deze gebruiker zich aanmelden bij alle mailboxen van het domein via user@example.com*thisuser@example.com',

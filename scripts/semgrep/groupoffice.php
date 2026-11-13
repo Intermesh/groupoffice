@@ -76,6 +76,7 @@ class Test extends Controller
 		// ok: go-class-from-request
 		$entityCls::find();
 
+		// ruleid: go-entity-from-params-without-acl
 		$user = \go\core\model\User::findById($params['id']);
 		// ok: go-class-from-request
 		$user->save();
@@ -250,3 +251,88 @@ class LegacyTest extends \GO\Base\Controller\AbstractModelController
 		}
 	}
 }
+
+
+class EntityFromParamsTest extends \go\core\jmap\EntityController
+{
+	protected function entityClass(): string
+	{
+		return \go\modules\community\notes\model\Note::class;
+	}
+
+	public function unchecked($params)
+	{
+		// ruleid: go-entity-from-params-without-acl
+		$note = \go\modules\community\notes\model\Note::findById($params['id']);
+		// ruleid: go-entity-from-params-without-acl
+		$notes = Note::findByIds($params['ids']);
+		// ruleid: go-entity-from-params-without-acl
+		$debtor = Debtor::findById($params['businessId'] . '-' . $params['contactId']);
+		// ok: go-entity-from-params-without-acl
+		$blob = \go\core\fs\Blob::findById($params['blobId']);
+		// ok: go-entity-from-params-without-acl
+		$note = $this->getEntity($params['id']);
+	}
+
+	public function copiedToVariable($params)
+	{
+		$id = $params['id'];
+		// ruleid: go-entity-from-params-without-acl
+		$note = Note::findById($id);
+		return $note;
+	}
+
+	public function copiedWithCast($params)
+	{
+		$id = (int) ($params['id'] ?? 0);
+		// ruleid: go-entity-from-params-without-acl
+		return Note::findById($id);
+	}
+
+	public function derivedId($params)
+	{
+		$note = $this->getEntity($params['id']);
+		// ok: go-entity-from-params-without-acl
+		return User::findById($note->createdBy);
+	}
+
+	public function copiedToVariableAndChecked($params)
+	{
+		$id = $params['id'];
+		// ok: go-entity-from-params-without-acl
+		$note = Note::findById($id);
+		if (!$note->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new Forbidden();
+		}
+		return $note;
+	}
+
+	public function checked($params)
+	{
+		// ok: go-entity-from-params-without-acl
+		$note = Note::findById($params['id']);
+		if (!$note || !$note->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+		return $note;
+	}
+
+	public function checkedWithCan($params)
+	{
+		// ok: go-entity-from-params-without-acl
+		$note = Note::findById($params['id']);
+		if (!$this->canUpdate($note)) {
+			throw new Forbidden();
+		}
+	}
+
+	public function adminOnly($params)
+	{
+		if (!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+		// ok: go-entity-from-params-without-acl
+		$user = User::findById($params['userId']);
+	}
+}
+

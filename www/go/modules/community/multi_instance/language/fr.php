@@ -20,4 +20,5 @@ return array (
   'Show trials' => 'Montrer Essais',
   'Download site config' => 'Télécharger configuration site',
   'Trial' => 'Essai',
+  'Is trial' => 'Est un essai',
 );

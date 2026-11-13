@@ -29,6 +29,32 @@ class ProjectDirectoryPermissionTest extends TestCase
 	private ?ProjectBook $book = null;
 	private ?Project3 $project = null;
 
+	public static function setUpBeforeClass(): void
+	{
+		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
+		try {
+			self::installModuleTables('business', 'business', $path . 'business/install/install.sql');
+			self::installModuleTables('business', 'projects3', $path . 'projects3/install/install.sql');
+		} catch (\Throwable $e) {
+			// PHPUnit doesn't call tearDownAfterClass() when this fails, and the module tables would stay behind
+			self::uninstallModuleTables();
+			throw $e;
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		if (in_array('business_projects3_project3', self::$createdModuleTables)) {
+			// install.sql adds these to the tasks table, which isn't dropped
+			foreach (['tasks_task_business_projects3_project3_id_fk', 'tasks_task_business_projects3_project3_milestone_id_fk'] as $fk) {
+				if (go()->getDbConnection()->query("SELECT 1 FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'tasks_task' AND CONSTRAINT_NAME = '" . $fk . "'")->fetch()) {
+					go()->getDbConnection()->exec('ALTER TABLE `tasks_task` DROP FOREIGN KEY `' . $fk . '`');
+				}
+			}
+		}
+		self::uninstallModuleTables();
+	}
+
 	protected function setUp(): void
 	{
 		$this->authState = go()->getAuthState();
@@ -37,10 +63,7 @@ class ProjectDirectoryPermissionTest extends TestCase
 		\GO::$disableModelCache = true;
 		$this->actAs(User::ID_SUPER_ADMIN);
 
-		$path = go()->getEnvironment()->getInstallPath() . '/go/modules/business/';
-		$this->installModuleTables('business', 'business', $path . 'business/install/install.sql');
-		$this->installModuleTables('business', 'projects3', $path . 'projects3/install/install.sql');
-		// The tables are created for every test, so books get the same id. Forget the books of other tests.
+		// The tables are created for every test class, so books of other classes may have had the same id. Forget them.
 		(new \ReflectionProperty(\go\core\acl\model\AclItemEntity::class, 'aclEntityCache'))->setValue(null, []);
 
 		$name = uniqid('p3user');
@@ -91,15 +114,6 @@ class ProjectDirectoryPermissionTest extends TestCase
 		if (isset($this->user)) {
 			User::delete(['id' => $this->user->id]);
 		}
-		if (in_array('business_projects3_project3', $this->createdModuleTables)) {
-			// install.sql adds these to the tasks table, which isn't dropped
-			foreach (['tasks_task_business_projects3_project3_id_fk', 'tasks_task_business_projects3_project3_milestone_id_fk'] as $fk) {
-				if (go()->getDbConnection()->query("SELECT 1 FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'tasks_task' AND CONSTRAINT_NAME = '" . $fk . "'")->fetch()) {
-					go()->getDbConnection()->exec('ALTER TABLE `tasks_task` DROP FOREIGN KEY `' . $fk . '`');
-				}
-			}
-		}
-		$this->uninstallModuleTables();
 
 		\GO::$ignoreAclPermissions = $this->ignoreAcl;
 		\GO::$disableModelCache = $this->disableModelCache;

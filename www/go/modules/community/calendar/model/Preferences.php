@@ -30,6 +30,10 @@ class Preferences extends Property
 	public bool $birthdaysAreVisible = false;
 
 	public bool $multiLine = false;
+
+	/** @var bool Show an event in the color of its category when one calendar is visible and the event has one category */
+	public bool $showCategoryColor = false;
+
 	/** @var bool Show birthdays on the calendar */
 	public bool $tasksAreVisible = false;
 	/** @var bool Show birthdays on the calendar */

@@ -32,6 +32,7 @@ use go\core\orm\CustomFieldsTrait;
 use go\core\orm\Relation;
 use go\core\util\ClassFinder;
 use go\core\util\DateTime;
+use go\core\util\Password;
 use go\core\validate\ErrorCode;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
@@ -1189,7 +1190,7 @@ public function historyLog(): bool|array
 	
 	/**
 	 * Hash a password for users
-	 * 
+	 *
 	 * @param string $password
 	 * @return string
 	 */
@@ -1200,7 +1201,7 @@ public function historyLog(): bool|array
 		if($passwordLen > go()->getSettings()->passwordMaxLength) {
 			throw new \InvalidArgumentException("Maximum password length is ".go()->getSettings()->passwordMaxLength." chars");
 		}
-		return password_hash($password, PASSWORD_DEFAULT);
+		return Password::hash($password);
 	}
 
 	/**

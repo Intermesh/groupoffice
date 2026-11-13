@@ -136,4 +136,11 @@ class CalendarEventImportTest extends TestCase
 		$this->assertSame('', $other->location);
 		$this->assertSame('', $other->description);
 	}
+
+	public function testLoadIcsFromUnknownFile(): void
+	{
+		go()->setAuthState(new \go\core\auth\TemporaryState(\go\core\model\User::ID_SUPER_ADMIN));
+		$this->expectException(\go\core\exception\NotFound::class);
+		(new \go\modules\community\calendar\controller\CalendarEvent())->loadICS(['fileId' => 999999999]);
+	}
 }

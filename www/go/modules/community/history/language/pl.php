@@ -14,4 +14,5 @@ return array (
   'History' => 'Historia',
   'Delete entries after' => 'Usuń wpisy po',
   'Entity ID' => 'ID jednostki',
+  'Datum' => 'Data',
 );

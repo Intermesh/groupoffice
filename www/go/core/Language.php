@@ -278,6 +278,21 @@ class Language {
 		return isset($this->data[$package]) && isset($this->data[$package][$module]) && isset($this->data[$package][$module][$str]);
 	}
 
+	/**
+	 * Get the translations in the language file of a module, without the English texts that {@see getTranslation()} uses
+	 * when the language file has no translation. Used to find missing translations.
+	 *
+	 * @param string $isoCode The language, like "nl"
+	 * @param string $package
+	 * @param string $module
+	 * @return array English text => translation. Empty when the module has no file for the language.
+	 * @throws \Exception When the file doesn't return an array
+	 */
+	public function getFileTranslations(string $isoCode, string $package = 'core', string $module = 'core'): array {
+		$file = $this->findLangFile($isoCode, $package, $module);
+		return $file->exists() ? $this->loadFile($file) : [];
+	}
+
 
 	private function loadSection($package = 'core', $module = 'core') {
 		if (!isset($this->data[$package])) {

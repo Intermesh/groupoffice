@@ -232,7 +232,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				entityStore: "LogEntry"
 			}),
 			viewConfig: {
-				emptyText: '<i>description</i><p>' + t("Item was never modified",'community','history') + '</p>',
+				emptyText: '<i>description</i><p>' + t("Item was never modified", 'history', 'community') + '</p>',
 				totalDisplay: false //heavy impact on performance
 			},
 			columns: cols

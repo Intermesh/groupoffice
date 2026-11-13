@@ -7,6 +7,11 @@ use go\core\Controller;
 
 class ParticipantIdentity extends Controller {
 
+	/**
+	 * Get the participant identity of the current user
+	 *
+	 * @apiPermission Module access: returns only the name and e-mail address of the user.
+	 */
 	public function get($params) {
 		$u = go()->getAuthState()->getUser(['displayName', 'email']);
 		return [

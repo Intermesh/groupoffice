@@ -383,6 +383,7 @@ CREATE TABLE calendar_preferences (
 	lastProcessedUid		  BIGINT DEFAULT 1 NOT NULL,
 	showDeclined          TINYINT(1) DEFAULT 1 NOT NULL,
 	multiLine          TINYINT(1) DEFAULT 0 NOT NULL,
+	showCategoryColor  TINYINT(1) DEFAULT 0 NOT NULL,
 	showWeekNumbers				TINYINT(1) DEFAULT 1 NOT NULL,
 	birthdaysAreVisible   TINYINT(1) DEFAULT 0 NOT NULL,
 	tasksAreVisible       TINYINT(1) DEFAULT 0 NOT NULL,

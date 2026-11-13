@@ -39,6 +39,15 @@ class Principal extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
+	/**
+	 * Get the busy periods of a principal. Returns an empty list when the calendar module is not installed.
+	 *
+	 * @apiParam string id Required. ID of the principal: a user ID or "Calendar:<id>" for a resource calendar
+	 * @apiParam string start Required. Start date and time of the period
+	 * @apiParam string end Required. End date and time of the period
+	 * @apiResponse {list: object[]} The busy periods
+	 * @apiPermission Checked in BusyPeriod::fetch(): only events in calendars on which the user has at least free/busy permission (Acl::applyToQuery() with Calendar::LEVEL_FREEBUSY).
+	 */
 	public function getAvailability($params){
  		if(Module::isInstalled('community', 'calendar')) {
 			 return \go\modules\community\calendar\Module::getAvailability(

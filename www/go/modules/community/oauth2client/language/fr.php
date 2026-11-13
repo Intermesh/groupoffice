@@ -1,0 +1,21 @@
+<?php
+return array (
+  'API Project Id' => 'ID du projet API',
+  'Click here' => 'Cliquez ici',
+  'Client Id' => 'ID client',
+  'Get a refresh token' => 'Obtenir un jeton d\'actualisation',
+  'Hello' => 'Bonjour',
+  'OAuth2 Connection' => 'Connexion OAuth2',
+  'OAuth2 Connections' => 'Connexions OAuth2',
+  'OAuth2 authentication was successful.' => 'L\'authentification OAuth2 a réussi.',
+  'OAuth2 client' => 'Client OAuth2',
+  'OAuth2 connection' => 'Connexion OAuth2',
+  'Please press the button "Refresh token" to finish the OAuth2 connection' => 'Veuillez appuyer sur le bouton « Refresh token » pour finaliser la connexion OAuth2',
+  'Project ID' => 'ID du projet',
+  'Project Id' => 'ID du projet',
+  'Provider' => 'Fournisseur',
+  'Request or update a refresh token in a separate window.' => 'Demander ou mettre à jour un jeton d\'actualisation dans une fenêtre séparée.',
+  'Use this connection for single signon with OpenID Connect' => 'Utiliser cette connexion pour l\'authentification unique avec OpenID Connect',
+  'to close this window.' => 'pour fermer cette fenêtre.',
+  'OAuth2 Client Settings' => 'Paramètres du client OAuth2',
+);

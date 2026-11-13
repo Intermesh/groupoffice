@@ -9,6 +9,7 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\Response;
 use go\core\Language as LangModel;
+use go\modules\community\dev\model\LanguageFile;
 use function GO;
 
 class Language extends Controller {
@@ -34,6 +35,10 @@ class Language extends Controller {
 	 * ```
 	 * docker compose exec groupoffice-64 php www/cli.php community/dev/Language/import --path=lang.csv
 	 * ```
+	 *
+	 * Existing translations are changed in place and new ones are added at the end of the file, so the file keeps its
+	 * formatting. Translations whose placeholders ({count}, {{contact.name}}, %s), HTML tags or line breaks differ from
+	 * the English text are skipped.
 	 * 
 	 * @param array $params
 	 * @throws \Exception
@@ -76,6 +81,10 @@ class Language extends Controller {
 
 		$lang = strtolower($headers[3]);
 
+		$english = new LangModel();
+		$english->initExport();
+		$english->setLanguage('en');
+
 		$data = [];
 
 		
@@ -91,6 +100,28 @@ class Language extends Controller {
 				continue;
 			}
 
+			// "Text[key]" is an item of an array translation, like the names of the months. Only when the English
+			// translation is an array: other texts can contain brackets too.
+			$arrayKey = null;
+			$englishText = null;
+			if (preg_match("/(.*)\[(.*)\]$/", $en, $matches)) {
+				$englishArray = $english->getTranslation($matches[1], $package, $module) ?? $english->getTranslation($matches[1]);
+				if (is_array($englishArray)) {
+					$arrayKey = $matches;
+					$englishText = $englishArray[$matches[2]] ?? $en;
+				}
+			}
+			if (!isset($arrayKey)) {
+				// Old keys like "recoveryMailBody" have their English text in en.php
+				$englishText = $english->getTranslation($en, $package, $module) ?? $english->getTranslation($en) ?? $en;
+			}
+
+			// The placeholders, tags and line breaks must be kept, or the text breaks in the user interface
+			if (!is_string($englishText) || !LanguageFile::hasSameTokens($englishText, $translation)) {
+				echo "SKIPPED: placeholders differ: " . $package . "/" . $module . ": " . $en . " => " . $translation . "\n";
+				continue;
+			}
+
 			if (!isset($data[$package])) {
 				$data[$package] = [];
 			}
@@ -99,8 +130,8 @@ class Language extends Controller {
 				$data[$package][$module] = [];
 			}
 
-			if (preg_match("/(.*)\[(.*)\]/", $en, $matches)) {
-				$data[$package][$module][$matches[1]][$matches[2]] = $translation;
+			if (isset($arrayKey)) {
+				$data[$package][$module][$arrayKey[1]][$arrayKey[2]] = $translation;
 			} else {
 				$data[$package][$module][$en] = $translation;
 			}
@@ -127,14 +158,16 @@ class Language extends Controller {
 					continue;
 				}
 				
-				if ($langfile->exists()) {
-					$existingTranslations = require($langfile->getPath());
-					
-					$translations = array_merge($existingTranslations, $translations);
-				}
+				// Existing entries are changed in place and new ones added, so the rest of the file stays as it is
 				echo "Writing: ".$langFilePath."\n";
-				
-				$langfile->putContents("<?php\nreturn ".var_export($translations, true).";\n");
+				$languageFile = new LanguageFile($langfile->getPath());
+				$languageFile->set($translations);
+				foreach ($languageFile->warnings as $warning) {
+					echo "WARNING: " . $langFilePath . ": " . $warning . "\n";
+				}
+				if (!$languageFile->save()) {
+					throw new \Exception("Could not write " . $langFilePath);
+				}
 			}
 		}
 		

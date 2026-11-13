@@ -273,7 +273,7 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 								}),
 								btn({
 									icon: "csv",
-									text: "Comma Seperated Values",
+									text: t("Comma Separated Values"),
 									handler: () => {
 										Export.toFile(
 											'Note',

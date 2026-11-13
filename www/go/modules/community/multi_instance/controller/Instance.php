@@ -22,6 +22,15 @@ class Instance extends EntityController {
 	}
 	
 	
+	/**
+	 * Create an access token to log in as administrator of an instance
+	 *
+	 * @apiParam string id Required. ID of the instance. Requires manage permission.
+	 * @apiResponse {success: bool, accessToken: string} The access token for the instance. It expires within an hour.
+	 * @apiPermission Manage permission on the instance.
+	 * @param array $params
+	 * @throws \go\core\exception\Forbidden
+	 */
 	public function login($params) {
 		
 		$instance = model\Instance::findById($params['id']);

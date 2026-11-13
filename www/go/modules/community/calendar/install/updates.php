@@ -535,3 +535,5 @@ $updates['202611091200'][] = "UPDATE calendar_calendar_event cce
 $updates['202611091200'][] = "ALTER TABLE `calendar_event` DROP COLUMN `uri`;";
 
 $updates['202611091200'][] = "delete from calendar_schedule_object;";
+
+$updates['202611121200'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN showCategoryColor TINYINT(1) DEFAULT 0 NOT NULL AFTER `multiLine`;";

@@ -346,6 +346,24 @@ export class Main extends Component {
 			)
 		);
 
+		CalendarItem.showCategoryColor = !!client.user.calendarPreferences?.showCategoryColor;
+		const onUserChange = async ({target, changes}: any) => {
+			if(!changes.updated || changes.updated.indexOf(client.user.id) === -1) {
+				return;
+			}
+			// read the value from the fetched user, client.user might not be updated yet
+			const user = await target.single(client.user.id),
+				showCategoryColor = !!user?.calendarPreferences?.showCategoryColor;
+			if(showCategoryColor !== CalendarItem.showCategoryColor) {
+				CalendarItem.showCategoryColor = showCategoryColor;
+				if(this.calendarsApplied) {
+					this.view.update();
+				}
+			}
+		};
+		userDS.on('change', onUserChange);
+		this.on('remove', () => userDS.un('change', onUserChange));
+
 		this.date = new DateTime();
 		// NOPE:router will call setSpan and render
 		// calendar store load will call first view update
@@ -389,6 +407,7 @@ export class Main extends Component {
 
 	private applyCalendars(ids: string[]) {
 		this.calendarsApplied = true;
+		CalendarItem.visibleCalendarCount = ids.length;
 		this.applyInCalendarFilter(ids);
 		this.updateView();
 
@@ -396,7 +415,12 @@ export class Main extends Component {
 		// instead of letting the server use the stored (stale) isVisible values.
 		categoryStore.setFilter('inCalendars', {operator: "OR", conditions: [{inCalendars: ids}, {mine: true}]});
 		// Never run two loads at once. A slow, older response could otherwise replace the newer filtered one.
-		this.categoryLoad = this.categoryLoad.catch(() => {}).then(() => categoryStore.load()).then(() => {});
+		this.categoryLoad = this.categoryLoad.catch(() => {}).then(() => categoryStore.load()).then(() => {
+			if(CalendarItem.showCategoryColor) {
+				// items resolve their category when rendered. Render again so the category color is applied.
+				this.view.update();
+			}
+		});
 	}
 
 	private enterView(view: any) {

@@ -161,4 +161,9 @@ Byly provedeny následující změny %s:
   'id' => 'id',
   'Deleted by' => 'Smazal',
   'Deleted at' => 'Smazáno v',
+  'Send notification email when something changes in subscribed files folder' => 'Odeslat upozornění e-mailem, když se něco změní v odebírané složce souborů',
+  'Send an email to the user when a folder is changed' => 'Odeslat uživateli e-mail, když se složka změní',
+  'The archive contains links or other special files and can\'t be decompressed' => 'Archiv obsahuje odkazy nebo jiné speciální soubory a nelze jej rozbalit',
+  'Invalid file or folder name' => 'Neplatný název souboru nebo složky',
+  'Could not restore the item' => 'Položku se nepodařilo obnovit',
 );

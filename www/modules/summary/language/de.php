@@ -36,4 +36,7 @@ return array (
   'statuses' => 'Status',
   'Visible calendars' => 'Sichtbare Kalender',
   'Visible' => 'Sichtbar',
+  'note' => 'Notiz',
+  'Confirmed' => 'Bestätigt',
+  'Tentative' => 'Vorläufig',
 );

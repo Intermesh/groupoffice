@@ -149,4 +149,5 @@ return array (
   'Is from mailing list' => 'Je ze seznamu adresátů',
   'exist' => 'existují',
   'Set a custom subject' => 'Nastavit vlastní předmět',
+  'The filter contains an invalid value' => 'Filtr obsahuje neplatnou hodnotu',
 );

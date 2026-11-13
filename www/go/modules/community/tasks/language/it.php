@@ -75,4 +75,7 @@ return array (
   'List: None' => 'Lista: nessuna',
   'Percent Complete' => 'percentuale di completamento',
   'Message' => 'Messaggio',
+  'Task list' => 'Lista attività',
+  'Tasklists' => 'Liste attività',
+  'This task already has booked hours or progress' => 'Questa attività ha già ore registrate o avanzamento',
 );

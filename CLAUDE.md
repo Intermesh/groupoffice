@@ -23,7 +23,7 @@ We are migrating away from legacy code. When writing new code or changing existi
 
 ## Running tests
 
-Run phpunit as `www-data`, never as root. Use `tools/phpunit groupoffice <path>` from the docker-groupoffice-development checkout or `docker compose exec -u www-data groupoffice ...`. Running as root creates root-owned files in `/tmp/phpunit`, `/tmp/groupoffice` and `/var/lib/groupoffice` and breaks the tooling. Tests live in `tests/` (`/usr/local/share/src/tests` in the container).
+Run phpunit as `www-data`, never as root. Use `tools/phpunit <path>` from the docker-groupoffice-development checkout (it runs as `www-data`; `-c <service>` picks another container than `groupoffice`, `-m install|upgrade|existing` the mode, default `install`, and `existing` runs against the existing database with Xdebug) or `docker compose exec -u www-data groupoffice ...`. Running as root creates root-owned files in `/tmp/phpunit`, `/tmp/groupoffice` and `/var/lib/groupoffice` and breaks the tooling. Tests live in `tests/` (`/usr/local/share/src/tests` in the container).
 
 ## Environment
 
@@ -45,12 +45,30 @@ Schema changes go in the module's `install/updates.php` as a new entry keyed by 
 
 Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module's `language/<lang>.php` (English is the source, `en.php`). Add new strings to `en.php`. Core translations are in `www/go/core/language/`.
 
+- The English text is the key, so it must be correct English: no typos, no Dutch or German. Fixing a key means changing the source and every language file; if the corrected text already exists (often in core), remove the old entries instead of renaming them.
+- Argument order differs: `go()->t($text, $package, $module)`, legacy `GO::t($text, $module, $package)`, ExtJS (`.js`) `t($text, $module, $package)` and GOUI (`.ts`) `t($text, $package, $module)`. Both default to the current module. Swapped arguments fall back to core without an error, so the module's translations are silently unused; the language export lists them as "Unknown package/module".
+- Lookup falls back from the module to core. A string that two or more modules use, or that core already translates (check the Dutch core file `www/go/core/language/nl.php`), belongs in the core language file instead of each module.
+- When adding translations, append entries before the closing `);` or `];` in the file's own style and indentation. Don't rewrite a file with `var_export()`; that reformats every line.
+- Keep placeholders exactly as in the source (`{count}`, `{{contact.name}}`, `%s`, HTML tags, `\n`). Reuse the existing terms of the language file and its register: Dutch "u", German "Sie", French "vous", Spanish "usted".
+- Short strings are ambiguous ("Read", "Bill", "Archive", "Split", "Quit", "To"). Check where they're used before translating: a permission level, a button (verb), a column header (noun) and a view name each need a different translation.
+- To add missing translations, use the dev module: export the missing strings of a language to CSV, fill in the last column, and import it. Export finds `t()` in JS/TS and `go()->t()` / `GO::t()` in PHP and puts strings that core or several modules use in core. Import changes existing entries in place, appends new ones in the file's style, and skips translations whose placeholders differ from the English:
+  ```
+  docker compose exec -u www-data groupoffice php www/cli.php community/dev/Language/export --language=it --missingOnly=1 --skipPackages=agya,customs,dakram,humblebuildings,udo,intermesh,goneo,duurzaamgebouw > it.csv
+  docker compose exec -u www-data groupoffice php www/cli.php community/dev/Language/import --path=it.csv
+  ```
+  `--skipPackages` leaves out customer modules; for legacy modules that link to another repository, give that folder name. Then check with `php -l` and the git diff.
+- Language files are cached. Check new translations with a `go\core\Language` object after `initExport()`, or rebuild the cache.
+
 ## Permissions and security
 
 - Every new JMAP entity and controller must enforce ACL. Use `Entity::hasPermissionLevel()`, `applyAclToQuery()` and `internalGetPermissionLevel()`, and don't skip them for convenience.
 - Admin-only or privileged behaviour needs a test that proves the guard actually fires. Recent fixes (#1593) were guards that never triggered.
 - Don't trust client-supplied properties on save, and never expose secrets to the browser.
 - Take the client IP from the existing `IpAddress` util, never from `X-Forwarded-For` directly.
+- In controller methods, load entities with `$this->getEntity()` or `findEntity()`, which check read permission, not `Model::findById($params[...])`, which checks nothing. Methods that change data or send mail need a write or manage check on the entity or its container.
+- Don't override `checkModulePermissions()` to return true without another guard, don't pass `$params` straight to `setValues()`, and don't return SQL in responses unless the debugger is enabled.
+- When you change a public controller method, check its permission guard first. Every public method of a JMAP controller can be called by any user with access to the module.
+- Document the permission of every custom controller method with `@apiPermission` (shown in `/api/doc.php`). `tests/go/core/jmap/ControllerPermissionTest.php` fails when a public controller method has no recognisable permission check. When access to the module is really enough, start the text with `Module access:` and give the reason; when the check is elsewhere, start with `Checked in <Class::method()>:`.
 
 ## Writing tests
 
@@ -60,7 +78,14 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - For ORM and JMAP behaviour, follow `tests/go/core/orm/EntityTest.php` and `tests/go/core/jmap/`. Test entities live in the `community/test` module.
 - Suggest creating tests when they will benefit security and stability of the system
 - Leave the database as you found it: delete the entities you create.
-- Run a single test: `tools/phpunit groupoffice <path>` (see "Running tests").
+- Write tests with performance in mind; the whole suite runs often. `setUp()` runs before every test and every data provider row:
+  - Create fixtures that tests only read (users that act, groups, permissions, books, module tables of `ModuleTablesTrait`) once per class in `setUpBeforeClass()` and remove them in `tearDownAfterClass()`. Create what a test changes in the test itself or in `setUp()`. See `tests/go/core/controller/UserTest.php` and `tests/go/modules/business/finance/controller/FinanceDocumentTest.php`.
+  - PHPUnit doesn't call `tearDownAfterClass()` when `setUpBeforeClass()` fails, so catch the exception there, clean up and throw it again.
+  - Check a class with shared fixtures with `--order-by=random`: a test must not depend on what another test changed.
+  - Hash passwords and secrets with `go\core\util\Password::hash()`, not `password_hash()`. The tests set a low cost with `passwordHashCost` in `tests/config.php`; the default cost takes 0.2 seconds per hash.
+  - Don't call external services. The test bootstrap disables the pwned module for that reason.
+  - Find slow tests with `--log-junit <file>`, which records the time of every test.
+- Run a single test: `tools/phpunit <path>` (see "Running tests").
 
 ## Converting ExtJS 3.4 to GOUI
 

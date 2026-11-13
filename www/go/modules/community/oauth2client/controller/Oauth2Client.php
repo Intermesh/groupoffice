@@ -44,7 +44,12 @@ final class Oauth2Client extends EntityController
 		$this->rights = $this->getClassRights();
 	}
 
-	public function entityClass(): string
+	/**
+	 * The class name of the entity this controller is for
+	 *
+	 * @return string
+	 */
+	protected function entityClass(): string
 	{
 		return model\Oauth2Client::class;
 	}
@@ -74,6 +79,7 @@ final class Oauth2Client extends EntityController
 	 *
 	 * Recieve token, add refreshtoken and expiry date to current OAuth2 account record
 	 *
+	 * @noapi Browser redirect from the OAuth2 provider via gauth.php
 	 * @throws Exception
 	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
 	 */
@@ -294,6 +300,7 @@ final class Oauth2Client extends EntityController
 	/**
 	 * Authenticate using google Oauth settings for current account ID
 	 *
+	 * @noapi Browser redirect to the OAuth2 provider via gauth.php
 	 * @param int $accountId
 	 * @throws Exception
 	 */
@@ -374,11 +381,15 @@ final class Oauth2Client extends EntityController
 	}
 
 	/**
+	 * Log in with OpenID Connect by redirecting the browser to the OAuth2 provider
+	 *
 	 * http://localhost/go/modules/commmunity/oauth2client/gauth.php/openid
 	 *
 	 *
 	 * sadshs-Ssd3-sd&
 	 *
+	 * @apiPermission Module access: starts the OpenID Connect login of the caller's own session. The redirect contains the public client ID but no secret.
+	 * @noapi Browser redirect to the OAuth2 provider via gauth.php
 	 * @return void
 	 * @throws \go\core\exception\NotFound
 	 */

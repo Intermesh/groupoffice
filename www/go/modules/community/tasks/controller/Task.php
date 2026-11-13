@@ -94,8 +94,12 @@ class Task extends EntityController {
 	}
 
 	/**
-	 * Used to show counter badge for support.
+	 * Count the open tasks in the default task list of the user that are due today or have no due date. Used for the
+	 * counter badge.
 	 *
+	 * @apiNoParams
+	 * @apiResponse int
+	 * @apiPermission Only the tasks the user may read are counted.
 	 */
 	public function countMine(): int
 	{
@@ -107,6 +111,8 @@ class Task extends EntityController {
 			->filter([
 				"tasklistId" => $defaultListId,
 				"complete" => false,
+				// The default list is a setting of the user, which may point to any list
+				"permissionLevel" => \go\core\model\Acl::LEVEL_READ,
 			])->filter([
 				"operator" => "OR",
 				"conditions" => [

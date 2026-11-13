@@ -4,6 +4,8 @@ namespace go\core\orm;
 use DateInterval;
 use DateTimeZone;
 use Exception;
+use LogicException;
+use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\jmap\exception\UnsupportedFilter;
 use go\core\util\DateTime;
@@ -17,6 +19,11 @@ class Filters {
 	
 	
 	private $filters = [];
+
+	/**
+	 * Lower case name of the filter that was added last. Used by {@see describe()}.
+	 */
+	private ?string $lastAdded = null;
 
 
 	const NO_DEFAULT = '__NO_DEFAULT__';
@@ -50,6 +57,7 @@ class Filters {
 	public function add(string $name, callable $fn, $default = self::NO_DEFAULT): Filters
 	{
 		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn, 'default' => $default, 'name' => $name];
+		$this->lastAdded = strtolower($name);
 		
 		return $this;
 	}
@@ -67,10 +75,11 @@ class Filters {
 	 *
 	 * ```
 	 *
-	 * If the column is a date or datetime it will use {@link addDate())
+	 * If the column is a datetime it will use {@see addDateTime()} and for date or localdatetime {@see addDate()}
 	 *
 	 * @param string $name
 	 * @return $this
+	 * @throws \InvalidArgumentException When the column does not exist
 	 */
 	public function addColumn(string $name): Filters
 	{
@@ -81,15 +90,172 @@ class Filters {
 
 		$col = $cls::getMapping()->getColumn($name);
 
-		if(in_array($col->dbType, ["localdatetime", "datetime", "date"])) {
+		if(!$col) {
+			throw new \InvalidArgumentException("Column '$name' does not exist in " . $cls);
+		}
+
+		if($col->dbType == "datetime") {
+			// datetime columns are stored in UTC so the user's input must be converted
+			return $this->addDateTime($name, function (Criteria $c, $comparator, $value) use ($name) {
+				$c->andWhere($name, $comparator, $value);
+			});
+		} else if(in_array($col->dbType, ["localdatetime", "date"])) {
 			return $this->addDate($name, function (Criteria $c, $comparator, $value) use ($name) {
 				$c->andWhere($name, $comparator, $value);
 			});
 		} else {
-			return $this->add($name, function (Criteria $c, $value) use ($name) {
+			$this->add($name, function (Criteria $c, $value) use ($name) {
 				$c->andWhere($name, '=', $value);
 			});
+			$this->filters[strtolower($name)]['schema'] = self::columnSchema($col);
+			return $this;
 		}
+	}
+
+	/**
+	 * JSON schema for the value of a column filter. An array value is matched with IN and null with IS NULL.
+	 *
+	 * @param Column $col
+	 * @return array
+	 */
+	private static function columnSchema(Column $col): array
+	{
+		$type = $col->getJsonType() ?? 'string';
+
+		$single = ['type' => $col->nullAllowed ? [$type, 'null'] : $type];
+
+		return ['anyOf' => [$single, ['type' => 'array', 'items' => ['type' => $type]]]];
+	}
+
+	/**
+	 * Describe the filter that was added last. The description is used in the API documentation and in
+	 * {@see toJsonSchema()}.
+	 *
+	 * The description is not translated. It's developer documentation for API clients, so write it in English.
+	 *
+	 * @example
+	 * ```
+	 * $filters->add('addressBookId', function(Criteria $c, $value) {
+	 *   $c->andWhere('addressBookId', '=', $value);
+	 * })->describe("Only contacts in the given address book", ['type' => 'integer']);
+	 * ```
+	 *
+	 * @param string $description What the filter does and what the value means
+	 * @param array|null $schema JSON schema of the filter value. When null the schema derived from the filter type is kept.
+	 * @return $this
+	 * @throws LogicException When no filter was added yet
+	 */
+	public function describe(string $description, ?array $schema = null): Filters
+	{
+		if (!isset($this->lastAdded)) {
+			throw new LogicException("Add a filter before calling describe()");
+		}
+
+		$this->filters[$this->lastAdded]['description'] = $description;
+		if (isset($schema)) {
+			$this->filters[$this->lastAdded]['schema'] = $schema;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Get the JSON schema (draft 2020-12) of the "filter" argument of the Foo/query method.
+	 *
+	 * The filter is either a FilterCondition object with the filters below or a FilterOperator object
+	 * with "operator" and "conditions" as described in the JMAP spec. The definitions are in "$defs" and referenced
+	 * with "#/$defs/...". When embedding this schema in another schema, move "$defs" to the root of that schema.
+	 *
+	 * Each filter property has an "x-filterType" keyword with the filter type (generic, text, number, date or datetime).
+	 *
+	 * @link https://jmap.io/spec-core.html#query
+	 * @param bool $withTypeSyntax Append the value syntax of the filter type ({@see getTypeSyntax()}) to each description.
+	 *   Pass false when the syntax is documented once elsewhere.
+	 * @return array
+	 */
+	public function toJsonSchema(bool $withTypeSyntax = true): array
+	{
+		$properties = [];
+		foreach ($this->filters as $filter) {
+			$properties[$filter['name']] = $this->filterSchema($filter, $withTypeSyntax);
+		}
+		ksort($properties, SORT_STRING | SORT_FLAG_CASE);
+
+		return [
+			'$schema' => 'https://json-schema.org/draft/2020-12/schema',
+			'$ref' => '#/$defs/Filter',
+			'$defs' => [
+				'Filter' => [
+					'anyOf' => [
+						['$ref' => '#/$defs/FilterOperator'],
+						['$ref' => '#/$defs/FilterCondition']
+					]
+				],
+				'FilterOperator' => [
+					'type' => 'object',
+					'description' => 'Combines filters. NOT matches when none of the conditions match.',
+					'properties' => [
+						'operator' => ['enum' => ['AND', 'OR', 'NOT']],
+						'conditions' => ['type' => 'array', 'items' => ['$ref' => '#/$defs/Filter']]
+					],
+					'required' => ['operator', 'conditions'],
+					'additionalProperties' => false
+				],
+				'FilterCondition' => [
+					'type' => 'object',
+					'description' => 'All given filters must match. Filter names are case insensitive.',
+					'properties' => (object) $properties,
+					'additionalProperties' => false
+				]
+			]
+		];
+	}
+
+	/**
+	 * Get the value syntax per filter type: text, number, date and datetime. Generic filters have no fixed syntax.
+	 *
+	 * @return array<string, string> Filter type => syntax description
+	 */
+	public static function getTypeSyntax(): array
+	{
+		$date = 'A date with an optional comparator (>, >=, <, <=) or a range "2025-01-01..2025-01-31". ' .
+			'Relative dates like "now" and "-1 week" are supported. A date without time in a range end includes that whole day.';
+
+		return [
+			'text' => 'Matched with SQL LIKE, use % as wildcard. An array matches any of the values.',
+			'number' => 'A number with an optional comparator (>, >=, <, <=, !=) or a range "1..10".',
+			'date' => $date,
+			'datetime' => $date . ' Times are in the time zone of the user.'
+		];
+	}
+
+	/**
+	 * JSON schema of a single filter value
+	 */
+	private function filterSchema(array $filter, bool $withTypeSyntax): array
+	{
+		$typeSchema = match ($filter['type']) {
+			'text' => ['anyOf' => [['type' => 'string'], ['type' => 'array', 'items' => ['type' => 'string']]]],
+			'number' => ['type' => ['number', 'string']],
+			'date', 'datetime' => ['type' => ['string', 'null']],
+			default => []
+		};
+
+		$schema = $filter['schema'] ?? $typeSchema;
+
+		$syntax = $withTypeSyntax ? (self::getTypeSyntax()[$filter['type']] ?? '') : '';
+		$description = trim(($filter['description'] ?? '') . ' ' . $syntax);
+		if ($description !== '') {
+			$schema['description'] = $description;
+		}
+
+		if ($filter['default'] !== self::NO_DEFAULT && (is_scalar($filter['default']) || is_array($filter['default']) || $filter['default'] === null)) {
+			$schema['default'] = $filter['default'];
+		}
+
+		$schema['x-filterType'] = $filter['type'];
+
+		return $schema;
 	}
 
 
@@ -271,6 +437,7 @@ class Filters {
 	public function addNumber(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
 	{
 		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn, 'default' => $default, 'name' => $name];
+		$this->lastAdded = strtolower($name);
 		
 		return $this;
 	}	
@@ -300,6 +467,7 @@ class Filters {
 	public function addDateTime(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
 	{
 		$this->filters[strtolower($name)] = ['type' => 'datetime', 'fn' => $fn, 'default' => $default, 'name' => $name];
+		$this->lastAdded = strtolower($name);
 
 		return $this;
 	}
@@ -330,6 +498,7 @@ class Filters {
 	public function addDate(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
 	{
 		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default, 'name' => $name];
+		$this->lastAdded = strtolower($name);
 
 		return $this;
 	}
@@ -348,6 +517,7 @@ class Filters {
 	public function addText(string $name, Callable $fn, $default = self::NO_DEFAULT): Filters
 	{
 		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn, 'default' => $default, 'name' => $name];
+		$this->lastAdded = strtolower($name);
 		
 		return $this;
 	}

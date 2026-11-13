@@ -381,4 +381,7 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Server' => 'Server',
   'Display linked tasks in messages list' => 'Verlinkte Aufgaben in der Nachrichtenliste anzeigen',
   'Failed to process invitation' => 'Fehler bei der Verarbeitung der Einladung',
+  'Message could not be saved because the \'Drafts\' folder is disabled.\\n\\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.' => 'Die Nachricht konnte nicht gespeichert werden, da der Ordner \'Entwürfe\' deaktiviert ist.\\n\\nGehen Sie zu E-Mail -> Administration -> Konten -> Doppelklick auf das Konto -> Ordner, um ihn zu konfigurieren.',
+  'Unsubscribe href' => 'Abmelde-href',
+  'Unsubscribe link' => 'Abmeldelink',
 );

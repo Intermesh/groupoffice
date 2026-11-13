@@ -866,7 +866,6 @@ return array (
   'is greater than or equal' => 'yra didesnis arba lygus',
   'is less than' => 'yra mažiau nei',
   'is less than or equal' => 'yra mažesnis arba lygus',
-  'Emtpy' => 'Emtpy',
   'Not set' => 'Nenustatytas',
   'is before, today plus' => 'yra anksčiau, šiandien plius',
   'is after, today plus' => 'yra po, šiandien plius',
@@ -1231,4 +1230,6 @@ return array (
   'Select files' => 'Pasirinkite dokumentai',
   'Authorized users' => 'Įgalioti vartotojai',
   'Authorized groups' => 'Įgaliotos grupės',
+  'Attach files by dropping or pasting them' => 'Pridėkite dokumentus vilkdami arba įklijuodami juos čia.',
+  'The minimum length for this field is {min}' => 'Minimalus šio lauko ilgis yra {min}',
 );

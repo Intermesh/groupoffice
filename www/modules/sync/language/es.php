@@ -29,4 +29,14 @@ return array (
   'Allow delete via synchronization' => 'Permitir borrar a través de la sincronización',
   'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'Por defecto, los dispositivos no pueden borrar elementos. Esto se añadió debido a un error en Android 12 que eliminaba contactos después de una actualización.',
   'Tasklists' => 'Listas de tareas',
+  '** 2-Factor authentication **' => '** Autenticación de 2 factores **',
+  '2fa-body' => 'Hola:
+
+Inicie sesión en {product_name} para completar la configuración de su cuenta en:
+
+{URL}
+
+Atentamente,
+
+{TITLE}',
 );

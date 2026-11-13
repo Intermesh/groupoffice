@@ -144,4 +144,38 @@ class RouterTest extends TestCase
 			}
 		}
 	}
+
+	public function testEntityControllerClass(): void
+	{
+		$this->assertEquals(
+			\go\modules\community\notes\controller\Note::class,
+			Router::entityControllerClass(\go\modules\community\notes\model\Note::entityType())
+		);
+	}
+
+	public function testGetEntityMethods(): void
+	{
+		$methods = Router::getEntityMethods(\go\modules\community\notes\model\Note::entityType());
+
+		foreach (['get', 'query', 'set', 'changes'] as $method) {
+			$this->assertArrayHasKey($method, $methods);
+		}
+		$this->assertEquals(Router::STANDARD_METHODS['get'], $methods['get']);
+
+		// Constructors, static and non public methods can't be called through JMAP
+		$this->assertArrayNotHasKey('__construct', $methods);
+		$this->assertArrayNotHasKey('onEntitySave', $methods);
+		$this->assertArrayNotHasKey('canDestroy', $methods);
+	}
+
+	public function testListedMethodsAreRoutable(): void
+	{
+		$type = \go\modules\community\notes\model\Note::entityType();
+		$controller = Router::entityControllerClass($type);
+
+		$this->assertTrue(Router::isRoutableController($controller));
+		foreach (array_keys(Router::getEntityMethods($type)) as $method) {
+			$this->assertTrue((new \ReflectionMethod($controller, $method))->isPublic(), $method);
+		}
+	}
 }

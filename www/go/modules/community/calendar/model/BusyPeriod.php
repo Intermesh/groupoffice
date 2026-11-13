@@ -88,7 +88,7 @@ class BusyPeriod {
 		$list = [];
 		foreach($stmt as $period) {
 			if((!empty($period->ownerId) && $period->ownerId == $ownerId && empty($period->groupId)) || // my calendar
-				!empty($event->participantId) || // participating
+				!empty($period->participantId) || // participating
 				$calendarId == $period->calendarId // resource
 			) {
 				if(!empty($period->recurrenceRule)) {
@@ -102,10 +102,11 @@ class BusyPeriod {
 		}
 		//ksort($list);
 
-		return [
-			'sql' => (string)$stmt,
-			'list' => array_values($list)
-		];
+		$response = ['list' => array_values($list)];
+		if (go()->getDebugger()->enabled) {
+			$response['sql'] = (string) $stmt;
+		}
+		return $response;
 	}
 
 	static function expand($p, string $from, string $until) {

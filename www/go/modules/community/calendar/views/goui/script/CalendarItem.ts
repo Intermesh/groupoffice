@@ -95,6 +95,12 @@ export class CalendarItem {
 
 	static clipboard?: CalendarItem;
 
+	/** User preference to show events in their category color. Set by Main. */
+	static showCategoryColor = false;
+
+	/** The number of calendars currently shown. Set by Main. */
+	static visibleCalendarCount = 0;
+
 	/**
 	 * Provider index type
 	 * eg. "event", "birthday", "task" etc.
@@ -273,8 +279,31 @@ export class CalendarItem {
 		return this.calendarPrincipal?.participationStatus === 'needs-action' && !this.isOwner;
 	}
 
-	get color() {
+	/**
+	 * The color of the calendar this item is in
+	 */
+	get calendarColor() {
 		return this.cal?.color || this.defaultColor || '356772';
+	}
+
+	/**
+	 * The color to display the item in. This is the calendar color, unless the user enabled "showCategoryColor",
+	 * exactly one calendar is visible and the event has exactly one category.
+	 */
+	get color() {
+		return this.categoryColor ?? this.calendarColor;
+	}
+
+	private get categoryColor(): string | undefined {
+		if(!CalendarItem.showCategoryColor || CalendarItem.visibleCalendarCount !== 1 || this.provider !== 'event') {
+			return undefined;
+		}
+		// count the ids, not the resolved categories. Not every category might be loaded.
+		const ids = this.patched.categoryIds;
+		if(!ids || ids.length !== 1) {
+			return undefined;
+		}
+		return this.categories.find(c => c.id == ids[0])?.color || undefined;
 	}
 
 	get participants() {

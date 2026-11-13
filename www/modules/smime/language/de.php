@@ -47,4 +47,11 @@ return array (
   'valid' => 'gültig',
   'since' => 'seit',
   'Certificate' => 'Zertifikat',
+  'Could not read p12 file:' => 'p12-Datei konnte nicht gelesen werden:',
+  'No OCSP URI found' => 'Keine OCSP-URI gefunden',
+  'No issuer URI found' => 'Keine Aussteller-URI gefunden',
+  'The SMIME password was incorrect.' => 'Das SMIME-Kennwort war falsch.',
+  'The certificate has been revoked!' => 'Das Zertifikat wurde widerrufen!',
+  'The certificate must be in PEM format' => 'Das Zertifikat muss im PEM-Format vorliegen',
+  'This certificate already exists' => 'Dieses Zertifikat existiert bereits',
 );

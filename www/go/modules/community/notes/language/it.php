@@ -29,4 +29,7 @@ return array (
   'Cannot decrypt' => 'Non riesco a decifrare',
   'Encrypt' => 'Cifra',
   'Passwords do not match' => 'le password non corrispondono',
+  'Switch between HTML and Markdown editor' => 'Passa dall\'editor HTML a Markdown e viceversa',
+  'Switching the editor will clear the content. Are you sure?' => 'Cambiando editor il contenuto verrà cancellato. Sei sicuro?',
+  'Default editor for new notes' => 'Editor predefinito per le nuove note',
 );

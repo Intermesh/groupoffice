@@ -5,4 +5,5 @@ return array (
     'data-target="#\'+e.id+\'"' => '[data- toggle = "sbalit"] [href = "# \'+ e.id +\'"], [data- toggle = "sbalit"] [data- target = "# \'+ e.id +\'"]',
   ),
   'body' => 'tělo',
+  'PDF editor' => 'PDF editor',
 );

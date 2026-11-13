@@ -134,8 +134,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$store->addRecord(array(
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
-			'name' => \GO::t("None", "legacy", "email"),
-			'text' => \GO::t("None", "legacy", "email"),
+			'name' => \GO::t("None", "email"),
+			'text' => \GO::t("None", "email"),
 			'template_id'=>0
 		));
 

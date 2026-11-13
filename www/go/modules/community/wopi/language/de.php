@@ -8,4 +8,5 @@ return array (
   'Service' => 'Dienst',
   'WOPI client URI' => 'WOPI-Client-URI',
   'Office Online' => 'Office Online',
+  'Libre Office Online' => 'Libre Office Online',
 );
