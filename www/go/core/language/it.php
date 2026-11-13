@@ -1574,7 +1574,7 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
   'at the' => 'al',
   'Each working day' => 'Ogni giorno lavorativo',
   'Customize' => 'Personalizza ricorrenza',
-  'first' => 'primo giorno d',
+  'first' => 'primo',
   'second' => 'secondo',
   'third' => 'terzo',
   'fourth' => 'quarto',
