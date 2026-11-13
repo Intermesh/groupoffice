@@ -1,4 +1,5 @@
 - Security: this release fixes a large number of security issues that were found in an extensive security review. Some were critical. We advise everyone to update. Please check the points below after updating.
+- Projects2: Fixed invalid access denied message for expenses, income and budgets
 
 12-11-2026: 25.0.117
 - Files: Security: after Group-Office looked up a folder path that doesn't exist, it ignored all permissions for the rest of that request. A request that first named a non-existing path could then read or change items the user has no access to, if the same request checked permissions afterwards. Permissions are now always checked again after the lookup. No configuration changes are needed.
