@@ -174,6 +174,11 @@ try {
 		}
 	}
 
+	// The install runs in Dutch, so the translated install is tested too, but the tests check English messages. Tests that
+	// act as the admin would otherwise switch the language to Dutch for the tests after them.
+	go()->getDbConnection()->update('core_user', ['language' => 'en'], ['id' => User::ID_SUPER_ADMIN])->execute();
+	go()->getLanguage()->setLanguage('en');
+
 	go()->rebuildCache();
 
 	go()->setAuthState(new State());
