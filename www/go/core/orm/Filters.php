@@ -7,6 +7,7 @@ use Exception;
 use LogicException;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\UnsupportedFilter;
 use go\core\util\DateTime;
 
@@ -303,6 +304,8 @@ class Filters {
 	 */
 	public function apply(Query $query, array $filter) :Filters {
 
+		$this->checkValues($query, $filter);
+
 		$criteria = new Criteria();
 		$this->internalApply($query, $filter, $criteria);
 
@@ -314,6 +317,127 @@ class Filters {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Check the given filter values against the schema of the filter, set with {@see describe()} or {@see addColumn()}.
+	 *
+	 * Only the types are checked, leniently: an integer may be a string of digits (JMAP IDs are strings), a string
+	 * may be a number and null is always allowed. "enum" isn't enforced. Filters without a schema and the defaults
+	 * of filters aren't checked.
+	 *
+	 * @param Query $query
+	 * @param array $filter A FilterCondition or a FilterOperator
+	 * @throws InvalidArguments When a value doesn't match the schema of its filter
+	 */
+	private function checkValues(Query $query, array $filter): void
+	{
+		if (isset($filter['conditions']) && isset($filter['operator'])) {
+			foreach ($filter['conditions'] as $condition) {
+				if (is_array($condition)) {
+					$this->checkValues($query, $condition);
+				}
+			}
+			return;
+		}
+
+		foreach ($filter as $name => $value) {
+			$config = $this->filters[strtolower($name)] ?? null;
+			if (!isset($config['schema']) || $value === null) {
+				continue;
+			}
+
+			if (!self::matchesSchema($value, $config['schema'])) {
+				throw new InvalidArguments("Invalid value for filter '" . $config['name'] . "' of entity '" .
+					$query->getModel()::entityType()->getName() . "'. Expected: " . json_encode(self::stripDescriptions($config['schema'])));
+			}
+		}
+	}
+
+	/**
+	 * Whether a value matches a JSON schema. Supports "anyOf", "type", "items", "properties" and "required".
+	 * Other keywords are ignored.
+	 */
+	private static function matchesSchema(mixed $value, array $schema): bool
+	{
+		if (isset($schema['anyOf'])) {
+			foreach ($schema['anyOf'] as $sub) {
+				if (self::matchesSchema($value, $sub)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		if (isset($schema['type'])) {
+			$matchesType = false;
+			foreach ((array) $schema['type'] as $type) {
+				if (self::matchesType($value, $type)) {
+					$matchesType = true;
+					break;
+				}
+			}
+			if (!$matchesType) {
+				return false;
+			}
+		}
+
+		if (!is_array($value)) {
+			return true;
+		}
+
+		if (isset($schema['items']) && array_is_list($value)) {
+			foreach ($value as $item) {
+				if (!self::matchesSchema($item, $schema['items'])) {
+					return false;
+				}
+			}
+		}
+
+		foreach ($schema['required'] ?? [] as $key) {
+			if (!array_key_exists($key, $value)) {
+				return false;
+			}
+		}
+
+		foreach ($schema['properties'] ?? [] as $key => $sub) {
+			if (isset($value[$key]) && !self::matchesSchema($value[$key], $sub)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Whether a value matches a JSON type, leniently: values a JSON client sends for that type also match
+	 */
+	private static function matchesType(mixed $value, string $type): bool
+	{
+		return match ($type) {
+			'null' => $value === null,
+			'integer' => is_int($value) || (is_string($value) && preg_match('/^-?\d+$/', $value) === 1),
+			'number' => is_int($value) || is_float($value) || (is_string($value) && is_numeric($value)),
+			'string' => is_string($value) || is_int($value) || is_float($value),
+			'boolean' => is_bool($value) || in_array($value, [0, 1, '0', '1'], true),
+			'array' => is_array($value) && array_is_list($value),
+			'object' => is_array($value) && ($value === [] || !array_is_list($value)),
+			default => true
+		};
+	}
+
+	/**
+	 * The schema without descriptions, for error messages
+	 */
+	private static function stripDescriptions(array $schema): array
+	{
+		unset($schema['description']);
+		foreach ($schema as $key => $sub) {
+			if (is_array($sub)) {
+				$schema[$key] = self::stripDescriptions($sub);
+			}
+		}
+		return $schema;
 	}
 
 	/**

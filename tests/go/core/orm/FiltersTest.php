@@ -315,6 +315,72 @@ class FiltersTest extends TestCase
 		$this->assertEquals('integer', $props['id']['anyOf'][0]['type']);
 	}
 
+	public static function filterValueProvider(): array
+	{
+		$int = ['type' => 'integer'];
+		$intOrList = ['anyOf' => [['type' => 'integer'], ['type' => 'array', 'items' => ['type' => 'integer']]]];
+		$link = [
+			'type' => 'object',
+			'properties' => ['entity' => ['type' => 'string'], 'id' => ['type' => 'integer']],
+			'required' => ['entity']
+		];
+
+		return [
+			'integer' => [$int, 1, true],
+			'integer as string, as JMAP IDs are' => [$int, "1", true],
+			'boolean is not an integer' => [$int, true, false],
+			'text is not an integer' => [$int, "abc", false],
+			'null is always allowed' => [$int, null, true],
+			'anyOf first branch' => [$intOrList, 2, true],
+			'anyOf second branch' => [$intOrList, [1, "2"], true],
+			'boolean in a list of integers' => [$intOrList, [1, true], false],
+			'string may be a number' => [['type' => 'string'], 12, true],
+			'boolean as 0 or 1' => [['type' => 'boolean'], 1, true],
+			'enum is not enforced' => [['type' => 'integer', 'enum' => [10, 20]], 5, true],
+			'object' => [$link, ['entity' => 'Contact', 'id' => "3"], true],
+			'object without required key' => [$link, ['id' => 3], false],
+			'object with invalid property' => [$link, ['entity' => 'Contact', 'id' => true], false],
+			'string is not an object' => [$link, 'Contact', false],
+			'no schema accepts anything' => [null, true, true],
+		];
+	}
+
+	#[DataProvider('filterValueProvider')]
+	public function testFilterValueIsCheckedAgainstSchema(?array $schema, mixed $value, bool $valid): void
+	{
+		$filters = (new Filters(A::class))->add('foo', function () {});
+		if (isset($schema)) {
+			$filters->describe("Foo", $schema);
+		}
+
+		if (!$valid) {
+			$this->expectException(InvalidArguments::class);
+		}
+
+		$filters->apply(A::find(), ['foo' => $value]);
+		$this->addToAssertionCount(1);
+	}
+
+	public function testFilterValueIsCheckedInsideOperator(): void
+	{
+		$filters = (new Filters(A::class))
+			->add('foo', function () {})
+			->describe("Foo", ['type' => 'integer']);
+
+		$this->expectException(InvalidArguments::class);
+		$filters->apply(A::find(), ['operator' => 'OR', 'conditions' => [['foo' => 1], ['foo' => true]]]);
+	}
+
+	public function testDefaultIsNotChecked(): void
+	{
+		$filters = (new Filters(A::class))
+			->add('foo', function () {}, true)
+			->describe("Foo", ['type' => 'integer']);
+
+		$filters->apply(A::find(), []);
+		$this->addToAssertionCount(1);
+	}
+
 	public function testToJsonSchemaForAllEntities(): void
 	{
 		foreach (EntityType::findAll() as $type) {
