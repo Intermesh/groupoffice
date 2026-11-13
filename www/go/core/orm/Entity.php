@@ -452,21 +452,8 @@ abstract class Entity extends Property {
 	 */
 	protected function internalSave(): bool
 	{
-		if (property_exists($this, 'filesFolderId') && count($this->attachments)) {
-			$folder = Folder::model()->findForEntity($this, false);
-			if (!isset($this->filesFolderId)) {
-				$this->filesFolderId = $folder->id;
-			}
-			foreach ($this->attachments as $attachment) {
-				$b = Blob::findById($attachment['blobId']);
-				if (!$b) {
-					throw new Exception("No blob found");
-				}
-				$dest = go()->getDataFolder()->getFile($folder->path . '/' . $b->name);
-				$dest->appendNumberToNameIfExists();
-				$f = $b->getFile();
-				$f->copy($dest);
-			}
+		if (count($this->attachments) && !$this->saveAttachments()) {
+			return false;
 		}
 
 
@@ -1689,6 +1676,79 @@ abstract class Entity extends Property {
 	public function setAttachments(array $attachments)
 	{
 		$this->attachments = $attachments;
+	}
+
+	/**
+	 * Add the blobs set with {@see setAttachments()} to the files folder of this entity
+	 *
+	 * The files module adds them, so they get a database record. All attachments are checked for a valid name, write
+	 * permission on the folder and the quota before any file is added: a file on disk isn't removed when the
+	 * transaction of the save is rolled back. A failure is set as a validation error on "attachments".
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function saveAttachments(): bool
+	{
+		if (!property_exists($this, 'filesFolderId')) {
+			return true;
+		}
+
+		$blobs = [];
+		$size = 0;
+		foreach ($this->attachments as $attachment) {
+			$blob = isset($attachment['blobId']) ? Blob::findById($attachment['blobId']) : null;
+			if (!$blob) {
+				$this->setValidationError('attachments', ErrorCode::NOT_FOUND, "Blob not found");
+				return false;
+			}
+			if (!\go\core\fs\FileSystemObject::isValidName((string) $blob->name)) {
+				$this->setValidationError('attachments', ErrorCode::INVALID_INPUT, "Invalid file name");
+				return false;
+			}
+			$blobs[] = $blob;
+			$size += $blob->size;
+		}
+
+		$folder = Folder::model()->findForEntity($this, false);
+		if (!isset($this->filesFolderId)) {
+			$this->filesFolderId = $folder->id;
+		}
+
+		if (!$folder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			$this->setValidationError('attachments', ErrorCode::FORBIDDEN, "No write permission on the files folder");
+			return false;
+		}
+
+		if (!\GO\Files\Model\File::checkQuota($size)) {
+			$this->setValidationError('attachments', ErrorCode::INVALID_INPUT, "Not enough disk space");
+			return false;
+		}
+
+		foreach ($blobs as $blob) {
+			// A copy, because the files module moves the file into the folder. The move changes the path of $tmp, so
+			// the temporary path is kept to clean up when the move failed.
+			$tmp = \GO\Base\Fs\File::tempFile();
+			$tmpPath = $tmp->path();
+			try {
+				$blob->getFile()->copy(new \go\core\fs\File($tmp->path()));
+				$folder->addFilesystemFile($tmp, true, $blob->name);
+			} catch (\GO\Base\Exception\AccessDenied $e) {
+				$this->setValidationError('attachments', ErrorCode::FORBIDDEN, $e->getMessage());
+				return false;
+			} catch (\GO\Base\Exception\InsufficientDiskspace|InvalidArgumentException $e) {
+				$this->setValidationError('attachments', ErrorCode::INVALID_INPUT, $e->getMessage());
+				return false;
+			} finally {
+				if (is_file($tmpPath)) {
+					unlink($tmpPath);
+				}
+			}
+		}
+
+		$this->attachments = [];
+
+		return true;
 	}
 	
 }
