@@ -39,6 +39,16 @@ final class ClientRegistration
 	const MAX_REGISTRATIONS_PER_HOUR = 10;
 
 	/**
+	 * A document that couldn't be fetched or was invalid isn't fetched again for this many seconds
+	 */
+	const FAILED_FETCH_TTL = 600;
+
+	/**
+	 * Maximum number of metadata documents fetched per IP address per hour
+	 */
+	const MAX_FETCHES_PER_HOUR = 30;
+
+	/**
 	 * Fetches a metadata document: fn(string $url): array. For tests, which may not call external services.
 	 *
 	 * @var callable|null
@@ -101,7 +111,9 @@ final class ClientRegistration
 			&& ($parts['scheme'] ?? '') === 'https'
 			&& !empty($parts['host'])
 			&& !empty($parts['path']) && $parts['path'] !== '/'
-			&& !isset($parts['fragment'], $parts['user'], $parts['pass'])
+			&& !isset($parts['fragment']) && !isset($parts['user']) && !isset($parts['pass'])
+			// Only the HTTPS port, so it can't be used to probe other services
+			&& (!isset($parts['port']) || $parts['port'] === 443)
 			// The identifier column holds 128 characters
 			&& strlen($clientId) <= 128;
 	}
@@ -121,6 +133,11 @@ final class ClientRegistration
 			return $existing;
 		}
 
+		$failedKey = 'oauth-metadata-failed-' . sha1($url);
+		if (go()->getCache()->get($failedKey)) {
+			return null;
+		}
+
 		try {
 			$document = self::fetch($url);
 
@@ -134,6 +151,8 @@ final class ClientRegistration
 			}
 		} catch (Exception $e) {
 			go()->debug("Invalid client ID metadata document " . $url . ": " . $e->getMessage());
+			// Not fetched on every authorization request
+			go()->getCache()->set($failedKey, true, true, self::FAILED_FETCH_TTL);
 			return null;
 		}
 
@@ -166,6 +185,9 @@ final class ClientRegistration
 		if (isset(self::$fetcher)) {
 			$document = (self::$fetcher)($url);
 		} else {
+			if (!self::mayFetch(\go\core\http\Request::get()->getRemoteIpAddress())) {
+				throw new Exception('Too many metadata documents fetched for this address');
+			}
 			$response = self::httpClient()->get($url);
 			if ($response['status'] !== 200) {
 				throw new Exception('HTTP status ' . $response['status']);
@@ -237,9 +259,22 @@ final class ClientRegistration
 	 */
 	public static function mayRegister(?string $ip): bool
 	{
-		$key = 'oauth-registrations-' . sha1((string) $ip) . '-' . date('YmdH');
+		return self::count('oauth-registrations', $ip, self::MAX_REGISTRATIONS_PER_HOUR);
+	}
+
+	/**
+	 * Whether this IP address may make the server fetch another metadata document. Counts the fetch.
+	 */
+	public static function mayFetch(?string $ip): bool
+	{
+		return self::count('oauth-metadata-fetches', $ip, self::MAX_FETCHES_PER_HOUR);
+	}
+
+	private static function count(string $name, ?string $ip, int $max): bool
+	{
+		$key = $name . '-' . sha1((string) $ip) . '-' . date('YmdH');
 		$count = (int) go()->getCache()->get($key);
-		if ($count >= self::MAX_REGISTRATIONS_PER_HOUR) {
+		if ($count >= $max) {
 			return false;
 		}
 		go()->getCache()->set($key, $count + 1, true, 3600);

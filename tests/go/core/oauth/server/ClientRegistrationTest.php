@@ -28,6 +28,12 @@ class ClientRegistrationTest extends TestCase
 	protected function setUp(): void
 	{
 		$this->fetches = 0;
+		$this->forgetFailedFetch();
+	}
+
+	private function forgetFailedFetch(): void
+	{
+		go()->getCache()->delete('oauth-metadata-failed-' . sha1(self::DOCUMENT_URL));
 	}
 
 	protected function tearDown(): void
@@ -137,11 +143,27 @@ class ClientRegistrationTest extends TestCase
 		$this->serveDocument(['client_id' => 'https://other.example.com/client.json'] + $this->validDocument());
 		$this->assertNull((new ClientRepository())->getClientEntity(self::DOCUMENT_URL), 'a document about another client');
 
+		$this->forgetFailedFetch();
 		$this->serveDocument(['redirect_uris' => ['http://evil.example.com/cb']] + $this->validDocument());
 		$this->assertNull((new ClientRepository())->getClientEntity(self::DOCUMENT_URL), 'a redirect over plain HTTP');
 
 		$this->assertFalse(ClientRegistration::isMetadataUrl('http://assistant.example.com/client.json'));
 		$this->assertFalse(ClientRegistration::isMetadataUrl('https://assistant.example.com'));
+		$this->assertFalse(ClientRegistration::isMetadataUrl('https://assistant.example.com:8443/client.json'), 'another port');
+		$this->assertFalse(ClientRegistration::isMetadataUrl('https://user@assistant.example.com/client.json'), 'credentials');
+		$this->assertFalse(ClientRegistration::isMetadataUrl('https://assistant.example.com/client.json#x'), 'fragment');
+		$this->assertTrue(ClientRegistration::isMetadataUrl('https://assistant.example.com:443/client.json'));
+	}
+
+	public function testFailedDocumentIsNotFetchedAgainSoon(): void
+	{
+		$this->allowRegistration();
+		$this->serveDocument(['client_id' => 'https://other.example.com/client.json'] + $this->validDocument());
+
+		(new ClientRepository())->getClientEntity(self::DOCUMENT_URL);
+		(new ClientRepository())->getClientEntity(self::DOCUMENT_URL);
+
+		$this->assertSame(1, $this->fetches);
 	}
 
 	/**
@@ -199,12 +221,17 @@ class ClientRegistrationTest extends TestCase
 		$this->assertNull((new ClientRepository())->getClientEntity($response['client_id']));
 	}
 
-	public function testRegistrationsAreLimitedPerAddress(): void
+	public function testRegistrationsAndFetchesAreLimitedPerAddress(): void
 	{
 		$ip = '198.51.100.' . random_int(1, 254) . '-' . uniqid();
 		for ($i = 0; $i < ClientRegistration::MAX_REGISTRATIONS_PER_HOUR; $i++) {
 			$this->assertTrue(ClientRegistration::mayRegister($ip));
 		}
 		$this->assertFalse(ClientRegistration::mayRegister($ip));
+
+		for ($i = 0; $i < ClientRegistration::MAX_FETCHES_PER_HOUR; $i++) {
+			$this->assertTrue(ClientRegistration::mayFetch($ip));
+		}
+		$this->assertFalse(ClientRegistration::mayFetch($ip));
 	}
 }

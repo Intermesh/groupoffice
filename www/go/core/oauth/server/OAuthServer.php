@@ -119,8 +119,8 @@ final class OAuthServer
 	/**
 	 * Check the "resource" parameter of an authorization or token request (RFC 8707)
 	 *
-	 * A token of a module scope is only for the resource server of that scope, like the MCP server. A request for
-	 * another resource is refused, so a token can't be issued for a server that isn't ours.
+	 * A token of a module scope is only for the resource servers of the module scopes, like the MCP server. A request
+	 * for another resource is refused, so a token can't be issued for a server that isn't ours.
 	 *
 	 * @param mixed $resource The "resource" parameter of the request
 	 * @throws OAuthServerException "invalid_target" when the resource is unknown
