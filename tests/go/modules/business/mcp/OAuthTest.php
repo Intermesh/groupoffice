@@ -285,4 +285,19 @@ class OAuthTest extends TestCase
 		$this->assertSame($first->id, $second->id);
 		$this->assertNull($second->getToken(), 'A key of an OAuth client has no secret');
 	}
+
+	public function testGrantWithWriteAccess(): void
+	{
+		go()->setAuthState(new TemporaryState(self::$mcpUser->id));
+		$note = (string) Note::entityType()->getId();
+		$book = (string) \go\modules\community\notes\model\NoteBook::entityType()->getId();
+
+		$key = OAuth::grant(self::$client, (int) self::$mcpUser->id, [['entityTypeId' => $note, 'mayWrite' => true], ['entityTypeId' => $book, 'mayWrite' => false]]);
+		$mayWrite = array_column(array_map(fn($e) => ['id' => $e->entityTypeId, 'w' => $e->mayWrite], $key->entities), 'w', 'id');
+		$this->assertSame([$note => true, $book => false], $mayWrite);
+
+		// Plain IDs give read access
+		$key = OAuth::grant(self::$client, (int) self::$mcpUser->id, [$note]);
+		$this->assertFalse($key->entities[0]->mayWrite);
+	}
 }
