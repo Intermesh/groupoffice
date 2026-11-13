@@ -23,7 +23,7 @@ We are migrating away from legacy code. When writing new code or changing existi
 
 ## Running tests
 
-Run phpunit as `www-data`, never as root. Use `tools/phpunit groupoffice <path>` from the docker-groupoffice-development checkout or `docker compose exec -u www-data groupoffice ...`. Running as root creates root-owned files in `/tmp/phpunit`, `/tmp/groupoffice` and `/var/lib/groupoffice` and breaks the tooling. Tests live in `tests/` (`/usr/local/share/src/tests` in the container).
+Run phpunit as `www-data`, never as root. Use `tools/phpunit <path>` from the docker-groupoffice-development checkout (it runs as `www-data`; `-c <service>` picks another container than `groupoffice`, `-m install|upgrade|existing` the mode, default `install`, and `existing` runs against the existing database with Xdebug) or `docker compose exec -u www-data groupoffice ...`. Running as root creates root-owned files in `/tmp/phpunit`, `/tmp/groupoffice` and `/var/lib/groupoffice` and breaks the tooling. Tests live in `tests/` (`/usr/local/share/src/tests` in the container).
 
 ## Environment
 
@@ -78,7 +78,7 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - For ORM and JMAP behaviour, follow `tests/go/core/orm/EntityTest.php` and `tests/go/core/jmap/`. Test entities live in the `community/test` module.
 - Suggest creating tests when they will benefit security and stability of the system
 - Leave the database as you found it: delete the entities you create.
-- Run a single test: `tools/phpunit groupoffice <path>` (see "Running tests").
+- Run a single test: `tools/phpunit <path>` (see "Running tests").
 
 ## Converting ExtJS 3.4 to GOUI
 
