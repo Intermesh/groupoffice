@@ -6,7 +6,6 @@ use go\core\ErrorHandler;
 use go\core\http\Router;
 use go\core\jmap\State;
 use go\core\model\OauthUser;
-use go\core\oauth\server\repositories;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Stream;
@@ -89,36 +88,7 @@ class OAuthController {
 	 */
 	public function userinfo(): ResponseInterface
 	{
-		$request = ServerRequest::fromGlobals();
-		$response = new Response();
-
-		$server = OAuthServer::resourceServer();
-
-		try {
-			$request = $server->validateAuthenticatedRequest($request);
-		} catch (OAuthServerException $exception) {
-			ErrorHandler::logException($exception);
-			return $exception->generateHttpResponse($response);
-		} catch (Exception $exception) {
-			ErrorHandler::logException($exception);
-			return (new OAuthServerException($exception->getMessage(), 0, 'unknown_error', 500))
-				->generateHttpResponse($response);
-		}
-
-		$userId = $request->getAttribute("oauth_user_id");
-
-		$userRepository = new repositories\UserRepository();
-		$userEntity = $userRepository->getUserEntityByIdentifier($userId);
-
-		$data = $userEntity->getClaims();
-		$data['sub'] = $userEntity->getIdentifier();
-
-		$response->getBody()->write(json_encode($data));
-		return $response
-			->withStatus(200)
-			->withHeader('pragma', 'no-cache')
-			->withHeader('cache-control', 'no-store')
-			->withHeader('content-type', 'application/json; charset=UTF-8');
+		return OAuthServer::userInfo(ServerRequest::fromGlobals(), OAuthServer::resourceServer());
 	}
 
 	/**
@@ -133,6 +103,7 @@ class OAuthController {
 		$response = new Response();
 
 		try {
+			OAuthServer::validateResource($request->getParsedBody()['resource'] ?? null);
 			return $server->respondToAccessTokenRequest($request, $response);
 		} catch (OAuthServerException $exception) {
 			ErrorHandler::logException($exception);

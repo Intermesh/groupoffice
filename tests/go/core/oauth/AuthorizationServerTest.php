@@ -29,6 +29,18 @@ class AuthorizationServerTest extends TestCase
 	private static ?OauthClient $publicClient = null;
 
 	private array $userIds = [];
+	private ?\go\core\fs\File $publicKeyFile = null;
+
+	const MODULE_SCOPE = 'testscope';
+	const MODULE_RESOURCE = 'https://localhost/api/page.php/test/resource';
+
+	/**
+	 * Listener that adds a scope like a module does
+	 */
+	public static function addModuleScope(\go\core\util\ArrayObject $scopes): void
+	{
+		$scopes[self::MODULE_SCOPE] = ['description' => 'Test scope', 'resource' => self::MODULE_RESOURCE];
+	}
 	private ?string $httpHost = null;
 
 	public static function setUpBeforeClass(): void
@@ -79,6 +91,9 @@ class AuthorizationServerTest extends TestCase
 		foreach ($this->userIds as $id) {
 			User::delete(['id' => $id]);
 		}
+
+		$this->publicKeyFile?->delete();
+		\go\core\event\Listeners::get()->clear();
 	}
 
 	private function newUser(): User
@@ -104,8 +119,14 @@ class AuthorizationServerTest extends TestCase
 	{
 		$keyFile = go()->getTmpFolder()->getFile(uniqid('oauth-test-key') . '.pem');
 		$keyFile->getFolder()->create();
-		$this->assertTrue(openssl_pkey_export_to_file(openssl_pkey_new(['private_key_bits' => 2048]), $keyFile->getPath()));
+		$key = openssl_pkey_new(['private_key_bits' => 2048]);
+		$this->assertTrue(openssl_pkey_export_to_file($key, $keyFile->getPath()));
 		$keyFile->chmod(0600);
+
+		// For a resource server that validates the tokens of this server
+		$this->publicKeyFile = go()->getTmpFolder()->getFile(uniqid('oauth-test-pub') . '.pem');
+		$this->publicKeyFile->putContents(openssl_pkey_get_details($key)['key']);
+		$this->publicKeyFile->chmod(0600);
 
 		$server = OAuthServer::authorizationServer($keyFile->getPath());
 
@@ -228,6 +249,62 @@ class AuthorizationServerTest extends TestCase
 		]);
 		$tokens = json_decode((string) $server->respondToAccessTokenRequest($request, new Response())->getBody(), true);
 		$this->assertNotEmpty($tokens['access_token']);
+	}
+
+	/**
+	 * Authorize the public client with PKCE and exchange the code. Returns the tokens.
+	 */
+	private function publicClientTokens(AuthorizationServer $server, string $scope, array $params = []): array
+	{
+		$verifier = 'a-verifier-of-at-least-43-characters-long-123';
+		$authRequest = OAuthServer::validateAuthorizationRequest($server, $this->publicAuthorizationRequest(array_merge([
+			'scope' => $scope,
+			'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '='),
+			'code_challenge_method' => 'S256'
+		], $params)));
+		$user = $this->newUser();
+		$authRequest->setUser(new OauthUser(User::findById($user->id, ['username', 'displayName', 'id', 'email', 'modifiedAt'])));
+		$authRequest->setAuthorizationApproved(true);
+		$response = $server->completeAuthorizationRequest($authRequest, new Response());
+		parse_str(parse_url($response->getHeaderLine('Location'), PHP_URL_QUERY), $query);
+
+		$request = (new ServerRequest('POST', 'https://localhost/api/oauth.php/token'))->withParsedBody([
+			'grant_type' => 'authorization_code',
+			'client_id' => self::$publicClient->getIdentifier(),
+			'redirect_uri' => self::REDIRECT_URI,
+			'code' => $query['code'],
+			'code_verifier' => $verifier
+		]);
+		return json_decode((string) $server->respondToAccessTokenRequest($request, new Response())->getBody(), true);
+	}
+
+	public function testUnknownResourceIsRefused(): void
+	{
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+		$server = $this->server();
+
+		$this->assertRefused(fn() => $this->publicClientTokens($server, self::MODULE_SCOPE, ['resource' => 'https://evil.example.com/mcp']), 'a token for another resource');
+
+		// The same resource, written differently
+		$tokens = $this->publicClientTokens($server, self::MODULE_SCOPE, ['resource' => 'https://LOCALHOST/api/page.php/test/resource/']);
+		$this->assertNotEmpty($tokens['access_token']);
+
+		$this->assertRefused(fn() => OAuthServer::validateResource('https://evil.example.com/mcp'), 'the token endpoint must refuse it too');
+	}
+
+	public function testTokenOfModuleScopeCanNotReadUserInfo(): void
+	{
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+		$server = $this->server();
+		$resourceServer = OAuthServer::resourceServer($this->publicKeyFile->getPath());
+
+		$moduleToken = $this->publicClientTokens($server, self::MODULE_SCOPE)['access_token'];
+		$response = OAuthServer::userInfo((new ServerRequest('GET', 'https://localhost/api/oauth.php/userinfo'))->withHeader('Authorization', 'Bearer ' . $moduleToken), $resourceServer);
+		$this->assertSame(403, $response->getStatusCode());
+
+		$openIdToken = $this->exchangeCode($server, self::$client, $this->authorize($server, self::$client, $this->newUser()))['access_token'];
+		$response = OAuthServer::userInfo((new ServerRequest('GET', 'https://localhost/api/oauth.php/userinfo'))->withHeader('Authorization', 'Bearer ' . $openIdToken), $resourceServer);
+		$this->assertSame(200, $response->getStatusCode());
 	}
 
 	public function testNormalFlowWorks()
