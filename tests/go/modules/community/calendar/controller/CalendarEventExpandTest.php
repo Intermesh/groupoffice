@@ -138,8 +138,6 @@ class CalendarEventExpandTest extends TestCase
 	{
 		if (isset($userId)) {
 			go()->setAuthState(new TemporaryState($userId));
-			// The calendar of an event is cached with the permission level of the user that loaded it first
-			(new \ReflectionProperty(\go\core\acl\model\AclItemEntity::class, 'aclEntityCache'))->setValue(null, []);
 		}
 		return (new \ReflectionClass(CalendarEvent::class))->newInstanceWithoutConstructor();
 	}
