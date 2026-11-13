@@ -62,6 +62,14 @@ try {
 		$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
 
 		try {
+
+			// only for testing. It speeds up but never use this for production.
+			$pdo->exec("SET GLOBAL innodb_flush_log_at_trx_commit = 2");
+		} catch (\Exception $e) {
+			echo "Could not relax InnoDB flushing: " . $e->getMessage() . "\n";
+		}
+
+		try {
 			echo "Dropping database 'groupoffice_phpunit'\n";
 			$pdo->query("DROP DATABASE groupoffice_phpunit");
 		}catch(\Exception $e) {
@@ -92,6 +100,14 @@ try {
 			'email' => "admin@intermesh.mailserver",
 			'language' => 'nl'
 		];
+
+		try {
+
+			// only for testing. It speeds up but never use this for production.
+			go()->getDbConnection()->exec("SET GLOBAL innodb_flush_log_at_trx_commit = 2");
+		} catch (\Exception $e) {
+			echo "Could not relax InnoDB flushing: " . $e->getMessage() . "\n";
+		}
 
 		$installer = go()->getInstaller();
 		$installer->install($admin);
@@ -149,6 +165,15 @@ try {
   } else {
 		echo "Using existing database 'groupoffice_phpunit'\n";
 	}
+	// The pwned module checks every new password with an online service, which makes tests slow and dependent on the network
+	$pwned = \go\core\model\Module::findByName('community', 'pwned');
+	if($pwned) {
+		$pwned->enabled = false;
+		if(!$pwned->save()) {
+			throw new Exception("Could not disable the pwned module");
+		}
+	}
+
 	go()->rebuildCache();
 
 	go()->setAuthState(new State());
