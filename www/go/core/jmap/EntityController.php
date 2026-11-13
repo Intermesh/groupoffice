@@ -833,7 +833,6 @@ abstract class EntityController extends Controller {
 		return empty($diff);
 	}
 
-
 	protected function checkAclChange(Entity $entity): bool
 	{
 		if(!($entity instanceof AclOwnerEntity)) {
@@ -892,7 +891,13 @@ abstract class EntityController extends Controller {
 			//if($entity::getMapping()->getQuery() != null) {
 				$entity = $this->getEntity($id);
 			//}
-			
+
+			if(!$entity) {
+				// The item was saved, but the user can't read it anymore. For example when it was moved to another container.
+				$result['updated'][$id] = null;
+				continue;
+			}
+
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
 			$entityProps = new ArrayObject($entity->toArray());			
 			$diff = $entityProps->diff($clientProps);

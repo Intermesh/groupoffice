@@ -10,6 +10,7 @@ use go\core\orm\Query;
 use go\core\db\Query as DbQuery;
 use go\core\jmap\EntityController;
 use go\core\jmap\Entity;
+use go\core\validate\ErrorCode;
 
 /**
  * The AclItemEntity class
@@ -342,6 +343,13 @@ abstract class AclItemEntity extends AclEntity {
 			return Acl::LEVEL_MANAGE;
 		}
 
+		if(!$this->isNew() && $this->isAclChanged()) {
+			// Moved to another container. The user needs permissions on both the old and the new one. Not cached
+			// because the cached level may belong to the old container.
+			$this->permissionLevel = null;
+			return min($this->findAclEntityPermissionLevel(true), $this->findAclEntityPermissionLevel(false));
+		}
+
 		if(!isset($this->permissionLevel)) {
 			$aclEntity = $this->findAclEntity();
 
@@ -349,6 +357,56 @@ abstract class AclItemEntity extends AclEntity {
 		}
 
 		return $this->permissionLevel;
+	}
+
+	/**
+	 * Get the permission level of the current user on the ACL entity this item belongs to, or belonged to before it was
+	 * modified.
+	 *
+	 * Returns 0 when that entity doesn't exist.
+	 *
+	 * @param bool $old Use the stored keys instead of the modified ones
+	 * @return int
+	 * @throws Exception
+	 */
+	private function findAclEntityPermissionLevel(bool $old): int
+	{
+		$cls = static::aclEntityClass();
+
+		/* @var $cls Entity */
+		$query = $cls::find($cls::getMapping()->getColumnNames(), true);
+		foreach (static::aclEntityKeys() as $from => $to) {
+			$value = $old ? $this->getOldValue($from) : $this->{$from};
+			if(!isset($value)) {
+				return 0;
+			}
+			$query->andWhere($query->getTableAlias() . "." . $to, '=', $value);
+		}
+
+		$aclEntity = $query->single();
+
+		return $aclEntity ? $aclEntity->getPermissionLevel() : 0;
+	}
+
+	/**
+	 * Moving an item to another container (like a contact to another address book) requires write permission on both.
+	 *
+	 * Checked here and not only in the controller, so other code that saves items, like imports, is covered too.
+	 *
+	 * @throws Exception
+	 */
+	protected function internalValidate()
+	{
+		if(!$this->isNew() && $this->isAclChanged()) {
+			$state = go()->getAuthState();
+			if($state && $state->isAuthenticated() && !$state->isAdmin() &&
+				min($this->findAclEntityPermissionLevel(true), $this->findAclEntityPermissionLevel(false)) < Acl::LEVEL_WRITE) {
+				$keys = array_keys(static::aclEntityKeys());
+				$this->setValidationError($keys[0], ErrorCode::FORBIDDEN, go()->t("Permission denied"));
+			}
+		}
+
+		parent::internalValidate();
 	}
 
 	/**

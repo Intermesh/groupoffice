@@ -138,7 +138,6 @@ views/Extjs3/javascript/base/Form.js
 
 views/Extjs3/javascript/base/model/ImportPanel.js
 
-views/Extjs3/javascript/base/upload/Paster.js
 
 views/Extjs3/javascript/base/model/multiselect/AddDialog.js
 views/Extjs3/javascript/base/model/multiselect/Dialog.js

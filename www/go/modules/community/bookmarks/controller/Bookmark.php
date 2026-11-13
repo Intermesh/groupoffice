@@ -15,7 +15,8 @@ use Throwable;
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
- */ 
+ * @extends EntityController<\go\modules\community\bookmarks\model\Bookmark>
+ */
 class Bookmark extends EntityController {
 	
 	/**
@@ -153,10 +154,11 @@ class Bookmark extends EntityController {
 					$blob = Blob::fromString($contents);
 					$blob->name = $filename;
 					$blob->type = "image/x-icon";
-					if(!$blob->save()) {
-						$errors = $blob->getValidationErrors();
+					if($blob->save()) {
+//						$errors = $blob->getValidationErrors();
+						$response['logo'] = $blob->id;
 					}
-					$response['logo'] = $blob->id;
+
 				}
 			}
 			catch(Throwable $e){

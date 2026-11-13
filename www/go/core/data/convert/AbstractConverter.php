@@ -281,6 +281,7 @@ abstract class AbstractConverter {
 					$this->notifyError($msg);
 
 					$response['errors'][] = $msg;
+					$this->index++;
 					continue;
 				}
 
