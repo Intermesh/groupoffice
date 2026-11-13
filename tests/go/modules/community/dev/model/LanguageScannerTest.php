@@ -26,4 +26,46 @@ class LanguageScannerTest extends TestCase
 
 		$this->assertEmpty(array_filter(array_keys($strings), fn($t) => str_starts_with($t, 'community/')));
 	}
+
+	/**
+	 * Scan a source file and return the targets per string
+	 */
+	private function scan(string $ext, string $source): array
+	{
+		$file = sys_get_temp_dir() . '/LanguageScannerTest-' . uniqid() . '.' . $ext;
+		file_put_contents($file, $source);
+		try {
+			$scanner = new LanguageScanner();
+			(new \ReflectionMethod($scanner, 'scanFile'))->invoke($scanner, $file, 'community', 'notes');
+			$uses = (new \ReflectionProperty($scanner, 'uses'))->getValue($scanner);
+		} finally {
+			unlink($file);
+		}
+		return array_map('array_keys', $uses);
+	}
+
+	public function testArgumentOrderOfExtjsAndGoui(): void
+	{
+		// ExtJS: t(text, module, package)
+		$this->assertSame(['community/tasks'], $this->scan('js', 'x = t("Task", "tasks", "community");')['Task']);
+		$this->assertSame(['legacy/billing'], $this->scan('js', 'x = t("Order", "billing");')['Order']);
+
+		// GOUI: t(text, package, module)
+		$this->assertSame(['community/tasks'], $this->scan('ts', 'x = t("Task", "community", "tasks");')['Task']);
+		$this->assertSame(['community/notes'], $this->scan('ts', 'x = t("Note");')['Note']);
+	}
+
+	public function testScansGouiCoreAndReportsUnknownModules(): void
+	{
+		$scanner = new LanguageScanner();
+		$strings = $scanner->getStrings();
+
+		// The MarkdownField of groupoffice-core
+		$this->assertContains('Bullet list', $strings['core/core']);
+
+		// A string with an unknown module falls back to core and is reported
+		foreach ($scanner->unknownTargets as $unknown) {
+			$this->assertMatchesRegularExpression('/^[\\w]+\\/[\\w]+: .+ \\(.+\\)$/s', $unknown);
+		}
+	}
 }

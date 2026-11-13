@@ -95,9 +95,15 @@ class Language extends Controller {
 
 		// Strings from JS, TS and PHP. Strings that core or more than one module uses go to core.
 		$skipPackages = empty($params['skipPackages']) ? [] : array_map('trim', explode(',', $params['skipPackages']));
-		foreach ((new LanguageScanner($skipPackages))->getStrings() as $target => $strings) {
+		$scanner = new LanguageScanner($skipPackages);
+		foreach ($scanner->getStrings() as $target => $strings) {
 			[$package, $module] = explode('/', $target);
 			$this->writeStrings($package, $module, $strings);
+		}
+
+		// Not exported, usually because the package and module arguments of t() are swapped
+		if (!empty($scanner->unknownTargets) && defined('STDERR')) {
+			fwrite(STDERR, "Unknown package/module:\n" . implode("\n", array_unique($scanner->unknownTargets)) . "\n");
 		}
 
 		if(empty($params['output'])) {
@@ -111,6 +117,16 @@ class Language extends Controller {
 	}
 
 	/**
+	 * @var array<string, array> "package/module" => translations of the language file
+	 */
+	private array $fileTranslations = [];
+
+	private function fileTranslations(string $package, string $module): array
+	{
+		return $this->fileTranslations[$package . '/' . $module] ??= go()->getLanguage()->getFileTranslations(go()->getLanguage()->getIsoCode(), $package, $module);
+	}
+
+	/**
 	 * Write the strings of a module with their translations to the export file
 	 *
 	 * @apiPermission Module access: helper of export() that only writes translations of the given strings. No user data is read.
@@ -120,10 +136,11 @@ class Language extends Controller {
 		foreach ($strings as $string) {
 			$enTranslation = $this->en->t($string, $package, $module);
 
-			$translated = go()->getLanguage()->getTranslation($string, $package, $module);
+			// The language file itself, because getTranslation() returns the English text when the file has none
+			$translated = $this->fileTranslations($package, $module)[$string] ?? null;
 
 			// Lookup falls back to core, so a string that core translates is not missing in a module
-			if ($this->missingOnly && !isset($translated) && $package !== 'core' && go()->getLanguage()->translationExists($string)) {
+			if ($this->missingOnly && !isset($translated) && $package !== 'core' && isset($this->fileTranslations('core', 'core')[$string])) {
 				continue;
 			}
 			if (is_array($enTranslation)) {
