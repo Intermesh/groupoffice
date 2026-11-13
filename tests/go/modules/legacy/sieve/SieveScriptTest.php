@@ -14,10 +14,21 @@ class SieveScriptTest extends TestCase
 {
 	const CAPABILITIES = ['fileinto', 'vacation', 'imap4flags', 'body', 'copy', 'date', 'relational', 'regex', 'reject'];
 
+	private string|false $language = false;
+
 	protected function setUp(): void
 	{
 		if(!\GO::modules()->isInstalled('sieve')) {
 			$this->markTestSkipped('The sieve module is required');
+		}
+		// the messages are checked in English, whatever language an earlier test left behind
+		$this->language = go()->getLanguage()->setLanguage('en');
+	}
+
+	protected function tearDown(): void
+	{
+		if ($this->language !== false) {
+			go()->getLanguage()->setLanguage($this->language);
 		}
 	}
 
