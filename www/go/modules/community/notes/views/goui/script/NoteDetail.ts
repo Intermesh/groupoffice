@@ -75,7 +75,7 @@ export class NoteDetail extends DetailPanel<Note> {
 					hr(),
 					this.deleteBtn = btn({
 						icon: "delete",
-						text: "Delete",
+						text: t("Delete"),
 						handler: () => {
 							void noteDS.confirmDestroy([this.entity!.id]);
 						}

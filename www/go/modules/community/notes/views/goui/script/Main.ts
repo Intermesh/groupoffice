@@ -270,7 +270,7 @@ export class Main extends MainThreeColumnPanel {
 								}),
 								btn({
 									icon: "csv",
-									text: "Comma Seperated Values",
+									text: t("Comma Separated Values"),
 									handler: () => {
 										go.util.exportToFile(
 											'Note',
