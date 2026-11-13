@@ -8,7 +8,7 @@ final class Password
 	 * Hash a password or secret to store it, with password_hash() and the default algorithm.
 	 *
 	 * Uses PHP's default cost unless the config option "passwordHashCost" is set. The tests set a low cost because
-	 * they create many users and OAuth clients.
+	 * they create many users, OAuth clients and remember me logins.
 	 *
 	 * @param string $password
 	 * @return string

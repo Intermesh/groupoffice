@@ -14,6 +14,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use go\core\util\Password;
 use ReflectionException;
 
 /**
@@ -126,7 +127,7 @@ class RememberMe extends Entity {
 	private function setNewToken(): void
 	{
 		$this->unhashedToken = static::generateToken();
-		$this->token = password_hash($this->unhashedToken, PASSWORD_DEFAULT);
+		$this->token = Password::hash($this->unhashedToken);
 	}
 
 	/**
