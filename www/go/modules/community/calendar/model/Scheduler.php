@@ -319,7 +319,7 @@ class Scheduler {
 		if (!$accountEmail || $method === 'NONE') {
 			return [
 				'method' => $method,
-				'feedback' => $accountEmail ? "" : ($method ==='REPLY' ? go()->t('Event not found', "email") : go()->t('You are not invited to this event', "email")),
+				'feedback' => $accountEmail ? "" : ($method ==='REPLY' ? go()->t('Event not found', 'community', 'calendar') : go()->t('You are not invited to this event', 'community', 'calendar')),
 				'event' => ICalendarHelper::parseVObject($vcalendar, new CalendarEvent())
 			];
 		} else {

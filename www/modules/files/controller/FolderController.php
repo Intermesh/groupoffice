@@ -429,7 +429,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						if ($projectsFolder) {
 							$node = $this->_folderToNode($projectsFolder, $expandFolderIds, false, $showFiles);
 							$node['path'] = $projectsFolder->path;
-							$node['text'] = \GO::t("projects", "projects");
+							$node['text'] = \GO::t("Projects", "projects2");
 							$response[] = $node;
 						}
 					}
