@@ -656,6 +656,8 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * Add an online meeting on save, like "jitsi". The link to join it becomes the location and is added to the
 	 * description. A meeting added earlier is replaced. Which services are available depends on the installed modules.
+	 * Isn't stored: get doesn't return it and set responds with null, so a client doesn't send it again with a later
+	 * update.
 	 *
 	 * @apiWriteOnly
 	 * @param string|null $service
