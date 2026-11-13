@@ -57,8 +57,8 @@ modules.register({
 						creator = {name: t("Unknown user")};
 					}
 
-					panelCfg.html = Format.htmlEncode(go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "comments", "community").replace("{creator}", creator.name)) + "<br /><br /><i>" + alert.data.excerpt + "</i>";
-					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by  {creator}.", "comments", "community").replace("{creator}", creator.name) + "\n\n" + alert.data.excerpt;
+					panelCfg.html = Format.htmlEncode(go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "community", "comments").replace("{creator}", creator.name)) + "<br /><br /><i>" + alert.data.excerpt + "</i>";
+					panelCfg.notificationBody = go.util.Format.dateTime(alert.triggerAt) + ": " + t("You were mentioned in a comment by {creator}.", "community", "comments").replace("{creator}", creator.name) + "\n\n" + alert.data.excerpt;
 					return panelCfg;
 
 				});

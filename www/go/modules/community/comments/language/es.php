@@ -13,6 +13,5 @@ return array (
   'Add labels' => 'Añadir etiquetas',
   'A comment was made by {creator}' => 'Un comentario fue hecho por {creator}',
   'Message' => 'Mensaje',
-  'You were mentioned in a comment by  {creator}.' => '{creator} le ha mencionado en un comentario.',
   'You were mentioned in a comment by {creator}.' => '{creator} le ha mencionado en un comentario.',
 );

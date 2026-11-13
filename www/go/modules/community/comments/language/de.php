@@ -15,5 +15,4 @@ return array (
   'You have an unsaved comment. Are you sure you want to discard the comment?' => 'Der Kommentar ist noch nicht gespeichert. Sind Sie sicher, dass Sie ihn verwerfen möchten?',
   'Message' => 'Nachricht hochladen',
   'You were mentioned in a comment by {creator}.' => 'Sie wurden von {creator} in einem Kommentar erwähnt.',
-  'You were mentioned in a comment by  {creator}.' => 'Sie wurden von {creator} in einem Kommentar erwähnt.',
 );
