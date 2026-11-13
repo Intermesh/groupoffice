@@ -284,7 +284,9 @@ abstract class AclItemEntity extends AclEntity {
 			go()->getDbConnection()->cacheStatement($cls . '.getAclEntity', $stmt);
 		}
 
-		$cacheKey = $cls;
+		// Per user: the entity keeps the permission level of the user that loaded it. A process can act as several
+		// users, like a CLI script or a JMAP method that changes the auth state.
+		$cacheKey = $cls . '-user-' . (go()->getAuthState() ? (int) go()->getAuthState()->getUserId() : 0);
 		$keys = [];
 		foreach (static::aclEntityKeys() as $from => $to) {
 			if (!isset($this->{$from})) {

@@ -144,6 +144,34 @@ class AclItemEntityTest extends TestCase
 		$this->assertSame($this->noteBooks['write']->id, $this->storedNoteBookId($note));
 	}
 
+	/**
+	 * The container is cached for a process. Its permission level is per user, so a second user in the same process,
+	 * like in a CLI script, must not get the level of the first.
+	 */
+	public function testPermissionLevelIsNotReusedForAnotherUser(): void
+	{
+		$note = $this->createNote('read');
+
+		$name = uniqid('aclother');
+		$other = new User();
+		$other->setValues(['username' => $name, 'displayName' => $name, 'email' => $name . '@example.com', 'password' => 'Pa55word!!xyz']);
+		$this->assertTrue($other->save(), $other->getValidationErrorsAsString());
+
+		try {
+			go()->setAuthState(new TemporaryState($this->user->id));
+			$this->assertEquals(Acl::LEVEL_READ, Note::findById($note->id)->getPermissionLevel());
+
+			go()->setAuthState(new TemporaryState($other->id));
+			$this->assertEquals(0, Note::findById($note->id)->getPermissionLevel());
+
+			go()->setAuthState(new TemporaryState($this->user->id));
+			$this->assertEquals(Acl::LEVEL_READ, Note::findById($note->id)->getPermissionLevel());
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			User::delete(['id' => $other->id]);
+		}
+	}
+
 	public function testAdminMayMove(): void
 	{
 		$note = $this->createNote('write');
