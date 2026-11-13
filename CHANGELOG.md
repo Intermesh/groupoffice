@@ -1,3 +1,9 @@
+- Core: relative times like "5 minutes ago" read naturally in other languages, like "vor 5 Minuten" and "il y a 5 minutes".
+- Core: Several translation errors fixed
+- Core: imported CSV files with only a few accented characters could get garbled characters, like "ﾃ､" instead of "ä".
+- Core: the API documentation at /api/doc.php now shows the parameters and response of all methods, the standard ones like Foo/get, Foo/query and Foo/set and the custom ones of each entity.
+- Calendar: events you participate in in another calendar now count as busy in your availability.
+
 12-11-2026: 26.0.60
 - Core: the API documentation at /api/doc.php now lists the methods of every entity, the type of each property including nested types like addresses, which properties are read only, and the filters with their value type, description and default. The entities are in a searchable menu on the left.
 - Core: the "Created by" and "Modified by" filters now work with a mix of user IDs and names. Filtering on links to two different items at the same time now returns the right results.
