@@ -22,8 +22,8 @@ class UserTest extends \PHPUnit\Framework\TestCase
 	public function testCreateFail() {
 		$user = new User();
 		$user->username = 'test1';
-		//pass should not be valid by haveibeenpwnd
-		$user->setPassword('test1test1');
+		// shorter than the minimum length. The tests disable the pwned module, so a breached password is accepted.
+		$user->setPassword('test1');
 		$user->displayName = 'Test user 1';
 		$user->email = $user->recoveryEmail = 'test1@intermesh.localhost';
 
@@ -122,6 +122,26 @@ class UserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals(true, $success);
 
 		$this->assertEquals($loginCount + 1, $token->getUser()->loginCount);
+	}
+
+	/**
+	 * The tests hash passwords with the low cost of tests/config.php. Without the option PHP's default is used.
+	 */
+	public function testPasswordHashUsesConfiguredCost() {
+		$config = go()->getConfig();
+		$this->assertSame(4, $config['passwordHashCost']);
+
+		$hash = User::passwordHash('sdfTgs-Dfgg-$#ddg');
+		$this->assertSame(4, password_get_info($hash)['options']['cost']);
+		$this->assertTrue(password_verify('sdfTgs-Dfgg-$#ddg', $hash));
+
+		try {
+			go()->setConfig(array_merge($config, ['passwordHashCost' => null]));
+			$default = password_get_info(password_hash('x', PASSWORD_DEFAULT))['options']['cost'];
+			$this->assertSame($default, password_get_info(User::passwordHash('sdfTgs-Dfgg-$#ddg'))['options']['cost']);
+		} finally {
+			go()->setConfig($config);
+		}
 	}
 
 	public function testDelete() {

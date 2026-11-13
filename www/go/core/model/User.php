@@ -1185,7 +1185,10 @@ public function historyLog(): bool|array
 	
 	/**
 	 * Hash a password for users
-	 * 
+	 *
+	 * Uses PHP's default cost unless the config option "passwordHashCost" is set. The tests set a low cost because
+	 * they create many users.
+	 *
 	 * @param string $password
 	 * @return string
 	 */
@@ -1196,7 +1199,8 @@ public function historyLog(): bool|array
 		if($passwordLen > go()->getSettings()->passwordMaxLength) {
 			throw new \InvalidArgumentException("Maximum password length is ".go()->getSettings()->passwordMaxLength." chars");
 		}
-		return password_hash($password, PASSWORD_DEFAULT);
+		$cost = go()->getConfig()['passwordHashCost'] ?? null;
+		return password_hash($password, PASSWORD_DEFAULT, isset($cost) ? ['cost' => (int) $cost] : []);
 	}
 
 	/**
