@@ -19,46 +19,59 @@ class PrincipalBackendTest extends TestCase
 
 	private $authState;
 
-	private User $searcher;
-	private User $visible;
-	private User $hidden;
+	/** The tests only search, so the users are created once for the class */
+	private static ?User $searcher = null;
+	private static ?User $visible = null;
+	private static ?User $hidden = null;
+
+	public static function setUpBeforeClass(): void
+	{
+		try {
+			self::$searcher = self::newUser();
+			self::$visible = self::newUser();
+			self::$hidden = self::newUser();
+
+			// share the visible user with the searcher
+			$group = self::$visible->getPersonalGroup();
+			$group->setAcl([
+				$group->id => Acl::LEVEL_READ,
+				self::$searcher->getPersonalGroup()->id => Acl::LEVEL_READ
+			]);
+			self::assertTrue($group->save(), $group->getValidationErrorsAsString());
+
+			// by default all users can see each other via the "Everyone" group. The hidden user is not shared.
+			$group = self::$hidden->getPersonalGroup();
+			$group->setAcl([$group->id => Acl::LEVEL_READ, Group::ID_EVERYONE => null]);
+			self::assertTrue($group->save(), $group->getValidationErrorsAsString());
+		} catch (\Throwable $e) {
+			// PHPUnit doesn't call tearDownAfterClass() when this fails
+			self::tearDownAfterClass();
+			throw $e;
+		}
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		foreach ([self::$searcher, self::$visible, self::$hidden] as $user) {
+			if ($user) {
+				User::delete(['id' => $user->id]);
+			}
+		}
+		self::$searcher = self::$visible = self::$hidden = null;
+	}
 
 	protected function setUp(): void
 	{
 		$this->authState = go()->getAuthState();
-
-		$this->searcher = $this->newUser();
-		$this->visible = $this->newUser();
-		$this->hidden = $this->newUser();
-
-		// share the visible user with the searcher
-		$group = $this->visible->getPersonalGroup();
-		$group->setAcl([
-			$group->id => Acl::LEVEL_READ,
-			$this->searcher->getPersonalGroup()->id => Acl::LEVEL_READ
-		]);
-		$this->assertTrue($group->save(), $group->getValidationErrorsAsString());
-
-		// by default all users can see each other via the "Everyone" group. The hidden user is not shared.
-		$group = $this->hidden->getPersonalGroup();
-		$group->setAcl([$group->id => Acl::LEVEL_READ, Group::ID_EVERYONE => null]);
-		$this->assertTrue($group->save(), $group->getValidationErrorsAsString());
-
-		go()->setAuthState(new TemporaryState($this->searcher->id));
+		go()->setAuthState(new TemporaryState(self::$searcher->id));
 	}
 
 	protected function tearDown(): void
 	{
 		go()->setAuthState($this->authState);
-
-		foreach ([$this->searcher ?? null, $this->visible ?? null, $this->hidden ?? null] as $user) {
-			if ($user) {
-				User::delete(['id' => $user->id]);
-			}
-		}
 	}
 
-	private function newUser(): User
+	private static function newUser(): User
 	{
 		$name = uniqid('principal');
 		$user = new User();
@@ -68,7 +81,7 @@ class PrincipalBackendTest extends TestCase
 			'email' => $name . '@example.com',
 			'password' => 'Pa55word!!xyz'
 		]);
-		$this->assertTrue($user->save(), var_export($user->getValidationErrors(), true));
+		self::assertTrue($user->save(), var_export($user->getValidationErrors(), true));
 
 		return $user;
 	}
@@ -86,7 +99,7 @@ class PrincipalBackendTest extends TestCase
 	#[DataProvider('anyOfAllOfProvider')]
 	public function testFindsSharedUser(string $test)
 	{
-		$name = $this->visible->username;
+		$name = self::$visible->username;
 		$result = $this->search([self::DISPLAYNAME => $name, self::EMAIL => $name], $test);
 
 		$this->assertEquals(['principals/' . $name], $result);
@@ -109,7 +122,7 @@ class PrincipalBackendTest extends TestCase
 	#[DataProvider('anyOfAllOfProvider')]
 	public function testDoesNotFindUserWithoutPermission(string $test)
 	{
-		$name = $this->hidden->username;
+		$name = self::$hidden->username;
 		$result = $this->search([self::DISPLAYNAME => $name, self::EMAIL => $name], $test);
 
 		$this->assertEquals([], $result);
