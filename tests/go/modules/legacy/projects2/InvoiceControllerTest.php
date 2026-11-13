@@ -96,7 +96,13 @@ class InvoiceControllerTest extends TestCase
 		$this->assertTrue($book->save(), $book->getValidationErrorsAsString());
 
 		// It continues after the permission check and stops at the customer that the project doesn't have
-		$this->expectExceptionMessage(go()->t("It's required to set a customer for the project when you create invoices from the project.", "legacy", "projects2"));
-		$this->createInvoice();
+		$message = null;
+		try {
+			$this->createInvoice();
+		} catch (\Exception $e) {
+			$message = $e->getMessage();
+		}
+		// translated after acting as the user, because that switches to the user's language
+		$this->assertSame(go()->t("It's required to set a customer for the project when you create invoices from the project.", "legacy", "projects2"), $message);
 	}
 }
