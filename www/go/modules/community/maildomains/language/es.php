@@ -44,7 +44,6 @@ return array (
   'Selector' => 'Selector',
   'Show inactive' => 'Mostrar inactivos',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'El nombre de host del sistema de correo. Se usa para las comprobaciones de PTR, SPF y MX.',
-  'The minimum length for this field is {max}' => 'La longitud mínima de este campo es {max}',
   'The passwords do not match' => 'Las contraseñas no coinciden',
   'Unlimited' => 'Ilimitada',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => 'Si se activa, este usuario puede iniciar sesión en todos los buzones del dominio usando user@example.com*thisuser@example.com',

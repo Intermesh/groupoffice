@@ -13,7 +13,6 @@ return array (
   'Used quota' => 'Naudojama kvota',
   'Backup MX' => 'Atsarginis MX',
   'Mailbox' => 'Pašto dėžutė',
-  'The minimum length for this field is {max}' => 'Minimalus šio lauko ilgis yra {max}',
   'The passwords do not match' => 'Slaptažodžiai nesutampa',
   'Quota (MB)' => 'Kvota (MB)',
   'Domain owner' => 'Domeno savininkas',

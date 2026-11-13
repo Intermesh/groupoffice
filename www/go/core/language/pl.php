@@ -2076,4 +2076,5 @@ Jeśli nie wysyłełeś prośby o zmianę hasła to skasuj tą wiadomość.',
 	'Numbered list' => 'Lista numerowana',
 	'Checklist' => 'Lista kontrolna',
 	'Preview' => 'Podgląd',
+	'The minimum length for this field is {min}' => 'Minimalna długość tego pola to {min}',
 );

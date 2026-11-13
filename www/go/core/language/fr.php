@@ -1809,4 +1809,5 @@ return array (
   'Numbered list' => 'Liste numérotée',
   'Checklist' => 'Liste de contrôle',
   'Preview' => 'Aperçu',
+  'The minimum length for this field is {min}' => 'La longueur minimale de ce champ est {min}',
 );

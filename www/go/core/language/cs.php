@@ -2184,4 +2184,5 @@ Pokud jste nežádal o nové heslo, prosím smažte tento mail.',
   'Numbered list' => 'Číslovaný seznam',
   'Checklist' => 'Kontrolní seznam',
   'Preview' => 'Náhled',
+  'The minimum length for this field is {min}' => 'Minimální délka pro toto pole je {min}',
 );

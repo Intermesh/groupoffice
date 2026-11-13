@@ -2077,4 +2077,5 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
   'Numbered list' => 'Elenco numerato',
   'Checklist' => 'Lista di controllo',
   'Preview' => 'Anteprima',
+  'The minimum length for this field is {min}' => 'La lunghezza minima di questo campo è {min}',
 );

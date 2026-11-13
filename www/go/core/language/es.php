@@ -2062,4 +2062,5 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Numbered list' => 'Lista numerada',
   'Checklist' => 'Lista de comprobación',
   'Preview' => 'Vista previa',
+  'The minimum length for this field is {min}' => 'La longitud mínima de este campo es {min}',
 );

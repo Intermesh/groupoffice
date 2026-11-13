@@ -2236,4 +2236,5 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Numbered list' => 'Nummerierte Liste',
   'Checklist' => 'Checkliste',
   'Preview' => 'Vorschau',
+  'The minimum length for this field is {min}' => 'Die minimale Länge für dieses Feld ist {min}',
 );

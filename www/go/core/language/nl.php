@@ -2129,4 +2129,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Numbered list' => 'Genummerde lijst',
   'Checklist' => 'Checklist',
   'Preview' => 'Voorbeeld',
+  'The minimum length for this field is {min}' => 'De minimale lengte voor dit veld is {min}',
 );

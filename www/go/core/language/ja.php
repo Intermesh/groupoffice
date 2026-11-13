@@ -1293,4 +1293,5 @@ return array (
   'hour' => '時間',
   'Encrypt content' => '内容を暗号化',
   'Attach files by dropping or pasting them' => 'ファイルをドラッグ＆ドロップまたは貼り付けで添付',
+  'The minimum length for this field is {min}' => 'このフィールドの最小文字数は{min}文字です。',
 );

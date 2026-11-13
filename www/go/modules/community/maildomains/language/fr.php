@@ -71,7 +71,6 @@ return array (
   'Selector' => 'Sélecteur',
   'Show inactive' => 'Afficher les inactifs',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'Le nom d\'hôte du système de messagerie. Utilisé pour les vérifications PTR, SPF et MX.',
-  'The minimum length for this field is {max}' => 'La longueur minimale de ce champ est {max}',
   'The passwords do not match' => 'Les mots de passe ne correspondent pas',
   'Unlimited' => 'Illimité',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => 'Si activé, cet utilisateur peut se connecter à toutes les boîtes aux lettres du domaine avec user@example.com*thisuser@example.com',

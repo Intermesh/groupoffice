@@ -76,7 +76,7 @@ export class MailboxDialog extends FormWindow {
 								const v = target.value as string, l = v.length,
 									minValidationLength = target.required ? 0 : 1;
 								if (l >= minValidationLength && l < minPasswordLength) {
-									target.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+									target.setInvalid(t("The minimum length for this field is {min}").replace("{min}", minPasswordLength));
 								}
 								const vc = this.passwordConfirmFld.value as string;
 								if (vc && vc.length > 0 && v !== vc) {
@@ -99,7 +99,7 @@ export class MailboxDialog extends FormWindow {
 								const v = target.value as string, l = v.length,
 									minValidationLength = target.required ? 0 : 1;
 								if (l >= minValidationLength && l < minPasswordLength) {
-									target.setInvalid(t("The minimum length for this field is {max}").replace("{max}", minPasswordLength));
+									target.setInvalid(t("The minimum length for this field is {min}").replace("{min}", minPasswordLength));
 								}
 								const vc = this.passwordFld.value as string;
 								if (vc && vc.length > 0 && v !== vc) {

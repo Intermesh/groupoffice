@@ -80,7 +80,6 @@ return array (
   'DKIM key import' => 'DKIM Schlüssel Import',
   'Private key' => 'Privater Schlüssel',
   'Mail domains' => 'E-Mail Domains',
-  'The minimum length for this field is {max}' => 'Die minimale Länge für dieses Feld ist {max}',
   'The passwords do not match' => 'Die Kennwörter stimmen nicht überein',
   'Domain owner' => 'Domain Inhaber',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => 'Wenn aktiviert, kann sich dieser Nutzer zu allen Mailboxen der Domain mit user@example.com*thisuser@example.com anmelden',

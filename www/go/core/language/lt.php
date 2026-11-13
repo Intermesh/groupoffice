@@ -1231,4 +1231,5 @@ return array (
   'Authorized users' => 'Įgalioti vartotojai',
   'Authorized groups' => 'Įgaliotos grupės',
   'Attach files by dropping or pasting them' => 'Pridėkite dokumentus vilkdami arba įklijuodami juos čia.',
+  'The minimum length for this field is {min}' => 'Minimalus šio lauko ilgis yra {min}',
 );
