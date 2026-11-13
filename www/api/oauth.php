@@ -60,6 +60,22 @@ class OAuthController {
 			}
 
 			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
+
+			if(OAuthServer::needsConsent($authRequest->getClient())) {
+				$body = $request->getParsedBody();
+				if($request->getMethod() === 'POST' && is_array($body) && isset($body['decision'])) {
+					// The consent screen posts the decision with the CSRF token. Without it the user isn't authenticated
+					// and is sent to the login page above.
+					$data = json_decode((string) ($body['data'] ?? ''), true);
+					return OAuthServer::completeConsent($server, $authRequest, new OauthUser($user), $body['decision'] === 'approve', is_array($data) ? $data : []);
+				}
+
+				// Ask the user in the web client
+				PendingAuthorization::save($authRequest);
+				$consentUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthConsent=1';
+				return $response->withStatus(302)->withHeader('Location', $consentUrl);
+			}
+
 			$authRequest->setUser(new OauthUser($user));
 
 			// Once the user has approved or denied the client update the status
@@ -86,6 +102,24 @@ class OAuthController {
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
+	/**
+	 * What the consent screen shows about the request that waits for the user's approval
+	 */
+	public function consent(): ResponseInterface
+	{
+		$response = new Response();
+		$authRequest = PendingAuthorization::peek();
+		if (!go()->getAuthState()->isAuthenticated() || !$authRequest) {
+			return $response->withStatus(404);
+		}
+
+		$response->getBody()->write(json_encode(OAuthServer::consentDetails($authRequest)));
+		return $response
+			->withStatus(200)
+			->withHeader('cache-control', 'no-store')
+			->withHeader('content-type', 'application/json; charset=UTF-8');
+	}
+
 	public function userinfo(): ResponseInterface
 	{
 		return OAuthServer::userInfo(ServerRequest::fromGlobals(), OAuthServer::resourceServer());
@@ -183,6 +217,8 @@ class OAuthController {
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Router())
 	->addRoute('/authorize/', 'GET', OAuthController::class, 'authorize')
+	->addRoute('/authorize/', 'POST', OAuthController::class, 'authorize')
+	->addRoute('/consent/', 'GET', OAuthController::class, 'consent')
 	->addRoute('/userinfo/', 'GET', OAuthController::class, 'userinfo')
 	->addRoute('/token/', 'POST', OAuthController::class, 'token')
 	->addRoute('/\.well-known\/openid-configuration/', 'GET', OAuthController::class, 'openIdConfiguration')

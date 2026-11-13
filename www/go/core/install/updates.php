@@ -1897,3 +1897,6 @@ $updates['202611091340'][] = "ALTER TABLE core_change
 
 $updates['202611091340'][] = "ALTER TABLE core_change_user
   ADD INDEX userId_entityTypeId_modSeq (userId, entityTypeId, modSeq, entityId)";
+
+// OAuth clients that registered themselves, like AI assistants, need the user's consent
+$updates['202611131400'][] = "ALTER TABLE core_oauth_client ADD registration VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL";

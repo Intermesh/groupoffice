@@ -27,6 +27,21 @@ class PendingAuthorization
 	}
 
 	/**
+	 * The stored request, without removing it. For showing it to the user before they approve it.
+	 */
+	public static function peek(): ?AuthorizationRequest
+	{
+		$authRequest = $_SESSION['authRequest'] ?? null;
+		$savedAt = $_SESSION['authRequestAt'] ?? 0;
+
+		if (!($authRequest instanceof AuthorizationRequest) || !is_int($savedAt) || $savedAt < time() - self::LIFETIME) {
+			return null;
+		}
+
+		return $authRequest;
+	}
+
+	/**
 	 * Take the stored request when the user returns from the login page
 	 *
 	 * The login page returns to the authorize URL without parameters. A request with its own parameters is a new

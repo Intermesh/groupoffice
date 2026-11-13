@@ -28,6 +28,13 @@ class AuthorizationServerTest extends TestCase
 	/** A client without a secret, like an AI assistant or an app */
 	private static ?OauthClient $publicClient = null;
 
+	/** A client that registered itself and returns to localhost, like a desktop AI assistant */
+	private static ?OauthClient $selfRegisteredClient = null;
+
+	/** What EVENT_CONSENT listeners got */
+	public static array $consents = [];
+	public static bool $refuseConsent = false;
+
 	private array $userIds = [];
 	private ?\go\core\fs\File $publicKeyFile = null;
 
@@ -61,17 +68,27 @@ class AuthorizationServerTest extends TestCase
 		$public->setIsConfidential(false);
 		self::assertTrue($public->save(), var_export($public->getValidationErrors(), true));
 		self::$publicClient = $public;
+
+		$self = new OauthClient();
+		$self->setIdentifier(uniqid('self'));
+		$self->setName('Self-registered assistant');
+		$self->setRedirectUri('http://localhost:3000/callback');
+		$self->setIsConfidential(false);
+		$self->setRegistration('dynamic');
+		self::assertTrue($self->save(), var_export($self->getValidationErrors(), true));
+		self::$selfRegisteredClient = $self;
 	}
 
 	public static function tearDownAfterClass(): void
 	{
-		foreach ([self::$client, self::$publicClient] as $client) {
+		foreach ([self::$client, self::$publicClient, self::$selfRegisteredClient] as $client) {
 			if (isset($client->id)) {
 				OauthClient::delete(['id' => $client->id]);
 			}
 		}
 		self::$client = null;
 		self::$publicClient = null;
+		self::$selfRegisteredClient = null;
 	}
 
 	protected function setUp(): void
@@ -93,6 +110,8 @@ class AuthorizationServerTest extends TestCase
 		}
 
 		$this->publicKeyFile?->delete();
+		self::$consents = [];
+		self::$refuseConsent = false;
 		\go\core\event\Listeners::get()->clear();
 	}
 
@@ -305,6 +324,89 @@ class AuthorizationServerTest extends TestCase
 		$openIdToken = $this->exchangeCode($server, self::$client, $this->authorize($server, self::$client, $this->newUser()))['access_token'];
 		$response = OAuthServer::userInfo((new ServerRequest('GET', 'https://localhost/api/oauth.php/userinfo'))->withHeader('Authorization', 'Bearer ' . $openIdToken), $resourceServer);
 		$this->assertSame(200, $response->getStatusCode());
+	}
+
+	/**
+	 * Listener like a module that stores what the user picked on the consent screen
+	 */
+	public static function onConsent($authRequest, int $userId, array $data): void
+	{
+		if (self::$refuseConsent) {
+			throw OAuthServerException::accessDenied('Refused by the module');
+		}
+		self::$consents[] = ['client' => $authRequest->getClient()->getIdentifier(), 'userId' => $userId, 'data' => $data];
+	}
+
+	private function selfRegisteredRequest(AuthorizationServer $server)
+	{
+		$verifier = 'a-verifier-of-at-least-43-characters-long-123';
+		return OAuthServer::validateAuthorizationRequest($server, (new ServerRequest('GET', 'https://localhost/api/oauth.php/authorize'))->withQueryParams([
+			'response_type' => 'code',
+			'client_id' => self::$selfRegisteredClient->getIdentifier(),
+			'redirect_uri' => 'http://localhost:3000/callback',
+			'scope' => self::MODULE_SCOPE,
+			'state' => 'abc',
+			'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '='),
+			'code_challenge_method' => 'S256'
+		]));
+	}
+
+	private function oauthUser(User $user): OauthUser
+	{
+		return new OauthUser(User::findById($user->id, ['username', 'displayName', 'id', 'email', 'modifiedAt']));
+	}
+
+	public function testOnlySelfRegisteredClientsNeedConsent(): void
+	{
+		$this->assertFalse(OAuthServer::needsConsent(self::$client));
+		$this->assertFalse(OAuthServer::needsConsent(self::$publicClient));
+		$this->assertTrue(OAuthServer::needsConsent(self::$selfRegisteredClient));
+	}
+
+	public function testConsentDetails(): void
+	{
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+
+		$details = OAuthServer::consentDetails($this->selfRegisteredRequest($this->server()));
+
+		$this->assertSame('Self-registered assistant', $details['clientName']);
+		$this->assertSame('localhost', $details['redirectHost']);
+		$this->assertTrue($details['localhostOnly']);
+		$this->assertSame([['name' => self::MODULE_SCOPE, 'description' => 'Test scope']], $details['scopes']);
+	}
+
+	public function testApprovalGivesModulesTheirData(): void
+	{
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+		OAuthServer::on(OAuthServer::EVENT_CONSENT, self::class, 'onConsent');
+		$server = $this->server();
+		$user = $this->newUser();
+
+		$response = OAuthServer::completeConsent($server, $this->selfRegisteredRequest($server), $this->oauthUser($user), true, ['items' => [1, 2]]);
+
+		parse_str(parse_url($response->getHeaderLine('Location'), PHP_URL_QUERY), $query);
+		$this->assertNotEmpty($query['code']);
+		$this->assertSame([['client' => self::$selfRegisteredClient->getIdentifier(), 'userId' => (int) $user->id, 'data' => ['items' => [1, 2]]]], self::$consents);
+	}
+
+	public function testModuleMayRefuseTheApproval(): void
+	{
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+		OAuthServer::on(OAuthServer::EVENT_CONSENT, self::class, 'onConsent');
+		self::$refuseConsent = true;
+		$server = $this->server();
+
+		$this->assertRefused(fn() => OAuthServer::completeConsent($server, $this->selfRegisteredRequest($server), $this->oauthUser($this->newUser()), true, []), 'the module refused');
+	}
+
+	public function testDenyDoesNotGiveACode(): void
+	{
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+		OAuthServer::on(OAuthServer::EVENT_CONSENT, self::class, 'onConsent');
+		$server = $this->server();
+
+		$this->assertRefused(fn() => OAuthServer::completeConsent($server, $this->selfRegisteredRequest($server), $this->oauthUser($this->newUser()), false, []), 'denied');
+		$this->assertEmpty(self::$consents, 'Modules were told about a denied request');
 	}
 
 	public function testNormalFlowWorks()

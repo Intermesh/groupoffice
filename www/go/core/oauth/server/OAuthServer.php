@@ -7,10 +7,13 @@ use Exception;
 use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\File;
+use go\core\model\OauthClient;
 use go\core\oauth\server\repositories;
 use go\core\util\ArrayObject;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
+use League\OAuth2\Server\Entities\ClientEntityInterface;
+use League\OAuth2\Server\Entities\UserEntityInterface;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
@@ -38,6 +41,14 @@ final class OAuthServer
 	 * resource server the tokens are for].
 	 */
 	const EVENT_SCOPES = 'scopes';
+
+	/**
+	 * Fired when the user approves a client that registered itself
+	 *
+	 * The listener gets the AuthorizationRequestInterface, the ID of the user and the array of data the consent screen
+	 * sent for the module, like the items an MCP client may read. It may throw an OAuthServerException to refuse.
+	 */
+	const EVENT_CONSENT = 'consent';
 
 	/**
 	 * Lifetime of an access token
@@ -159,6 +170,67 @@ final class OAuthServer
 		}
 
 		return $authRequest;
+	}
+
+	/**
+	 * Whether the user must approve the client before it gets a token
+	 *
+	 * Clients that registered themselves, like AI assistants, need consent. Clients that an administrator registered
+	 * are trusted.
+	 */
+	public static function needsConsent(ClientEntityInterface $client): bool
+	{
+		return $client instanceof OauthClient && $client->isSelfRegistered();
+	}
+
+	/**
+	 * What the consent screen shows about a request
+	 *
+	 * @return array{clientId: string, clientName: string, redirectHost: string, localhostOnly: bool, scopes: array<array{name: string, description: string}>}
+	 */
+	public static function consentDetails(AuthorizationRequestInterface $authRequest): array
+	{
+		$client = $authRequest->getClient();
+		$redirectUri = $authRequest->getRedirectUri() ?? (is_array($client->getRedirectUri()) ? ($client->getRedirectUri()[0] ?? '') : $client->getRedirectUri());
+		$host = (string) parse_url((string) $redirectUri, PHP_URL_HOST);
+
+		$moduleScopes = self::moduleScopes();
+		$scopes = [];
+		foreach ($authRequest->getScopes() as $scope) {
+			$name = $scope->getIdentifier();
+			$scopes[] = [
+				'name' => $name,
+				'description' => $moduleScopes[$name]['description'] ?? $name
+			];
+		}
+
+		return [
+			'clientId' => $client->getIdentifier(),
+			'clientName' => $client->getName(),
+			// The spec of client ID metadata documents requires showing where the user is sent back to
+			'redirectHost' => $host,
+			'localhostOnly' => in_array(strtolower($host), ['localhost', '127.0.0.1', '[::1]', '::1'], true),
+			'scopes' => $scopes
+		];
+	}
+
+	/**
+	 * Complete a request after the user approved or denied it on the consent screen
+	 *
+	 * @param array $data What the consent screen sent for the modules, see {@see EVENT_CONSENT}
+	 * @throws OAuthServerException When a module refuses the approval
+	 */
+	public static function completeConsent(AuthorizationServer $server, AuthorizationRequestInterface $authRequest, UserEntityInterface $user, bool $approved, array $data): ResponseInterface
+	{
+		$authRequest->setUser($user);
+
+		if ($approved) {
+			static::fireEvent(self::EVENT_CONSENT, $authRequest, (int) $user->getIdentifier(), $data);
+		}
+
+		$authRequest->setAuthorizationApproved($approved);
+
+		return $server->completeAuthorizationRequest($authRequest, new Response());
 	}
 
 	/**
