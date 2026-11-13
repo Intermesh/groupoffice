@@ -1,3 +1,4 @@
+13-11-2026: 6.8.184
 - Security: this release fixes a large number of security issues that were found in an extensive security review. Some were critical. We advise everyone to update. Please check the points below after updating.
 - Projects2: Fixed invalid access denied message for expenses, income and budgets
 
