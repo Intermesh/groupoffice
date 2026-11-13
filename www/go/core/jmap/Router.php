@@ -47,6 +47,14 @@ class Router
 	private $logFile;
 
 	/**
+	 * Put in front of the request ID of every method call, like "MCP: Claude"
+	 *
+	 * The request ID is stored with the changes in the history, so it shows who made a change on behalf of the user,
+	 * like an AI assistant.
+	 */
+	public ?string $requestIdPrefix = null;
+
+	/**
 	 * Run the router
 	 *
 	 * Takes the request and loops through each method call. For each method a
@@ -95,7 +103,7 @@ class Router
 
 		Response::get()->setClientCall($method, $clientCallId);
 
-		go()->getDebugger()->setRequestId("JMAP " . $method);
+		go()->getDebugger()->setRequestId((isset($this->requestIdPrefix) ? $this->requestIdPrefix . ' ' : '') . "JMAP " . $method);
 		
 		if($method != "community/dev/Debugger/get") {
 			//App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
