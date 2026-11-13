@@ -48,6 +48,11 @@ class OAuthController {
 		go()->debug($request->getQueryParams());
 
 		try {
+			$body = $request->getParsedBody();
+			if($request->getMethod() === 'POST' && is_array($body) && isset($body['decision'])) {
+				return $this->decide($server, $body);
+			}
+
 			// Validate the HTTP request and return an AuthorizationRequest object.
 			// The auth request object can be serialized into a user's session
 			// Only resumed when the user returns from the login page
@@ -63,14 +68,6 @@ class OAuthController {
 			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
 
 			if(OAuthServer::needsConsent($authRequest->getClient())) {
-				$body = $request->getParsedBody();
-				if($request->getMethod() === 'POST' && is_array($body) && isset($body['decision'])) {
-					// The consent screen posts the decision with the CSRF token. Without it the user isn't authenticated
-					// and is sent to the login page above.
-					$data = json_decode((string) ($body['data'] ?? ''), true);
-					return OAuthServer::completeConsent($server, $authRequest, new OauthUser($user), $body['decision'] === 'approve', is_array($data) ? $data : []);
-				}
-
 				// Ask the user in the web client
 				PendingAuthorization::save($authRequest);
 				$consentUrl = dirname($_SERVER['PHP_SELF'], 3) . '?oauthConsent=1';
@@ -104,6 +101,33 @@ class OAuthController {
 	 * @throws Exception
 	 */
 	/**
+	 * The decision of the user on the consent screen
+	 *
+	 * The screen posts it with the CSRF token, without which the user isn't authenticated, and with the ID of the
+	 * request it showed.
+	 *
+	 * @throws OAuthServerException When a module refuses the approval
+	 */
+	private function decide(AuthorizationServer $server, array $body): ResponseInterface
+	{
+		$response = new Response();
+		if(!go()->getAuthState()->isAuthenticated()) {
+			return $response->withStatus(403);
+		}
+
+		$authRequest = PendingAuthorization::takeForConsent((string) ($body['requestId'] ?? ''));
+		if(!$authRequest || !OAuthServer::needsConsent($authRequest->getClient())) {
+			// Not the request the user saw. Not redirected anywhere: the client may not be the one the user approved.
+			$response->getBody()->write(go()->t("The authorization request expired. Please connect the application again."));
+			return $response->withStatus(400)->withHeader('content-type', 'text/plain; charset=UTF-8');
+		}
+
+		$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
+		$data = json_decode((string) ($body['data'] ?? ''), true);
+		return OAuthServer::completeConsent($server, $authRequest, new OauthUser($user), $body['decision'] === 'approve', is_array($data) ? $data : []);
+	}
+
+	/**
 	 * What the consent screen shows about the request that waits for the user's approval
 	 */
 	public function consent(): ResponseInterface
@@ -114,7 +138,7 @@ class OAuthController {
 			return $response->withStatus(404);
 		}
 
-		$response->getBody()->write(json_encode(OAuthServer::consentDetails($authRequest)));
+		$response->getBody()->write(json_encode(OAuthServer::consentDetails($authRequest) + ['requestId' => PendingAuthorization::id()]));
 		return $response
 			->withStatus(200)
 			->withHeader('cache-control', 'no-store')
