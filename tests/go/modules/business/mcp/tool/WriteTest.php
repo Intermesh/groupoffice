@@ -139,7 +139,7 @@ class WriteTest extends TestCase
 		$result = $this->write([['NoteBook/set', ['create' => ['b' => ['name' => 'New book']]], 's']]);
 
 		$this->assertTrue($result['isError']);
-		$this->assertStringContainsString('only set and custom methods that change data', $result['structuredContent']['error']);
+		$this->assertStringContainsString('only set, on entities with write access', $result['structuredContent']['error']);
 	}
 
 	public function testReadKeyCanNotWrite(): void
@@ -172,15 +172,72 @@ class WriteTest extends TestCase
 		$this->assertTrue($result['isError']);
 	}
 
-	public function testCustomMethodsWithoutReadOnlyTagAreWrites(): void
+	/**
+	 * Custom methods without the read-only tag can't be called at all: they aren't limited to their own entity, like
+	 * CalendarEvent/loadICS reading mail, and may delete or change many items
+	 */
+	public function testCustomMethodsWithoutReadOnlyTagAreNotAvailable(): void
 	{
-		$custom = JmapTool::customMethods(Note::entityType());
+		$key = self::createMcpKey(['CalendarEvent' => true]);
 
-		foreach ($custom as $name => $readOnly) {
-			$read = $this->callTool('jmap_read', ['calls' => [['Note/' . $name, [], 'c']]])['result'];
-			$this->assertSame(!$readOnly, $read['isError'], 'Note/' . $name . ' with jmap_read');
+		$custom = JmapTool::customMethods(\go\modules\community\calendar\model\CalendarEvent::entityType());
+		$this->assertArrayHasKey('loadICS', $custom);
+		$this->assertFalse($custom['loadICS'], 'loadICS reads mail and must not be tagged read-only');
+
+		$params = ['account_id' => 1, 'mailbox' => 'INBOX', 'uid' => 1, 'number' => '2', 'encoding' => 'base64'];
+		$write = $this->write([['CalendarEvent/loadICS', $params, 'l']], $key);
+		$this->assertTrue($write['isError']);
+		$this->assertStringContainsString('only set', $write['structuredContent']['error']);
+
+		$read = $this->callTool('jmap_read', ['calls' => [['CalendarEvent/loadICS', $params, 'l']]], $key)['result'];
+		$this->assertTrue($read['isError']);
+	}
+
+	public function testLongKeyNameIsShortenedInTheRequestId(): void
+	{
+		$key = self::createMcpKey(['Note' => true], ['name' => str_repeat('x', 180)]);
+
+		$this->write([['Note/set', ['create' => ['n' => ['noteBookId' => self::$writableBook->id, 'name' => 'Long', 'content' => 'x']]], 's']], $key);
+
+		$this->assertSame('MCP: ' . str_repeat('x', 50) . ' JMAP Note/set', go()->getDebugger()->getRequestId());
+	}
+
+	/**
+	 * The example "schedule an appointment for me and a colleague", following the recipe
+	 */
+	public function testCreateAppointmentWithParticipantAsTheRecipeSays(): void
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		$calendar = new \go\modules\community\calendar\model\Calendar();
+		$calendar->name = uniqid('mcpcal');
+		$calendar->setOwnerId(self::$mcpUser->id);
+		$calendar->setAcl([self::$mcpUser->getPersonalGroup()->id => Acl::LEVEL_MANAGE]);
+		$this->assertTrue($calendar->save(), $calendar->getValidationErrorsAsString());
+		go()->setAuthState(new TemporaryState(self::$mcpUser->id));
+
+		try {
+			$key = self::createMcpKey(['CalendarEvent' => true, 'Calendar' => false]);
+			$result = $this->write([['CalendarEvent/set', ['create' => ['e' => [
+				'calendarId' => $calendar->id,
+				'title' => 'Project X kick-off',
+				'start' => '2030-03-05T13:00:00',
+				'timeZone' => 'Europe/Amsterdam',
+				'duration' => 'PT1H',
+				'participants' => [
+					'me' => ['email' => self::$mcpUser->email, 'name' => self::$mcpUser->displayName, 'roles' => ['owner' => true, 'attendee' => true]],
+					'colleague' => ['email' => 'colleague@example.com', 'name' => 'Colleague', 'roles' => ['attendee' => true]]
+				]
+			]]], 'c']], $key);
+
+			$this->assertFalse($result['isError'], json_encode($result));
+			$set = $result['structuredContent']['responses'][0][1];
+			$this->assertArrayHasKey('e', $set['created'], json_encode($set));
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			\go\modules\community\calendar\model\CalendarEvent::delete(['calendarId' => $calendar->id]);
+			\go\modules\community\calendar\model\Calendar::delete(['id' => $calendar->id]);
+			go()->setAuthState(new TemporaryState(self::$mcpUser->id));
 		}
-		$this->assertNotEmpty($custom, 'Note has custom methods to test with');
 	}
 
 	public function testRecipeIsDescribed(): void
