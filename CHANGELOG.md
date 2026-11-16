@@ -1,4 +1,5 @@
-16-11-2026: 26.0.60
+- Core: with a 12-hour clock, time fields saved "12:30 am" as 12:30 in the afternoon and didn't correct hours above 12. They now save 0:30, and an hour above 12 becomes 12.
+- Core: time fields move on from the hours to the minutes while typing, like date fields do, as soon as the hour can't get another digit (for example "14", or "8" which becomes 08). With a 12-hour clock the minutes move on to am/pm.
 - Finance: fixed the error "Cannot assign null to property FinanceDocumentItem::$priceEntryMode" when adding articles with "Add from catalog".
 - Finance: a book has options to show or hide "Reverse charge VAT", the delivery date and the execution date in its documents. New books hide the dates; existing books keep showing them. A hidden field still shows when a document has a value for it.
 - Finance: sales invoices can be put "On hold" in the invoice dialog or, for invoices that are already sent, in the menu of the invoice. No reminders are sent for an invoice on hold and it is left out of the customer's statement.
