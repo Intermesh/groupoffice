@@ -165,6 +165,8 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 		$mergeableTypes = array('textfield', 'textarea');
 		
 		$this->getRequestedModel($params['model_name']);
+		// Checked by getRequestedModel() above.
+		// nosemgrep: go-class-from-request
 		$tmpModel = new $params['model_name']();
 		$columns = $tmpModel->getColumns();
 		

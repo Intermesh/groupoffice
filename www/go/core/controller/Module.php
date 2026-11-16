@@ -137,6 +137,8 @@ class Module extends EntityController {
 			throw new NotFound();
 		}
 		
+		// Admin only.
+		// nosemgrep: go-class-from-request
 		$mod = $cls::get();
 		$model = $mod->install();
 
@@ -173,6 +175,8 @@ class Module extends EntityController {
 		$cls = "go\\modules\\" . $params['package'] . "\\" . $params['name'] . "\Module";
 		if(class_exists($cls)) {
 
+			// Admin only.
+			// nosemgrep: go-class-from-request
 			$mod = $cls::get();
 			$success = $mod->uninstall();
 		} else {

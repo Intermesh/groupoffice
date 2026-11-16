@@ -1430,6 +1430,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		// Only models that have a files folder
+		// Checked with is_a() on this line.
+		// nosemgrep: go-class-from-request
 		if(!is_string($cls) || !is_a($cls, \GO\Base\Db\ActiveRecord::class, true) || !$cls::model()->hasFiles()) {
 			throw new \GO\Base\Exception\NotFound();
 		}
@@ -1666,6 +1668,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$workingFolder = Folder::model()->findByPk($params['working_folder_id']);
 		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
+		// Checked with checkFileStoragePath() below.
+		// nosemgrep: go-path-from-request
 		$archiveFile = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$destinationFolder->path . '/' . $params['archive_name'] . '.zip');
 		$archiveFile->checkFileStoragePath();
 

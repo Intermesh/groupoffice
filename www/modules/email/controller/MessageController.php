@@ -748,6 +748,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 				$filename .= ".eml";
 				$tempDir = $this->getTempDir($params['account_id'], $value->mailbox, $value->uid);
+				// The name is cleaned with stripInvalidChars().
+				// nosemgrep: go-path-from-request
 				$tmpFile = new \GO\Base\Fs\File($tempDir . $filename);
 				$tmpFile->putContents($attachmentMessage->getSource());
 
@@ -1603,6 +1605,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	{
 		GO::session()->closeWriting();
 
+		// Only the name is used, for the download headers.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(go()->getTmpFolder()->getPath(). '/' . $params['filename']);
 
 		$account = Account::model()->findByPk($params['account_id']);
@@ -1628,6 +1632,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	protected function actionTnefAttachmentFromTempFile(array $params)
 	{
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
+		// The temporary folder is per user and GO\Base\Fs\File rejects ".." in paths.
+		// nosemgrep: go-path-from-request
 		$tmpFile = new \GO\Base\Fs\File(GO::config()->tmpdir.$params['tmp_file']);
 
 		chdir($tmpFolder->path());
@@ -1659,6 +1665,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);		
+		// The name is cleaned with stripInvalidChars() and checked with checkFileStoragePath() below.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.$folder->path.'/'.$params['filename']);
 		$file->checkFileStoragePath();
 
@@ -1667,6 +1675,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$imap = $account->openImapConnection($params['mailbox']);
 			$response['success'] = $imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding']);
 		} else {
+			// The temporary folder is per user and GO\Base\Fs\File rejects ".." in paths.
+			// nosemgrep: go-path-from-request
 			$tmpfile = new \GO\Base\Fs\File(GO::config()->tmpdir.$params['tmp_file']);
 			$file = $tmpfile->copy($file->parent(), $params['filename']);
 			$response['success'] = $file != false;

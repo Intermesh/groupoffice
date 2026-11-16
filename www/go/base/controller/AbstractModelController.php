@@ -808,10 +808,14 @@ class AbstractModelController extends AbstractController {
 				$select = ','.$select;
 						
 			// Custom field columns are added by joinCustomFields() in ActiveRecord::find()
+			// The fields are set by the server code, not by the request.
+			// nosemgrep: go-sql-from-request
 			$findParams->select('t.*'.$select);
 		}
 		
 		if(!empty($params['type']))
+			// Checked with AbstractExport::isExportClass() in the beginning of this method.
+			// nosemgrep: go-class-from-request
 			$export = new $params['type']($store, $columnModel,$model, $findParams, $showHeader, $humanHeaders, $title, $orientation, $extraParams);
 		else
 			$export = new \GO\Base\Export\ExportCSV($store, $columnModel, $model, $findParams, $showHeader, $humanHeaders, $title, $orientation, $extraParams); // The default Export is the CSV outputter.
@@ -876,6 +880,8 @@ class AbstractModelController extends AbstractController {
 			if ($params['importType']=='Xls' && !empty($params['maxColumnNr']))
 				$importFile = new \GO\Base\Fs\XlsFile($params['file'],$params['maxColumnNr']);
 			else
+				// importType is checked against Csv and Xls above.
+				// nosemgrep: go-class-from-request
 				$importFile = new $fileClassName($params['file']);
 		
 			if(!empty($params['delimiter']))

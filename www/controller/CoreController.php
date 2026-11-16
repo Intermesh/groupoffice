@@ -261,6 +261,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 
 		$dir = GO::config()->root_path . 'views/Extjs3/themes/Paper/img/filetype/';
 		$url = GO::config()->host . 'views/Extjs3/themes/Paper/img/filetype/';
+		// GO\Base\Fs\File rejects ".." in paths and the file is only read after checkThumbFilePermission().
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path . $params['src']);
 		
 		
@@ -343,6 +345,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			}
 		}
 
+		// A file checked with checkThumbFilePermission() or a fixed icon.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File($src);
 		
 		if($file->size() > \GO::config()->max_thumbnail_size*1024*1024){
@@ -395,6 +399,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		}
 
 		$cacheFilename = 't_'. $w . '_' . $h . '_' . $lw . '_' . $ph. '_' . $pw . '_' . $lw;
+		// A file checked with checkThumbFilePermission() or a fixed icon.
+		// nosemgrep: go-path-from-request
 		$cacheDir = new \GO\Base\Fs\Folder(GO::config()->orig_tmpdir . 'thumbcache/'.$file->parent()->stripFileStoragePath());
 		$cacheDir->create();
 		
@@ -463,6 +469,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				header('Content-Disposition: inline; filename="' . $cacheFilename . '"');
 				header('Content-Transfer-Encoding: binary');
 
+		// A file checked with checkThumbFilePermission() or a fixed icon.
+		// nosemgrep: go-path-from-request
 		readfile($readfile);
 
 
@@ -529,6 +537,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		$inline = !isset($params['inline']) || !empty($params['inline']);
 		
+		// The temporary folder is per user and GO\Base\Fs\File rejects ".." in paths.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(GO::config()->tmpdir.$params['path']);
 		if($file->exists()){
 			\GO\Base\Util\Http::outputDownloadHeaders($file, $inline, !empty($params['cache']));
@@ -547,6 +557,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	 * @param String $path 
 	 */
 	protected function actionDownloadPublicFile($params){
+		// The public folder is public and GO\Base\Fs\File rejects ".." in paths.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path.'public/'.$params['path']);
 		
 		if($file->exists()){

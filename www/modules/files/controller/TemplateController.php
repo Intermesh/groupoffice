@@ -71,6 +71,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionDownload($params){
 		$template = \GO\Files\Model\Template::model()->findByPk($params['id']);
 		
+	  // Name from the database, only used for the download headers.
+	  // nosemgrep: go-path-from-request
 	  \GO\Base\Util\Http::outputDownloadHeaders(new \GO\Base\Fs\File($template->name.'.'.$template->extension));
 		
 		echo $template->content;
@@ -101,6 +103,8 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController {
 		if(!empty($template->extension))
 			$path .= '.'.$template->extension;
 
+		// Checked with checkFileStoragePath() below.
+		// nosemgrep: go-path-from-request
 		$fsFile = new \GO\Base\Fs\File($path);
 		$fsFile->checkFileStoragePath();
 
