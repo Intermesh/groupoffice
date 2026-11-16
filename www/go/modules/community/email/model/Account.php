@@ -17,9 +17,17 @@ class Account extends AclOwnerEntity
 
 	public ?string $id;
 	public string $username;
-	public $password;
+
+	/**
+	 * Encrypted. Never returned by the API, see {@see setPassword()}.
+	 */
+	protected $password;
 	public $smtp_username;
-	public $smtp_password;
+
+	/**
+	 * Encrypted. Never returned by the API, see {@see setSmtp_password()}.
+	 */
+	protected $smtp_password;
 	public $acl_id;
 	public $force_smtp_login;
 	public $password_encrypted;
@@ -57,6 +65,28 @@ class Account extends AclOwnerEntity
 		Acl::applyToQuery($query, $tableAlias . '.' . static::$aclColumnName, $level, $userId, $groups);
 
 		return $query;
+	}
+
+	/**
+	 * The IMAP password. It's encrypted when saved and never returned, because everyone who may read the account would
+	 * get it.
+	 *
+	 * @apiWriteOnly
+	 */
+	public function setPassword(?string $password): void
+	{
+		$this->password = $password;
+	}
+
+	/**
+	 * The SMTP password. It's encrypted when saved and never returned, because everyone who may read the account would
+	 * get it.
+	 *
+	 * @apiWriteOnly
+	 */
+	public function setSmtp_password(?string $password): void
+	{
+		$this->smtp_password = $password;
 	}
 
 	protected function internalSave(): bool
