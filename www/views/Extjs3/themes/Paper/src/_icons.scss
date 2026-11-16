@@ -14,7 +14,7 @@
 i.icon {
 	@extend %icon;
 	background-size: contain;
-	width:utils.dp(24);
+	width: utils.dp(24);
 	height: utils.dp(24);
 }
 
@@ -1048,6 +1048,8 @@ $material-icons : (
 	restore,
 	restore_page,
 	ring_volume,
+	robot,
+	robot_2,
 	room,
 	room_service,
 	rotate_90_degrees_ccw,
