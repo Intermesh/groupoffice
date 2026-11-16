@@ -22,8 +22,9 @@ class UserTest extends \PHPUnit\Framework\TestCase
 	public function testCreateFail() {
 		$user = new User();
 		$user->username = 'test1';
-		// shorter than the minimum length. The tests disable the pwned module, so a breached password is accepted.
-		$user->setPassword('test1');
+		// shorter than the minimum length, which differs per database (the upgrade test database has 4). The tests disable
+		// the pwned module, so a breached password is accepted.
+		$user->setPassword(str_repeat('a', go()->getSettings()->passwordMinLength - 1));
 		$user->displayName = 'Test user 1';
 		$user->email = $user->recoveryEmail = 'test1@intermesh.localhost';
 

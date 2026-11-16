@@ -182,7 +182,8 @@ class OAuthTest extends TestCase
 	{
 		Listeners::get()->clear(); // only the listeners of the installed modules
 
-		$this->assertArrayNotHasKey(OAuth::SCOPE, OAuthServer::moduleScopes());
+		// A fresh install has no license, but the upgrade test database has one for "groupoffice-pro"
+		$this->assertSame(Module::get()->isLicensed(), array_key_exists(OAuth::SCOPE, OAuthServer::moduleScopes()));
 	}
 
 	public function testUnauthorizedResponseLinksToTheMetadata(): void
