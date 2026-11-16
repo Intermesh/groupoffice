@@ -1,5 +1,5 @@
 16-11-2026: 26.0.60
-- MCP: AI assistants can communicate via MCP with GroupOffice
+- MCP: New beta MCP module. AI assistants can communicate via MCP with GroupOffice
 - Core: files added to an item through the API ("attachments") now show up in its files folder right away, count towards the disk quota and require write permission on the folder. An invalid file name, a full quota or a missing permission now returns an error on "attachments". Creating an item with attachments no longer fails. #1367
 - Core: uploading or storing a file with the same content as an existing file, for example someone else's attachment, renamed that existing file, for example when files of an item were used in a template. The existing file now keeps its name.
 - Calendar: the API failed with "Cannot use object of type stdClass as array" when one CalendarEvent/get asked for a recurring event's occurrence and other events, and the leave days module was installed.
