@@ -117,7 +117,11 @@ class EntityAttachmentsTest extends TestCase
 	private static function actAs(int $userId): void
 	{
 		go()->setAuthState(new TemporaryState($userId));
+		// The legacy session switches PHP to the timezone of the user. Keep the timezone, or later tests write local
+		// times into UTC columns.
+		$timezone = date_default_timezone_get();
 		\GO::session()->setCurrentUser($userId);
+		date_default_timezone_set($timezone);
 	}
 
 	private function createBlob(string $name, string $content): Blob
