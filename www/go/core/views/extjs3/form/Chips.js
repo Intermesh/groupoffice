@@ -37,7 +37,20 @@
 				name: "addressBooks",
 				fieldLabel: t("Options")
 			}
- * 
+ *
+ * With your own combo box, for example to show more than the name in the list:
+ *
+ * {
+				xtype: "chips",
+				entityStore: "Contact",
+				name: "organizationIds",
+				comboBox:new go.modules.community.addressbook.ContactCombo({
+					fieldLabel: t("Organizations"),
+					isOrganization: true,
+					submit: false
+				})
+			}
+ *
  */
 
 go.form.ChipsView = Ext.extend(Ext.DataView, {
@@ -268,7 +281,25 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			this.comboStore = this.store;
 			return;
 		}
-		
+
+		if(this.comboBox) {
+			// A combo box passed in the config, for example a contact combo that shows more than the name
+			this.comboStore = this.comboBox.store;
+		} else {
+			this.comboBox = this.createDefaultComboBox();
+		}
+
+		delete this.fieldLabel;
+
+		this.comboBox.on('select', function(combo, record) {
+			this.dataView.store.add([record]);
+			combo.reset();
+		}, this);
+
+		return this.comboBox;
+	},
+
+	createDefaultComboBox: function () {
 		if(this.entityStore){
 
 			var cfg = this.comboStoreConfig || {};
@@ -282,8 +313,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			}));
 		}
 
-		
-		this.comboBox = new go.form.ComboBox({
+		return new go.form.ComboBox({
 			// listeners: {
 			// 	focus: function(combo){
 			// 		//use settimeout to give combo change to run initLis()
@@ -312,15 +342,6 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			allowNew: this.allowNew,
 			createDialog: this.createDialog
 		});
-
-		delete this.fieldLabel;
-		
-		this.comboBox.on('select', function(combo, record) {
-			this.dataView.store.add([record]);
-			combo.reset();
-		}, this);
-		
-		return this.comboBox;
 	},
 	
 	onClick: function(dv, index, node,e) {

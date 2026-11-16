@@ -52,23 +52,10 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 								entityStore: "Contact",
 								displayField: "name",
 								valueField: 'id',
-								allowNew: {
-									isOrganization: true,
-									addressBookId: go.Modules.get("core", "core").settings.userAddressBookId
-								},
-								comboStoreConfig: {
-									sortInfo: {
-										field: 'name',
-										direction: 'ASC'
-									},
-									filters:  {
-										defaults: {
-											isOrganization: true
-										}
-									}
-								},
-								name: "organizationIds",
-								fieldLabel: t("Organizations")
+								comboBox: new go.modules.community.addressbook.OrganizationCombo({
+									newAddressBookId: go.Modules.get("core", "core").settings.userAddressBookId
+								}),
+								name: "organizationIds"
 							}),
 						]},
 					{
