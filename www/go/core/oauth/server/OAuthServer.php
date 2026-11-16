@@ -165,14 +165,16 @@ final class OAuthServer
 
 		self::validateResource($request->getQueryParams()['resource'] ?? null);
 
-		// A client that registered itself may only ask for the scopes of modules, like "mcp"
+		// A client that registered itself only gets the scopes of modules, like "mcp". Others are left out instead of
+		// refusing the request (RFC 6749 section 3.3), because clients like ChatGPT ask for every scope in the discovery
+		// document, including "openid".
 		if (self::needsConsent($authRequest->getClient())) {
 			$moduleScopes = self::moduleScopes();
-			foreach ($authRequest->getScopes() as $scope) {
-				if (!isset($moduleScopes[$scope->getIdentifier()])) {
-					throw OAuthServerException::invalidScope($scope->getIdentifier());
-				}
+			$scopes = array_values(array_filter($authRequest->getScopes(), fn($scope) => isset($moduleScopes[$scope->getIdentifier()])));
+			if (empty($scopes)) {
+				throw OAuthServerException::invalidScope(implode(' ', array_map(fn($scope) => $scope->getIdentifier(), $authRequest->getScopes())));
 			}
+			$authRequest->setScopes($scopes);
 		}
 
 		if (!$authRequest->getClient()->isConfidential() && $authRequest->getCodeChallengeMethod() !== 'S256') {
@@ -371,17 +373,20 @@ final class OAuthServer
 			'token_endpoint' => self::endpoint('token'),
 			'userinfo_endpoint' => self::endpoint('userinfo'),
 			'jwks_uri' => self::endpoint('certs'),
-			'scopes_supported' => array_merge(['openid'], array_keys(self::moduleScopes())),
+			// Clients like ChatGPT ask for every scope in this list, but a client that registered itself only gets the
+			// scopes of modules. So "openid" isn't advertised then, which OpenID Connect Discovery allows: clients that
+			// log in with OpenID Connect ask for it themselves.
+			'scopes_supported' => array_keys(self::moduleScopes()) ?: ['openid'],
 			'response_types_supported' => ['code', 'code token', 'code id_token', 'token', 'id_token token', 'code id_token token', 'id_token'],
 			'grant_types_supported' => ['authorization_code', 'refresh_token'],
 			'acr_values_supported' => [],
 			'subject_types_supported' => ['pairwise'],
 			'userinfo_signing_alg_values_supported' => $signing_alg_values_supported,
 			'id_token_signing_alg_values_supported' => $signing_alg_values_supported,
-			// "none" for public clients without a secret, which must use PKCE
-			'token_endpoint_auth_methods_supported' => ['client_secret_post', 'client_secret_basic', 'client_secret_jwt', 'private_key_jwt', 'none'],
+			// Only what the server supports, because clients like ChatGPT pick their preferred method from this list.
+			// "none" for public clients without a secret, which must use PKCE.
+			'token_endpoint_auth_methods_supported' => ['client_secret_post', 'client_secret_basic', 'none'],
 			'code_challenge_methods_supported' => ['S256'],
-			'token_endpoint_auth_signing_alg_values_supported' => $signing_alg_values_supported,
 			'display_values_supported' => ['page'],
 			'claim_types_supported' => ['normal'],
 			'claims_supported' => ['aud', 'iss', 'iat', 'exp', 'nonce']

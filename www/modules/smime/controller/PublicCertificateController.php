@@ -35,6 +35,8 @@ class PublicCertificateController extends \GO\Base\Controller\AbstractModelContr
 		}
 
 		$blob = \go\core\fs\Blob::findById($params['blobId']);
+		// Path of a blob from the database.
+		// nosemgrep: go-path-from-request
 		$content = file_get_contents($blob->path());
 		$success = PublicCertificate::import($content, [$params['email']]);
 		return ['success' => $success];

@@ -136,6 +136,34 @@ class ClientRegistrationTest extends TestCase
 		$this->assertSame(1, $this->fetches);
 	}
 
+	/**
+	 * ChatGPT prefers "private_key_jwt" but also supports "none". It was refused, so adding it failed with "Client
+	 * authentication failed".
+	 */
+	public function testMetadataDocumentOfClientThatAlsoSupportsNone(): void
+	{
+		$this->allowRegistration();
+		$this->serveDocument([
+			'token_endpoint_auth_method' => 'private_key_jwt',
+			'token_endpoint_auth_methods_supported' => ['none', 'private_key_jwt']
+		] + $this->validDocument());
+
+		$client = (new ClientRepository())->getClientEntity(self::DOCUMENT_URL);
+		$this->assertNotNull($client);
+		$this->assertFalse($client->isConfidential());
+	}
+
+	public function testMetadataDocumentOfClientThatNeedsASecret(): void
+	{
+		$this->allowRegistration();
+		$this->serveDocument([
+			'token_endpoint_auth_method' => 'private_key_jwt',
+			'token_endpoint_auth_methods_supported' => ['private_key_jwt']
+		] + $this->validDocument());
+
+		$this->assertNull((new ClientRepository())->getClientEntity(self::DOCUMENT_URL));
+	}
+
 	public function testInvalidMetadataDocuments(): void
 	{
 		$this->allowRegistration();
@@ -200,8 +228,12 @@ class ClientRegistrationTest extends TestCase
 			'code_challenge_method' => 'S256'
 		]);
 
+		// Like ChatGPT, that asks for every scope of the discovery document: "openid" is left out
+		$authRequest = OAuthServer::validateAuthorizationRequest($server, $request('openid testscope'));
+		$this->assertSame(['testscope'], array_map(fn($scope) => $scope->getIdentifier(), $authRequest->getScopes()));
+
 		try {
-			OAuthServer::validateAuthorizationRequest($server, $request('openid testscope'));
+			OAuthServer::validateAuthorizationRequest($server, $request('openid'));
 			$this->fail('A self-registered client got the openid scope');
 		} catch (OAuthServerException $e) {
 			$this->assertSame('invalid_scope', $e->getErrorType());

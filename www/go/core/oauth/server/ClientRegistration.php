@@ -102,6 +102,21 @@ final class ClientRegistration
 	}
 
 	/**
+	 * Whether the client of a metadata document can work without a secret
+	 *
+	 * A client may prefer another method and still support "none", like ChatGPT with "private_key_jwt". It picks a
+	 * method this server supports, and the client is registered as public, so it must use PKCE.
+	 */
+	private static function canBePublic(array $document): bool
+	{
+		if (($document['token_endpoint_auth_method'] ?? 'none') === 'none') {
+			return true;
+		}
+		$supported = $document['token_endpoint_auth_methods_supported'] ?? null;
+		return is_array($supported) && in_array('none', $supported, true);
+	}
+
+	/**
 	 * Whether a client ID is the URL of a metadata document: HTTPS with a path
 	 */
 	public static function isMetadataUrl(string $clientId): bool
@@ -146,7 +161,7 @@ final class ClientRegistration
 				throw new InvalidArgumentException('client_id of the document is not its URL');
 			}
 			$redirectUris = self::validRedirectUris($document['redirect_uris'] ?? null);
-			if (($document['token_endpoint_auth_method'] ?? 'none') !== 'none') {
+			if (!self::canBePublic($document)) {
 				throw new InvalidArgumentException('only public clients');
 			}
 		} catch (Exception $e) {

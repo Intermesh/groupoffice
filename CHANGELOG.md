@@ -1,6 +1,13 @@
 - Calendar: a new event now selects the calendar's default reminder, also after switching "All day" on or off, instead of "Default".
 
-12-11-2026: 26.0.60
+16-11-2026: 26.0.60
+- MCP: New beta MCP module. AI assistants can communicate via MCP with GroupOffice
+- Core: files added to an item through the API ("attachments") now show up in its files folder right away, count towards the disk quota and require write permission on the folder. An invalid file name, a full quota or a missing permission now returns an error on "attachments". Creating an item with attachments no longer fails. #1367
+- Core: uploading or storing a file with the same content as an existing file, for example someone else's attachment, renamed that existing file, for example when files of an item were used in a template. The existing file now keeps its name.
+- Calendar: the API failed with "Cannot use object of type stdClass as array" when one CalendarEvent/get asked for a recurring event's occurrence and other events, and the leave days module was installed.
+- Files: when a file or folder can't be moved into a folder, an error is now returned instead of adding an entry for something that isn't there.
+- Core: the API now returns an "invalidArguments" error when a filter gets a value of the wrong type, for example true for a user ID, instead of returning wrong results.
+- Projects: the project filter "isResource" is renamed to "forUser". It takes a user ID or a list of user IDs. API clients that use "isResource" must change it.
 - Core: relative times like "5 minutes ago" read naturally in other languages, like "vor 5 Minuten" and "il y a 5 minutes".
 - Core: Several translation errors fixed
 - Core: imported CSV files with only a few accented characters could get garbled characters, like "ﾃ､" instead of "ä".

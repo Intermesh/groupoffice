@@ -41,6 +41,8 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 
 		$filename = str_replace(array('@', '.'), '-', $account->getDefaultAlias()->email) . '.p12';
 
+		// Name from the e-mail address of the account, only used for the download headers.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File($filename);
 		\GO\Base\Util\Http::outputDownloadHeaders($file);
 

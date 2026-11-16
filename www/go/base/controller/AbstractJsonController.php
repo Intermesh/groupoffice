@@ -248,6 +248,8 @@ abstract class AbstractJsonController extends AbstractController {
 		}
 		
 		if(!empty($params['type'])){
+			// Checked with AbstractExport::isExportClass() in the beginning of this method.
+			// nosemgrep: go-class-from-request
 			$export = new $params['type']($store, $settings->export_include_headers, $settings->export_human_headers, $params['documentTitle'], $orientation);
 		}else
 			$export = new \GO\Base\Storeexport\ExportCSV($store, $settings->export_include_headers, $settings->export_human_headers, $params['documentTitle'], $orientation); // The default Export is the CSV outputter.
