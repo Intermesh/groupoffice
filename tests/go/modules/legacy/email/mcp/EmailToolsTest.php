@@ -108,6 +108,24 @@ class EmailToolsTest extends TestCase
 		$this->assertNotContains((string) Account::entityType()->getId(), array_map(fn($e) => (string) $e->entityTypeId, $key->getAllEntities()));
 	}
 
+	/**
+	 * E-mail accounts hold passwords, so they can't be picked as a whole entity type, also not by a key that picked it
+	 * before
+	 */
+	public function testAccountsCanNotBePickedAsEntityType(): void
+	{
+		$this->assertFalse(McpKey::isPickable(Account::entityType()));
+
+		$key = $this->key([]);
+		$entity = new McpKeyEntity($key);
+		$entity->entityTypeId = (string) Account::entityType()->getId();
+		$entity->mayWrite = true;
+		$key->entities = [$entity];
+		$this->assertNull($key->findEntity('Account'));
+		$this->assertSame([], array_filter($key->getAllEntities(), fn($e) => (string) $e->entityTypeId === (string) Account::entityType()->getId()));
+		$this->assertFalse($key->save(), 'a new key with the entity type');
+	}
+
 	public function testAccountThatIsNotPickedIsRefused(): void
 	{
 		$result = $this->call($this->key([[$this->account->id + 1000, false]]), 'email_query', ['accountId' => (string) $this->account->id]);
