@@ -1,4 +1,5 @@
 16-11-2026: 26.0.60
+- Finance: fixed the error "Cannot assign null to property FinanceDocumentItem::$priceEntryMode" when adding articles with "Add from catalog".
 - Finance: a book has options to show or hide "Reverse charge VAT", the delivery date and the execution date in its documents. New books hide the dates; existing books keep showing them. A hidden field still shows when a document has a value for it.
 - Finance: sales invoices can be put "On hold" in the invoice dialog or, for invoices that are already sent, in the menu of the invoice. No reminders are sent for an invoice on hold and it is left out of the customer's statement.
 - Tasks: the permission "Change lists" is now only needed to create and delete task lists. Users with manage permission on a list can change its name and permissions; write permission is no longer enough for that.
