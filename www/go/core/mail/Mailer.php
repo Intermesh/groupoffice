@@ -44,6 +44,12 @@ class Mailer {
 	 *
 	 * This is set when you use {@see App::getMailer()}
 	 */
+	/**
+	 * When set, sending is refused with this reason. For example during the request of an AI assistant (MCP), so text
+	 * written by others, like an e-mail it reads, can't make it send data to someone.
+	 */
+	public static ?string $sendingDisabled = null;
+
 	public string|null $fromEmail;
 
 	/**
@@ -160,6 +166,7 @@ class Mailer {
 	 */
 	public function send(Message $message) : void
 	{
+		self::checkSendingAllowed();
 
 		$message->setMailer($this);
 		$this->prepareMessage($message);
@@ -168,6 +175,16 @@ class Mailer {
 
 		$this->mail->send();
 		$this->sent = true;
+	}
+
+	/**
+	 * @throws Exception When sending is disabled, see {@see $sendingDisabled}
+	 */
+	private static function checkSendingAllowed(): void
+	{
+		if (isset(self::$sendingDisabled)) {
+			throw new Exception(self::$sendingDisabled);
+		}
 	}
 
 	/**
@@ -535,6 +552,7 @@ class Mailer {
 
 
 	public function sendMime(string $mime) : bool {
+		self::checkSendingAllowed();
 		$this->initTransport();
 		return $this->mail->sendMime($mime);
 	}
