@@ -37,6 +37,19 @@ class IdTokenResponse extends BaseIdTokenResponse
 		return $issuer;
 	}
 
+	/**
+	 * Add the granted scopes, because they may differ from the requested ones (RFC 6749 section 5.1)
+	 *
+	 * A client that registered itself and asked for "openid mcp" only gets "mcp", see
+	 * {@see OAuthServer::validateAuthorizationRequest()}.
+	 */
+	protected function getExtraParams(AccessTokenEntityInterface $accessToken): array
+	{
+		return parent::getExtraParams($accessToken) + [
+			'scope' => implode(' ', array_map(fn($scope) => $scope->getIdentifier(), $accessToken->getScopes()))
+		];
+	}
+
 	protected function getBuilder(AccessTokenEntityInterface $accessToken, UserEntityInterface $userEntity)
 	{
 		return parent::getBuilder($accessToken, $userEntity)->issuedBy(self::issuer());

@@ -229,6 +229,18 @@ class AuthorizationServerTest extends TestCase
 		$this->assertNotContains('client_secret_jwt', $metadata['token_endpoint_auth_methods_supported']);
 	}
 
+	/**
+	 * ChatGPT asks for every advertised scope. A client that registered itself doesn't get "openid", so it isn't
+	 * advertised when modules offer scopes.
+	 */
+	public function testMetadataOnlyAdvertisesModuleScopes(): void
+	{
+		$this->assertSame(['openid'], OAuthServer::metadata()['scopes_supported']);
+
+		OAuthServer::on(OAuthServer::EVENT_SCOPES, self::class, 'addModuleScope');
+		$this->assertSame([self::MODULE_SCOPE], OAuthServer::metadata()['scopes_supported']);
+	}
+
 	private function publicAuthorizationRequest(array $params): ServerRequest
 	{
 		return (new ServerRequest('GET', 'https://localhost/api/oauth.php/authorize'))->withQueryParams(array_merge([
@@ -320,7 +332,10 @@ class AuthorizationServerTest extends TestCase
 		$server = $this->server();
 		$resourceServer = OAuthServer::resourceServer($this->publicKeyFile->getPath());
 
-		$moduleToken = $this->publicClientTokens($server, self::MODULE_SCOPE)['access_token'];
+		$moduleTokens = $this->publicClientTokens($server, self::MODULE_SCOPE);
+		// The granted scopes are in the response, because they may differ from the requested ones
+		$this->assertSame(self::MODULE_SCOPE, $moduleTokens['scope']);
+		$moduleToken = $moduleTokens['access_token'];
 		$response = OAuthServer::userInfo((new ServerRequest('GET', 'https://localhost/api/oauth.php/userinfo'))->withHeader('Authorization', 'Bearer ' . $moduleToken), $resourceServer);
 		$this->assertSame(403, $response->getStatusCode());
 

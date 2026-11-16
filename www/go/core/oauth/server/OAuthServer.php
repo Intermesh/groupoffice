@@ -373,7 +373,10 @@ final class OAuthServer
 			'token_endpoint' => self::endpoint('token'),
 			'userinfo_endpoint' => self::endpoint('userinfo'),
 			'jwks_uri' => self::endpoint('certs'),
-			'scopes_supported' => array_merge(['openid'], array_keys(self::moduleScopes())),
+			// Clients like ChatGPT ask for every scope in this list, but a client that registered itself only gets the
+			// scopes of modules. So "openid" isn't advertised then, which OpenID Connect Discovery allows: clients that
+			// log in with OpenID Connect ask for it themselves.
+			'scopes_supported' => array_keys(self::moduleScopes()) ?: ['openid'],
 			'response_types_supported' => ['code', 'code token', 'code id_token', 'token', 'id_token token', 'code id_token token', 'id_token'],
 			'grant_types_supported' => ['authorization_code', 'refresh_token'],
 			'acr_values_supported' => [],
