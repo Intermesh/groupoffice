@@ -237,11 +237,19 @@ class CalendarEvent extends EntityController {
 	 *   false.
 	 */
 	public function set($params) {
+		// Restore the flags afterwards: one request (a JMAP batch or MCP call) may run more than one set
+		$sendSchedulingMessages = model\CalendarEvent::$sendSchedulingMessages;
+		$fromClient = model\CalendarEvent::$fromClient;
 		if(!empty($params['sendSchedulingMessages'])) {
 			model\CalendarEvent::$sendSchedulingMessages = true;
 		}
 		model\CalendarEvent::$fromClient = true;
-		return $this->defaultSet($params);
+		try {
+			return $this->defaultSet($params);
+		} finally {
+			model\CalendarEvent::$sendSchedulingMessages = $sendSchedulingMessages;
+			model\CalendarEvent::$fromClient = $fromClient;
+		}
 	}
 	
 	
