@@ -31,7 +31,7 @@ use ReflectionMethod;
 class MaintenanceController extends AbstractController {
 	
 	protected function allowGuests() {
-		return array('upgrade','checkdatabase','servermanagerreport','test','downloadfromshop', 'removeduplicates','buildsearchcache', "buildprincipals");
+		return array('upgrade','checkdatabase','servermanagerreport','test','downloadfromshop', 'removeduplicates','buildsearchcache', "buildprincipals", "getnewacl");
 	}
 	
 	/**
