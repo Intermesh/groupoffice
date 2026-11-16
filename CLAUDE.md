@@ -111,7 +111,7 @@ Every module with a GOUI UI has its own `package.json` in its `views/goui` folde
 The release build (`build/build.sh`) encodes every PHP file of `go/modules/business/*` and the pro modules with SourceGuardian, except `Module.php`. Without the loader, loading an encoded file ends PHP: it isn't an exception, so `try`/`catch` can't stop it, and an upgrade or cache rebuild fails. Dev checkouts aren't encoded, so you won't see this locally.
 
 - Code outside a business module must not load its classes until it has checked the module, through its unencoded `Module.php`: `class_exists(...\Module::class) && ...\Module::get()->isAvailable()` (see `GO\Email\EmailModule::defineListeners()`). `class_exists()` on any other class of the module loads the file. Using `Foo::class` as a string or in a `use` statement is safe.
-- Take extra care in `defineListeners()`: it runs for every enabled module on every cache rebuild, including the one at the end of an upgrade.
+- Take extra care in `defineListeners()`: it runs for every enabled module on every cache rebuild, including the one at the end of an upgrade. `tests/go/core/event/ListenersTest.php` rebuilds the cache with the business modules unavailable and fails when one of their other classes is loaded.
 
 ## Static analysis
 
