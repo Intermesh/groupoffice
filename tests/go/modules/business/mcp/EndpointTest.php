@@ -43,6 +43,7 @@ class EndpointTest extends TestCase
 	protected function tearDown(): void
 	{
 		go()->setAuthState($this->authState);
+		\go\core\mail\Mailer::$sendingDisabled = null;
 	}
 
 	/**
@@ -88,6 +89,7 @@ class EndpointTest extends TestCase
 		$this->assertEquals(200, $response['status']);
 		$this->assertEquals('2025-11-25', $response['body']['result']['protocolVersion']);
 		$this->assertEquals(self::$mcpUser->id, go()->getAuthState()->getUserId());
+		$this->assertNotNull(\go\core\mail\Mailer::$sendingDisabled, 'an AI assistant may not send e-mail');
 	}
 
 	public function testUnlicensedModuleIsRefused(): void

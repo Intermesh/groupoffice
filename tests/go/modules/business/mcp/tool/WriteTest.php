@@ -160,6 +160,15 @@ class WriteTest extends TestCase
 		$this->assertNotNull(Note::findById($id));
 	}
 
+	public function testInvitationsAreNotSent(): void
+	{
+		$key = self::createMcpKey(['CalendarEvent' => true]);
+		$result = $this->write([['CalendarEvent/set', ['create' => ['e' => ['title' => 'Meeting']], 'sendSchedulingMessages' => true], 'c']], $key);
+
+		$this->assertTrue($result['isError']);
+		$this->assertStringContainsString("invitations can't be sent", $result['structuredContent']['error']);
+	}
+
 	public function testTooManyChangesAtOnce(): void
 	{
 		$create = [];
