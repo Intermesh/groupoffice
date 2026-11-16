@@ -228,8 +228,12 @@ class ClientRegistrationTest extends TestCase
 			'code_challenge_method' => 'S256'
 		]);
 
+		// Like ChatGPT, that asks for every scope of the discovery document: "openid" is left out
+		$authRequest = OAuthServer::validateAuthorizationRequest($server, $request('openid testscope'));
+		$this->assertSame(['testscope'], array_map(fn($scope) => $scope->getIdentifier(), $authRequest->getScopes()));
+
 		try {
-			OAuthServer::validateAuthorizationRequest($server, $request('openid testscope'));
+			OAuthServer::validateAuthorizationRequest($server, $request('openid'));
 			$this->fail('A self-registered client got the openid scope');
 		} catch (OAuthServerException $e) {
 			$this->assertSame('invalid_scope', $e->getErrorType());

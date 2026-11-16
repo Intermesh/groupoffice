@@ -165,14 +165,16 @@ final class OAuthServer
 
 		self::validateResource($request->getQueryParams()['resource'] ?? null);
 
-		// A client that registered itself may only ask for the scopes of modules, like "mcp"
+		// A client that registered itself only gets the scopes of modules, like "mcp". Others are left out instead of
+		// refusing the request (RFC 6749 section 3.3), because clients like ChatGPT ask for every scope in the discovery
+		// document, including "openid".
 		if (self::needsConsent($authRequest->getClient())) {
 			$moduleScopes = self::moduleScopes();
-			foreach ($authRequest->getScopes() as $scope) {
-				if (!isset($moduleScopes[$scope->getIdentifier()])) {
-					throw OAuthServerException::invalidScope($scope->getIdentifier());
-				}
+			$scopes = array_values(array_filter($authRequest->getScopes(), fn($scope) => isset($moduleScopes[$scope->getIdentifier()])));
+			if (empty($scopes)) {
+				throw OAuthServerException::invalidScope(implode(' ', array_map(fn($scope) => $scope->getIdentifier(), $authRequest->getScopes())));
 			}
+			$authRequest->setScopes($scopes);
 		}
 
 		if (!$authRequest->getClient()->isConfidential() && $authRequest->getCodeChallengeMethod() !== 'S256') {
