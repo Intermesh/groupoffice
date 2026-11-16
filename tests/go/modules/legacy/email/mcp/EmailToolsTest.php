@@ -162,6 +162,11 @@ class EmailToolsTest extends TestCase
 		$key = $this->key([[$this->account->id, false]]);
 		$this->assertTrue($key->save(), var_export($key->getValidationErrors(), true));
 		try {
+			// Write access added later is checked too
+			$key = McpKey::findById($key->id);
+			$key->setValues(['entities' => [['entityTypeId' => (string) Account::entityType()->getId(), 'entityId' => (string) $this->account->id, 'mayWrite' => true]]]);
+			$this->assertFalse($key->save(), 'write access needs create permission on the account');
+
 			$this->actAs(\go\core\model\User::ID_SUPER_ADMIN);
 			$acl = Acl::findById($this->account->acl_id);
 			$acl->removeGroup($this->other->getPersonalGroup()->id);
@@ -171,6 +176,12 @@ class EmailToolsTest extends TestCase
 			// Access that was revoked later doesn't block saving the key: the tools refuse the account
 			$key = McpKey::findById($key->id);
 			$key->name = 'renamed';
+			$this->assertTrue($key->save(), var_export($key->getValidationErrors(), true));
+
+			// Also when the dialog or an OAuth consent sends the same items again
+			$row = ['entityTypeId' => (string) Account::entityType()->getId(), 'entityId' => (string) $this->account->id, 'mayWrite' => false];
+			$key = McpKey::findById($key->id);
+			$key->setValues(['entities' => [$row]]);
 			$this->assertTrue($key->save(), var_export($key->getValidationErrors(), true));
 
 			$other = $this->key([[$this->account->id + 1000, false]]);
