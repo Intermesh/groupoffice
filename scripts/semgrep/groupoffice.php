@@ -56,6 +56,8 @@ class Test extends Controller
 		$db->select('*')->from('core_user')->where(['username' => $params['username']]);
 		// ok: go-sql-from-request
 		$db->query("SELECT * FROM core_user WHERE id = " . (int) $params['id']);
+		// ok: go-sql-from-request
+		$db->select('*')->from('core_user')->where((new Criteria)->where('email', 'LIKE', '%' . $params['q'] . '%')->orWhere('displayName', 'LIKE', '%' . $params['q'] . '%'));
 	}
 
 	public function classes($params)
@@ -120,6 +122,10 @@ class Test extends Controller
 		}
 		// ok: go-exception-not-thrown
 		$e = new \Exception("x");
+		// ok: go-exception-not-thrown
+		$this->exceptionHandler(new ErrorException("x"));
+		// ok: go-exception-not-thrown
+		handle(new \Exception("x"));
 	}
 
 	public function aclBypassNotRestored()
