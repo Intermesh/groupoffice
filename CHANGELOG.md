@@ -1,3 +1,4 @@
+16-11-2026: 26.0.60
 - Calendar: the printed month view shows the start and end time of an event in front of its title, with leading zeros (09:00-10:30).
 - Core: with a 12-hour clock, time fields saved "12:30 am" as 12:30 in the afternoon and didn't correct hours above 12. They now save 0:30, and an hour above 12 becomes 12.
 - Core: time fields move on from the hours to the minutes while typing, like date fields do, as soon as the hour can't get another digit (for example "14", or "8" which becomes 08). With a 12-hour clock the minutes move on to am/pm.
