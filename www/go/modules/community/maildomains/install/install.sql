@@ -9,6 +9,8 @@ create table community_maildomains_domain
     maxMailboxes int unsigned      default 0         not null,
     totalQuota   bigint unsigned   default 0         not null,
     defaultQuota bigint unsigned   default 0         not null,
+    defaultAutoExpunge varchar(20) default '30d'     not null comment 'Default autoExpunge for new mailboxes',
+    defaultFts   tinyint(1)        default 0         not null comment 'Default full text search for new mailboxes',
     transport    varchar(255)      default 'virtual' not null,
     backupMx     tinyint(1)        default 0         not null,
     spf          varchar(255)                        null,

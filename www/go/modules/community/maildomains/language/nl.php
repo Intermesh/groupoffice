@@ -80,4 +80,5 @@ return array (
   'Auto expunge' => 'Automatisch verwijderen',
   'Automatically delete mail from the Trash and Spam folder after a period of time.' => 'Verwijder automatisch e-mail uit de map Prullenbak en Spam na een periode.',
   'Expunge after days' => 'Ontruimen na dagen',
+  'Mailbox defaults' => 'Standaardwaarden mailboxen',
 );

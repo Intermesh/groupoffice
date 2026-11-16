@@ -9,6 +9,8 @@ export interface MailDomain extends BaseEntity {
 	spfStatus:boolean
 	dkim:any,
 	defaultQuota:number
+	defaultAutoExpunge:string
+	defaultFts:boolean
 	maxMailboxes:number,
 	maxAliases:number
 }
