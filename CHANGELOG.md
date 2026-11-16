@@ -1,3 +1,5 @@
+- Calendar: a new event now selects the calendar's default reminder, also after switching "All day" on or off, instead of "Default".
+
 12-11-2026: 26.0.60
 - Core: relative times like "5 minutes ago" read naturally in other languages, like "vor 5 Minuten" and "il y a 5 minutes".
 - Core: Several translation errors fixed

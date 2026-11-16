@@ -39,7 +39,7 @@ import {
 	principalDS,
 	recurrencefield
 } from "@intermesh/groupoffice-core";
-import {OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
+import {Calendar, OnlineMeetingButton, t, writeableCalendarStore} from "./Index.js";
 import {ParticipantField, participantfield} from "./ParticipantField.js";
 import {AlertField, alertfield} from "./AlertField.js";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
@@ -64,6 +64,8 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 
 	private titleField: TextField
 	private alertField: AlertField
+	// the alert came from the event or the user, so don't replace it with the calendar's default
+	private alertChosen = false
 	private confirmedScheduleMessage: boolean = false;
 	private categoryStore: DataSourceStore;
 
@@ -81,7 +83,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 		// this.startTime = textfield({type:'time',value: '12:00', width: 128})
 		// this.endTime = textfield({type:'time',value: '13:00', width: 128})
 		var recurrenceField = recurrencefield({name: 'recurrenceRule',flex:1});
-		this.alertField = alertfield();
+		this.alertField = alertfield({listeners: {change: () => { this.alertChosen = true; }}});
 
 		const exceptionsBtn = btn({text:t('Exceptions'), handler: _b => {
 			this.openExceptionsWindow();
@@ -98,6 +100,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 				.addDays(data.showWithoutTime? -1 : 0)
 				.format(data.showWithoutTime ? 'Y-m-d' : 'Y-m-dTH:i:s');
 			exceptionsBtn.hidden = !data.recurrenceOverrides;
+			this.alertChosen = !!data.id || !!data.alerts;
 			if(data.useDefaultAlerts) {
 				this.alertField.useDefault = true;
 				delete data.alerts;
@@ -226,8 +229,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 								]
 						});
 
-							const d = this.form.value.showWithoutTime ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-							this.alertField.setDefaultLabel(d);
+							this.applyDefaultAlerts(r, !!this.form.value.showWithoutTime);
 
 							const hasParticipants = Object.keys(this.item?.participants || {}).length > 0;
 							if (!this.item?.key && hasParticipants) {
@@ -266,8 +268,7 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 					if(this.form.value.calendarId) {
 						writeableCalendarStore.dataSource.single(this.form.value.calendarId).then(r => {
 							if (!r) return;
-							const d = newValue ? r.defaultAlertsWithoutTime : r.defaultAlertsWithTime;
-							this.alertField.setDefaultLabel(d)
+							this.applyDefaultAlerts(r, newValue);
 						});
 					}
 					this.startDate.withTime = this.endDate.withTime = !newValue;
@@ -431,6 +432,20 @@ export class EventWindow extends FormWindow<CalendarEvent> {
 			}));
 
 		exceptionView.show();
+	}
+
+	/**
+	 * Shows the calendar's default alert in the "Default" option and selects it for a new event when no alert was chosen yet
+	 *
+	 * @param cal
+	 * @param withoutTime Use the default alerts for full-day events
+	 */
+	private applyDefaultAlerts(cal: Calendar, withoutTime: boolean): void {
+		const alerts = withoutTime ? cal.defaultAlertsWithoutTime : cal.defaultAlertsWithTime;
+		this.alertField.setDefaultLabel(alerts);
+		if(!this.alertChosen) {
+			this.alertField.value = alerts && Object.keys(alerts).length ? alerts : 'default';
+		}
 	}
 
 	parseSavedData(data: any) {
