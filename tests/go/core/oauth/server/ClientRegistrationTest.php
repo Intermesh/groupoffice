@@ -136,6 +136,34 @@ class ClientRegistrationTest extends TestCase
 		$this->assertSame(1, $this->fetches);
 	}
 
+	/**
+	 * ChatGPT prefers "private_key_jwt" but also supports "none". It was refused, so adding it failed with "Client
+	 * authentication failed".
+	 */
+	public function testMetadataDocumentOfClientThatAlsoSupportsNone(): void
+	{
+		$this->allowRegistration();
+		$this->serveDocument([
+			'token_endpoint_auth_method' => 'private_key_jwt',
+			'token_endpoint_auth_methods_supported' => ['none', 'private_key_jwt']
+		] + $this->validDocument());
+
+		$client = (new ClientRepository())->getClientEntity(self::DOCUMENT_URL);
+		$this->assertNotNull($client);
+		$this->assertFalse($client->isConfidential());
+	}
+
+	public function testMetadataDocumentOfClientThatNeedsASecret(): void
+	{
+		$this->allowRegistration();
+		$this->serveDocument([
+			'token_endpoint_auth_method' => 'private_key_jwt',
+			'token_endpoint_auth_methods_supported' => ['private_key_jwt']
+		] + $this->validDocument());
+
+		$this->assertNull((new ClientRepository())->getClientEntity(self::DOCUMENT_URL));
+	}
+
 	public function testInvalidMetadataDocuments(): void
 	{
 		$this->allowRegistration();

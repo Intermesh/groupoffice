@@ -378,10 +378,10 @@ final class OAuthServer
 			'subject_types_supported' => ['pairwise'],
 			'userinfo_signing_alg_values_supported' => $signing_alg_values_supported,
 			'id_token_signing_alg_values_supported' => $signing_alg_values_supported,
-			// "none" for public clients without a secret, which must use PKCE
-			'token_endpoint_auth_methods_supported' => ['client_secret_post', 'client_secret_basic', 'client_secret_jwt', 'private_key_jwt', 'none'],
+			// Only what the server supports, because clients like ChatGPT pick their preferred method from this list.
+			// "none" for public clients without a secret, which must use PKCE.
+			'token_endpoint_auth_methods_supported' => ['client_secret_post', 'client_secret_basic', 'none'],
 			'code_challenge_methods_supported' => ['S256'],
-			'token_endpoint_auth_signing_alg_values_supported' => $signing_alg_values_supported,
 			'display_values_supported' => ['page'],
 			'claim_types_supported' => ['normal'],
 			'claims_supported' => ['aud', 'iss', 'iat', 'exp', 'nonce']

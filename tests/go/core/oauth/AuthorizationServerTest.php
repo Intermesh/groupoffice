@@ -224,6 +224,9 @@ class AuthorizationServerTest extends TestCase
 		// MCP clients refuse an authorization server without code_challenge_methods_supported
 		$this->assertSame(['S256'], $metadata['code_challenge_methods_supported']);
 		$this->assertContains('none', $metadata['token_endpoint_auth_methods_supported']);
+		// Clients like ChatGPT pick their preferred method from this list, so it may only contain what works
+		$this->assertNotContains('private_key_jwt', $metadata['token_endpoint_auth_methods_supported']);
+		$this->assertNotContains('client_secret_jwt', $metadata['token_endpoint_auth_methods_supported']);
 	}
 
 	private function publicAuthorizationRequest(array $params): ServerRequest
