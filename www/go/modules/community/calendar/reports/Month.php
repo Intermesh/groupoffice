@@ -195,20 +195,15 @@ class Month extends Calendar {
 			$title = substr($event->title, 0, 25);
 
 			if (!$event->showWithoutTime) {
-				$start = $event->start(false, $tz)->format('G:i');
-				$timeWidth = 7;//$this->GetStringWidth($start);
-				$this->SetTextColor(0, 0, 0);
-				$this->Cell($width - $timeWidth - 4, 4, $title, 0, 0);
-				$catX = $this->GetX();
-
-				$this->SetFillColor($bgcolor);
-
-				$this->Rect($x + $width - $timeWidth - 1.5, $currentY+1, $timeWidth + 1.5, 4, 'F');
+				$time = $event->start(false, $tz)->format('H:i') . '-' . $event->end(false, $tz)->format('H:i');
+				$timeWidth = $this->GetStringWidth($time) + 1.5;
 
 				$this->SetTextColor(80);
-				$this->SetXY($x + $width - $timeWidth-1, $currentY);
-				$this->Cell($timeWidth, 4, $start, 0, 0, 'R');
+				$this->Cell($timeWidth, 4, $time, 0, 0);
 
+				$this->SetTextColor(0, 0, 0);
+				$this->Cell($width - $pad - $timeWidth - 1, 4, $title, 0, 0);
+				$catX = $x + $width - 1;
 
 			} else {
 				$this->SetTextColor($r, $g, $b);
