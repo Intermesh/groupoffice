@@ -1050,7 +1050,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				
 				$replyText = $header;
 			} else {
-				$replyText = sprintf(GO::t("On %s, %s at %s %s wrote:", "email"), $fullDays[date('w', $message->udate)], date(GO::user()->completeDateFormat, $message->udate), date(GO::user()->time_format, $message->udate), $fromArr['personal']);
+				$replyText = sprintf(GO::t("On %s, %s at %s %s wrote:", "email"), $fullDays[date('w', $message->udate)], date(GO::user()->completeDateFormat, $message->udate), date(GO::user()->time_format, $message->udate), htmlspecialchars($fromArr['personal'] ?? '', ENT_QUOTES, 'UTF-8'));
 			}
 			
 			$response['data']['htmlbody'] .= '<br /><br />' .
