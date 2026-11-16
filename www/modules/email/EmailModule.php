@@ -65,6 +65,20 @@ class EmailModule extends \GO\Base\Module{
 
 		App::on(App::EVENT_USER_MAILER, static::class, 'getUserMailer');
 
+		// E-mail tools for AI assistants, only when the MCP server module is available
+		if (class_exists(\go\modules\business\mcp\Server::class)) {
+			\go\modules\business\mcp\Server::on(\go\modules\business\mcp\Server::EVENT_TOOL_PROVIDERS, static::class, 'onMcpToolProviders');
+		}
+	}
+
+	/**
+	 * Add the e-mail tools to the MCP server
+	 *
+	 * @param \go\core\util\ArrayObject $providers
+	 */
+	public static function onMcpToolProviders(\go\core\util\ArrayObject $providers): void
+	{
+		$providers[] = new \GO\Email\Mcp\EmailToolProvider();
 	}
 
 	public function depends()
