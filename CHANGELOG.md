@@ -1,3 +1,5 @@
+- Calendar: a new event now selects the calendar's default reminder, also after switching "All day" on or off, instead of "Default".
+
 16-11-2026: 26.0.60
 - MCP: New beta MCP module. AI assistants can communicate via MCP with GroupOffice
 - Core: files added to an item through the API ("attachments") now show up in its files folder right away, count towards the disk quota and require write permission on the folder. An invalid file name, a full quota or a missing permission now returns an error on "attachments". Creating an item with attachments no longer fails. #1367
