@@ -1,3 +1,6 @@
+- Core: the global search and the links panel could hang for many minutes on large installations, filling up the database server with slow queries.
+- Core: the global search, the link search and the search fields of the modules start searching automatically from 3 characters. Press enter to search for shorter text.
+
 13-11-2026: 6.8.184
 - Security: this release fixes a large number of security issues that were found in an extensive security review. Some were critical. We advise everyone to update. Please check the points below after updating.
 - Projects2: Fixed invalid access denied message for expenses, income and budgets
