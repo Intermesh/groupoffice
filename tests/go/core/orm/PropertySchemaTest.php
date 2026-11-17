@@ -16,6 +16,18 @@ class PropertySchemaTest extends TestCase
 		return (array) $schema['$defs'][$def]['properties'];
 	}
 
+	/**
+	 * Properties documented with "@var <type> <description>" get that description, so a client that reads the schema
+	 * knows what they mean
+	 */
+	public function testVarDescriptionIsUsed(): void
+	{
+		$schema = PropertySchema::build(\go\modules\community\calendar\model\CalendarEvent::class);
+		$props = $this->properties($schema, 'Participant');
+
+		$this->assertStringContainsString('What kind of entity', $props['kind']['description']);
+	}
+
 	public function testRootReferencesEntityDefinition(): void
 	{
 		$schema = PropertySchema::build(A::class);
@@ -29,7 +41,10 @@ class PropertySchemaTest extends TestCase
 		$schema = PropertySchema::build(A::class);
 		$props = $this->properties($schema, 'A');
 
-		$this->assertEquals(['type' => 'array', 'items' => ['$ref' => '#/$defs/AHasMany']], $props['hasMany']);
+		$this->assertEquals('array', $props['hasMany']['type']);
+		$this->assertEquals(['$ref' => '#/$defs/AHasMany'], $props['hasMany']['items']);
+		// From "@var AHasMany[] The has many property models"
+		$this->assertEquals('The has many property models', $props['hasMany']['description']);
 		$this->assertEquals(['$ref' => '#/$defs/AMap'], $props['map']['additionalProperties']);
 		$this->assertContains(['$ref' => '#/$defs/AHasOne'], $props['hasOne']['anyOf']);
 
@@ -93,6 +108,21 @@ class PropertySchemaTest extends TestCase
 
 		$this->assertTrue($props['permissionLevel']['readOnly']);
 		$this->assertEquals('integer', $props['permissionLevel']['type']);
+	}
+
+	/**
+	 * A setter without a getter is only a property when it's tagged "@apiWriteOnly". Most are internal, like setValues().
+	 */
+	public function testOnlyTaggedSettersAreWriteOnlyProperties(): void
+	{
+		$props = $this->properties(PropertySchema::build(\go\modules\community\calendar\model\CalendarEvent::class), 'CalendarEvent');
+		$this->assertTrue($props['onlineMeeting']['writeOnly']);
+		$this->assertArrayNotHasKey('readOnly', $props['onlineMeeting']);
+
+		$this->assertArrayNotHasKey('customFieldsJSON', $props);
+
+		$userProps = $this->properties(PropertySchema::build(\go\core\model\User::class), 'User');
+		$this->assertArrayNotHasKey('values', $userProps);
 	}
 
 	public function testAllEntitiesHaveValidSchemas(): void

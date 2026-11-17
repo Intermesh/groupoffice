@@ -61,6 +61,7 @@ class Contact extends AclItemEntity {
 	 */							
 	public ?string $id;
 
+	/** ID of the AddressBook the contact is in. The permissions of the address book apply to the contact. */
 	public string $addressBookId;
 	
 	/**
@@ -77,8 +78,11 @@ class Contact extends AclItemEntity {
 	 */							
 	public ?string $prefixes = '';
 	public ?string $initials = '';
+	/** First name of a person */
 	public ?string $firstName = '';
+	/** Middle name of a person, like "van der" */
 	public ?string $middleName = '';
+	/** Last name of a person */
 	public ?string $lastName = '';
 
 	/**
@@ -96,7 +100,9 @@ class Contact extends AclItemEntity {
 	 * ['P', t("Won't say")]
 	 */							
 	public ?string $gender;
+	/** Free text notes about the contact */
 	public ?string $notes;
+	/** True for an organization, false for a person */
 	public bool $isOrganization = false;
 
 	public function genderAsText(): string {
@@ -1005,6 +1011,9 @@ class Contact extends AclItemEntity {
 	private $organizationIds;
 	protected $setOrganizationIds;
 	
+	/**
+	 * IDs of the organizations (contacts with isOrganization) a person belongs to
+	 */
 	public function getOrganizationIds() {
 
 		if(!isset($this->organizationIds)) {			

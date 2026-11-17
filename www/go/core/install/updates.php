@@ -1898,15 +1898,22 @@ $updates['202611091340'][] = "ALTER TABLE core_change
 $updates['202611091340'][] = "ALTER TABLE core_change_user
   ADD INDEX userId_entityTypeId_modSeq (userId, entityTypeId, modSeq, entityId)";
 
+// OAuth clients that registered themselves, like AI assistants, need the user's consent
+$updates['202611131400'][] = "ALTER TABLE core_oauth_client ADD registration VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL";
+
+// A client ID metadata document is fetched again a day after it was saved
+$updates['202611131500'][] = "ALTER TABLE core_oauth_client ADD modifiedAt DATETIME NULL DEFAULT NULL";
+
+
 // 26.1
-$updates['202611091340'][] = "alter table core_module
+$updates['202611131500'][] = "alter table core_module
     drop column sort_order;";
 
-$updates['202611091340'][] = "alter table core_module
+$updates['202611131500'][] = "alter table core_module
     drop column admin_menu;";
 
 
-$updates['202611091340'][] = "create table if not exists core_module_user
+$updates['202611131500'][] = "create table if not exists core_module_user
 (
 	userId   int          not null,
     moduleId int          not null,
@@ -1920,7 +1927,7 @@ $updates['202611091340'][] = "create table if not exists core_module_user
             on delete cascade
 );";
 
-$updates['202611091340'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
+$updates['202611131500'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
 
-$updates['202611091340'][] = "alter table core_alert
+$updates['202611131500'][] = "alter table core_alert
     add isSent boolean default false not null;";

@@ -53,8 +53,9 @@ class StringHelper {
 	
 	/**
 	 * Convert non ascii characters to chars that come close to them.
-	 * @param type $string
-	 * @return type 
+	 * @param string $string
+	 * @return string
+	 * @throws Exception when the string cannot be converted
 	 */
 		public static function utf8ToASCII($string) {
 

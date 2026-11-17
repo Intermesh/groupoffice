@@ -12,6 +12,7 @@ namespace go\core\oauth\server\repositories;;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use go\core\model\OauthScope;
+use go\core\oauth\server\OAuthServer;
 
 class ScopeRepository implements ScopeRepositoryInterface
 {
@@ -38,6 +39,10 @@ class ScopeRepository implements ScopeRepositoryInterface
 		        ]
         ];
 
+        foreach (OAuthServer::moduleScopes() as $name => $scope) {
+            $scopes[$name] = ['description' => $scope['description']];
+        }
+
         if (array_key_exists($identifier, $scopes) === false) {
             return null;
         }
@@ -58,6 +63,15 @@ class ScopeRepository implements ScopeRepositoryInterface
 		 */
     public function finalizeScopes(array $scopes, string $grantType, ClientEntityInterface $clientEntity, $userIdentifier = null, ?string $authCodeId = null): array
 		{
+        // A token for a module, like an MCP client, only gets what it asked for. It may not read the profile of the
+        // user with /userinfo unless it asked for "openid".
+        $moduleScopes = OAuthServer::moduleScopes();
+        foreach ($scopes as $requested) {
+            if (isset($moduleScopes[$requested->getIdentifier()])) {
+                return $scopes;
+            }
+        }
+
         $scope = new OauthScope();
         $scope->setIdentifier('openid');
         $scopes[] = $scope;

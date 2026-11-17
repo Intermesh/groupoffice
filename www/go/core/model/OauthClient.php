@@ -15,6 +15,14 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 
 	protected ?string $secret;
 
+	/**
+	 * How the client registered itself: "dynamic" (RFC 7591) or "metadata" (a client ID metadata document). Null for a
+	 * client that an administrator registered.
+	 */
+	protected ?string $registration = null;
+
+	public ?\DateTimeInterface $modifiedAt = null;
+
 	protected static function defineMapping(): Mapping
 	{
 		return parent::defineMapping()
@@ -37,13 +45,22 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 		$this->name = $name;
 	}
 
+	/**
+	 * @param string|string[] $uri Several URIs are stored as a JSON array
+	 */
 	public function setRedirectUri(string|array $uri): void
 	{
-		$this->redirectUri = $uri;
+		$this->redirectUri = is_array($uri) ? json_encode(array_values($uri), JSON_UNESCAPED_SLASHES) : $uri;
 	}
 
 	public function getRedirectUri(): array|string
 	{
+		if (is_string($this->redirectUri) && str_starts_with($this->redirectUri, '[')) {
+			$uris = json_decode($this->redirectUri, true);
+			if (is_array($uris)) {
+				return $uris;
+			}
+		}
 		return $this->redirectUri;
 	}
 
@@ -55,5 +72,26 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 	public function getIsConfidential(): bool
 	{
 		return $this->isConfidential();
+	}
+
+	/**
+	 * @param string|null $registration "dynamic", "metadata", or null for a client that an administrator registered
+	 */
+	public function setRegistration(?string $registration): void
+	{
+		$this->registration = $registration;
+	}
+
+	public function getRegistration(): ?string
+	{
+		return $this->registration;
+	}
+
+	/**
+	 * Whether the client registered itself, like an AI assistant. The user must then approve it.
+	 */
+	public function isSelfRegistered(): bool
+	{
+		return $this->registration !== null;
 	}
 }

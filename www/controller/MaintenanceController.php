@@ -31,7 +31,7 @@ use ReflectionMethod;
 class MaintenanceController extends AbstractController {
 	
 	protected function allowGuests() {
-		return array('upgrade','checkdatabase','servermanagerreport','test','downloadfromshop', 'removeduplicates','buildsearchcache', "buildprincipals");
+		return array('upgrade','checkdatabase','servermanagerreport','test','downloadfromshop', 'removeduplicates','buildsearchcache', "buildprincipals", "getnewacl");
 	}
 	
 	/**
@@ -309,7 +309,11 @@ class MaintenanceController extends AbstractController {
 			echo "Resetting cache!\n";
 			//change mtime's so they will be updated
 			if(!empty($params['modelName'])){
+				// Admin or CLI only.
+				// nosemgrep: go-class-from-request
 				$entityTypeId = $params['modelName']::entityType()->getId();
+				// Admin or CLI only, and the ID is an integer from the database.
+				// nosemgrep: go-sql-from-request
 				go()->getDbConnection()->exec("update core_search set `rebuild` = true WHERE entityTypeId=" . $entityTypeId);
 			} else {
 				go()->getDbConnection()->exec("update core_search set `rebuild` = true");
@@ -402,11 +406,15 @@ class MaintenanceController extends AbstractController {
 
 					$class = 'GO\\' . ucfirst($params['module']) . '\\' . ucfirst($params['module']) . 'Module';
 					if (class_exists($class)) {
+						// Admin or CLI only.
+						// nosemgrep: go-class-from-request
 						$module = $class::get();
 						$module->checkDatabase($response);
 					}
 				} else {
 					$class = 'go\\modules\\' . $params['package'] . '\\' . $params['module'] . '\\Module';
+					// Admin or CLI only.
+					// nosemgrep: go-class-from-request
 					$module = $class::get();
 					$module->checkDatabase($response);
 				}

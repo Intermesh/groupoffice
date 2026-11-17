@@ -348,6 +348,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);
+		// The name is cleaned with stripInvalidChars().
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(\GO::config()->file_storage_path . $tmpFolder->path.'/'.$params['filename']);
 		$file->parent()->create();
 
@@ -359,6 +361,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			}
 		}else
 		{
+			// The temporary folder is per user and GO\Base\Fs\File rejects ".." in paths.
+			// nosemgrep: go-path-from-request
 			$tmpfile = new \GO\Base\Fs\File(\GO::config()->tmpdir.$params['tmp_file']);
 			$file = $tmpfile->copy($file->parent(), $file->name());
 			if(!$file) {
@@ -520,6 +524,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			}
 
 			//Supports range download
+			// Path of a file model from the database.
+			// nosemgrep: go-path-from-request
 			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
 
 			// HTML, SVG and XML are downloaded even when $inline is true. See Response::isSafeInlineContentType().

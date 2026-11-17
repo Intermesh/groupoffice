@@ -26,10 +26,10 @@ class Principal extends AclOwnerEntity
 	protected $entityId;
 	protected $entityTypeId;
 
-	/** @var string generated use from clientName-entityId */
+	/** @var string The user ID for a user, like "12". Other principals have the entity name and ID, like "Contact:34" or "Calendar:5". */
 	public string $id;
 
-	/** @var string One of the type constants */
+	/** @var string "individual" for a person, "group", "resource" like a projector, "location" like a meeting room, or "other" */
 	public string $type;
 
 	/** @var string The name of the principal, e.g. “Jane Doe”, or “Room 4B”. */

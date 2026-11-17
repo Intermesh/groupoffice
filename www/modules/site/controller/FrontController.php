@@ -96,6 +96,8 @@ class FrontController extends \GO\Site\Components\Controller {
 	protected function actionThumb($params){
 			
 		$rootFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'site/'.\Site::model()->id);
+		// Site files are public and GO\Base\Fs\File rejects ".." in paths.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(\GO::config()->file_storage_path.'site/'.\Site::model()->id.'/'.$params['src']);
 		$folder = $file->parent();
 		

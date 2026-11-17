@@ -42,6 +42,20 @@ final class Domain extends AclOwnerEntity
 	 */
 	public float $defaultQuota = 0;
 
+	/**
+	 * Default auto expunge period for new mailboxes. Use "0" to disable.
+	 *
+	 * @see Mailbox::$autoExpunge
+	 */
+	public string $defaultAutoExpunge = "30d";
+
+	/**
+	 * Default full text search indexing for new mailboxes
+	 *
+	 * @see Mailbox::$fts
+	 */
+	public bool $defaultFts = false;
+
 	public string $transport;
 	public bool $backupMx = false;
 	public ?int $createdBy;

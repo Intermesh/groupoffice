@@ -1,4 +1,27 @@
-12-11-2026: 26.0.60
+16-11-2026: 26.0.61
+- Email: the upgrade failed while rebuilding the cache on servers without the SourceGuardian loader, because the e-mail module loaded the encoded MCP server class.
+
+16-11-2026: 26.0.60
+- Calendar: the printed month view shows the start and end time of an event in front of its title, with leading zeros (09:00-10:30).
+- Core: with a 12-hour clock, time fields saved "12:30 am" as 12:30 in the afternoon and didn't correct hours above 12. They now save 0:30, and an hour above 12 becomes 12.
+- Core: time fields move on from the hours to the minutes while typing, like date fields do, as soon as the hour can't get another digit (for example "14", or "8" which becomes 08). With a 12-hour clock the minutes move on to am/pm.
+- Finance: fixed the error "Cannot assign null to property FinanceDocumentItem::$priceEntryMode" when adding articles with "Add from catalog".
+- Finance: a book has options to show or hide "Reverse charge VAT", the delivery date and the execution date in its documents. New books hide the dates; existing books keep showing them. A hidden field still shows when a document has a value for it.
+- Finance: sales invoices can be put "On hold" in the invoice dialog or, for invoices that are already sent, in the menu of the invoice. No reminders are sent for an invoice on hold and it is left out of the customer's statement.
+- Tasks: the permission "Change lists" is now only needed to create and delete task lists. Users with manage permission on a list can change its name and permissions; write permission is no longer enough for that.
+- Maildomains: a domain has mailbox defaults for auto expunge and full text search, grouped with the default quota. New mailboxes get these settings.
+- Calendar: a new event now selects the calendar's default reminder, also after switching "All day" on or off, instead of "Default".
+- Addressbook: the organizations field of a contact and of the profile in your account settings shows the address book of each organization, so organizations with the same name in different (personal) address books can be told apart.
+- MCP: AI assistants can't send e-mail, also not calendar invitations or replies to support tickets. Text written by others, like an e-mail the assistant reads, could otherwise make it send your data to someone. Colleagues still see meetings in their calendar; you send invitations to others and support replies yourself.
+- Email: security: the API returned the passwords (encrypted) and the OAuth tokens of an e-mail account to every user who may read the account, for example a colleague a mailbox is shared with. With the OAuth tokens they could open the mailbox at the mail provider (Google, Microsoft). They are no longer returned. Mailboxes that use OAuth and were shared with others: disconnect and connect the account again, so new tokens are issued.
+- MCP: AI assistants can search and read e-mail and write drafts in the e-mail accounts you pick per connection. They never send: you check and send the draft yourself. Shared mailboxes are only included when you pick them.
+- MCP: New beta MCP module. AI assistants can communicate via MCP with GroupOffice
+- Core: files added to an item through the API ("attachments") now show up in its files folder right away, count towards the disk quota and require write permission on the folder. An invalid file name, a full quota or a missing permission now returns an error on "attachments". Creating an item with attachments no longer fails. #1367
+- Core: uploading or storing a file with the same content as an existing file, for example someone else's attachment, renamed that existing file, for example when files of an item were used in a template. The existing file now keeps its name.
+- Calendar: the API failed with "Cannot use object of type stdClass as array" when one CalendarEvent/get asked for a recurring event's occurrence and other events, and the leave days module was installed.
+- Files: when a file or folder can't be moved into a folder, an error is now returned instead of adding an entry for something that isn't there.
+- Core: the API now returns an "invalidArguments" error when a filter gets a value of the wrong type, for example true for a user ID, instead of returning wrong results.
+- Projects: the project filter "isResource" is renamed to "forUser". It takes a user ID or a list of user IDs. API clients that use "isResource" must change it.
 - Core: relative times like "5 minutes ago" read naturally in other languages, like "vor 5 Minuten" and "il y a 5 minutes".
 - Core: Several translation errors fixed
 - Core: imported CSV files with only a few accented characters could get garbled characters, like "ﾃ､" instead of "ä".

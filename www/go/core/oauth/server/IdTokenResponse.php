@@ -14,9 +14,11 @@ use OpenIDConnectServer\IdTokenResponse as BaseIdTokenResponse;
 class IdTokenResponse extends BaseIdTokenResponse
 {
 	/**
-	 * The issuer of this server: "https://" and the host (and port) of the URL in the system settings
+	 * The issuer of this server: the scheme, host and port of the URL in the system settings
 	 *
-	 * Always https and without a path, like it was when it came from the "Host" header, so clients keep working.
+	 * Without a path, like it was when it came from the "Host" header, so clients keep working. The scheme must
+	 * be the real one, because MCP clients fetch the server metadata from the issuer (RFC 9728), so an https issuer
+	 * on an http installation can't be reached.
 	 *
 	 * @return string
 	 */
@@ -27,11 +29,25 @@ class IdTokenResponse extends BaseIdTokenResponse
 			// Not configured. Only happens before the installation is finished.
 			return 'https://' . ($_SERVER['HTTP_HOST'] ?? '');
 		}
-		$issuer = 'https://' . $url['host'];
+		$scheme = strtolower($url['scheme'] ?? '') === 'http' ? 'http' : 'https';
+		$issuer = $scheme . '://' . $url['host'];
 		if (isset($url['port'])) {
 			$issuer .= ':' . $url['port'];
 		}
 		return $issuer;
+	}
+
+	/**
+	 * Add the granted scopes, because they may differ from the requested ones (RFC 6749 section 5.1)
+	 *
+	 * A client that registered itself and asked for "openid mcp" only gets "mcp", see
+	 * {@see OAuthServer::validateAuthorizationRequest()}.
+	 */
+	protected function getExtraParams(AccessTokenEntityInterface $accessToken): array
+	{
+		return parent::getExtraParams($accessToken) + [
+			'scope' => implode(' ', array_map(fn($scope) => $scope->getIdentifier(), $accessToken->getScopes()))
+		];
 	}
 
 	protected function getBuilder(AccessTokenEntityInterface $accessToken, UserEntityInterface $userEntity)

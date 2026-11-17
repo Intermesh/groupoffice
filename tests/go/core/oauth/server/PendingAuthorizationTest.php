@@ -54,4 +54,37 @@ class PendingAuthorizationTest extends TestCase
 
 		$this->assertNull(PendingAuthorization::take([]));
 	}
+
+	public function testConsentCompletesTheRequestTheUserSaw(): void
+	{
+		$authRequest = new AuthorizationRequest();
+		PendingAuthorization::save($authRequest);
+		$id = PendingAuthorization::id();
+
+		$this->assertNotEmpty($id);
+		$this->assertSame($authRequest, PendingAuthorization::takeForConsent($id));
+		$this->assertNull(PendingAuthorization::takeForConsent($id), 'it can only be completed once');
+	}
+
+	/**
+	 * Another tab or page may start an authorization of another client while the consent screen is open. Approving
+	 * must not complete that one.
+	 */
+	public function testConsentDoesNotCompleteARequestThatReplacedIt(): void
+	{
+		PendingAuthorization::save(new AuthorizationRequest());
+		$shown = PendingAuthorization::id();
+
+		PendingAuthorization::save(new AuthorizationRequest());
+
+		$this->assertNull(PendingAuthorization::takeForConsent($shown));
+		$this->assertArrayNotHasKey('authRequest', $_SESSION);
+	}
+
+	public function testConsentNeedsTheId(): void
+	{
+		PendingAuthorization::save(new AuthorizationRequest());
+
+		$this->assertNull(PendingAuthorization::takeForConsent(''));
+	}
 }

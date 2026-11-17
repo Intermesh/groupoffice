@@ -201,6 +201,13 @@ rules:
       - pattern: count(...)
       - pattern: isset(...)
       - pattern: empty(...)
+      # where('column', 'LIKE', $value) binds the value as a parameter, so a Criteria built this way is safe to pass
+      # to another where().
+      - patterns:
+          - pattern: $Q->$M('...', $OP, $V)
+          - metavariable-regex:
+              metavariable: $M
+              regex: ^(where|andWhere|orWhere|having|andHaving|orHaving)$
       # Records looked up in the database, such as EntityType::findByName($params['entity']).
       - patterns:
           - pattern: $C::$FIND(...)
@@ -511,6 +518,9 @@ rules:
       - pattern-not-inside: throw $T;
       - pattern-not-inside: return $T;
       - pattern-not-inside: $V = $T;
+      # Passed to a handler, such as ErrorHandler::exceptionHandler(new ErrorException(...)).
+      - pattern-not-inside: $FN(..., $T, ...);
+      - pattern-not-inside: $O->$FN(..., $T, ...);
       - metavariable-regex:
           metavariable: $E
           regex: .*(Exception|Forbidden|NotFound|AccessDenied|Unauthorized|SecurityException|InvalidArguments)$

@@ -846,13 +846,17 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param \GO\Base\Fs\File $file
 	 * @param boolean $appendNumberToNameIfExists Set if a number needs to be added to the name if the file already exists.
 	 * @return File
+	 * @throws \Exception When the file can't be moved. Then no record is added and the file stays where it was.
 	 */
 	public function addFilesystemFile(\GO\Base\Fs\File $file, $appendNumberToNameIfExists=false, $newFilename = false){
 
 		if(!File::checkQuota($file->size()))
 			throw new \GO\Base\Exception\InsufficientDiskspace();
 
-		$file->move($this->fsFolder, $newFilename, false, $appendNumberToNameIfExists);
+		// Without this check a record would be added for a file that isn't in the folder
+		if(!$file->move($this->fsFolder, $newFilename, false, $appendNumberToNameIfExists)) {
+			throw new \Exception("Could not move file " . $file->name() . " to folder " . $this->path);
+		}
 		$file->setDefaultPermissions();
 		return $this->addFile($file->name());
 	}
@@ -863,9 +867,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @param \GO\Base\Fs\File $file
 	 * @return File
+	 * @throws \Exception When the folder can't be moved. Then no record is added.
 	 */
 	public function addFilesystemFolder(\GO\Base\Fs\Folder $folder){
-		$folder->move($this->fsFolder);
+		if(!$folder->move($this->fsFolder)) {
+			throw new \Exception("Could not move folder " . $folder->name() . " to folder " . $this->path);
+		}
 		return $this->addFolder($folder->name(), true);
 	}
 
@@ -874,11 +881,14 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @param array $filesArrayItem Item from the $_FILES array
 	 * @return boolean
+	 * @throws \Exception When the file can't be moved, for example because it wasn't uploaded. Then no record is added.
 	 */
 	public function addUploadedFile($filesArrayItem){
 
 		$fsFile = new \GO\Base\Fs\File($filesArrayItem['tmp_name']);
-		$fsFile->move($this->fsFolder, $filesArrayItem['name'], true, true);
+		if(!$fsFile->move($this->fsFolder, $filesArrayItem['name'], true, true)) {
+			throw new \Exception("Could not move uploaded file " . $filesArrayItem['name'] . " to folder " . $this->path);
+		}
 
 		return $this->addFile($fsFile->name());
 	}

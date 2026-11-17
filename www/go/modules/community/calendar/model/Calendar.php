@@ -50,6 +50,7 @@ class Calendar extends AclOwnerEntity {
 	public ?string $id;
 	/** @var string The user-visible name of the calendar */
 	public string $name;
+	/** Free text about the calendar */
 	public ?string $description;
 	/** @var ?string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
 	public ?string $color = null;
@@ -71,6 +72,7 @@ class Calendar extends AclOwnerEntity {
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
 
+	/** Whether the calendar is synchronized to the user's devices, like phones with CalDAV or ActiveSync */
 	public ?bool $syncToDevice = null;
 
 	protected ?string $defaultColor = null;
@@ -95,11 +97,14 @@ class Calendar extends AclOwnerEntity {
 	 */
 	protected ?int $ownerId = null;
 	public ?string $createdBy;
+	/** URL of an external iCalendar feed the calendar is read from. Null for a normal calendar. */
 	public ?string $webcalUri = null;
 	protected ?string $webcalHash = null;
 
+	/** ID of the resource group when the calendar is a resource, like a meeting room. Null for other calendars. */
 	public ?string $groupId;
 
+	/** When set, the calendar is published read only on a public URL with this key */
 	public ?string $publishKey;
 	protected ?string $highestItemModSeq;
 

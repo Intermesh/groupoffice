@@ -99,6 +99,12 @@ class Blob extends orm\Entity {
 
 	private $strContent;
 
+	/**
+	 * Set when a factory like fromFile() found an existing blob with the same content. It may be someone else's
+	 * attachment, so saving must not rename it.
+	 */
+	private bool $keepStoredMetaData = false;
+
 
 	protected function init()
 	{
@@ -208,6 +214,8 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = $file->getSize();
 
+		} else {
+			$blob->keepStoredMetaData = true;
 		}
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
@@ -243,6 +251,42 @@ class Blob extends orm\Entity {
 	}
 
 	/**
+	 * Store an uploaded file
+	 *
+	 * A blob with the same content may exist already, like someone else's attachment. It keeps its name, type and date:
+	 * the returned blob has the name and type of this upload, but they're only saved for a new blob. The temporary file is
+	 * removed.
+	 *
+	 * @param File $tmpFile The uploaded temporary file
+	 * @param string $name File name given by the client
+	 * @param DateTime $modifiedAt Modification time given by the client
+	 * @return self
+	 * @throws Exception
+	 */
+	public static function fromUpload(File $tmpFile, string $name, DateTime $modifiedAt): Blob
+	{
+		$blob = self::fromTmp($tmpFile);
+		$blob->name = $name;
+		$blob->modifiedAt = $modifiedAt;
+
+		if ($blob->isNew()) {
+			if (!$blob->save()) {
+				throw new Exception("Could not save file: " . $blob->getValidationErrorsAsString());
+			}
+		} else if (!file_exists($blob->path())) {
+			// Restore the missing file of the existing blob
+			if (!is_dir(dirname($blob->path()))) {
+				mkdir(dirname($blob->path()), 0775, true);
+			}
+			$tmpFile->move(new File($blob->path()));
+		} else {
+			$tmpFile->delete();
+		}
+
+		return $blob;
+	}
+
+	/**
 	 * Create from string
 	 *
 	 * @example
@@ -265,6 +309,8 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = mb_strlen($string, '8bit');
 			$blob->strContent = $string;
+		} else {
+			$blob->keepStoredMetaData = true;
 		}
 		return $blob;
 	}
@@ -316,8 +362,24 @@ class Blob extends orm\Entity {
 				file_put_contents($this->path(), $this->strContent);
 			}
 		}
-		
-		return parent::internalSave();
+
+		if (!$this->keepStoredMetaData || $this->isNew()) {
+			return parent::internalSave();
+		}
+
+		// An existing blob found by its content keeps its stored name, type and date. The caller still sees its own.
+		$own = [];
+		foreach (['name', 'type', 'modifiedAt'] as $prop) {
+			if ($this->isModified($prop)) {
+				$own[$prop] = $this->$prop;
+				$this->$prop = $this->getOldValue($prop);
+			}
+		}
+		$success = parent::internalSave();
+		foreach ($own as $prop => $value) {
+			$this->$prop = $value;
+		}
+		return $success;
 	}
 
 	/**

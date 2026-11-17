@@ -61,7 +61,6 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 				{
 					itemId: "edit",
 					iconCls: 'ic-edit',
-					hidden: !canEditTaskLists,
 					text: t("Edit")+'…',
 					handler: function() {
 						var dlg = new go.modules.community.tasks.TasklistDialog({entityStore: this.support ? "SupportList" : "TaskList"});
@@ -82,9 +81,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 						}, this);
 					},
 					scope: this
-				}, new Ext.menu.Separator({
-					hidden: !canEditTaskLists,
-				}),
+				}, new Ext.menu.Separator(),
 				{
 					text: t('Unsubscribe'),
 					iconCls: 'ic-remove-circle',
@@ -103,8 +100,9 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 
 		this.on('beforeshowmenu', (menu, record) => {
 			const permissionLevel = record.json.permissionLevel || 10;
-			menu.getComponent("edit").setDisabled(permissionLevel < go.permissionLevels.edit);
-			menu.getComponent("delete").setDisabled(!go.Modules.get("community", 'tasks').userRights.mayChangeTasklists || permissionLevel < go.permissionLevels.manage);
+			// Editing the name and permissions needs manage permission. Deleting also needs the module right.
+			menu.getComponent("edit").setDisabled(permissionLevel < go.permissionLevels.manage);
+			menu.getComponent("delete").setDisabled(!canEditTaskLists || permissionLevel < go.permissionLevels.manage);
 		});
 	},
 });

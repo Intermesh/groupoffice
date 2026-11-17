@@ -56,6 +56,26 @@ class MethodSchemaTest extends TestCase
 		$this->assertEquals(['data', 'password'], $schema['methods']['decrypt']['params']['required']);
 	}
 
+	public function testForEntityAddsDocumentedArgumentsOfStandardMethods(): void
+	{
+		$schema = MethodSchema::forEntity(EntityType::findByName('CalendarEvent'));
+		$params = (array) $schema['methods']['query']['params']['properties'];
+
+		// The standard arguments stay
+		$this->assertArrayHasKey('filter', $params);
+		$this->assertArrayHasKey('limit', $params);
+
+		// CalendarEvent/query documents its own arguments with @apiParam
+		$this->assertEquals('boolean', $params['expandRecurrences']['type']);
+		$this->assertStringContainsString('after', $params['expandRecurrences']['description']);
+		$this->assertEquals('string', $params['timeZone']['type']);
+
+		// Also on Foo/set, next to create, update and destroy
+		$setParams = (array) $schema['methods']['set']['params']['properties'];
+		$this->assertArrayHasKey('create', $setParams);
+		$this->assertEquals('boolean', $setParams['sendSchedulingMessages']['type']);
+	}
+
 	public function testForEntityReferencesExistingDefinitions(): void
 	{
 		foreach (EntityType::findAll() as $type) {
@@ -99,6 +119,21 @@ class MethodSchemaTest extends TestCase
 		$this->assertEquals('Maximum number of results', $schema['params']['properties']['limit']['description']);
 		$this->assertEquals(['$ref' => '#/$defs/Note'], $schema['response']['properties']['list']['items']);
 		$this->assertEquals('The notes', $schema['response']['description']);
+	}
+
+	/**
+	 * Only methods tagged "@apiReadOnly" may be called by clients that may only read
+	 */
+	public function testReadOnly(): void
+	{
+		$tagged = "/**\n * Count the tasks\n *\n * @apiReadOnly\n * @apiPermission Module access: only counts\n */";
+		$this->assertTrue(MethodSchema::isReadOnly($tagged));
+		$this->assertTrue(MethodSchema::fromDocComment($tagged, 'Task')['readOnly']);
+
+		$untagged = "/**\n * Move the tasks\n *\n * @apiPermission Checked in Task::move()\n */";
+		$this->assertFalse(MethodSchema::isReadOnly($untagged));
+		$this->assertArrayNotHasKey('readOnly', MethodSchema::fromDocComment($untagged, 'Task'));
+		$this->assertFalse(MethodSchema::isReadOnly(false));
 	}
 
 	public function testPermission(): void

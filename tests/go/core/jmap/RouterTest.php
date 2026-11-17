@@ -42,6 +42,21 @@ class RouterTest extends TestCase
 		return [$output, array_slice(Response::get()->getData(), -count($calls))];
 	}
 
+	/**
+	 * The history stores the request ID with a change, so a caller like an AI assistant can be recognized
+	 */
+	public function testRequestIdPrefix(): void
+	{
+		$router = new Router();
+		$router->requestIdPrefix = 'MCP: Test assistant';
+		$router->run([['Core/echo', ['a' => 1], 'c1']], false);
+
+		$this->assertSame('MCP: Test assistant JMAP Core/echo', go()->getDebugger()->getRequestId());
+
+		(new Router())->run([['Core/echo', [], 'c2']], false);
+		$this->assertSame('JMAP Core/echo', go()->getDebugger()->getRequestId());
+	}
+
 	public static function cliMethods(): array
 	{
 		return [

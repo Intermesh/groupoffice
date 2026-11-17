@@ -277,7 +277,9 @@ export class DomainDetail extends DetailPanel<MailDomain> {
 		dlg.form.value = {
 			domainId: d.id,
 			domain: this.form.findField("domain")!.value,
-			quota:  d.defaultQuota
+			quota:  d.defaultQuota,
+			autoExpunge: this.entity!.defaultAutoExpunge,
+			fts: this.entity!.defaultFts
 		};
 		dlg.show();
 		if (id) {

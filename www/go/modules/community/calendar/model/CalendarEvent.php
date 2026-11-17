@@ -33,6 +33,7 @@ use go\core\orm\SearchableTrait;
 use go\core\util\JSON;
 use go\core\util\UUID;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 
 class CalendarEvent extends AclItemEntity {
 
@@ -80,11 +81,24 @@ class CalendarEvent extends AclItemEntity {
 	static bool $sendSchedulingMessages = false;
 
 	/**
+	 * Fired when an online meeting is requested with {@see setOnlineMeeting()}. Listeners get the event and the name of
+	 * the service, like "jitsi". The listener of that service returns the URL to join the meeting, other listeners
+	 * return null.
+	 */
+	const EVENT_ONLINE_MEETING = 'onlinemeeting';
+
+	/**
+	 * Service of the online meeting to add on save
+	 */
+	private ?string $onlineMeetingService = null;
+
+	/**
 	 * Only true when saving from JMAP controller
 	 * @var bool
 	 */
 	static bool $fromClient = false;
 
+	/** ID of the calendar the event is in. Use Calendar/query to find the calendars of the user. */
 	public string $calendarId;
 	protected ?int $eventId = null;
 	/**
@@ -100,10 +114,15 @@ class CalendarEvent extends AclItemEntity {
 
 	public ?string $id = null;
 	public ?string $prodId = null;
+	/** IANA time zone of "start", like "Europe/Amsterdam". Null for a floating event, which happens at the same local time in every time zone. */
 	public ?string $timeZone;
+	/** Language of the text of the event, like "en" or "nl-NL" */
 	public ?string $locale;
+	/** 0 is undefined, 1 is the highest and 9 the lowest priority */
 	public int $priority = 0;
+	/** Color of the event for this user, as a CSS color. Overrides the color of the calendar. */
 	public ?string $color;
+	/** Use the default alerts of the calendar instead of "alerts" */
 	public ?bool $useDefaultAlerts = true;
 
 	/**
@@ -224,6 +243,7 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	public $alerts = [];
 
+	/** @var string[] IDs of the categories of the event. See Category/query. */
 	public $categoryIds = [];
 	public $links = [];
 
@@ -439,6 +459,9 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
+	 * How the event repeats, as a JSCalendar RecurrenceRule like {"frequency": "weekly", "byDay": [{"day": "mo"}]}. Null when it doesn't repeat.
+	 *
+	 * @link https://www.rfc-editor.org/rfc/rfc8984.html#name-recurrencerules
 	 * @return RecurrenceRule | null
 	 */
 	public function getRecurrenceRule() {
@@ -628,6 +651,56 @@ class CalendarEvent extends AclItemEntity {
 
 	public function isInstance() {
 		return !empty($this->recurrenceId);
+	}
+
+	/**
+	 * Add an online meeting on save, like "jitsi". The link to join it becomes the location and is added to the
+	 * description. A meeting added earlier is replaced. Which services are available depends on the installed modules.
+	 * Isn't stored: get doesn't return it and set responds with null, so a client doesn't send it again with a later
+	 * update.
+	 *
+	 * @apiWriteOnly
+	 * @param string|null $service
+	 */
+	public function setOnlineMeeting(?string $service): void
+	{
+		$this->onlineMeetingService = $service;
+	}
+
+	protected function internalValidate()
+	{
+		parent::internalValidate();
+
+		if (isset($this->onlineMeetingService) && !$this->hasValidationErrors()) {
+			$this->addOnlineMeeting($this->onlineMeetingService);
+			$this->onlineMeetingService = null;
+		}
+	}
+
+	/**
+	 * Ask the service for a link to join a new meeting and put it in the location and description
+	 */
+	private function addOnlineMeeting(string $service): void
+	{
+		$uri = static::fireEvent(self::EVENT_ONLINE_MEETING, $this, $service);
+		if (!is_string($uri) || $uri === '') {
+			$this->setValidationError('onlineMeeting', ErrorCode::INVALID_INPUT,
+				"The online meeting service '" . $service . "' isn't available");
+			return;
+		}
+
+		$separator = "--------------------------------";
+		$label = go()->t("Join the online meeting now");
+
+		// Replace a meeting that was added before, so the description doesn't get several links
+		$description = preg_replace('/\n*' . $separator . '\n' . preg_quote($label, '/') . ':\n\n.*?\n' . $separator . '\n*/s', '', $this->description ?? '');
+		$description = trim($description);
+		if ($description !== '') {
+			$description .= "\n\n";
+		}
+
+		$this->description = $description . $separator . "\n" . $label . ":\n\n" . $uri . "\n" . $separator . "\n";
+		$this->location = $uri;
 	}
 
 	protected function internalSave() : bool {
@@ -860,11 +933,14 @@ class CalendarEvent extends AclItemEntity {
 
 	public function toArray(array|null $properties = null): array
 	{
-		if(!($this->start instanceof DateTimeInterface)) {
-			//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
-			$this->start = new DateTime($this->start);
+		// Not loaded when the client asked for other properties only
+		if(isset($this->start)) {
+			if (!($this->start instanceof DateTimeInterface)) {
+				//make sure timezone info is not sent by setting isLocal below. We can't be sure this datetime is a go\core\util\DateTime
+				$this->start = new DateTime($this->start);
+			}
+			$this->start->isLocal = true;
 		}
-		$this->start->isLocal = true;
 
 		$arr =  parent::toArray($properties);
 		if($this->showAsPrivate()) {
@@ -1263,6 +1339,15 @@ class CalendarEvent extends AclItemEntity {
 	protected static function aclEntityClass(): string
 	{
 		return Calendar::class;
+	}
+
+	/**
+	 * toArray() hides the details of private events of others with these, also when a client asks for other
+	 * properties only. The calendar owner is always selected by the mapping.
+	 */
+	protected static function internalRequiredProperties(): array
+	{
+		return array_merge(parent::internalRequiredProperties(), ['privacy', 'createdBy']);
 	}
 
 	protected static function aclEntityKeys(): array

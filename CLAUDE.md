@@ -68,7 +68,7 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - In controller methods, load entities with `$this->getEntity()` or `findEntity()`, which check read permission, not `Model::findById($params[...])`, which checks nothing. Methods that change data or send mail need a write or manage check on the entity or its container.
 - Don't override `checkModulePermissions()` to return true without another guard, don't pass `$params` straight to `setValues()`, and don't return SQL in responses unless the debugger is enabled.
 - When you change a public controller method, check its permission guard first. Every public method of a JMAP controller can be called by any user with access to the module.
-- Document the permission of every custom controller method with `@apiPermission` (shown in `/api/doc.php`). `tests/go/core/jmap/ControllerPermissionTest.php` fails when a public controller method has no recognisable permission check. When access to the module is really enough, start the text with `Module access:` and give the reason; when the check is elsewhere, start with `Checked in <Class::method()>:`.
+- Document the permission of every custom controller method with `@apiPermission` (shown in `/api/doc.php`). `tests/go/core/jmap/ControllerPermissionTest.php` fails when a public controller method has no recognisable permission check. When access to the module is really enough, start the text with `Module access:` and give the reason; when the check is elsewhere, start with `Checked in <Class::method()>:`. Tag a custom method that only reads with `@apiReadOnly`: clients that may only read, like AI assistants with read access, can then call it. A method without the tag counts as one that changes data.
 
 ## Writing tests
 
@@ -98,6 +98,20 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 ## Building the GOUI frontend
 
 Every module with a GOUI UI has its own `package.json` in its `views/goui` folder (e.g. `www/go/modules/community/calendar/views/goui`), and so does core (`www/views/goui`). Build from that folder with `npm run build`, or `npm run watch` while developing.
+
+### Styling
+
+- Don't use inline styles (`el.style.…`, `style: {…}` in a component config). Use GOUI's classes where they fit (`pad`, `flow`, `fit`, …), otherwise a class in the module stylesheet.
+- The module stylesheet is `views/goui/style/style.scss`. `npm run build` compiles it to `dist/style.css`, which the web client loads for every module. The `build:sass` and `start:sass` scripts in `package.json` do this (see the apikeys or approval module).
+- Use GOUI's sass helpers for sizes, like `util.dp()`, instead of pixels: `@use '../../../../../../../views/goui/goui/style/util';` and then `padding: util.dp(12) util.dp(16);`.
+- GOUI's utility classes like `pad` are styled as `.goui.pad`, so they only work on GOUI components, not on an element made with `E()`. Give such an element its own class in the module stylesheet.
+
+## Encoded business modules
+
+The release build (`build/build.sh`) encodes every PHP file of `go/modules/business/*` and the pro modules with SourceGuardian, except `Module.php`. Without the loader, loading an encoded file ends PHP: it isn't an exception, so `try`/`catch` can't stop it, and an upgrade or cache rebuild fails. Dev checkouts aren't encoded, so you won't see this locally.
+
+- Code outside a business module must not load its classes until it has checked the module, through its unencoded `Module.php`: `class_exists(...\Module::class) && ...\Module::get()->isAvailable()` (see `GO\Email\EmailModule::defineListeners()`). `class_exists()` on any other class of the module loads the file. Using `Foo::class` as a string or in a `use` statement is safe.
+- Take extra care in `defineListeners()`: it runs for every enabled module on every cache rebuild, including the one at the end of an upgrade. `tests/go/core/event/ListenersTest.php` rebuilds the cache with the business modules unavailable and fails when one of their other classes is loaded.
 
 ## Static analysis
 

@@ -14,3 +14,6 @@ $updates['202510171328'][] = "UPDATE community_maildomains_mailbox SET maildir =
 
 
 $updates['202611101507'][] = "update community_maildomains_alias set active=1 where active >1;";
+
+$updates['202611161200'][] = "alter table community_maildomains_domain add defaultAutoExpunge varchar(20) default '30d' not null comment 'Default autoExpunge for new mailboxes' after defaultQuota;";
+$updates['202611161200'][] = "alter table community_maildomains_domain add defaultFts tinyint(1) default 0 not null comment 'Default full text search for new mailboxes' after defaultAutoExpunge;";
