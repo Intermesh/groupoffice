@@ -1,3 +1,6 @@
+- Tasks: fix icon in main panel
+- Core: turning on maintenance mode could fail with "Record has changed since last read" when another request was using a login token at the same moment. Logging out the other users is now retried after a short wait.
+
 16-11-2026: 26.0.61
 - Email: the upgrade failed while rebuilding the cache on servers without the SourceGuardian loader, because the e-mail module loaded the encoded MCP server class.
 
