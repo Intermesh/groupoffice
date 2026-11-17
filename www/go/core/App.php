@@ -1100,6 +1100,31 @@ namespace go\core {
 			$this->optimizerSearchDepthSet = true;
 		}
 
+		private bool $semiJoinDisabled = false;
+
+		/**
+		 * Turns off the semi-join optimization for the rest of the database session
+		 *
+		 * Used for queries on the search cache that filter on "aclId IN (subquery)" and sort on modifiedAt with a limit.
+		 * With a semi-join MariaDB may start from the user's ACLs, fetch every search row the user can read into a
+		 * temporary table and sort it all, which hung for many minutes on large installations. Without it the ACL
+		 * subquery is materialized once and MariaDB walks the modifiedAt index until it has enough rows.
+		 */
+		public function disableSemiJoin(): void
+		{
+			if($this->semiJoinDisabled) {
+				return;
+			}
+
+			try {
+				go()->getDbConnection()->exec("SET SESSION optimizer_switch='semijoin=off'");
+			} catch(Exception $e) {
+				ErrorHandler::log("Could not set 'optimizer_switch' semijoin=off on mysql. " . $e->getMessage());
+			}
+
+			$this->semiJoinDisabled = true;
+		}
+
 		public function checkAcls()
 		{
 			//one legacy model that needs checking
