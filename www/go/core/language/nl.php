@@ -2235,4 +2235,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'This panel expects an address list ID that is positive, but did not receive one. Please contact the administrator.' => 'Dit paneel verwacht een positieve adreslijst-ID, maar heeft die niet ontvangen. Neem contact op met de beheerder.',
   'Total remaining' => 'Totaal resterend',
   'There are no address books' => 'Er zijn geen adresboeken',
+  'The search took too long. Please use a longer or more specific search text.' => 'Het zoeken duurde te lang. Gebruik een langere of specifiekere zoektekst.',
 );

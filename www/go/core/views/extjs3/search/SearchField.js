@@ -58,8 +58,8 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
         this.panel = new go.search.Panel({
             searchField: this,
             listeners: {
-              searchexception: function() {
-                this.markInvalid(t("Invalid search query"));
+              searchexception: function(panel, response) {
+                this.markInvalid(response && response.type === "queryTimeout" ? response.message : t("Invalid search query"));
               },
               scope: this
             }
