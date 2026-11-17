@@ -248,7 +248,8 @@ class Calendar extends AclOwnerEntity {
 //	}
 
 	public function isOwner() {
-		return $this->ownerId === go()->getUserId();
+		// ownerId is an int, go()->getUserId() a string
+		return isset($this->ownerId) && (string) $this->ownerId === go()->getUserId();
 	}
 
 	public function isOwned() {
