@@ -5,7 +5,7 @@
 # Runs the unit tests, builds the tar.gz and Debian package and publishes them to
 # GitHub, the Debian repository, SourceForge and Docker Hub.
 #
-# Usage: ./build.sh [--distro=twentysixzero] [--branch=master] [--test] [--skip-tests]
+# Usage: ./build.sh [--distro=twentysixzero] [--branch=master] [--test] [--skip-tests] [--skip-docker]
 #
 #   --distro      Debian distribution. "testing" creates a GitHub prerelease and
 #                 pushes the Docker image as intermesh/groupoffice:testing. (default: twentysixzero)
