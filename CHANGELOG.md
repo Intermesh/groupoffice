@@ -1,3 +1,6 @@
+16-11-2026: 26.0.61
+- Email: the upgrade failed while rebuilding the cache on servers without the SourceGuardian loader, because the e-mail module loaded the encoded MCP server class.
+
 16-11-2026: 26.0.60
 - Calendar: the printed month view shows the start and end time of an event in front of its title, with leading zeros (09:00-10:30).
 - Core: with a 12-hour clock, time fields saved "12:30 am" as 12:30 in the afternoon and didn't correct hours above 12. They now save 0:30, and an hour above 12 becomes 12.
