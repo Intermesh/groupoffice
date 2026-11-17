@@ -2,7 +2,9 @@
 
 namespace go\modules\legacy\email;
 
+use go\core\event\Listeners;
 use go\core\model\Acl;
+use GO\Email\EmailModule;
 use GO\Email\Mcp\Query;
 use GO\Email\Model\Account;
 use go\modules\business\mcp\model\McpKey;
@@ -30,10 +32,15 @@ class EmailToolsTest extends TestCase
 			self::markTestSkipped('The MCP module is required');
 		}
 		self::setUpMcp();
+
+		// EmailModule only adds the e-mail tools with a license, which the tests don't have. Listeners added at runtime
+		// last until the listeners are loaded again.
+		Server::on(Server::EVENT_TOOL_PROVIDERS, EmailModule::class, 'onMcpToolProviders');
 	}
 
 	public static function tearDownAfterClass(): void
 	{
+		Listeners::get()->clear();
 		if (class_exists(Server::class)) {
 			self::tearDownMcp();
 		}

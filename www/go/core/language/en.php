@@ -453,4 +453,5 @@ If you did not request a new password please delete this mail.',
   'After your decision you are sent back to {host}.' => 'After your decision you are sent back to {host}.',
   'This application runs on your own computer. Only allow it if you started it yourself.' => 'This application runs on your own computer. Only allow it if you started it yourself.',
   'The authorization request expired. Please connect the application again.' => 'The authorization request expired. Please connect the application again.',
+  'The search took too long. Please use a longer or more specific search text.' => 'The search took too long. Please use a longer or more specific search text.',
 );

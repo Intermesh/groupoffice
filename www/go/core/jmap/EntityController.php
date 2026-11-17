@@ -11,6 +11,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
 use go\core\http\PostResponseProcessor;
 use go\core\jmap\exception\CannotCalculateChanges;
+use go\core\jmap\exception\QueryTimeout;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
 use go\core\App;
@@ -333,6 +334,8 @@ abstract class EntityController extends Controller {
 			$msg = $e->getPrevious()->getMessage();
 			if(strpos($msg, '42S22') !== false && strpos($msg, 'order clause') !== false) {
 				throw new UnsupportedSort();
+			} else if($e->isMaxExecutionTimeExceeded()) {
+				throw new QueryTimeout();
 			} else{
 				throw $e;
 			}

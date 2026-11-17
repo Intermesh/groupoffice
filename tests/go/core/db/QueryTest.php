@@ -204,4 +204,83 @@ class QueryTest extends TestCase {
 		$this->assertEquals(1, $record['id']);
 	}
 
+	private function optimizerSwitch(): string
+	{
+		return go()->getDbConnection()->query("SELECT @@SESSION.optimizer_switch")->fetchColumn();
+	}
+
+	public function testDisableSemiJoinOnlyWhileExecuting()
+	{
+		$before = $this->optimizerSwitch();
+
+		$during = go()->getDbConnection()
+			->selectSingleValue('@@SESSION.optimizer_switch')
+			->from('core_module')
+			->disableSemiJoin()
+			->single();
+
+		$this->assertStringContainsString('semijoin=off', $during);
+		$this->assertEquals($before, $this->optimizerSwitch());
+	}
+
+	public function testDisableSemiJoinRestoredAfterError()
+	{
+		$before = $this->optimizerSwitch();
+
+		try {
+			go()->getDbConnection()
+				->select('doesNotExist')
+				->from('core_module')
+				->disableSemiJoin()
+				->single();
+			$this->fail("Query should have failed");
+		} catch (DbException $e) {
+			// expected
+		}
+
+		$this->assertEquals($before, $this->optimizerSwitch());
+	}
+
+	private function maxExecutionTimeVar(): string
+	{
+		return go()->getDatabase()->isMariaDB() ? "max_statement_time" : "max_execution_time";
+	}
+
+	private function sessionMaxExecutionTime(): float
+	{
+		return (float) go()->getDbConnection()->query("SELECT @@SESSION." . $this->maxExecutionTimeVar())->fetchColumn();
+	}
+
+	public function testMaxExecutionTimeOnlyWhileExecuting()
+	{
+		$before = $this->sessionMaxExecutionTime();
+
+		$during = go()->getDbConnection()
+			->selectSingleValue('@@SESSION.' . $this->maxExecutionTimeVar())
+			->from('core_module')
+			->maxExecutionTime(5)
+			->single();
+
+		$this->assertEquals(go()->getDatabase()->isMariaDB() ? 5 : 5000, (float) $during);
+		$this->assertEquals($before, $this->sessionMaxExecutionTime());
+	}
+
+	public function testMaxExecutionTimeAbortsQuery()
+	{
+		$before = $this->sessionMaxExecutionTime();
+
+		try {
+			go()->getDbConnection()
+				->selectSingleValue('SLEEP(2)')
+				->from('core_module')
+				->maxExecutionTime(0.2)
+				->single();
+			$this->fail("Query should have been aborted");
+		} catch (DbException $e) {
+			$this->assertTrue($e->isMaxExecutionTimeExceeded(), $e->getMessage());
+		}
+
+		$this->assertEquals($before, $this->sessionMaxExecutionTime());
+	}
+
 }

@@ -633,14 +633,45 @@ class Token extends Entity {
 	 */
 	public static function logoutEveryoneButAdmins(): bool
 	{
-		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
-		$q = (new Query)
-			->where('expiresAt', '!=', null)
-			->where('userId', 'NOT IN ', $admins);
+		$query = function() {
+			$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
+			return (new Query)
+				->where('expiresAt', '!=', null)
+				->where('userId', 'NOT IN ', $admins);
+		};
 
 		ErrorHandler::log("Logout everyone but admins is used!");
 
-		return self::delete($q) && RememberMe::delete($q);
+		return self::deleteWithRetry(self::class, $query) && self::deleteWithRetry(RememberMe::class, $query);
+	}
+
+	/**
+	 * Delete entities and retry when a concurrent transaction changed one of the records
+	 * since this transaction's snapshot was taken (MariaDB error 1020 "Record has changed since last read").
+	 *
+	 * Each attempt waits a little longer so the conflicting transaction, for example a request that
+	 * updates the token's lastActiveAt, can finish first. A retry only helps when the delete runs in its own
+	 * transaction, because an outer transaction keeps its old snapshot. In that case the exception is thrown at once.
+	 *
+	 * @param class-string<Entity> $cls The entity to delete, Token or RememberMe
+	 * @param callable(): Query $query Returns a new delete query for every attempt
+	 * @param int $attempts Maximum number of attempts
+	 * @return bool
+	 * @throws Throwable
+	 */
+	private static function deleteWithRetry(string $cls, callable $query, int $attempts = 5): bool
+	{
+		for ($i = 1; ; $i++) {
+			try {
+				return $cls::delete($query());
+			} catch (DbException $e) {
+				if (!$e->isRecordChanged() || $i >= $attempts || go()->getDbConnection()->inTransaction()) {
+					throw $e;
+				}
+				go()->debug("Record changed while deleting " . $cls . ", retrying (" . $i . "/" . $attempts . ")");
+				usleep(100000 * $i);
+			}
+		}
 	}
 
 	/**
