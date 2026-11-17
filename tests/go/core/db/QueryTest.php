@@ -204,4 +204,41 @@ class QueryTest extends TestCase {
 		$this->assertEquals(1, $record['id']);
 	}
 
+	private function optimizerSwitch(): string
+	{
+		return go()->getDbConnection()->query("SELECT @@SESSION.optimizer_switch")->fetchColumn();
+	}
+
+	public function testDisableSemiJoinOnlyWhileExecuting()
+	{
+		$before = $this->optimizerSwitch();
+
+		$during = go()->getDbConnection()
+			->selectSingleValue('@@SESSION.optimizer_switch')
+			->from('core_module')
+			->disableSemiJoin()
+			->single();
+
+		$this->assertStringContainsString('semijoin=off', $during);
+		$this->assertEquals($before, $this->optimizerSwitch());
+	}
+
+	public function testDisableSemiJoinRestoredAfterError()
+	{
+		$before = $this->optimizerSwitch();
+
+		try {
+			go()->getDbConnection()
+				->select('doesNotExist')
+				->from('core_module')
+				->disableSemiJoin()
+				->single();
+			$this->fail("Query should have failed");
+		} catch (DbException $e) {
+			// expected
+		}
+
+		$this->assertEquals($before, $this->optimizerSwitch());
+	}
+
 }

@@ -5,6 +5,7 @@ namespace go\core\db;
 use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
+use go\core\ErrorHandler;
 use IteratorAggregate;
 use JsonSerializable;
 use PDO;
@@ -327,6 +328,31 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		$this->noCache = $v;
 
 		return $this;
+	}
+
+	private bool $disableSemiJoin = false;
+
+	/**
+	 * Turn off the semi-join optimization of the server while this query executes
+	 *
+	 * Use it for "IN (subquery)" filters that MariaDB may turn into a semi-join that reads far more rows than needed.
+	 * For example an ACL filter with an ORDER BY and LIMIT, which can then walk an index of the sort column
+	 * instead of fetching and sorting every row the user can read. The previous optimizer_switch is restored
+	 * after execution.
+	 *
+	 * @param bool $v
+	 * @return $this
+	 */
+	public function disableSemiJoin(bool $v = true): static
+	{
+		$this->disableSemiJoin = $v;
+
+		return $this;
+	}
+
+	public function getDisableSemiJoin(): bool
+	{
+		return $this->disableSemiJoin;
 	}
 	
 	private $unions = [];
@@ -678,14 +704,35 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    */
 	public function execute(): Statement
 	{
-		
+		$restoreOptimizerSwitch = $this->disableSemiJoin && $this->turnOffSemiJoin();
+
 		try {
 			$stmt = $this->createStatement();
 			$stmt->execute();
 		} catch(PDOException $e) {
 			throw new DbException($e, $this);
+		} finally {
+			if($restoreOptimizerSwitch) {
+				$this->getDbConnection()->exec("SET SESSION optimizer_switch = @goOptimizerSwitch");
+			}
 		}
 		return $stmt;
+	}
+
+	/**
+	 * Saves the current optimizer_switch in a session variable and turns off semijoin
+	 *
+	 * @return bool true when the switch was changed and must be restored
+	 */
+	private function turnOffSemiJoin(): bool
+	{
+		try {
+			$this->getDbConnection()->exec("SET @goOptimizerSwitch = @@SESSION.optimizer_switch, SESSION optimizer_switch = 'semijoin=off'");
+			return true;
+		} catch(DbException $e) {
+			ErrorHandler::log("Could not turn off semijoin in optimizer_switch: " . $e->getMessage());
+			return false;
+		}
 	}
 
   /**

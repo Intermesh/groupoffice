@@ -177,7 +177,7 @@ class Search extends AclOwnerEntity {
 	 */
 	public static function applyAclToQuery(Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): Query
 	{
-		go()->disableSemiJoin();
+		$query->disableSemiJoin();
 		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
 
 		return $query;
