@@ -463,7 +463,7 @@ class Link extends AclItemEntity
 	{
 		$level = Acl::LEVEL_READ;
 		//return parent::applyAclToQuery($query, $level, $userId, $groups);
-		go()->disableSemiJoin();
+		$query->disableSemiJoin();
 		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
 		return $query;
 	}
