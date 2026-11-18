@@ -91,6 +91,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		});
 
 		this.entityGrid = new go.links.EntityGrid({
+			entities: go.Entities.getSearchLinkConfigs(),
 			width: dp(160),
 			mobile:{
 				width: dp(120),
