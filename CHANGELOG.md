@@ -4,6 +4,7 @@
 - Core: the global search, the link search and the search fields of the modules start searching automatically from 3 characters. Press enter to search for shorter text.
 - Core: the database stops a search or links query that takes longer than 10 seconds, so slow searches can no longer pile up on the database server. The user is asked to search with a longer text. Change the limit with $config['searchMaxExecutionTime'] in config.php (in seconds, 0 for no limit).
 - Calendar: resource calendars can be exported to an .ics file. Like other calendars, this needs manage permission on the resource. #38305
+- Calendar: the contact and user lists of the Newsletters module can be selected when adding participants to an event, like in the e-mail composer. #38301
 
 16-11-2026: 26.0.61
 - Email: the upgrade failed while rebuilding the cache on servers without the SourceGuardian loader, because the e-mail module loaded the encoded MCP server class.
