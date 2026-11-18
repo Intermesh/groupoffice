@@ -500,6 +500,9 @@ export class Main extends Component {
 			window.open(client.pageUrl('community/calendar/printList/' + start.format('Y-m-d') + "/" + end.format('Y-m-d')));
 		} else if(['day', 'month', 'list'].includes(type)) {
 			window.open(client.pageUrl('community/calendar/print/' + type + '/'+ this.date.format('Y-m-d')));
+		} else if(['week', 'days'].includes(type) && client.user.calendarPreferences?.printWeekInGrid) {
+			start.setDay(DateTime.firstWeekDay);
+			window.open(client.pageUrl('community/calendar/print/' + type + '/' + start.format('Y-m-d')));
 		} else if(type ==='week') {
 			start.setDay(DateTime.firstWeekDay);
 			window.open(client.pageUrl('community/calendar/printRange/week/7/' + start.format('Y-m-d')));

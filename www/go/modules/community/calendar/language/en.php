@@ -5,6 +5,7 @@ return [
 	'CalendarEvent' => 'Event',
 	'Show event in category color' => 'Show event in category color',
 	'Only when one calendar is selected and the event has one category' => 'Only when one calendar is selected and the event has one category',
+	'Print week and workweek in a grid with hours' => 'Print week and workweek in a grid with hours',
 
 
 	'mayChangeCalendars'=> 'Create/Delete Calendars',
