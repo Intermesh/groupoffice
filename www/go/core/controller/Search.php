@@ -152,6 +152,11 @@ class Search extends EntityController {
 				->select("search.id")
 				->removeJoin('core_entity', 'e');
 
+		$excluded = model\Search::getExcludedEntityTypeIds();
+		if(!empty($excluded)) {
+			$query->andWhere('search.entityTypeId', 'NOT IN', $excluded);
+		}
+
 		return $query;
 	}
 

@@ -3662,6 +3662,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$search->entityId = $this->id;
 		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
 
+		// The search record is always saved because links depend on it. Excluded entities just don't get keywords.
+		if(\go\core\model\Search::isExcluded(static::entityType())) {
+			$isNew = $search->isNew();
+			$search->rebuild = false;
+			$search->cutPropertiesToColumnLength();
+			if(!$search->save()) {
+				throw new SaveException($search);
+			}
+			if(!$isNew) {
+				go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
+			}
+			return true;
+		}
+
 		$keywords = $this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr));
 		$keywords = array_filter($keywords, function($word) {
 			return strlen($word) > 1;

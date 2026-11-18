@@ -357,6 +357,87 @@ class Settings extends core\Settings {
 		return empty($this->corsAllowOrigin) ? [] : explode(" ", $this->corsAllowOrigin);
 	}
 
+	/**
+	 * Entity names that are left out of the global search, separated by a space.
+	 *
+	 * @var string
+	 */
+	protected $searchExcludedEntities = "";
+
+	/**
+	 * Set the entities to leave out of the global search
+	 *
+	 * Their keywords are removed from the search index. The core_search record stays because links depend on it.
+	 *
+	 * @param string[]|null $entities Entity names like "File" or "Comment". Unknown names are skipped.
+	 * @throws Exception
+	 */
+	public function setSearchExcludedEntities(?array $entities): void
+	{
+		$names = [];
+		foreach($entities ?? [] as $name) {
+			if(is_string($name) && core\orm\EntityType::existsByName($name)) {
+				$names[] = core\orm\EntityType::findByName($name)->getName();
+			}
+		}
+		$names = array_unique($names);
+		sort($names);
+		$this->searchExcludedEntities = implode(" ", $names);
+	}
+
+	/**
+	 * Get the entities that are left out of the global search
+	 *
+	 * @return string[] Entity names
+	 */
+	public function getSearchExcludedEntities(): array
+	{
+		return empty($this->searchExcludedEntities) ? [] : explode(" ", $this->searchExcludedEntities);
+	}
+
+	/**
+	 * Remove the keywords of newly excluded entities and mark the search records of entities that are included again
+	 * for a rebuild of the search index.
+	 *
+	 * @throws Exception
+	 */
+	private function applySearchExcludedEntities(): void
+	{
+		if(!$this->isModified('searchExcludedEntities')) {
+			return;
+		}
+
+		$old = (new core\db\Query)
+			->selectSingleValue('value')
+			->from('core_setting')
+			->where(['moduleId' => $this->getModuleId(), 'name' => 'searchExcludedEntities'])
+			->single();
+
+		$old = empty($old) ? [] : explode(" ", $old);
+		$new = $this->getSearchExcludedEntities();
+
+		$toIds = function(array $names) : array {
+			return array_values(array_map(function($name) {
+				return core\orm\EntityType::findByName($name)->getId();
+			}, array_filter($names, [core\orm\EntityType::class, 'existsByName'])));
+		};
+
+		$excludedIds = $toIds(array_diff($new, $old));
+		if(!empty($excludedIds)) {
+			go()->getDbConnection()->delete('core_search_word', (new core\db\Query)
+				->join('core_search', 's', 's.id = t.searchId')
+				->where('s.entityTypeId', 'IN', $excludedIds)
+			)->execute();
+		}
+
+		$includedIds = $toIds(array_diff($old, $new));
+		if(!empty($includedIds)) {
+			go()->getDbConnection()->update('core_search', ['rebuild' => true], ['entityTypeId' => $includedIds])->execute();
+		}
+
+		Search::resetExcludedEntityTypeIds();
+	}
+
 
 	/** @var bool Allow registration via the auth.php endpoint */
 	public $allowRegistration = false;
@@ -745,7 +826,9 @@ class Settings extends core\Settings {
 		}
 
 		$this->saveDefaultGroups();
-		
+
+		$this->applySearchExcludedEntities();
+
 		return parent::save();
 	}
 
