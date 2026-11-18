@@ -135,4 +135,5 @@ return array (
   'New Event' => 'Naujas įvykis',
   'You' => 'Tu',
   'This' => 'Šis',
+  'Print week and workweek in a grid with hours' => 'Spausdinti savaitę ir darbo savaitę tinklelyje su valandomis',
 );

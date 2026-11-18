@@ -192,4 +192,5 @@ return array (
     'declined' => '{name} ha rifiutato l\'evento "{title}" {date}',
     'tentative' => '{name} è incerto per l\'evento "{title}" {date}',
   ),
+  'Print week and workweek in a grid with hours' => 'Stampa la settimana e la settimana lavorativa in una griglia con le ore',
 );
