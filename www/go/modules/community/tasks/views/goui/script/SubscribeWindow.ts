@@ -10,7 +10,7 @@ export class SubscribeWindow extends Window {
 
 		this.title = t("Subscribe to Tasklist");
 		this.height = 800;
-		this.width = 400;
+		this.width = 500;
 		this.resizable = true;
 
 		this.cls = "bg-lowest";
@@ -34,15 +34,16 @@ export class SubscribeWindow extends Window {
 				headers: false,
 				columns: [
 					column({
-						id: "name"
+						id: "name",
+						width: 330
 					}),
 					column({
 						id: "btn",
 						sticky: true,
-						width: 100,
+						width: 60,
 						renderer: (columnValue, record, td, table, storeIndex, column) => {
 							return btn({
-								cls: "outlined",
+								cls: "primary",
 								text: t("Subscribe"),
 								handler: () => {
 									if (record) {

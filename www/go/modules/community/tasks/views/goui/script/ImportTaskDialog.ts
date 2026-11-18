@@ -23,7 +23,7 @@ export class ImportTaskDialog extends Window {
 
 		this.title = t("Choose a tasklist");
 		this.height = 800;
-		this.width = 800;
+		this.width = 600;
 		this.modal = true;
 		this.resizable = true;
 
@@ -54,6 +54,7 @@ export class ImportTaskDialog extends Window {
 					flex: 1
 				},
 				this.tasklistGrid = tasklistgrid({
+					fit: true,
 					cls: "bg-lowest",
 					columns: [
 						column({

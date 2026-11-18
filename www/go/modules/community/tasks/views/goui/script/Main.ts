@@ -4,6 +4,7 @@ import {
 	checkbox,
 	CheckboxField,
 	checkboxselectcolumn,
+	checkboxSelectColumnRenderer,
 	column,
 	comp,
 	EntityID,
@@ -111,6 +112,7 @@ export class Main extends MainThreeColumnPanel {
 					}
 				}),
 				h3({text: t("Assigned")}),
+				hr(),
 				this.assignedToMeCheckbox = checkbox({
 					label: t("Mine"),
 					listeners: {
@@ -177,6 +179,7 @@ export class Main extends MainThreeColumnPanel {
 					cls: "scroll"
 				},
 				this.taskListGrid = tasklistgrid({
+					headers: false,
 					cls: "no-row-lines",
 					dropOn: true,
 					sortableGroup: "TaskToList",
@@ -197,11 +200,13 @@ export class Main extends MainThreeColumnPanel {
 					columns: [
 						checkboxselectcolumn({
 							id: "check",
-							listeners: {
-								render: ({result, record}) => {
-									const checkbox = result as CheckboxField;
-									checkbox.color = "#" + record.color;
+							renderer: (columnValue, record, td, table, storeIndex, column) => {
+								const checkbox = checkboxSelectColumnRenderer(columnValue, record, td, table, storeIndex, column) as CheckboxField;
+								// an invalid color makes the tick invisible, so only set it when there is one
+								if (record.color) {
+									checkbox.color = "#" + record.color.replace(/^#/, "");
 								}
+								return checkbox;
 							}
 						}),
 						column({
@@ -384,7 +389,7 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: ({text}) => {
-							(this.taskGrid.store.queryParams.filter as Filter).text = text;
+							this.taskGrid.store.setFilter("search", {text: text});
 							void this.taskGrid.store.load();
 						}
 					}
@@ -518,8 +523,8 @@ export class Main extends MainThreeColumnPanel {
 		this.taskDetail = new TaskDetail();
 		this.taskDetail.itemId = "taskDetail";
 		this.taskDetail.stateId = "task-detail";
-
 		this.taskDetail.toolbar.items.insert(0, this.hideEastButton(), this.closeEastButton());
+
 		return this.taskDetail;
 	}
 
@@ -547,5 +552,6 @@ export class Main extends MainThreeColumnPanel {
 
 	public showTask(taskId: EntityID) {
 		void this.taskDetail.load(taskId);
+		this.activatePanel(this.east);
 	}
 }

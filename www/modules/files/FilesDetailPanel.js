@@ -314,7 +314,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 
 	createFolderWhenNoneExist: function(cb) {
-		let dv = this.findParentByType("detailview"), entityId, entity;
+		let dv = this.detailView || this.findParentByType("detailview"), entityId, entity;
 		if(!dv) {
 			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
 		}
@@ -438,6 +438,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	onLoad: function (dv) {
 
 		this.detailView = dv;
+		this.browseBtn.detailView = dv;
 
 		this.uploadBtn.setDisabled(dv.data.permissionLevel < go.permissionLevels.write);
 		if(dv.data.permissionLevel < go.permissionLevels.write) {

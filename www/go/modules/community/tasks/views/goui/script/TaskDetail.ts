@@ -1,4 +1,13 @@
-import {addbutton, client, DetailPanel, img, modules, principalDS} from "@intermesh/groupoffice-core";
+import {
+	addbutton,
+	client, CustomFieldDetailFieldset,
+	customFields,
+	DetailPanel,
+	img,
+	LinkDetail,
+	modules,
+	principalDS
+} from "@intermesh/groupoffice-core";
 import {
 	avatar,
 	btn, Button,
@@ -17,6 +26,7 @@ import {TaskDialog} from "./TaskDialog.js";
 import {taskCategoryDS, taskDS, tasklistDS} from "./Index.js";
 import {CommentsPanel} from "@intermesh/community-comments";
 import {HistoryDetailPanel} from "@intermesh/community-history";
+import {noteDS} from "notes/dist/Index";
 
 export class TaskDetail extends DetailPanel {
 	private form: DataSourceForm;
@@ -152,11 +162,11 @@ export class TaskDetail extends DetailPanel {
 							return "";
 						}
 					})
-				)
-			)
+				),
+				...customFields.getFieldSets("Task").map(fs => new CustomFieldDetailFieldset(fs))
+			),
 		);
 
-		this.addCustomFields();
 		if (modules.isAvailable("community", "comments")) {
 			this.scroller.items.add(new CommentsPanel(this.entityName))
 		}

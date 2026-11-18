@@ -257,12 +257,13 @@ export class TaskGrid extends Table<DataSourceStore> {
 				column({
 					id: "taskcategories",
 					header: t("Categories"),
-					width: 160,
-					sortable: true,
+					sortable: false,
 					renderer: (columnValue) => {
-						return columnValue.map((v: {
-							name: any;
-						}) => '<span class="tasks-category">' + Ext.util.Format.htmlEncode(v.name) + '</span>').join("");
+						return comp({
+							html: columnValue.map((v: {
+								name: any;
+							}) => '<span class="support-category">' + Ext.util.Format.htmlEncode(v.name) + '</span>').join(", ")
+						})
 					},
 					resizable: true
 				}),

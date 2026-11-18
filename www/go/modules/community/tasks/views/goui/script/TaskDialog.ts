@@ -1,6 +1,6 @@
 import {
 	client,
-	FormWindow,
+	FormWindow, modules,
 	PrincipalCombo,
 	principalcombo,
 	RecurrenceField,
@@ -9,7 +9,7 @@ import {
 import {
 	ArrayField,
 	arrayfield,
-	btn, Button,
+	btn,
 	collapsebtn,
 	colorfield,
 	combobox,
@@ -18,8 +18,8 @@ import {
 	datefield, DateInterval, DateTime, durationfield,
 	fieldset,
 	h3,
-	hr,
-	htmlfield, rangefield, router,
+	rangefield, router,
+	Window,
 	t,
 	tbar,
 	textarea,
@@ -30,6 +30,7 @@ import {TaskCategoryChips, taskcategorychips} from "./TaskCategoryChips.js";
 import {progresscombo} from "./ProgressCombo.js";
 import {prioritycombo} from "./PriorityCombo.js";
 import {projectDS, tasklistDS} from "./Index.js";
+import {commentDS, CommentEditor} from "@intermesh/community-comments";
 
 export class TaskDialog extends FormWindow {
 	private responsibleCombo: PrincipalCombo;
@@ -37,18 +38,35 @@ export class TaskDialog extends FormWindow {
 	private startDate: DateField;
 	private dueDate: DateField;
 	private recurrenceField: RecurrenceField;
-
+	private commentField: CommentEditor|undefined;
+	private commentContainer: ContainerField|undefined;
 
 	constructor() {
 		super("Task");
 
 		this.title = t("Task");
 		this.width = 800;
-		this.height = 800;
+		this.minHeight = 800;
 
 		this.maximizable = true;
 		this.collapsible = true;
 		this.resizable = true;
+		this.hasLinks = true;
+
+		this.form.on("submit", async () => {
+			if (!this.commentField || !this.commentContainer || !this.commentField.editor.value || this.form.currentId) {
+				return;
+			}
+
+			await commentDS.create(
+				Object.assign({
+					entity: "Task",
+					entityId: this.form.currentId
+				}, this.commentContainer.value)
+			).catch(e => {
+				void Window.error(e);
+			});
+		});
 
 		this.form.on("save", ({data}) => {
 			router.goto("tasks/" + data.id)
@@ -75,7 +93,8 @@ export class TaskDialog extends FormWindow {
 					this.responsibleCombo = principalcombo({
 						flex: 1,
 						label: t("Responsible"),
-						name: "responsibleUserId"
+						name: "responsibleUserId",
+						entity: "User"
 					}),
 					tasklistcombo({
 						flex: 1,
@@ -123,37 +142,6 @@ export class TaskDialog extends FormWindow {
 						cls: "border-top"
 					},
 					h3({
-						text: t("Message")
-					})
-				),
-				htmlfield({
-					name: "description"
-				})
-			),
-			fieldset({
-					flex: 1,
-					cls: "flow border-top"
-				},
-				hr(),
-				this.categoryChips = taskcategorychips({
-					label: t("Categories"),
-					name: "categories"
-				}),
-				combobox({
-					name: "projectId",
-					label: t("Project"),
-					dataSource: projectDS,
-					displayProperty: "number",
-					valueProperty: "id"
-				})
-			),
-			fieldset({
-					flex: 1
-				},
-				tbar({
-						cls: "border-top"
-					},
-					h3({
 						text: t("Date")
 					}),
 					"->",
@@ -164,7 +152,6 @@ export class TaskDialog extends FormWindow {
 				),
 				comp({
 						cls: "flow",
-						hidden: true,
 						flex: 1
 					},
 					comp({cls: "row"},
@@ -206,7 +193,8 @@ export class TaskDialog extends FormWindow {
 						progresscombo({
 							label: t("Progress"),
 							name: "progress",
-							flex: 1
+							flex: 1,
+							value: "needs-action"
 						}),
 						rangefield({
 							flex: 1,
@@ -219,7 +207,8 @@ export class TaskDialog extends FormWindow {
 						prioritycombo({
 							label: t("Priority"),
 							name: "priority",
-							flex: 1
+							flex: 1,
+							value: 0
 						})
 					),
 					this.recurrenceField = recurrencefield({
@@ -232,9 +221,7 @@ export class TaskDialog extends FormWindow {
 			fieldset({
 					flex: 1
 				},
-				tbar({
-						cls: "border-top"
-					},
+				tbar({},
 					h3({
 						text: t("Description") + " / " + t("Location")
 					}),
@@ -246,7 +233,6 @@ export class TaskDialog extends FormWindow {
 				),
 				comp({
 						cls: "flow",
-						hidden: true,
 						flex: 1
 					},
 					textarea({
@@ -262,14 +248,26 @@ export class TaskDialog extends FormWindow {
 				)
 			),
 			fieldset({
+					flex: 1,
+					cls: "flow"
+				},
+				this.categoryChips = taskcategorychips({
+					label: t("Categories"),
+					name: "categories"
+				}),
+				combobox({
+					name: "projectId",
+					label: t("Project"),
+					dataSource: projectDS,
+					displayProperty: "number",
+					valueProperty: "id",
+					hidden: !modules.isAvailable("business", "projects3")
+				})
+			),
+			fieldset({
 					flex: 1
 				},
-				tbar({
-						cls: "border-top"
-					},
-					h3({
-						text: t("Alerts")
-					}),
+				tbar({}, h3({text: t("Alerts")}),
 					"->",
 					collapsebtn({
 						stateId: "task-dialog-alerts",
@@ -278,7 +276,6 @@ export class TaskDialog extends FormWindow {
 				),
 				comp({
 						cls: "flow",
-						hidden: true,
 						flex: 1
 					},
 					arrayfield({
@@ -319,7 +316,19 @@ export class TaskDialog extends FormWindow {
 					})
 				)
 			)
-		)
-	}
+		);
+		this.addCustomFields();
+		this.on("ready", ({currentId}) => {
+			if (modules.isAvailable("community", "comments") && !currentId) {
+				this.commentField = new CommentEditor();
+				this.commentField.editor.required = false;
 
+				// container field without a name, so the comment is not submitted as part of the task
+				const cfs = fieldset({flex:''},
+					this.commentContainer = containerfield({}, this.commentField)
+				);
+				this.generalTab.items.insert(1, cfs);
+			}
+		});
+	}
 }
