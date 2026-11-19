@@ -685,9 +685,10 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * Whether an event with participants and the same UID is already in a calendar. GroupOffice stores such an event
 	 * once for all calendars it's in, so a client must not create a second copy, for example by adding an invitation
-	 * from an e-mail attachment. The participants would get two events and their replies would go to the wrong address.
+	 * from an e-mail attachment or by importing it. The participants would get two events and their replies would go to
+	 * the wrong address.
 	 */
-	private function scheduledEventWithSameUidExists(): bool
+	public function scheduledEventWithSameUidExists(): bool
 	{
 		if (empty($this->uid)) {
 			return false;

@@ -413,7 +413,8 @@ class ICalendarHelper {
 
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && isset($existing[$ev->uid])) {
+				} else if($uid === 'check' && (isset($existing[$ev->uid]) || $ev->scheduledEventWithSameUidExists())) {
+					// An invitation that is already in another calendar must not be added again as a copy
 					$r->skipped++;
 					continue;
 					// check if exists
