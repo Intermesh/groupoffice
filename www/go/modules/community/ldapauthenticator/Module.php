@@ -155,6 +155,55 @@ class Module extends core\Module implements DomainProvider
 
 
 	/**
+	 * Disable the user and archive it when it isn't archived yet.
+	 *
+	 * Archiving removes the user from all groups and shares, so it only runs once. It needs the right to change users,
+	 * so it runs in the sync but not at login, where the user is only disabled.
+	 *
+	 * @throws Exception
+	 */
+	private static function archiveUser(User $user): void
+	{
+		$user->enabled = false;
+
+		if (self::isArchived($user)) {
+			return;
+		}
+
+		if (!go()->getModel()->getUserRights()->mayChangeUsers) {
+			go()->debug("Not archiving user '" . $user->username . "' because the current user may not change users");
+			return;
+		}
+
+		$user->setArchive(true);
+	}
+
+	/**
+	 * A user is archived when its profile is in the address book for archived users. Without the address book module
+	 * a user counts as archived when it was disabled already.
+	 */
+	private static function isArchived(User $user): bool
+	{
+		if ($user->isNew()) {
+			return false;
+		}
+
+		if (!CoreModelModule::isInstalled('community', 'addressbook')) {
+			return !$user->getOldValue('enabled');
+		}
+
+		$archivedAddressBookId = go()->getSettings()->archivedUsersAddressBook;
+		if (empty($archivedAddressBookId)) {
+			return false;
+		}
+
+		return Contact::find(['id'])
+			->where('goUserId', '=', $user->id)
+			->andWhere('addressBookId', '=', $archivedAddressBookId)
+			->single() !== null;
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public static function ldapRecordToUser(string $username, Record $record, User $user): User
@@ -186,6 +235,10 @@ class Module extends core\Module implements DomainProvider
 		if (isset($values['email'])) $user->email = mb_strtolower($values['email']);
 		if (isset($values['displayName'])) $user->displayName = $values['name'] = $values['displayName'];
 		if (isset($values['homeDir'])) $user->homeDir = $values['homeDir'];
+
+		if (!empty($values['archived'])) {
+			self::archiveUser($user);
+		}
 
 		if (!isset($user->recoveryEmail)) {
 			$user->recoveryEmail = $user->email;

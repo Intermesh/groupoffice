@@ -1138,6 +1138,11 @@ public function historyLog(): bool|array
 			return true;
 		}
 
+		// A pending archive must be saved, also when no other property changed
+		if($forIsModified && $this->archive && ($allProps || in_array('archive', $properties))) {
+			return true;
+		}
+
 		// Add contact profile
 		if (($allProps || in_array('profile', $properties)) && isset($this->contact) && $this->contact->isModified()) {
 			if($forIsModified) {

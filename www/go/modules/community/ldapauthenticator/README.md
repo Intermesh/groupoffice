@@ -52,3 +52,19 @@ $config['ldapMapping'] = [
 ];
 ````
 
+Archiving users
+---------------
+
+Add an `archived` key to the mapping to archive users in the LDAP sync. When it returns true, the user is disabled
+and archived: it is removed from all groups except "Everyone", its shares are removed and its profile moves to the
+"Archived users" address book. This happens once; the next syncs leave the archived user alone. When it returns false
+again, the user stays as it is and must be restored by an administrator.
+
+```
+'archived' => function($record) {
+    return !isset($record->{"UniHGW-Affiliation"});
+},
+```
+
+At login the user is only disabled. Archiving needs the right to change users, which the sync has.
+
