@@ -248,6 +248,17 @@ th {
 
 		$this->index = 0;
 		foreach($entities as $entity) {
+			// The export query may come from EntityController::getGetQuery() with explicit ids, which carries
+			// no ACL condition: check READ per entity, like AbstractConverter::exportToBlob() does.
+			if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+				// Drop the partial file: a CSV/HTML one already holds the readable rows written so far.
+				if(is_resource($this->fp)) {
+					fclose($this->fp);
+				}
+				$this->tempFile->delete();
+				throw new \go\core\exception\Forbidden();
+			}
+
 			$this->exportEntity($entity);
 			$this->index++;
 		}
