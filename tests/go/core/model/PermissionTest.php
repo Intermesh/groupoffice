@@ -60,4 +60,10 @@ class PermissionTest extends TestCase
 		$this->grant($this->groupIds[0], 1);
 		$this->assertNull(Permission::findUserRights($this->moduleId, -1));
 	}
+
+	public function testNoUserReturnsNull()
+	{
+		$this->grant($this->groupIds[0], 1);
+		$this->assertNull(Permission::findUserRights($this->moduleId, null));
+	}
 }
