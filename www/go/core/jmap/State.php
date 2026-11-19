@@ -293,6 +293,8 @@ class State extends AbstractState {
 		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
 
 		$response['CSRFToken'] = $this->getToken()->CSRFToken;
+		// The client of the old framework sends it with its requests. {@see Token::getLegacySecurityToken()}
+		$response['securityToken'] = $this->getToken()->getLegacySecurityToken();
 
 		return $response;
 	}

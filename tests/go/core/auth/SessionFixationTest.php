@@ -135,10 +135,53 @@ class SessionFixationTest extends TestCase
 	{
 		$token = $this->newToken();
 
-		$values = $this->startSession(['user_id' => $token->userId, 'accessToken' => $token->accessToken, 'security_token' => 'abc'], $token->accessToken);
+		$values = $this->startSession(['user_id' => $token->userId, 'accessToken' => $token->accessToken, 'security_token' => $token->getLegacySecurityToken()], $token->accessToken);
 
 		$this->assertEquals($token->userId, $values['user_id']);
-		$this->assertSame('abc', $values['security_token']);
+		$this->assertSame($token->getLegacySecurityToken(), $values['security_token']);
+	}
+
+	/**
+	 * PHP cleans up the session long before the access token expires. The session that is restored from the access
+	 * token must accept the security token that the page got before, or the client asks to log in again.
+	 */
+	public function testRestoredSessionKeepsSecurityToken(): void
+	{
+		$token = $this->newToken();
+		$page = $this->startSession(['user_id' => $token->userId, 'accessToken' => $token->accessToken], $token->accessToken);
+
+		$restored = $this->startSession([], $token->accessToken);
+
+		$this->assertEquals($token->userId, $restored['user_id']);
+		$this->assertSame($page['security_token'], $restored['security_token']);
+		$this->assertSame($token->getLegacySecurityToken(), $restored['security_token']);
+	}
+
+	public function testSecurityTokenIsReplacedByTheOneOfTheAccessToken(): void
+	{
+		$token = $this->newToken();
+
+		// a session of before the security token was derived from the access token
+		$values = $this->startSession(['user_id' => $token->userId, 'accessToken' => $token->accessToken, 'security_token' => 'abc'], $token->accessToken);
+
+		$this->assertSame($token->getLegacySecurityToken(), $values['security_token']);
+		$this->assertSame($values['security_token'], go()->getAuthState()->getSession()['securityToken'], 'the client must get the same token');
+	}
+
+	public function testSecurityTokenDiffersPerAccessToken(): void
+	{
+		$token = $this->newToken();
+		$other = $this->newToken();
+
+		$this->assertNotSame($token->getLegacySecurityToken(), $other->getLegacySecurityToken());
+		$this->assertNotSame($token->CSRFToken, $token->getLegacySecurityToken(), 'the CSRF token must not end up in URLs');
+	}
+
+	public function testSessionWithoutAccessTokenGetsRandomSecurityToken(): void
+	{
+		$values = $this->startSession([], null);
+
+		$this->assertMatchesRegularExpression('/^[a-zA-Z1-9]{20}$/', $values['security_token']);
 	}
 
 	public function testSessionUserIsDroppedWithoutAccessToken(): void
@@ -174,11 +217,11 @@ class SessionFixationTest extends TestCase
 		$state->setToken($token);
 		go()->setAuthState($state);
 
-		\GO::session()->values = ['user_id' => $token->userId, 'accessToken' => $token->accessToken, 'security_token' => 'abc'];
+		\GO::session()->values = ['user_id' => $token->userId, 'accessToken' => $token->accessToken, 'security_token' => $token->getLegacySecurityToken()];
 		\GO::session()->start();
 
 		$this->assertEquals($token->userId, \GO::session()->values['user_id']);
-		$this->assertSame('abc', \GO::session()->values['security_token'], 'the security token of the page must stay valid');
+		$this->assertSame($token->getLegacySecurityToken(), \GO::session()->values['security_token'], 'the security token of the page must stay valid');
 	}
 
 	public function testSessionUserWithInvalidAccessTokenIsDropped(): void
@@ -203,7 +246,7 @@ class SessionFixationTest extends TestCase
 	 */
 	private function crossSitePost(Token $token): void
 	{
-		$this->startSession(['user_id' => $token->userId, 'accessToken' => $token->accessToken, 'security_token' => 'secret'], $token->accessToken);
+		$this->startSession(['user_id' => $token->userId, 'accessToken' => $token->accessToken], $token->accessToken);
 		$_SERVER['REQUEST_METHOD'] = 'POST';
 		unset($_SERVER['HTTP_X_CSRF_TOKEN']);
 		$_REQUEST['r'] = 'files/folder/delete';
@@ -224,8 +267,9 @@ class SessionFixationTest extends TestCase
 
 	public function testPostWithWrongSecurityTokenIsRefused(): void
 	{
-		$this->crossSitePost($this->newToken());
-		$_REQUEST['security_token'] = ['secret'];
+		$token = $this->newToken();
+		$this->crossSitePost($token);
+		$_REQUEST['security_token'] = [$token->getLegacySecurityToken()];
 
 		$this->expectException(SecurityTokenMismatch::class);
 		$this->checkSecurityToken();
@@ -233,8 +277,9 @@ class SessionFixationTest extends TestCase
 
 	public function testPostWithSecurityTokenIsAccepted(): void
 	{
-		$this->crossSitePost($this->newToken());
-		$_REQUEST['security_token'] = 'secret';
+		$token = $this->newToken();
+		$this->crossSitePost($token);
+		$_REQUEST['security_token'] = $token->getLegacySecurityToken();
 
 		$this->checkSecurityToken();
 		$this->assertFalse(State::$CSRFcheck);
