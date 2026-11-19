@@ -23,6 +23,74 @@ class Settings extends core\Settings
 
 	public string $videoJwtAppId = '';
 
+	// Optional JaaS (8x8) authentication configuration.
+	public bool $jaasEnabled = false;
+	public string $jaasAppId = '';
+	public string $jaasKeyId = '';
+	protected string $jaasPrivateKeyPath = '';
+
+	public function setJaasPrivateKeyPath(string $path): void
+	{
+		$this->jaasPrivateKeyPath = $path;
+	}
+
+	public function getJaasPrivateKeyPath()
+	{
+		return null;
+	}
+
+
+
+	/**
+	 * Generate a JaaS JWT using RS256.
+	 *
+	 * @param string $room Meeting room identifier
+	 * @param bool $moderator Whether the participant is a moderator
+	 */
+	public function createJaasJwtToken(string $room, bool $moderator = false): string
+	{
+		if (!$this->jaasEnabled) {
+			throw new \RuntimeException('JaaS authentication is not enabled');
+		}
+
+		if ($this->jaasAppId === '' || $this->jaasKeyId === '' || $this->jaasPrivateKeyPath === '') {
+			throw new \RuntimeException('JaaS configuration is incomplete');
+		}
+
+		if (!is_file($this->jaasPrivateKeyPath) || !is_readable($this->jaasPrivateKeyPath)) {
+			throw new \RuntimeException('JaaS private key file is not readable');
+		}
+
+		$privateKey = file_get_contents($this->jaasPrivateKeyPath);
+		if ($privateKey === false) {
+			throw new \RuntimeException('Unable to read JaaS private key');
+		}
+
+		$now = time();
+
+		$payload = [
+			'aud' => 'jitsi',
+			'iss' => 'chat',
+			'sub' => $this->jaasAppId,
+			'room' => $room,
+			'iat' => $now,
+			'nbf' => $now,
+			'exp' => $now + (30 * 24 * 3600),
+			'context' => [
+				'user' => [
+					'moderator' => $moderator ? 'true' : 'false'
+				]
+			]
+		];
+
+		return \Firebase\JWT\JWT::encode(
+			$payload,
+			$privateKey,
+			'RS256',
+			$this->jaasAppId . '/' . $this->jaasKeyId
+		);
+	}
+
 	private static function encode($data) {
 		return strtr(base64_encode($data), ['+'=>'-', '/'=>'_', '='=>'']);
 	}
@@ -50,6 +118,12 @@ class Settings extends core\Settings
 	public function createMeetingUri(): string
 	{
 		$room = core\util\StringUtil::random(8);
+
+		if ($this->jaasEnabled) {
+			return $this->videoUri . $this->jaasAppId . '/' . $room
+				. '?jwt=' . $this->createJaasJwtToken($room, true);
+		}
+
 		$uri = $this->videoUri . $room;
 		if ($this->videoJwtEnabled) {
 			$uri .= '?jwt=' . $this->createJwtToken($room);
