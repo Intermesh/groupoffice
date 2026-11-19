@@ -1823,11 +1823,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	protected function actionSource(array $params)
 	{
-
 		$account = Account::model()->findByPk($params['account_id']);
+
+		if(!$account) {
+			throw new \go\core\exception\NotFound("Account not found");
+		}
+
 		$imap  = $account->openImapConnection($params['mailbox']);
 
 		$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+
+		if(!$message) {
+			throw new NotFound();
+		}
 		
 		$filename = GO\Base\Fs\File::stripInvalidChars(date("Y-m-d_Hi", $message->udate) . "_". $message->from->getAddress()['email'] . "_" .$message->subject);
 		$filename .= empty($params['download']) ? ".txt" :".eml";
