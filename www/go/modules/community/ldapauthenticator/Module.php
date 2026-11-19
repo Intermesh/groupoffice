@@ -248,8 +248,14 @@ class Module extends core\Module implements DomainProvider
 
 			if(!$user->isNew())
 				$contact = Contact::findForUser($user->id);
-			if(empty($contact))
+			if(empty($contact)) {
 				$contact = $user->getProfile();
+				// The contact is saved below, before the user. Link it now, or every sync adds a new contact without a user.
+				// For a new user, User::saveContact() links it when the user is saved.
+				if(!$user->isNew()) {
+					$contact->goUserId = $user->id;
+				}
+			}
 
 			$phoneNbs = [];
 			if (isset($values['homePhone'])) {

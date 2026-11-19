@@ -174,6 +174,41 @@ class ArchiveMappingTest extends TestCase
 		$this->assertNotContains(self::$extraGroup->id, User::findById($this->user->id)->groups);
 	}
 
+	public function testDeletedProfileIsRecreatedInArchivedAddressBook(): void
+	{
+		$this->sync(false);
+
+		Contact::delete(['goUserId' => $this->user->id]);
+		$this->assertNull(Contact::findForUser($this->user->id));
+
+		// the next sync archives again and moves the new profile to the archived users
+		$this->sync(false);
+		$this->assertTrue($this->isInArchivedAddressBook());
+
+		// and the sync after that leaves the user alone
+		$user = User::findById($this->user->id);
+		Module::ldapRecordToUser($user->username, $this->record(false), $user);
+		$this->assertFalse($user->isModified());
+	}
+
+	public function testDeletedProfileIsRecreatedOnce(): void
+	{
+		Contact::delete(['goUserId' => $this->user->id]);
+
+		$this->sync(true);
+		$this->sync(true);
+
+		$count = go()->getDbConnection()
+			->selectSingleValue('count(*)')
+			->from('addressbook_contact', 'c')
+			->join('addressbook_email_address', 'e', 'e.contactId = c.id')
+			->where('e.email', '=', $this->user->email)
+			->single();
+
+		$this->assertEquals(1, $count, "The sync must link the new profile to the user instead of adding a contact on every run");
+		$this->assertNotNull(Contact::findForUser($this->user->id));
+	}
+
 	public function testUserIsLeftAsIsWhenNotArchived(): void
 	{
 		$this->sync(false);
