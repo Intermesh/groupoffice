@@ -320,8 +320,9 @@ abstract class AbstractController extends Observable {
 		
 		if(!in_array($action, $allowGuests) && !in_array('*', $allowGuests)){			
 			//check for logged in user
-			if(!GO::user()){					
-				return false;	
+			if(!GO::user()){
+				$this->denyReason = 'no user in session';
+				return false;
 			}
 			
 			$this->checkSecurityToken();
@@ -336,13 +337,69 @@ abstract class AbstractController extends Observable {
 			{
 				// return !!go()->getAuthState()->getClassPermissionLevel(static::class);
 				$module = $this->getModule();		
-				if(!$module || !$module->permissionLevel)
+				if(!$module || !$module->permissionLevel) {
+					$this->denyReason = 'no module permission';
 					return false;
+				}
 			}
 		}
-		
-		return $this->_checkRequiredPermissionLevels($action);
-		
+
+		if(!$this->_checkRequiredPermissionLevels($action)) {
+			$this->denyReason = 'required permission level';
+			return false;
+		}
+		return true;
+
+	}
+
+	/**
+	 * Why {@see _checkPermission()} denied the request, for {@see logDenied()}
+	 *
+	 * @var string|null
+	 */
+	private $denyReason = null;
+
+	/**
+	 * Write a denied request to the error log
+	 *
+	 * AccessDenied and SecurityTokenMismatch are not logged otherwise, so without debug mode there was no way to tell
+	 * which check denied a request, for example when opening an attachment of a shared e-mail account fails now and then.
+	 * No tokens are logged, only whether they were sent.
+	 *
+	 * @param \Throwable $e
+	 * @param array $params The parameters of the action
+	 * @return void
+	 */
+	private function logDenied(\Throwable $e, array $params): void
+	{
+		try {
+			$caller = $e->getTrace()[0] ?? [];
+			$where = $this->denyReason ?? (basename($e->getFile()) . ':' . $e->getLine() .
+				(isset($caller['file']) ? ' called from ' . basename($caller['file']) . ':' . ($caller['line'] ?? '?') : ''));
+
+			$context = [];
+			foreach (['account_id', 'id', 'mailbox'] as $key) {
+				if (isset($params[$key]) && is_scalar($params[$key])) {
+					$context[] = $key . '=' . substr((string) $params[$key], 0, 100);
+				}
+			}
+
+			$session = GO::session()->values;
+			\go\core\ErrorHandler::log(sprintf(
+				'%s in %s for user %s: %s. %s Session user: %s, session access token: %s, access token cookie: %s, security token sent: %s',
+				get_class($e),
+				$_REQUEST['r'] ?? (static::class . '::' . $this->getAction()),
+				GO::user()->id ?? 'none',
+				$where,
+				$context ? '(' . implode(', ', $context) . ')' : '',
+				empty($session['user_id']) ? 'no' : 'yes',
+				empty($session['accessToken']) ? 'no' : 'yes',
+				empty($_COOKIE['accessToken']) ? 'no' : 'yes',
+				empty($_REQUEST['security_token']) ? 'no' : 'yes'
+			));
+		} catch (\Throwable $logError) {
+			// Logging must never change the response
+		}
 	}
 	
 	/**
@@ -441,6 +498,7 @@ abstract class AbstractController extends Observable {
 		}
 		catch(SecurityTokenMismatch $e) {
 			GO::debug("EXCEPTION: ".(string) $e);
+			$this->logDenied($e, $params);
 
 			$response = new JsonResponse();
 
@@ -454,6 +512,7 @@ abstract class AbstractController extends Observable {
 		}
 		catch(AccessDenied $e) {
 			GO::debug("EXCEPTION: ".(string) $e);
+			$this->logDenied($e, $params);
 
 			$response = new JsonResponse();
 
