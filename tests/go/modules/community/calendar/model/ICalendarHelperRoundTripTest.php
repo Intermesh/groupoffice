@@ -150,6 +150,60 @@ class ICalendarHelperRoundTripTest extends TestCase
 		$this->assertTrue((bool)$imported->recurrenceOverrides['2027-03-24T09:30:00']->excluded);
 	}
 
+	private function eventWithParticipants(): CalendarEvent
+	{
+		$event = $this->timedEvent();
+		$event->uid = 'roundtrip-participants@intermesh.localhost';
+		$participants = [];
+		foreach (['organizer' => ['owner' => true, 'attendee' => true], 'required' => ['attendee' => true],
+			         'optional' => ['optional' => true], 'informational' => ['informational' => true],
+			         'chair' => ['chair' => true]] as $name => $roles) {
+			$email = $name . '@roles.localhost';
+			$participants[$email] = ['email' => $email, 'name' => $name, 'roles' => $roles, 'kind' => 'individual',
+				'participationStatus' => 'accepted'];
+		}
+		$event->setValues(['participants' => $participants]);
+		return $event;
+	}
+
+	public static function participantRoles(): array
+	{
+		return [
+			'organizer' => ['organizer', ['owner' => true]],
+			'required' => ['required', ['attendee' => true]],
+			'optional' => ['optional', ['optional' => true]],
+			'informational' => ['informational', ['informational' => true]],
+			'chair' => ['chair', ['chair' => true]],
+		];
+	}
+
+	/**
+	 * @dataProvider participantRoles
+	 */
+	public function testParticipantRoles(string $name, array $expectedRoles): void
+	{
+		$imported = $this->roundTrip($this->eventWithParticipants());
+		$this->assertArrayHasKey($name . '@roles.localhost', $imported->participants);
+		$this->assertEquals((object)$expectedRoles, $imported->participants[$name . '@roles.localhost']->getRoles());
+	}
+
+	public function testOrganizerHasNoRole(): void
+	{
+		$vevent = ICalendarHelper::toVObject($this->eventWithParticipants())->VEVENT[0];
+		$this->assertFalse(isset($vevent->ORGANIZER['ROLE']), 'ROLE is not a parameter of ORGANIZER');
+		$this->assertSame('REQ-PARTICIPANT', (string)$vevent->ATTENDEE[0]['ROLE']);
+	}
+
+	public function testAttendeeWithoutRoleIsRequired(): void
+	{
+		$ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:test\r\nBEGIN:VEVENT\r\nUID:no-role@intermesh.localhost\r\n" .
+			"DTSTART:20270310T093000Z\r\nDTEND:20270310T103000Z\r\nSUMMARY:No role\r\n" .
+			"ORGANIZER:mailto:organizer@roles.localhost\r\nATTENDEE;PARTSTAT=NEEDS-ACTION:mailto:attendee@roles.localhost\r\n" .
+			"END:VEVENT\r\nEND:VCALENDAR\r\n";
+		$imported = ICalendarHelper::parseVObject($ics, new CalendarEvent());
+		$this->assertEquals((object)['attendee' => true], $imported->participants['attendee@roles.localhost']->getRoles());
+	}
+
 	public function testAlert(): void
 	{
 		$imported = $this->roundTrip($this->timedEvent());

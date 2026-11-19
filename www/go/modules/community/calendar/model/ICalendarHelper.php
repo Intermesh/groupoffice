@@ -246,14 +246,17 @@ class ICalendarHelper {
 			//ENUM('individual', 'group', 'location', 'resource','unknown') NOT NULL,
 			$attr['CUTYPE'] = $participant->kind == 'location' ? "ROOM" : strtoupper($participant->kind);
 		}
-		foreach ($participant->getRoles() as $role => $true) {
-			if (in_array($role, self::$roleMap)) {
-				$attr['ROLE'] = self::$roleMap[$role];
-				break;
+		$isOwner = !empty($participant->isOwner());
+		if(!$isOwner) { // ROLE is not a parameter of ORGANIZER
+			foreach ($participant->getRoles() as $role => $true) {
+				if (isset(self::$roleMap[$role])) {
+					$attr['ROLE'] = self::$roleMap[$role];
+					break;
+				}
 			}
 		}
 		return [
-			!empty($participant->isOwner()) ? 'ORGANIZER' : 'ATTENDEE',
+			$isOwner ? 'ORGANIZER' : 'ATTENDEE',
 			'mailto:'.strtolower($participant->email),
 			$attr
 		];
@@ -653,11 +656,11 @@ class ICalendarHelper {
 		if(!empty($vattendee['PARTSTAT'])) {
 			$p->participationStatus = strtolower($vattendee['PARTSTAT']);
 		}
-		if(!empty($vattendee['ROLE'])) {
+		if($vattendee->name === 'ATTENDEE') {
 			$map = array_flip(self::$roleMap);
-			if (in_array((string)$vattendee['ROLE'], $map)) {
-				$p->roles = [$map[(string)$vattendee['ROLE']] => true];
-			}
+			$role = strtoupper((string)$vattendee['ROLE']);
+			// REQ-PARTICIPANT is the default when ROLE is missing (RFC 5545)
+			$p->roles = [$map[$role] ?? 'attendee' => true];
 		}
 		return [
 			$principalIds[0] ?? $key,
