@@ -71,6 +71,11 @@ class CalendarEvent extends AclItemEntity {
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'veventBlobId'];
 
+	/**
+	 * Details of a private event that only its owner may see. Also hidden in the recurrence overrides.
+	 */
+	const PrivateDetails = ['title', 'description', 'location', 'categoryIds'];
+
 //	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 //	const IgnoredPropertiesInException = [
 //		'uid', 'links', 'method', 'privacy', 'prodId',
@@ -257,6 +262,11 @@ class CalendarEvent extends AclItemEntity {
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
 	protected ?string  $ownerId = null; // find calendar owner to see if Private events needs to be altered
+
+	/**
+	 * Set on an instance of patchedInstance(). It is a new copy of the series, so isNew() can't tell who owns it.
+	 */
+	private ?bool $seriesOwnedByCurrentUser = null;
 
 	public static function customFieldsTableName(): string
 	{
@@ -641,7 +651,9 @@ class CalendarEvent extends AclItemEntity {
 			$patchArray['start'] = new DateTime($recurrenceId);
 		}
 
-		$e = JSON::patch($this->copy(), $patchArray);
+		$copy = $this->copy();
+		$copy->seriesOwnedByCurrentUser = $this->currentUserIsOwner();
+		$e = JSON::patch($copy, $patchArray);
 		$e->recurrenceId = $recurrenceId;
 		$e->excluded = isset($this->recurrenceOverrides[$recurrenceId]) && $this->recurrenceOverrides[$recurrenceId]->excluded;
 		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
@@ -935,6 +947,9 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function currentUserIsOwner() {
+		if(isset($this->seriesOwnedByCurrentUser)) {
+			return $this->seriesOwnedByCurrentUser;
+		}
 		return $this->isNew() || $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
@@ -980,6 +995,15 @@ class CalendarEvent extends AclItemEntity {
 			$arr['description'] = '';
 			$arr['location'] = '';
 			$arr['categoryIds'] = [];
+			// An exception of the series may have its own details. Leave them out instead of clearing them, so the
+			// client doesn't send empty values back. RecurrenceOverride::setValues() keeps them when it does.
+			if(!empty($arr['recurrenceOverrides'])) {
+				foreach($arr['recurrenceOverrides'] as $recurrenceId => $patch) {
+					if(is_array($patch)) {
+						$arr['recurrenceOverrides'][$recurrenceId] = array_diff_key($patch, array_flip(self::PrivateDetails));
+					}
+				}
+			}
 		}
 		unset($arr['recurrenceId'], $arr['excluded']);
 		return $arr;

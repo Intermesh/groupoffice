@@ -215,7 +215,7 @@ class ICalendarHelper {
 		// Sequence is for updates on the event it's used for ITIP
 		if(isset($event->sequence)) $vevent->SEQUENCE = $event->sequence;
 
-		$showAsPrivate = $event->isPrivate() && !$event->currentUserIsOwner();
+		$showAsPrivate = $event->showAsPrivate();
 		if(!empty($event->title)) $vevent->SUMMARY = $showAsPrivate ? '('.go()->t('Private', 'community', 'calendar').')' : $event->title;
 		if(!empty($event->description) && !$showAsPrivate) $vevent->DESCRIPTION = $event->description;
 		if(!empty($event->location) && !$showAsPrivate) $vevent->LOCATION = $event->location;
