@@ -267,6 +267,11 @@ class Module extends core\Module
 	public function pagePrintRange($type,$days, $date) {
 		$calendarIds = $this->visibleCalendarIds();
 
+		$days = (int) $days;
+		if($days < 1 || $days > 366) {
+			throw new core\http\Exception(400, "Invalid number of days");
+		}
+
 		$this->printWeeks(new \DateTime($date),$days, $calendarIds);
 	}
 
@@ -331,7 +336,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output($report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
+		$report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf');
 	}
 
 	private function printWeeks($date, $amount, $calendarIds) {
@@ -356,12 +361,12 @@ class Module extends core\Module
 		$report->printMonth = false;
 
 
-		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'COALESCE(caluser.color, calendar_calendar.defaultColor) AS color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
 		$report->calendars = array_column($rows, null, 'id');
 		$report->setEvents($events);
 		$report->render();
 
-		$report->Output($report->Output('calendar_weeks_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
+		$report->Output('calendar_weeks_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf');
 	}
 
 	private function printMonth($date, $calendarIds) {
@@ -370,7 +375,7 @@ class Module extends core\Module
 		$dates = $report->getStartEndOfMonth($date->format("n"), $date->format("Y"));
 		$report->day = $dates[0];
 		$report->end = $dates[1];
-		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'COALESCE(caluser.color, calendar_calendar.defaultColor) AS color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
 		$report->calendars = array_column($rows, null, 'id');
 		foreach($report->calendars as $id => $attr) {
 
