@@ -107,8 +107,8 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 			if (activeWrapper && !isResizing && activeWrapper.parentNode) {
 				const img = activeWrapper.querySelector('img');
 				if (img) {
-					const width = img.style.width || img.getAttribute('width');
-					const height = img.style.height || img.getAttribute('height');
+					const width = img.style.width;
+					const height = img.style.height;
 
 					activeWrapper.parentNode.insertBefore(img, activeWrapper);
 
@@ -182,6 +182,7 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 				requestAnimationFrame(() => {
 					img.style.width = `${newWidth}px`;
 					img.style.height = `${newHeight}px`;
+					setSizeAttributes(img, newWidth, newHeight);
 					activeWrapper.style.width = `${newWidth}px`;
 					imageSizeLabel.textContent = `${Math.round(newWidth)} x ${Math.round(newHeight)}`;
 				});
@@ -273,6 +274,19 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 			sel.removeAllRanges();
 		};
 
+		/**
+		 * Outlook ignores the CSS size of images. When it quotes a message in a reply it shows the image at the size of
+		 * the width and height attributes, or at its original size when they are missing.
+		 */
+		const setSizeAttributes = (img, width, height) => {
+			img.width = Math.round(width);
+			if (height) {
+				img.height = Math.round(height);
+			} else {
+				img.removeAttribute('height');
+			}
+		};
+
 		// Add these functions:
 		const resizeImage = (img, percentage) => {
 			const wrapper = img.closest('.img-wrapper');
@@ -284,6 +298,7 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 			img.style.width = `${newWidth}px`;
 			img.style.height = 'auto';
 			wrapper.style.width = `${newWidth}px`;
+			setSizeAttributes(img, newWidth, img.naturalWidth ? newWidth * img.naturalHeight / img.naturalWidth : null);
 
 			updateSizeLabel(wrapper);
 		};
@@ -294,6 +309,9 @@ Ext.extend(GO.plugins.HtmlEditorImageResize, Ext.util.Observable, {
 
 			img.style.width = '';
 			img.style.height = '';
+			// Without a size all clients, also Outlook, show the original size
+			img.removeAttribute('width');
+			img.removeAttribute('height');
 			wrapper.style.width = `${img.naturalWidth}px`;
 
 			updateSizeLabel(wrapper);

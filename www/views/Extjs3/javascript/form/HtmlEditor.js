@@ -320,6 +320,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 							imgEl.addEventListener("load", () => {
 								const width = imgEl.offsetWidth, height = imgEl.offsetHeight;
 								imgEl.setAttribute('style', `max-width: 100%;height:auto;aspect-ratio: ${width} / ${height};`);
+								// Outlook ignores the CSS size of images and uses these attributes
+								imgEl.width = imgEl.naturalWidth;
+								imgEl.height = imgEl.naturalHeight;
 							});
 						}
 					}
@@ -459,6 +462,9 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
 						imgEl.setAttribute('style', `max-width: 100%;height:auto;aspect-ratio: ${loader.width} / ${loader.height};`);
+						// Outlook ignores the CSS size of images and uses these attributes
+						imgEl.width = loader.width;
+						imgEl.height = loader.height;
 						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});
