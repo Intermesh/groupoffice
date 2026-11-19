@@ -40,4 +40,5 @@ return [
 		'declined' => 'You have declined the event',
 		'tentative' => 'You are tentative about the event',
 	],
+	'This event already exists. Open it in your calendar to respond to it.' => 'This event already exists. Open it in your calendar to respond to it.',
 ];

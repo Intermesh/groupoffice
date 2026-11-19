@@ -671,10 +671,34 @@ class CalendarEvent extends AclItemEntity {
 	{
 		parent::internalValidate();
 
+		if ($this->isNew() && self::$fromClient && $this->scheduledEventWithSameUidExists()) {
+			$this->setValidationError('uid', ErrorCode::UNIQUE,
+				go()->t("This event already exists. Open it in your calendar to respond to it.", 'community', 'calendar'));
+		}
+
 		if (isset($this->onlineMeetingService) && !$this->hasValidationErrors()) {
 			$this->addOnlineMeeting($this->onlineMeetingService);
 			$this->onlineMeetingService = null;
 		}
+	}
+
+	/**
+	 * Whether an event with participants and the same UID is already in a calendar. GroupOffice stores such an event
+	 * once for all calendars it's in, so a client must not create a second copy, for example by adding an invitation
+	 * from an e-mail attachment. The participants would get two events and their replies would go to the wrong address.
+	 */
+	private function scheduledEventWithSameUidExists(): bool
+	{
+		if (empty($this->uid)) {
+			return false;
+		}
+		return (bool) go()->getDbConnection()->selectSingleValue('e.eventId')
+			->from('calendar_event', 'e')
+			->join('calendar_calendar_event', 'cce', 'cce.eventId = e.eventId')
+			->join('calendar_participant', 'p', 'p.eventId = e.eventId')
+			->where(['e.uid' => $this->uid, 'e.recurrenceId' => $this->recurrenceId])
+			->limit(1)
+			->single();
 	}
 
 	/**
