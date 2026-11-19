@@ -1,3 +1,10 @@
+- Calendar: importing an ICS file with an invitation that is already in GroupOffice created a second copy of the event. Such events are now skipped, like events that are already in the selected calendar.
+- Calendar: Security: the "Change Organizer" permission was only checked in the web client. Users without it could still change or remove the organizer of an event they may edit through the API. The server now refuses this. Give the permission in the calendar module settings to the groups that need it.
+- Calendar: after "Change organizer", the replies of attendees still went to the e-mail address of the previous organizer, with the name of the new organizer. Events that were changed before this update keep the old address until the organizer is changed again.
+- Calendar: opening the .ics attachment of an invitation and clicking "Add" created a second copy of the event in the calendars of all participants. Their replies to the copy went to the user who added it, with the organizer's name. Opening the attachment now shows the event in your calendar, and a copy of an existing invitation can't be created anymore.
+- Calendar: the role of attendees (required, optional, for information, chair) was lost in invitations and imported events
+- Core: new System settings page "Search" to leave items like files, comments and saved e-mails out of the global search. Their keywords are removed from the search index, which saves space and makes searching faster. Existing links keep working. After checking an item again, run "Update search index" in Tools.
+- Calendar: new preference "Print week and workweek in a grid with hours" prints the week and workweek as a grid with hours instead of a list per day.
 - Tasks: fix icon in main panel
 - Core: turning on maintenance mode could fail with "Record has changed since last read" when another request was using a login token at the same moment. Logging out the other users is now retried after a short wait.
 - Core: the global search and the links panel could hang for many minutes on large installations, filling up the database server with slow queries.
