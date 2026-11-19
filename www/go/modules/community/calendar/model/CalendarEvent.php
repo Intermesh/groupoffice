@@ -827,6 +827,9 @@ class CalendarEvent extends AclItemEntity {
 					}
 				}
 				$this->replyTo = $owner->email;
+			} else if ($this->organizerChanged()) {
+				// "Change organizer": replies must go to the new organizer, not to the one who created the event
+				$this->replyTo = $this->organizer()->email;
 			}
 		}
 
@@ -1207,6 +1210,27 @@ class CalendarEvent extends AclItemEntity {
 		]);
 		$this->participants[$principal->id] = $p;
 		return $p;
+	}
+
+	/**
+	 * Whether another participant became the organizer of this event in this save. Only for events that were created
+	 * in GroupOffice. For an invitation from outside, replyTo is the address of the external organizer.
+	 */
+	private function organizerChanged(): bool
+	{
+		if ($this->isNew() || !$this->isOrigin || !$this->isModified('participants')) {
+			return false;
+		}
+		$organizer = $this->organizer();
+		if (empty($organizer->email)) {
+			return false;
+		}
+		foreach ($this->getOldValue('participants') ?? [] as $old) {
+			if ($old->isOwner()) {
+				return strtolower($old->email) !== strtolower($organizer->email);
+			}
+		}
+		return false;
 	}
 
 	public function organizer() : ?Participant {
