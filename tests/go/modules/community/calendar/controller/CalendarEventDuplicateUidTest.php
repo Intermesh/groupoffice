@@ -7,6 +7,7 @@ use go\core\model\User;
 use go\core\util\DateTime;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\CalendarEvent as EventModel;
+use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\calendar\Module;
 use PHPUnit\Framework\TestCase;
 
@@ -159,6 +160,33 @@ class CalendarEventDuplicateUidTest extends TestCase
 	{
 		$response = $this->createAs('attendee', []);
 		$this->assertArrayHasKey('new', $response['created'] ?? [], json_encode($response));
+	}
+
+	private function openInvitationAs(string $userKey): EventModel
+	{
+		go()->setAuthState(new TemporaryState(self::$users['organizer']->id));
+		$ics = ICalendarHelper::toVObject(EventModel::findById($this->event->id))->serialize();
+
+		go()->setAuthState(new TemporaryState(self::$users[$userKey]->id));
+		$method = new \ReflectionMethod(CalendarEvent::class, 'eventFromIcs');
+		return $method->invoke($this->controller(), $ics);
+	}
+
+	public function testOpeningInvitationShowsTheEventOfTheAttendee(): void
+	{
+		$event = $this->openInvitationAs('attendee');
+
+		$this->assertFalse($event->isNew(), 'The attendee must get the event in their calendar, not an unsaved copy to add');
+		$this->assertEquals(Calendar::fetchPersonal(self::$users['attendee']->id), $event->calendarId);
+		$this->assertSame($this->event->customFieldsModelId(), $event->customFieldsModelId());
+	}
+
+	public function testOpeningInvitationWithoutAccessDoesNotShowTheEvent(): void
+	{
+		$event = $this->openInvitationAs('outsider');
+
+		$this->assertTrue($event->isNew(), 'A user without access must not get the event of others');
+		$this->assertSame($this->event->uid, $event->uid);
 	}
 
 	public function testEventWithoutParticipantsMayShareUid(): void

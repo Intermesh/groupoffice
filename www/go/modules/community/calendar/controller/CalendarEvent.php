@@ -267,7 +267,8 @@ class CalendarEvent extends EntityController {
 	 * Read an event from an ICS file or e-mail attachment without saving it
 	 *
 	 * Reads the ICS data from a file, or else from a part of an e-mail message. The event is put in the personal
-	 * calendar of the user, when the user has one.
+	 * calendar of the user, when the user has one. When the event is already in a calendar the user owns, that event
+	 * is returned with its id.
 	 *
 	 * @apiParam int fileId ID of a file with the ICS data
 	 * @apiParam int account_id E-mail account ID, when no fileId is given
@@ -275,7 +276,7 @@ class CalendarEvent extends EntityController {
 	 * @apiParam int uid UID of the message
 	 * @apiParam string number Number of the message part with the ICS data
 	 * @apiParam string encoding Encoding of the message part
-	 * @apiResponse {success: bool, data: CalendarEvent} The event. It is not saved.
+	 * @apiResponse {success: bool, data: CalendarEvent} The event. It is not saved, unless it was already in a calendar of the user.
 	 * @apiPermission Checked in ActiveRecord::findByPk(): read permission on the folder of the file, or on the e-mail account. The event is parsed but not saved.
 	 * @param array $params
 	 * @return array
@@ -297,15 +298,32 @@ class CalendarEvent extends EntityController {
 			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
 		}
 
+		return ['success' => true, 'data' => $this->eventFromIcs($data)];
+	}
+
+	/**
+	 * The event of the ICS data. When the event is already in a calendar of the user, for example an invitation that
+	 * the user received, that event is returned, so the user responds to it instead of adding a copy.
+	 */
+	protected function eventFromIcs(string $data): model\CalendarEvent
+	{
 		$event = new model\CalendarEvent();
 		$personalCalendar = go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId;
 		if(!empty($personalCalendar)) {
 			$event->calendarId = $personalCalendar;
 		}
 
-		//$event = model\ICalendarHelper::fromICal($data, $event);
 		$event = ICalendarHelper::parseVObject($data, $event);
-		return ['success' => true, 'data' => $event];
+
+		if(!empty($event->uid)) {
+			$existing = model\CalendarEvent::findForUser($event->uid, go()->getUserId())
+				->andWhere('recurrenceId', '=', $event->recurrenceId)
+				->single();
+			if($existing) {
+				return $existing;
+			}
+		}
+		return $event;
 
 	}
 
