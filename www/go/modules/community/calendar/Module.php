@@ -388,7 +388,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = $attr['name'];
 		}
-		$report->Output($report->Output('calendar_month_'.$date->format('Y-m').'.pdf'));
+		$report->Output('calendar_month_'.$date->format('Y-m').'.pdf');
 	}
 
 
