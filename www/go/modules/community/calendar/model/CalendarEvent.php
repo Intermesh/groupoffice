@@ -757,6 +757,10 @@ class CalendarEvent extends AclItemEntity {
 					throw new Forbidden('Not allowed to edit anything other than per-user properties when isOrigin is false');
 				}
 
+				if ($this->organizerRoleMoved() && empty(\go\modules\community\calendar\Module::get()->getModel()->getUserRights()->mayChangeOrganizer)) {
+					throw new Forbidden('Not allowed to change the organizer');
+				}
+
 				$currPart = $this->calendarParticipant();
 				if ($currPart && !$currPart->isOwner() && $this->ownerId !== null) { // not owner, not shared
 					if ($this->isModified(self::OwnerOnlyProperties)) {
@@ -1218,19 +1222,42 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	private function organizerChanged(): bool
 	{
-		if ($this->isNew() || !$this->isOrigin || !$this->isModified('participants')) {
+		if (!$this->isOrigin) {
+			return false;
+		}
+		$previous = $this->previousOrganizer();
+		$organizer = $this->organizer();
+		return $previous && !empty($organizer->email) && strtolower($previous->email) !== strtolower($organizer->email);
+	}
+
+	/**
+	 * Whether the organizer role was moved to another participant or taken away in this save. This needs the
+	 * "mayChangeOrganizer" right. Removing all participants is not a change of the organizer.
+	 */
+	private function organizerRoleMoved(): bool
+	{
+		$previous = $this->previousOrganizer();
+		if (!$previous || empty($this->participants)) {
 			return false;
 		}
 		$organizer = $this->organizer();
-		if (empty($organizer->email)) {
-			return false;
+		return !$organizer || strtolower($previous->email) !== strtolower($organizer->email);
+	}
+
+	/**
+	 * The organizer before this save, when the participants changed
+	 */
+	private function previousOrganizer(): ?Participant
+	{
+		if ($this->isNew() || !$this->isModified('participants')) {
+			return null;
 		}
 		foreach ($this->getOldValue('participants') ?? [] as $old) {
 			if ($old->isOwner()) {
-				return strtolower($old->email) !== strtolower($organizer->email);
+				return $old;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public function organizer() : ?Participant {
