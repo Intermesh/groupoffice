@@ -33,6 +33,23 @@ class RouterTest extends TestCase
 				['core/System/runCron', '--module=calendar', '--package=community', '--name=ScanEmailForInvites', '--debug'],
 				['core/System/runCron', 'module' => 'calendar', 'package' => 'community', 'name' => 'ScanEmailForInvites', 'debug' => true]
 			],
+			'long option with space' => [
+				['community/dev/Language/export', '--language', 'nl', '--missingOnly'],
+				['community/dev/Language/export', 'language' => 'nl', 'missingOnly' => true]
+			],
+			'short option with space' => [
+				['-c', '/etc/go.php', 'core/cron/run', '-q'],
+				['c' => '/etc/go.php', 'core/cron/run', 'q' => true]
+			],
+			'option followed by option is a flag' => [['--debug', '--delete'], ['debug' => true, 'delete' => true]],
+			'negative number needs equals sign' => [['--offset', '-1'], ['offset' => true, '1' => true]],
+			'negative number with equals sign' => [['--offset=-1'], ['offset' => '-1']],
+			'empty string after space' => [['--name', ''], ['name' => '']],
+			'combined short flags take no value' => [['-qv', 'core/cron/run'], ['q' => true, 'v' => true, 'core/cron/run']],
+			'space and equals mixed' => [
+				['--path', 'x', '--path=y', '--name', 'z'],
+				['path' => 'y', 'name' => 'z']
+			],
 		];
 	}
 
