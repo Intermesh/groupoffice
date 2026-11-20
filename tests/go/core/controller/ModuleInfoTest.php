@@ -101,7 +101,7 @@ class ModuleInfoTest extends TestCase
 
 	public function testUserOnlyGetsModulesTheyManage()
 	{
-		// The module model holds its settings, like the JWT secret of jitsimeet, so users only get modules they manage
+		// The module model holds its settings, so users only get the modules they manage
 		$ids = $this->getIds(self::$user->id);
 		$this->assertNotContains('community/notes', $ids);
 		$this->assertNotContains('community/jitsimeet', $ids);
