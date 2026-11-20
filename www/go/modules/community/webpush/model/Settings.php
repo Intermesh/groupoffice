@@ -10,4 +10,12 @@ class Settings extends core\Settings
 	public string $vapidPrivateKey = '';
 	//public string $vapidSubject = '';
 
+	/**
+	 * The private VAPID key signs the push messages, so it's never sent to the client
+	 */
+	protected static function writeOnlyProperties(): array
+	{
+		return ['vapidPrivateKey'];
+	}
+
 }
