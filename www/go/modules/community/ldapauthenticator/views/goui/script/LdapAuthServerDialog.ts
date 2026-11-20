@@ -435,7 +435,8 @@ export class LdapAuthServerDialog extends FormWindow {
 
 		this.form.on("load", ({data}) => {
 
-			this.ldapUseAuthCb.value = !!(data.username && data.password);
+			// The password is write only and never loaded, so the username tells if authentication is used
+			this.ldapUseAuthCb.value = !!data.username;
 			this.createEmailCheckbox.value = !!data.imapHostname;
 		});
 
@@ -448,6 +449,11 @@ export class LdapAuthServerDialog extends FormWindow {
 
 		this.form.on("beforesave", ({data}) => {
 			const currentId = this.form.currentId;
+
+			if (!this.ldapUseAuthCb.value) {
+				data.username = null;
+				data.password = null;
+			}
 
 			if (!this.createEmailCheckbox.value) {
 				data.imapHostname = null;
