@@ -146,6 +146,30 @@ abstract class Settings extends Model {
 		return $this->readOnlyKeys;
 	}
 
+	/**
+	 * Settings that can be set but are never sent to the client, like API keys and secrets.
+	 *
+	 * Their value is null in toArray(). Clients only send changed settings, so the stored value is kept when the
+	 * field is left empty.
+	 *
+	 * @return string[]
+	 */
+	protected static function writeOnlyProperties(): array
+	{
+		return [];
+	}
+
+	public function toArray(?array $properties = null): array
+	{
+		$arr = parent::toArray($properties);
+		foreach (static::writeOnlyProperties() as $name) {
+			if (array_key_exists($name, $arr)) {
+				$arr[$name] = null;
+			}
+		}
+		return $arr;
+	}
+
 	private function getSettingProperties(): array
 	{
 		return array_filter(get_object_vars($this), function($key) {
