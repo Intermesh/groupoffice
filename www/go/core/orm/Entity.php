@@ -949,7 +949,12 @@ abstract class Entity extends Property {
 
 		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
 			// Compares the date of the last comment. Entities without comments get NULL, so they only match inside NOT.
-			$lastCommentDate = '(SELECT MAX(commentFilter.date) FROM comments_comment commentFilter WHERE ' . self::commentsCorrelation($query) . ')';
+			$lastComment = (new DbQuery())
+				->select('MAX(commentFilter.date)')
+				->from('comments_comment', 'commentFilter')
+				->where(self::commentsCorrelation($query));
+			self::onlyVisibleComments($lastComment);
+			$lastCommentDate = '(' . $lastComment . ')';
 
 			if ($value === null) {
 				// A null filter value finds entities without comments
@@ -969,6 +974,7 @@ abstract class Entity extends Property {
 				->from('comments_comment', 'commentFilter')
 				->where(self::commentsCorrelation($query))
 				->andWhere('commentFilter.text', $comparator, $value);
+			self::onlyVisibleComments($sub);
 
 			$criteria->whereExists($sub);
 		})
@@ -1022,6 +1028,33 @@ abstract class Entity extends Property {
 	private static function commentsCorrelation(Query $query): string
 	{
 		return 'commentFilter.entityId = ' . $query->getTableAlias() . '.id AND commentFilter.entityTypeId = ' . static::entityType()->getId();
+	}
+
+	/**
+	 * Limit a sub query on comments to the comments the current user may read
+	 *
+	 * Comments in a section, like private notes, are only for users who may change the entity. See
+	 * {@see \go\modules\community\comments\model\Comment::internalGetPermissionLevel()}. Without this, a user who may
+	 * only read an entity could find out the text of its private notes with the "comment" filter.
+	 *
+	 * @param DbQuery $commentQuery A query on comments_comment with alias "commentFilter"
+	 */
+	private static function onlyVisibleComments(DbQuery $commentQuery): void
+	{
+		if (go()->getAuthState()->isAdmin()) {
+			return;
+		}
+
+		$writable = static::find(static::getPrimaryKey(false), true);
+		$writable->select($writable->getTableAlias() . '.id')
+			->andWhere($writable->getTableAlias() . '.id = commentFilter.entityId');
+		static::applyAclToQuery($writable, Acl::LEVEL_WRITE);
+
+		$commentQuery->andWhere(
+			(new Criteria())
+				->where('commentFilter.section IS NULL')
+				->orWhereExists($writable)
+		);
 	}
 
 	/**

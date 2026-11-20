@@ -208,6 +208,10 @@ class Comment extends AclItemEntity {
 	/**
 	 * Get the permission level of the current user
 	 *
+	 * Comments in a {@see $section}, like the private notes and drafts of a support ticket, are only for users who may
+	 * change the entity. Users who may only read it, like the customer of a ticket, only see the comments without a
+	 * section.
+	 *
 	 * @return int
 	 */
 	protected function internalGetPermissionLevel(): int
@@ -217,7 +221,12 @@ class Comment extends AclItemEntity {
 			return Acl::LEVEL_MANAGE;
 		}
 
+		$requiredLevel = isset($this->section) ? Acl::LEVEL_WRITE : Acl::LEVEL_READ;
+
 		if($this->isNew()) {
+			if(isset($this->section)) {
+				return $this->findEntity()->hasPermissionLevel($requiredLevel) ? Acl::LEVEL_WRITE : 0;
+			}
 			return $this->findEntity()->getPermissionLevel() ? Acl::LEVEL_WRITE : false;
 		}
 
@@ -225,7 +234,7 @@ class Comment extends AclItemEntity {
 			return Acl::LEVEL_MANAGE;
 		}
 
-		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_CREATE : false;
+		return $this->findEntity()->hasPermissionLevel($requiredLevel) ? Acl::LEVEL_CREATE : false;
 
 	}
 
