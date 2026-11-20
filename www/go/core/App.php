@@ -1010,11 +1010,17 @@ namespace go\core {
 
 		/**
 		 * Display's logo without authentication via /api/page.php/core/logo
+		 *
+		 * /api/page.php/core/logo/dark shows the logo for the dark theme, or the normal logo when there's none.
+		 *
+		 * @param string $theme "dark" for the logo of the dark theme
 		 * @throws Exception
 		 * @noinspection PhpUnused
 		 */
-		public function pageLogo() {
-			$blob = Blob::findById(App::get()->getSettings()->logoId);
+		public function pageLogo(string $theme = "") {
+			$settings = App::get()->getSettings();
+			$blobId = $theme == "dark" && isset($settings->logoIdDark) ? $settings->logoIdDark : $settings->logoId;
+			$blob = isset($blobId) ? Blob::findById($blobId) : null;
 
 			if (!$blob) {
 				echo "Not found";

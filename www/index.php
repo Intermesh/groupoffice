@@ -112,6 +112,24 @@ $baseUrl = \go\core\http\Request::get()->getFullUrl()  ;
     <link rel="stylesheet" media="print,screen" href="views/Extjs3/themes/Paper/style.css">
     <link rel="stylesheet" href="node_modules/@intermesh/groupoffice-core/dist/groupoffice.css">
     <link rel="stylesheet" href="views/Extjs3/css.php">
+<?php
+    // Custom logos of the system settings. The blob ID is added for caching only.
+    $logoId = go()->getSettings()->logoId;
+    $logoIdDark = go()->getSettings()->logoIdDark;
+    if(isset($logoId) || isset($logoIdDark)): ?>
+    <style>
+<?php if(isset($logoId)): ?>
+        .groupoffice-logo, .login-overlay:after {
+            background-image: url("api/page.php/core/logo?v=<?= urlencode($logoId) ?>");
+        }
+<?php endif; ?>
+<?php if(isset($logoIdDark)): ?>
+        .dark .groupoffice-logo, .dark .login-overlay:after {
+            background-image: url("api/page.php/core/logo/dark?v=<?= urlencode($logoIdDark) ?>");
+        }
+<?php endif; ?>
+    </style>
+<?php endif; ?>
 
 
 <!--    <meta http-equiv="Content-Security-Policy"-->
