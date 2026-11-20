@@ -149,7 +149,8 @@ class GetBlobTest extends TestCase
 		imagepng($image);
 		$png = ob_get_clean();
 		$png .= uniqid(); // unique content, so the blob is new
-		$id = $this->createBlob($png, 'screenshot.png', 'image/png');
+		// The stored type is wrong, the content decides
+		$id = $this->createBlob($png, 'screenshot', 'application/octet-stream');
 
 		$result = $this->callTool(['blobId' => $id]);
 		$this->assertFalse($result['isError'], json_encode($result));
@@ -157,6 +158,15 @@ class GetBlobTest extends TestCase
 		$this->assertEquals('image/png', $result['content'][1]['mimeType']);
 		$this->assertEquals($png, base64_decode($result['content'][1]['data']));
 		$this->assertArrayNotHasKey('image', $result['structuredContent']);
+	}
+
+	public function testTextStoredAsImageIsText(): void
+	{
+		$id = $this->createBlob('not an image ' . uniqid(), 'fake.png', 'image/png');
+		$result = $this->callTool(['blobId' => $id]);
+		$this->assertFalse($result['isError'], json_encode($result));
+		$this->assertEquals('text', $result['content'][1]['type']);
+		$this->assertStringStartsWith('not an image ', $result['content'][1]['text']);
 	}
 
 	public function testBinaryIsRefused(): void
