@@ -43,6 +43,33 @@ class Holiday {
 		'us'=>'en-US',
 	);
 
+	/**
+	 * Holiday sets without a country part are languages. These language codes differ from the country code of their
+	 * holiday file, or have no country at all (null). For example "sv" is Swedish but sv.json is El Salvador.
+	 */
+	private const LANGUAGE_COUNTRY = [
+		'ar' => null,
+		'ca' => 'ES',
+		'cs' => 'CZ',
+		'da' => 'DK',
+		'el' => 'GR',
+		'en' => null,
+		'et' => 'EE',
+		'he' => 'IL',
+		'ja' => 'JP',
+		'ko' => 'KR',
+		'nb' => 'NO',
+		'sl' => 'SI',
+		'sv' => 'SE',
+	];
+
+	/**
+	 * Country parts of legacy holiday sets that differ from the ISO country code
+	 */
+	private const COUNTRY_ALIAS = [
+		'UK' => 'GB',
+	];
+
 
 	public function __construct(string $rule, $data,$year) {
 		$this->year = $year;
@@ -114,6 +141,35 @@ class Holiday {
 		return '';
 	}
 
+
+	/**
+	 * Get the country code for a holiday set to pass to {@see generate()}
+	 *
+	 * A holiday set is a locale like "en_gb" or a language like "nl", for example the user's "holidayset" or
+	 * language. The holiday files are per country.
+	 *
+	 * @param string $set Holiday set, for example "en_gb", "de_at" or "sv"
+	 * @return string|null Upper case country code like "GB", or null when there are no holidays for this set
+	 */
+	public static function countryForHolidaySet(string $set): ?string
+	{
+		$parts = explode('_', strtolower(str_replace('-', '_', trim($set))));
+
+		if (isset($parts[1])) {
+			$country = strtoupper($parts[1]);
+			$country = self::COUNTRY_ALIAS[$country] ?? $country;
+		} else if (array_key_exists($parts[0], self::LANGUAGE_COUNTRY)) {
+			$country = self::LANGUAGE_COUNTRY[$parts[0]];
+		} else {
+			$country = strtoupper($parts[0]);
+		}
+
+		if ($country === null || !preg_match('/^[A-Z]{2}$/', $country) || !is_file(__DIR__ . '/../language/holidays/countries/' . strtolower($country) . '.json')) {
+			return null;
+		}
+
+		return $country;
+	}
 
 	static function generate(string $set, string $lang, \DateTimeInterface $from, \DateTimeInterface $till) {
 		$dir = __DIR__ . '/../language/holidays/';

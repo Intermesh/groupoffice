@@ -91,11 +91,16 @@ class Date {
 			}
 		}
 
+		$country = \go\core\model\Holiday::countryForHolidaySet($region);
+		if(!isset($country)) {
+			return false;
+		}
+
 		$year = date('Y', $time);
 		$startDate = \DateTime::createFromFormat('Y-m-d', $year.'-01-01');
 		$endDate = \DateTime::createFromFormat('Y-m-d', $year.'-12-31');
 		if (!isset(self::$holidays[$region][$year])){
-			foreach (\go\core\model\Holiday::generate($region, \GO::config()->language, $startDate, $endDate) as $h) {
+			foreach (\go\core\model\Holiday::generate($country, \GO::config()->language, $startDate, $endDate) as $h) {
 				self::$holidays[$region][$year][$h->start] = $h->title;
 			}
 		}

@@ -791,12 +791,8 @@ export class Main extends Component {
 				if(!client.user.holidayset) {
 					client.user.holidayset = client.user.language;
 				}
-				let [lang,country] = client.user.holidayset.split('_');
-				if(!country) country = lang;
-				if(country=='uk')
-					country ='gb';
 				return client.jmap("core/Holiday/fetch",{
-					set: country.toUpperCase(), lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
+					holidaySet: client.user.holidayset, lang: client.user.holidayset.replace("_", "-"),from:start.format('Y-m-d'),till:end.format('Y-m-d')
 				}).then(r => {
 					this.list = r.list;
 				});
