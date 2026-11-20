@@ -8,6 +8,7 @@ export class PreferencesPanel extends AppSettingsPanel {
 	constructor() {
 		super();
 		this.title = t('Push subscription');
+		this.icon = "notifications";
 
 		this.items.add(containerfield({},
 			fieldset({},
