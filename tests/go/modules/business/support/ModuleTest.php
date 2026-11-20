@@ -49,6 +49,7 @@ class ModuleTest extends TestCase
 				self::$customer->getPersonalGroup()->id => SupportList::ACL_LEVEL_SUBMIT_AS_CUSTOMER,
 				self::$agent->getPersonalGroup()->id => Acl::LEVEL_WRITE
 			]);
+			self::$list->notifyCustomerReplyEnabled = true;
 			self::assertTrue(self::$list->save(), self::$list->getValidationErrorsAsString());
 
 			self::$ticket = new SupportTicket();
@@ -223,5 +224,91 @@ class ModuleTest extends TestCase
 		$this->assertEquals([self::$ticket->id], $query(self::$customer->id, $customer), 'The customer finds the ticket');
 		$this->assertEquals([], $query(self::$customer->id, $customer + $search));
 		$this->assertEquals([self::$ticket->id], $query(self::$agent->id, $agent + $search));
+	}
+
+	private function comment(string $createdBy, ?string $section = null): Comment
+	{
+		$comment = new Comment();
+		$comment->createdBy = $createdBy;
+		$comment->section = $section;
+		return $comment;
+	}
+
+	/**
+	 * @return string[] The e-mail addresses that are notified of the comment
+	 */
+	private function recipients(Comment $comment, ?int $responsibleUserId = null, bool $withQuestion = true): array
+	{
+		if ($withQuestion) {
+			$this->addQuestion();
+		}
+		$ticket = SupportTicket::findById(self::$ticket->id);
+		$ticket->responsibleUserId = $responsibleUserId;
+		return array_map(fn($a) => $a->getEmail(), Module::findCustomerReplyRecipients($ticket, $comment));
+	}
+
+	/**
+	 * Saves the question of the customer, the first comment of the ticket
+	 */
+	private function addQuestion(): Comment
+	{
+		go()->setAuthState(new TemporaryState(self::$customer->id));
+		$question = new Comment();
+		$question->setEntity(self::$ticket);
+		$question->text = 'Question of the customer';
+		$this->assertTrue($question->save(), $question->getValidationErrorsAsString());
+		return $question;
+	}
+
+	public function testFirstCommentOfNewTicketDoesNotNotify(): void
+	{
+		$this->assertEquals([], $this->recipients($this->comment((string) self::$customer->id), self::$agent->id, false));
+
+		// The question is saved before the notification is sent
+		$question = $this->addQuestion();
+		$this->assertEquals([], $this->recipients($question, self::$agent->id, false));
+	}
+
+	public function testCustomerReplyNotifiesResponsibleAgent(): void
+	{
+		$this->assertEquals([self::$agent->email], $this->recipients($this->comment((string) self::$customer->id), self::$agent->id));
+	}
+
+	public function testCustomerReplyNotifiesAllAgentsWhenNobodyIsAssigned(): void
+	{
+		$recipients = $this->recipients($this->comment((string) self::$customer->id));
+		$this->assertContains(self::$agent->email, $recipients);
+		$this->assertNotContains(self::$customer->email, $recipients);
+	}
+
+	public function testReplyOfContactNotifies(): void
+	{
+		$this->assertEquals([self::$agent->email], $this->recipients($this->comment('Contact:1'), self::$agent->id));
+	}
+
+	public function testAgentCommentDoesNotNotify(): void
+	{
+		$this->assertEquals([], $this->recipients($this->comment((string) self::$agent->id), self::$agent->id));
+		$this->assertEquals([], $this->recipients($this->comment((string) User::ID_SUPER_ADMIN), self::$agent->id));
+	}
+
+	public function testPrivateCommentDoesNotNotify(): void
+	{
+		$this->assertEquals([], $this->recipients($this->comment((string) self::$customer->id, 'private'), self::$agent->id));
+		$this->assertEquals([], $this->recipients($this->comment((string) self::$customer->id, Comment::SECTION_DRAFT), self::$agent->id));
+	}
+
+	public function testDisabledDoesNotNotify(): void
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		$list = SupportList::findById(self::$list->id);
+		$list->notifyCustomerReplyEnabled = false;
+		$this->assertTrue($list->save(), $list->getValidationErrorsAsString());
+		try {
+			$this->assertEquals([], $this->recipients($this->comment((string) self::$customer->id), self::$agent->id));
+		} finally {
+			$list->notifyCustomerReplyEnabled = true;
+			$list->save();
+		}
 	}
 }
