@@ -18,7 +18,8 @@ modules.register({
 export interface Oauth2Client extends BaseEntity {
 	name: string,
 	defaultClientId: string|undefined,
-	clientSecret: string,
+	/** Write only: it's always null when read */
+	clientSecret?: string|null,
 	clientId: string,
 	projectId: string|undefined
 }

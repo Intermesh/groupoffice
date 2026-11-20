@@ -21,11 +21,6 @@ export class Oauth2ClientTable extends Table {
 				sortable: true
 			}),
 			column({
-				id: "clientSecret",
-				header: t("Client Secret"),
-				hidden: true
-			}),
-			column({
 				header: t("Project ID"),
 				id: "projectId",
 			}),

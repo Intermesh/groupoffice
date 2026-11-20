@@ -1,5 +1,5 @@
 import {FormWindow} from "@intermesh/groupoffice-core";
-import {checkbox, combobox, fieldset, t, textfield} from "@intermesh/goui";
+import {checkbox, combobox, fieldset, t, TextField, textfield} from "@intermesh/goui";
 import {DefaultClientDS} from "./Index";
 
 export class Oauth2ClientDialog extends FormWindow {
@@ -13,6 +13,8 @@ export class Oauth2ClientDialog extends FormWindow {
 		this.closable = true;
 		this.width = 800;
 		this.height = 800;
+
+		let secretFld: TextField;
 
 		this.generalTab.items.add(
 			fieldset({},
@@ -32,9 +34,11 @@ export class Oauth2ClientDialog extends FormWindow {
 					label: t("Client Id"),
 					required: true
 				}),
-				textfield({
+				secretFld = textfield({
+					type: "password",
 					name: "clientSecret",
 					label: t("Client Secret"),
+					autocomplete: "new-password",
 					required: true
 				}),
 				textfield({
@@ -50,5 +54,11 @@ export class Oauth2ClientDialog extends FormWindow {
 				})
 			)
 		);
+
+		// The secret is write only, so it's never loaded. When editing, leaving it empty keeps the current secret.
+		this.form.on("load", () => {
+			secretFld.required = false;
+			secretFld.hint = t("Leave empty to keep the current secret");
+		});
 	}
 }

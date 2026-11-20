@@ -24,4 +24,5 @@ return array (
   'Use this connection for single signon with OpenID Connect' => 'Deze verbinding gebruiken voor single signon met OpenID Connect',
   'OAuth2 connection' => 'OAuth2-verbinding',
   'Project Id' => 'Project-ID',
+  'Leave empty to keep the current secret' => 'Laat leeg om het huidige geheim te behouden',
 );
