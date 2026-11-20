@@ -36,7 +36,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 
 			var e = go.Entities.get(link.entity);
 
-			if(config.supportsFiles && !e.supportsFiles) {
+			if(config.supportsFiles && (!e.supportsFiles && e.name !='File' && e.name != 'Folder')) {
 				return;
 			}
 

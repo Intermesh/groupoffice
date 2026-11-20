@@ -440,6 +440,26 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		}
 
 		var fileBrowserHandle = function(result) {
+
+			if(result.entity === 'File') {
+
+				this.attachmentsView.addFiles([
+					{
+						human_size: Ext.util.Format.fileSize(result.size),
+						extension: result.extension,
+						size: result.size,
+						type: result.type,
+						name: result.name,
+						fileName: result.name,
+						from_file_storage: true,
+						tmp_file: result.path
+					}
+				]);
+
+				return;
+			}
+
+
 			GO.files.createSelectFileBrowser();
 
 			GO.selectFileBrowser.setFileClickHandler(function(){
