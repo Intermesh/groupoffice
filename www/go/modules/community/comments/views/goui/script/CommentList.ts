@@ -232,21 +232,42 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			});
 
 			if (comment.section === "draft") {
-				// Posting the draft sends it, like a reply to the customer of a support ticket
+				const mayChange = client.user.isAdmin || writtenByUser;
 				commentComp.items.add(
-					btn({
-						cls: "raised",
-						icon: "send",
-						text: t("Send"),
-						disabled: client.user.isAdmin ? false : !writtenByUser,
-						handler: async () => {
-							if (await Window.confirm(t("Send this draft?"))) {
-								commentDS.update(comment.id, {section: null}).catch((err) => {
-									void Window.error(err);
-								});
+					comp({cls: "hbox gap"},
+						// Posting the draft sends it, like a reply to the customer of a support ticket
+						btn({
+							cls: "raised",
+							icon: "send",
+							text: t("Send"),
+							disabled: !mayChange,
+							handler: async () => {
+								if (await Window.confirm(t("Send this draft?"))) {
+									commentDS.update(comment.id, {section: null}).catch((err) => {
+										void Window.error(err);
+									});
+								}
 							}
-						}
-					})
+						}),
+						btn({
+							icon: "edit",
+							text: t("Edit"),
+							disabled: !mayChange,
+							handler: () => {
+								const commentDlg = new CommentDialog();
+								void commentDlg.load(comment.id);
+								commentDlg.show();
+							}
+						}),
+						btn({
+							icon: "delete",
+							text: t("Delete"),
+							disabled: !mayChange,
+							handler: () => {
+								commentDS.confirmDestroy([comment.id]);
+							}
+						})
+					)
 				);
 			}
 
