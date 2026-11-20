@@ -84,12 +84,30 @@ $baseUrl = \go\core\http\Request::get()->getFullUrl()  ;
 
     <script type="module" src="views/goui/dist/Index.js"></script>
 
-    <meta name="theme-color" content="#000">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php
+    $title = htmlspecialchars(go()->getSettings()->title);
+    $primaryColor = htmlspecialchars(!empty(go()->getSettings()->primaryColor) ? '#' . go()->getSettings()->primaryColor : 'rgb(22, 82, 161)');
+    $favicon = go()->getConfig()['favicon'] ?? null;
+    $faviconUrl = "views/Extjs3/themes/Paper/img/favicon/";
+    ?>
+    <meta name="theme-color" content="<?= $primaryColor ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="apple-mobile-web-app-capable" content="no">
+    <meta name="apple-mobile-web-app-title" content="<?= $title ?>">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="msapplication-TileColor" content="<?= $primaryColor ?>">
 
-    <link rel="icon"
-          type="image/x-icon"
-          href="./favicon.ico">
+<?php if(!empty($favicon)): ?>
+    <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($favicon) ?>">
+<?php else: ?>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= $faviconUrl ?>favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= $faviconUrl ?>favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= $faviconUrl ?>apple-touch-icon.png">
+    <link rel="manifest" href="views/site.webmanifest">
+    <link rel="mask-icon" href="<?= $faviconUrl ?>safari-pinned-tab.svg" color="#888888">
+<?php endif; ?>
 
     <link rel="stylesheet" media="print,screen" href="views/Extjs3/themes/Paper/style.css">
     <link rel="stylesheet" href="node_modules/@intermesh/groupoffice-core/dist/groupoffice.css">
