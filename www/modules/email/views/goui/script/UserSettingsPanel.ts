@@ -92,6 +92,13 @@ export class UserSettingsPanel extends AppSettingsPanel {
 			)
 		);
 
+		this.form.on("beforesave", ({data}) => {
+			// The database stores "no account" as 0, not null
+			if(data.syncSettings && !data.syncSettings.account_id) {
+				data.syncSettings.account_id = 0;
+			}
+		});
+
 		this.items.add(this.form);
 	}
 
