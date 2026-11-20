@@ -1,3 +1,4 @@
+- Email: Fixed attaching file and folder from search
 - Core: Added new "isolateFormFields" property to GOUI commponents for excluding nested form fields in a component from a form
 - Maildomains: Fixed invalid domain error when adding aliases
 - Filesearch: since the security update of 6 November, deleting a file that was in the search index failed with "Access denied", because the index checked the permissions of the file after it was already deleted. This also broke opening e-mail attachments, which removes a temporary file. The index of a deleted file is now removed without this check.
