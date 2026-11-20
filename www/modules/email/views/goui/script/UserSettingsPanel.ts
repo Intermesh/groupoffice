@@ -81,6 +81,11 @@ export class UserSettingsPanel extends AppSettingsPanel {
 						name: "account_id",
 						displayProperty: "username",
 						dataSource: jmapds("Account")
+					}),
+					checkbox({
+						name: "allowDeletes",
+						label: t("Allow delete via synchronization", "legacy", "sync"),
+						hint: t("By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.", "legacy", "sync")
 					})
 				)
 

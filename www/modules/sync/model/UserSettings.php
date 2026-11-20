@@ -36,6 +36,13 @@ class UserSettings extends Property
 	 */
 	public $account_id;
 
+	/**
+	 * Allow devices to delete items. Off by default because of an Android 12 bug that deleted contacts after an update.
+	 *
+	 * @var bool
+	 */
+	public $allowDeletes = false;
+
 	private $doSetup = false;
 
 	protected function init(): void

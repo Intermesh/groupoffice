@@ -133,3 +133,9 @@ $updates['202610291332'][] = "drop table sync_tasklist_user;";
 
 $updates['202610291332'][] = "drop table sync_user_note_book;";
 
+// The column was left out of install.sql, so installations made since then don't have it
+$updates['202611201600'][] = function() {
+	if(!\go\core\db\Utils::columnExists("sync_settings", "allowDeletes")) {
+		go()->getDbConnection()->exec("alter table sync_settings add allowDeletes boolean default false null;");
+	}
+};
