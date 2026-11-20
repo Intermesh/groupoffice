@@ -189,4 +189,47 @@ class CommentTest extends TestCase
 		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
 		Comment::delete(['id' => $result['created']['public']['id']]);
 	}
+
+	/**
+	 * A draft isn't added to the entity until it's posted, so it doesn't change the status of a ticket. Posting it sets
+	 * its date.
+	 */
+	public function testDraftIsAddedWhenPosted(): void
+	{
+		$authState = go()->getAuthState();
+		$alerts = \go\core\model\Alert::$enabled;
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		\go\core\model\Alert::$enabled = true;
+
+		$task = new Task();
+		$task->tasklistId = self::$taskList->id;
+		$task->title = 'Task with a draft';
+		$task->setProgress('completed');
+		$this->assertTrue($task->save(), $task->getValidationErrorsAsString());
+
+		try {
+			$draft = new Comment();
+			$draft->setEntity($task);
+			$draft->section = Comment::SECTION_DRAFT;
+			$draft->text = 'Draft reply';
+			$draft->date = new \go\core\util\DateTime('-1 day');
+			$this->assertTrue($draft->save(), $draft->getValidationErrorsAsString());
+			$this->assertFalse($draft->isPosted());
+
+			$this->assertEquals('completed', Task::findById($task->id)->getProgress(), 'A draft must not change the task');
+
+			$draft = Comment::findById($draft->id);
+			$draft->section = null;
+			$this->assertTrue($draft->isPosted());
+			$this->assertTrue($draft->save(), $draft->getValidationErrorsAsString());
+
+			$this->assertEquals('needs-action', Task::findById($task->id)->getProgress(), 'Posting the draft adds it');
+			$this->assertGreaterThan(new \DateTime('-1 hour'), Comment::findById($draft->id)->date);
+		} finally {
+			\go\core\model\Alert::$enabled = $alerts;
+			Comment::delete(['entityId' => $task->id, 'entityTypeId' => Task::entityType()->getId()]);
+			Task::delete(['id' => $task->id]);
+			go()->setAuthState($authState);
+		}
+	}
 }
