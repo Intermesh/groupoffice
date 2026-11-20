@@ -28,7 +28,9 @@ class Query extends EmailTool
 	public function getDescription(): string
 	{
 		return 'Search the messages in a folder of an e-mail account, newest first. All given fields must match. Returns '
-			. 'the sender, recipients, subject and date of each message, and its accountId, mailbox and uid for email_get.';
+			. 'the sender, recipients, subject and date of each message, and its accountId, mailbox and uid for email_get. '
+			. '"hasAttachments" is a guess from the type of the message: an invitation can contain an .ics file that only '
+			. 'email_get lists.';
 	}
 
 	public function getInputSchema(): array
