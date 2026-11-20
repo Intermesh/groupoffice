@@ -22,7 +22,8 @@ try {
 	exit();
 }
 
-$baseUrl = \go\core\http\Request::get()->getFullUrl()  ;
+// Without the path and query of the request, eg. "?oauthConsent=1" or "index.php?lang=nl"
+$baseUrl = \go\core\webclient\Extjs3::get()->getBaseUrl();
 
 ?>
 
