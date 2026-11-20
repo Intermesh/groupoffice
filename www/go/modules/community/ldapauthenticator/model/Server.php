@@ -57,7 +57,7 @@ class Server extends Entity
 	public ?string $smtpHostname;
 	public ?int $smtpPort;
 	public ?string $smtpUsername;
-	public ?string $smtpPassword;
+	protected ?string $smtpPassword;
 	public bool $smtpUseUserCredentials= false;
 	public bool $smtpValidateCertificate = true;
 	public ?string $smtpEncryption;
@@ -129,9 +129,11 @@ class Server extends Entity
 
 
 	/**
+	 * The password to bind to the LDAP server. It's write only, so it's never sent to the client.
+	 *
 	 * @throws Exception
 	 */
-	public function getPassword(): ?string
+	public function decryptPassword(): ?string
 	{
 		return isset($this->password) ? Crypt::decrypt($this->password) : null;
 	}
@@ -142,6 +144,19 @@ class Server extends Entity
 	public function setPassword($value)
 	{
 		$this->password = !empty($value) ? Crypt::encrypt($value) : null;
+	}
+
+	/**
+	 * The SMTP password for the e-mail accounts this server creates. It's write only, so it's never sent to the client.
+	 */
+	public function readSmtpPassword(): ?string
+	{
+		return $this->smtpPassword ?? null;
+	}
+
+	public function setSmtpPassword(?string $value): void
+	{
+		$this->smtpPassword = $value;
 	}
 
 	protected static function defineMapping(): Mapping
@@ -287,7 +302,7 @@ class Server extends Entity
 
 		if (!empty($this->username)) {
 
-			if (!$this->connection->bind($this->username, $this->getPassword())) {
+			if (!$this->connection->bind($this->username, $this->decryptPassword())) {
 				throw new Exception("Invalid password given for '" . $this->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $this->username . '"');

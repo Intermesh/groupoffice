@@ -90,7 +90,7 @@ class Sync extends Controller
 		$connection = $server->connect();
 
 		if (!empty($xserver->username)) {
-			if (!$connection->bind($server->username, $server->getPassword())) {
+			if (!$connection->bind($server->username, $server->decryptPassword())) {
 				throw new Exception("Invalid password given for '" . $server->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $server->username . '"');
@@ -156,7 +156,7 @@ class Sync extends Controller
 		$connection = $server->connect();
 
 		if (!empty($xserver->username)) {
-			if (!$connection->bind($server->username, $server->getPassword())) {
+			if (!$connection->bind($server->username, $server->decryptPassword())) {
 				throw new Exception("Invalid password given for '" . $server->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $server->username . '"');
@@ -425,7 +425,7 @@ class Sync extends Controller
 		}, $server->domains);
 
 		if (!empty($server->username)) {
-			if (!$connection->bind($server->username, $server->getPassword())) {
+			if (!$connection->bind($server->username, $server->decryptPassword())) {
 				throw new Exception("Invalid password given for '" . $server->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $server->username . '"');
