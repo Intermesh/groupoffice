@@ -94,6 +94,34 @@ final class TrashedItem extends \GO\Base\Db\ActiveRecord
 	}
 
 	/**
+	 * Move a file or folder back to its original place on disk after moving it to the trash failed
+	 *
+	 * Moving to the trash changes the disk before the database transaction is committed. When the transaction is rolled
+	 * back, the database still has the item in its original folder, so the disk must match it again. Otherwise the
+	 * item can't be opened and moving it to the trash again fails because it already exists there.
+	 *
+	 * @param string $originalPath Absolute path of the item before it was moved
+	 * @param string[] $currentPaths Absolute paths where the item may be now, like in the trash folder or renamed in
+	 *  its original folder
+	 */
+	public static function moveBackOnDisk(string $originalPath, array $currentPaths): void
+	{
+		if (file_exists($originalPath)) {
+			return;
+		}
+
+		foreach ($currentPaths as $path) {
+			if ($path === $originalPath || !file_exists($path)) {
+				continue;
+			}
+			if (!rename($path, $originalPath)) {
+				\go\core\ErrorHandler::log("Could not move " . $path . " back to " . $originalPath . " after moving it to the trash failed");
+			}
+			return;
+		}
+	}
+
+	/**
 	 * A file has just been trashed. Create as fs_trash record if it does not exist
 	 *
 	 * @param \GO\Files\Model\File $file

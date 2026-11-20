@@ -1654,6 +1654,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$trashFolder = Folder::model()->findByPath('trash');
 		$originalParent = $this->parent;
+		$originalPath = $this->fsFolder->path();
 
 		// Only create the trash record when the folder was moved
 		go()->getDbConnection()->beginTransaction();
@@ -1667,6 +1668,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			go()->getDbConnection()->commit();
 		} catch (\Throwable $e) {
 			go()->getDbConnection()->rollBack();
+			// The folder may already have been moved, or renamed when its name exists in the trash
+			\GO\Files\Model\TrashedItem::moveBackOnDisk($originalPath, [
+				$trashFolder->fsFolder->path() . '/' . $this->name,
+				dirname($originalPath) . '/' . $this->name
+			]);
 			throw $e;
 		}
 	}

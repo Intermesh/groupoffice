@@ -1028,6 +1028,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			throw new Exception("File is already in trash");
 		}
 		$originalFolder = $this->folder;
+		$originalPath = $this->fsFile->path();
 
 		// Only create the trash record when the file was moved
 		go()->getDbConnection()->beginTransaction();
@@ -1041,6 +1042,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			go()->getDbConnection()->commit();
 		} catch (\Throwable $e) {
 			go()->getDbConnection()->rollBack();
+			// The file may already have been moved, or renamed when its name exists in the trash
+			TrashedItem::moveBackOnDisk($originalPath, [
+				$trashFolder->fsFolder->path() . '/' . $this->name,
+				dirname($originalPath) . '/' . $this->name
+			]);
 			throw $e;
 		}
 	}
