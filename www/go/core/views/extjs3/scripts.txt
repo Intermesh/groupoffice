@@ -138,16 +138,9 @@ usersettings/UserSettingsDialog.js
 usersettings/AppPasswordsFieldset.js
 usersettings/AppPasswordDialog.js
 
-systemsettings/Panel.js
-
-oauth/ClientGrid.js
-oauth/ClientDialog.js
-oauth/SystemSettingsPanel.js
 
 
-defaultpermissions/DefaultPermissionsPanel.js
-defaultpermissions/SystemSettingsPanel.js
-defaultpermissions/ShareWindow.js
+
 
 
 Wizard.js
@@ -169,42 +162,23 @@ menu/StoreMenu.js
 
 Module.js
 
-cron/Stores.js
-cron/CronDialog.js
-cron/NewCronDialog.js
-cron/ParametersPanel.js
-cron/PeriodGrid.js
-cron/SystemSettingsCronGrid.js
 
-tools/SystemSettingsTools.js
 
 groups/ModulePermissionCombo.js
-groups/SystemSettingsGroupGrid.js
-groups/GroupDialog.js
-groups/GroupUserGrid.js
 groups/GroupCombo.js
-groups/GroupModuleGrid.js
 groups/GroupMemberWindow.js
 
 users/UserGrid.js
-users/UserDefaultsWindow.js
-users/SystemSettingsUserGrid.js
 users/CreateUserAccountPanel.js
-users/CreateUserPasswordPanel.js
-users/CreateUserWizard.js
 users/UserGroupGrid.js
 users/UserCombo.js
 users/SelectDialogPanel.js
 
 customfields/FieldSetCombo.js
-customfields/ExportDialog.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
 customfields/DetailPanel.js
-customfields/EntityPanel.js
-customfields/EntityDialog.js
-customfields/SystemSettingsPanel.js
 customfields/CustomFieldRelationGrid.js
 customfields/FieldSetDialog.js
 customfields/type/Text.js
@@ -252,9 +226,6 @@ search/SearchEmailCombo.js
 search/SearchCombo.js
 search/SearchField.js
 
-modules/SystemSettingsModuleGrid.js
-modules/GroupRights.js
-modules/ModuleSortWindow.js
 
 
 filter/Conditions.js
