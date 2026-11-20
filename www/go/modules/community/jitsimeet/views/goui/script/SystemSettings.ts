@@ -1,45 +1,22 @@
-import {checkbox, containerfield, h3, textfield, Component, t, datasourceform, fieldset} from "@intermesh/goui";
-import {jmapds, modules} from "@intermesh/groupoffice-core";
+import {checkbox, containerfield, Fieldset, t, textfield} from "@intermesh/goui";
 
-// @deprecated. To be replaced by settings.ts
-export class SystemSettings extends Component {
-	private form;
-
+/**
+ * Module settings shown in the module dialog. The dialog's form loads and saves the "settings" of the module.
+ */
+export class SystemSettings extends Fieldset {
 	constructor() {
 		super();
-		this.title = t("Settings");
+		this.legend = t('Video meeting', "community", "jitsimeet");
 
-		this.form = datasourceform({
-				dataSource: jmapds("Module")
-			},
-
-			fieldset({},
-
-				containerfield({
-						name: "settings"
-					},
-
-					h3({html:t('Video meeting')}),
-					textfield({label: t('Server URL'), name: 'videoUri',}),
-					checkbox({label: t("Enable JWT authentification"), name: "videoJwtEnabled"}),
-					textfield({type: "password", label: t('App Secret'), name: 'videoJwtSecret'}),
-					textfield({label: t('App ID'), name: 'videoJwtAppId',}),
-
-				)
+		this.items.add(
+			containerfield({
+					name: "settings"
+				},
+				textfield({label: t('Server URL', "community", "jitsimeet"), name: 'videoUri'}),
+				checkbox({label: t("Enable JWT authentification", "community", "jitsimeet"), name: "videoJwtEnabled"}),
+				textfield({type: "password", label: t('App Secret', "community", "jitsimeet"), name: 'videoJwtSecret'}),
+				textfield({label: t('App ID', "community", "jitsimeet"), name: 'videoJwtAppId'})
 			)
 		);
-
-
-		this.items.add(this.form);
-
-		const mod = modules.get("community", "jitsimeet");
-
-		if(mod) {
-			this.form.load(mod.id);
-		}
-	}
-
-	onSubmit() {
-		return this.form.submit();
 	}
 }
