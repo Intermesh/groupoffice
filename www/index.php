@@ -10,8 +10,18 @@ if (str_starts_with($ua, 'AppleExchangeWebServices')) {
 
 require_once('vendor/autoload.php');
 use go\core\App;
+use go\core\jmap\State;
+use go\core\webclient\Startup;
 
-App::get();
+try {
+	App::get()->setAuthState(new State());
+	// Shows a page when the system is unavailable, and logs in with a token of the server manager or the remember me cookie
+	Startup::run();
+} catch(Throwable $e) {
+	Startup::handleException($e);
+	exit();
+}
+
 $baseUrl = \go\core\http\Request::get()->getFullUrl()  ;
 
 ?>
