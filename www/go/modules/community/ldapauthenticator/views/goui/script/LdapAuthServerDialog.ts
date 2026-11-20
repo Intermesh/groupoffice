@@ -162,8 +162,6 @@ export class LdapAuthServerDialog extends FormWindow {
 						if (spf && suf) {
 							suf.hidden = newValue;
 							spf.hidden = newValue;
-							suf.required = !newValue;
-							spf.required = !newValue;
 							suf.disabled = newValue;
 							spf.disabled = newValue;
 						}
@@ -335,7 +333,7 @@ export class LdapAuthServerDialog extends FormWindow {
 				type: "switch",
 				label: t("Create e-mail account for users"),
 				listeners: {
-					change: ({newValue, oldValue}) => {
+					setvalue: ({newValue, oldValue}) => {
 						imapFs.hidden = !newValue;
 						smtpFs.hidden = !newValue;
 						imapFs.findChildrenByType(InputField).forEach((fld) => {
@@ -438,12 +436,7 @@ export class LdapAuthServerDialog extends FormWindow {
 		this.form.on("load", ({data}) => {
 
 			this.ldapUseAuthCb.value = !!(data.username && data.password);
-			if (data.imapHostname && data.imapHostname.length > 0) {
-				this.createEmailCheckbox.value = true;
-			}
-			if (data.smtpUsername && data.smtpUsername.length > 0) {
-				this.form.findField("smtpUseUserCredentials")!.value = true;
-			}
+			this.createEmailCheckbox.value = !!data.imapHostname;
 		});
 
 		this.form.on("beforeload", ({data}) => {
@@ -455,6 +448,10 @@ export class LdapAuthServerDialog extends FormWindow {
 
 		this.form.on("beforesave", ({data}) => {
 			const currentId = this.form.currentId;
+
+			if (!this.createEmailCheckbox.value) {
+				data.imapHostname = null;
+			}
 
 			if (data.groups) {
 				const arGrp = data.groups;
