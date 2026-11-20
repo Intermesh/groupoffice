@@ -1,15 +1,22 @@
 import {
 	btn,
-	checkbox, column,
 	comp,
 	DataSourceForm,
-	datasourceform, DefaultEntity,
-	displayfield, EntityID, Format,
-	h2,
-	h3, hr,
-	menu, mstbar, Notifier, searchbtn,
+	datasourceform,
+	DefaultEntity,
+	displayfield,
+	EntityID,
+	Filter,
+	Format,
+	h3,
+	hr,
+	menu,
+	mstbar,
+	Notifier,
+	searchbtn,
 	t,
-	tbar, Window, Filter
+	tbar,
+	Window
 } from "@intermesh/goui";
 import {DetailPanel, jmapds} from "@intermesh/groupoffice-core";
 import {DnsSettingsPanel} from "./DnsSettingsPanel.js";
