@@ -93,16 +93,16 @@ class GetBlobTest extends TestCase
 
 		$result = $this->callTool(['blobId' => $id, 'length' => 100]);
 		$this->assertFalse($result['isError'], json_encode($result));
-		$this->assertEquals(substr($log, 0, 100), $result['content'][1]['text']);
+		$this->assertEquals(substr($log, 0, 100), $result['structuredContent']['text']);
 		$this->assertEquals(strlen($log), $result['structuredContent']['total']);
 		$this->assertTrue($result['structuredContent']['hasMore']);
-		$this->assertArrayNotHasKey('text', $result['structuredContent']);
+		$this->assertEquals($result['structuredContent'], json_decode($result['content'][0]['text'], true));
 
 		$result = $this->callTool(['blobId' => $id, 'offset' => 100, 'length' => 50]);
-		$this->assertEquals(substr($log, 100, 50), $result['content'][1]['text']);
+		$this->assertEquals(substr($log, 100, 50), $result['structuredContent']['text']);
 
 		$tail = $this->callTool(['blobId' => $id, 'offset' => -30]);
-		$this->assertEquals(substr($log, -30), $tail['content'][1]['text']);
+		$this->assertEquals(substr($log, -30), $tail['structuredContent']['text']);
 		$this->assertFalse($tail['structuredContent']['hasMore']);
 	}
 
@@ -113,7 +113,8 @@ class GetBlobTest extends TestCase
 		$result = $this->callTool(['blobId' => $id, 'search' => 'fatal ERROR']);
 		$this->assertFalse($result['isError'], json_encode($result));
 		$this->assertEquals(10, $result['structuredContent']['matchCount']);
-		$this->assertStringStartsWith("100: [100] PHP Fatal error: something 100\n200: ", $result['content'][1]['text']);
+		$this->assertEquals(['line' => 100, 'text' => '[100] PHP Fatal error: something 100'], $result['structuredContent']['matches'][0]);
+		$this->assertEquals(200, $result['structuredContent']['matches'][1]['line']);
 	}
 
 	public function testDecompressesGzip(): void
@@ -125,10 +126,10 @@ class GetBlobTest extends TestCase
 		$this->assertFalse($result['isError'], json_encode($result));
 		$this->assertTrue($result['structuredContent']['decompressed']);
 		$this->assertEquals(strlen($log), $result['structuredContent']['total']);
-		$this->assertEquals(substr($log, -50), $result['content'][1]['text']);
+		$this->assertEquals(substr($log, -50), $result['structuredContent']['text']);
 
 		$search = $this->callTool(['blobId' => $id, 'search' => 'something 500']);
-		$this->assertStringStartsWith('500: ', $search['content'][1]['text']);
+		$this->assertEquals(500, $search['structuredContent']['matches'][0]['line']);
 	}
 
 	public function testGzipIsReadUpToTheLimit(): void
@@ -165,8 +166,7 @@ class GetBlobTest extends TestCase
 		$id = $this->createBlob('not an image ' . uniqid(), 'fake.png', 'image/png');
 		$result = $this->callTool(['blobId' => $id]);
 		$this->assertFalse($result['isError'], json_encode($result));
-		$this->assertEquals('text', $result['content'][1]['type']);
-		$this->assertStringStartsWith('not an image ', $result['content'][1]['text']);
+		$this->assertStringStartsWith('not an image ', $result['structuredContent']['text']);
 	}
 
 	public function testBinaryIsRefused(): void
@@ -182,8 +182,8 @@ class GetBlobTest extends TestCase
 		$id = $this->createBlob("caf\xc3\xa9 \xff\xfe broken " . uniqid(), 'latin.log');
 		$result = $this->callTool(['blobId' => $id]);
 		$this->assertFalse($result['isError'], json_encode($result));
-		$this->assertStringStartsWith('café ', $result['content'][1]['text']);
-		$this->assertTrue(mb_check_encoding($result['content'][1]['text'], 'UTF-8'));
+		$this->assertStringStartsWith('café ', $result['structuredContent']['text']);
+		$this->assertTrue(mb_check_encoding($result['structuredContent']['text'], 'UTF-8'));
 		$this->assertNotFalse(json_encode($result));
 	}
 
