@@ -115,7 +115,7 @@ The release build (`build/build.sh`) encodes every PHP file of `go/modules/busin
 
 ## Static analysis
 
-- PHPStan (level 3, config `tests/phpstan.neon`, covers `www/api` and `www/go`): from `www/` run `composer go:analyse` (inside the container). New code should not add errors.
+- PHPStan (level 3, config `tests/phpstan.neon`, covers `www/api` and `www/go`): from `www/` run `composer go:analyse` (inside the container). New code should not add errors. It runs in GitHub Actions (`.github/workflows/phpstan.yml`); existing errors are in `tests/phpstan-baseline.neon`, so only new errors fail. Fix an error instead of adding it to the baseline. After fixing an old error, lower its count or remove its entry in the baseline by hand. Regenerate the baseline only with `scripts/phpstan-baseline.sh` (on the host), which analyses a copy without the modules of other repositories, like CI does; locally the business and customer modules add their own errors (see `tests/phpstan-baselines.php`).
 - Semgrep (`scripts/semgrep.sh`, security rule sets for PHP, JS/TS and secrets) and Qodana (`qodana.yaml`) run on the codebase as well. Don't introduce findings such as SQL built from user input, and don't commit secrets.
 - Don't analyse or edit vendored code, `activesync` or Z-Push (excluded in the configs).
 

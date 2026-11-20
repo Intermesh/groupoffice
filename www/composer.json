@@ -72,7 +72,7 @@
     }
   },
   "scripts": {
-    "go:analyse": "./vendor/phpstan/phpstan/phpstan analyse -c ../tests/phpstan.neon --memory-limit=1G;"
+    "go:analyse": "./vendor/phpstan/phpstan/phpstan analyse -c ../tests/phpstan.neon --memory-limit=2G;"
   },
   "config": {
     "optimize-autoloader": true,
