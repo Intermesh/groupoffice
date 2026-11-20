@@ -21,6 +21,11 @@ import {commentDS} from "./Index.js";
 export class CommentsPanel extends Component {
 	public focusEditorOnload = false;
 
+	/**
+	 * Hide the panel when there are no comments, like the drafts of a ticket
+	 */
+	public hideWhenEmpty = false;
+
 	private readonly commentList!: CommentList;
 	private readonly commentEditor!: CommentEditor;
 	private readonly countBadge!: Component;
@@ -68,6 +73,14 @@ export class CommentsPanel extends Component {
 			hidden: true,
 			text: "",
 			cls: "count-badge"
+		});
+
+		this.commentList.store.on("load", () => {
+			const count = this.commentList.store.count();
+			this.countBadge.text = count.toString();
+			if (this.hideWhenEmpty) {
+				this.hidden = count === 0;
+			}
 		});
 
 		this.commentList.on("listready", () => {
@@ -193,7 +206,6 @@ export class CommentsPanel extends Component {
 		this.commentEditor.editor.clearInvalid();
 
 		await this.commentList.store.load();
-		this.countBadge.text = this.commentList.store.count().toString();
 		this.disabled = false;
 	}
 }

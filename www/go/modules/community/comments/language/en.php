@@ -5,4 +5,5 @@ return array (
 		"category" => "Category",
 		"comment" => "Comment",
 		"comments" => "Comments",
+		"Send this draft?" => "Send this draft?",
 );

@@ -231,6 +231,25 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 				}
 			});
 
+			if (comment.section === "draft") {
+				// Posting the draft sends it, like a reply to the customer of a support ticket
+				commentComp.items.add(
+					btn({
+						cls: "raised",
+						icon: "send",
+						text: t("Send"),
+						disabled: client.user.isAdmin ? false : !writtenByUser,
+						handler: async () => {
+							if (await Window.confirm(t("Send this draft?"))) {
+								commentDS.update(comment.id, {section: null}).catch((err) => {
+									void Window.error(err);
+								});
+							}
+						}
+					})
+				);
+			}
+
 			if (quote) {
 				commentComp.items.add(
 					btn({

@@ -154,6 +154,19 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				this.privateComments.section = "private";
 
 				wrapper.comp = this.privateComments;
+
+				// Replies that are written, for example by an AI assistant, but not sent to the customer yet
+				const draftsWrapper = new go.GOUIWrapper({
+					cls: ""
+				});
+				this.insert(this.items.indexOf(wrapper), draftsWrapper);
+				this.draftComments = new GO.comments.CommentsPanel(this.entityStore.entity.name);
+				this.draftComments.title = t("Drafts");
+				this.draftComments.section = "draft";
+				this.draftComments.hideWhenEmpty = true;
+				this.draftComments.hidden = true;
+
+				draftsWrapper.comp = this.draftComments;
 			}
 
 			this.addContracts();
@@ -257,6 +270,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		if (this.privateComments) {
 			this.privateComments.load(this.data.id);
+		}
+
+		if (this.draftComments) {
+			this.draftComments.load(this.data.id);
 		}
 
 
