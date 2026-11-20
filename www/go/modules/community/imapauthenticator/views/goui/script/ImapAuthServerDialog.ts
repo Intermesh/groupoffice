@@ -180,9 +180,9 @@ export class ImapAuthServerDialog extends FormWindow {
 
 			checkbox({
 				type: "switch",
+				name: "smtpUseUserCredentials",
 				label: t("Use IMAP credentials"),
 				hint: t("Enable this if the SMTP server credentials are identical to the IMAP server."),
-				value: true,
 				listeners: {
 					setvalue: ({newValue, oldValue}) => {
 						this.smtpUserNameFld.disabled = newValue;
