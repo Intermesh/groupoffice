@@ -11,5 +11,7 @@ Please login to Group-Office to complete your account setup at:
 
 Best regards,
 
-{TITLE}'
+{TITLE}',
+  'Allow delete via synchronization' => 'Allow delete via synchronization',
+  'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.' => 'By default devices are not allowed to delete items. This was added due to a bug in Android 12 that deleted contacts after an update.',
 );

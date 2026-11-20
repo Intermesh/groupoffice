@@ -458,4 +458,6 @@ If you did not request a new password please delete this mail.',
   'Uncheck the items that you don\'t want to find in the search at the top. Their keywords are removed from the search index, which saves space and makes searching faster. Existing links to these items keep working, but you can\'t search for them when you create a link.' => 'Uncheck the items that you don\'t want to find in the search at the top. Their keywords are removed from the search index, which saves space and makes searching faster. Existing links to these items keep working, but you can\'t search for them when you create a link.',
   'When you check an item again, run "Update search index" in Tools to add it to the search index again.' => 'When you check an item again, run "Update search index" in Tools to add it to the search index again.',
   'Drafts' => 'Drafts',
+  'Create desktop notification for new e-mails' => 'Create desktop notification for new e-mails',
+  'Employee number' => 'Employee number',
 );
