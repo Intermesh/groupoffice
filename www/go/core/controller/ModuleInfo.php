@@ -3,6 +3,7 @@
 namespace go\core\controller;
 
 use GO\Base\Model\Module;
+use go\core\exception\Forbidden;
 use go\core\exception\NotFound;
 use go\core\Installer;
 use go\core\jmap\SetError;
@@ -11,18 +12,21 @@ use go\core\util\ArrayObject;
 
 class ModuleInfo extends \go\core\Controller
 {
+	/**
+	 * Get the installed and installable modules with their settings
+	 *
+	 * @apiPermission Administrators get all modules. Other users only get the installed modules they may manage, because the module model holds its settings.
+	 * @apiReadOnly
+	 */
 	public function get(array $params)
 	{
-
-		$col = new \GO\Base\ModuleCollection();
-
-		$mods = $col->getAvailableModules(true);
-
 		$list = array_map(function ($m) {
-			return $m::get()->toArray();
-		}, $mods);
+			return $m->toArray();
+		}, $this->getVisibleModules());
 
-		$list = array_merge($list, $this->getUnavailable());
+		if (go()->getAuthState()->isAdmin()) {
+			$list = array_merge($list, $this->getUnavailable());
+		}
 
 		if (!empty($params['ids'])) {
 			$list = array_values(array_filter($list, function ($m) use ($params) {
@@ -66,20 +70,53 @@ class ModuleInfo extends \go\core\Controller
 		return $mods;
 	}
 
+	/**
+	 * Get the ID's of the installed and installable modules
+	 *
+	 * @apiPermission Checked in ModuleInfo::getVisibleModules(): administrators get all modules, other users the installed modules they may manage.
+	 * @apiReadOnly
+	 */
 	public function query(array $params)
 	{
-		$col = new \GO\Base\ModuleCollection();
-
-		$mods = $col->getAvailableModules(true);
-
 		return ['ids' => array_map(function ($m) {
-			$i = $m::get();
-			return ($i->getPackage()) . "/" . $i->name();
-		}, $mods)];
+			return $m->getPackage() . "/" . $m->name();
+		}, $this->getVisibleModules())];
 	}
 
+	/**
+	 * The available modules the current user may see. Administrators see all of them, other users only the installed
+	 * modules they may manage.
+	 *
+	 * @return \go\core\Module[]
+	 */
+	private function getVisibleModules(): array
+	{
+		$col = new \GO\Base\ModuleCollection();
+		$mods = array_map(function ($m) {
+			return $m::get();
+		}, $col->getAvailableModules(true));
+
+		if (go()->getAuthState()->isAdmin()) {
+			return $mods;
+		}
+
+		return array_values(array_filter($mods, function ($m) {
+			$model = $m->getModel();
+			return $model && !empty($model->getUserRights()->mayManage);
+		}));
+	}
+
+	/**
+	 * Install, uninstall, enable or delete modules
+	 *
+	 * @apiPermission Only administrators.
+	 * @throws Forbidden
+	 */
 	public function set(array $params)
 	{
+		if (!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
 
 		$result = new ArrayObject([
 			'created' => null,
