@@ -205,6 +205,13 @@ export class ImapAuthServerDialog extends FormWindow {
 
 		this.generalTab.items.add(imapServerFs, smtpServerFs, userOptionsFs);
 
+		this.form.on("beforeload", ({data}) => {
+			// The server returns [{serverId, groupId}], the group chips use group IDs
+			if (data.groups) {
+				data.groups = data.groups.map((g: any) => g.groupId);
+			}
+		});
+
 		this.form.on("beforesave", ({data}) => {
 			const currentId = this.form.currentId;
 
