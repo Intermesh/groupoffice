@@ -46,6 +46,45 @@ class Search extends AclOwnerEntity {
 		// do nothing for search
 	}
 
+	private static ?array $excludedEntityTypeIds = null;
+
+	/**
+	 * Get the entity type ID's that are left out of the global search in the system settings
+	 *
+	 * @return int[]
+	 */
+	public static function getExcludedEntityTypeIds(): array
+	{
+		if(!isset(self::$excludedEntityTypeIds)) {
+			self::$excludedEntityTypeIds = [];
+			foreach(go()->getSettings()->getSearchExcludedEntities() as $name) {
+				if(EntityType::existsByName($name)) {
+					self::$excludedEntityTypeIds[] = EntityType::findByName($name)->getId();
+				}
+			}
+		}
+		return self::$excludedEntityTypeIds;
+	}
+
+	/**
+	 * Check if an entity type is left out of the global search. Its search record is saved for links but without keywords.
+	 *
+	 * @param EntityType $entityType
+	 * @return bool
+	 */
+	public static function isExcluded(EntityType $entityType): bool
+	{
+		return in_array($entityType->getId(), self::getExcludedEntityTypeIds());
+	}
+
+	/**
+	 * Clear the cached excluded entity types after the setting changed
+	 */
+	public static function resetExcludedEntityTypeIds(): void
+	{
+		self::$excludedEntityTypeIds = null;
+	}
+
 	/**
 	 * Prepares the query for a search
 	 *

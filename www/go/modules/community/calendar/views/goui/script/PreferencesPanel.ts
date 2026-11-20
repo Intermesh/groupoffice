@@ -77,7 +77,7 @@ export class PreferencesPanel extends AppSettingsPanel {
 					checkbox({name:'multiLine', label: t('Show multiline event blocks')+' (beta)'}),
 					checkbox({name:'showCategoryColor', label: t('Show event in category color'),
 						hint: t('Only when one calendar is selected and the event has one category')}),
-
+					checkbox({name:'printWeekInGrid', label: t('Print week and workweek in a grid with hours')}),
 					select({name:'defaultCalendarId', label: t('Default calendar'), store: this.calendarStore, valueField: 'id',
 						hint: t('Start with this calendar selected')}),
 					select({name:'personalCalendarId', label: t('Personal calendar'), store: this.personalCalendarStore, valueField: 'id',

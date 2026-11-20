@@ -13,6 +13,11 @@
   position: relative;
 }
 
+// Buttons of a draft. The comment already has padding.
+.goui.goui-toolbar.comment-actions {
+  padding: dp(8) 0 0;
+}
+
 .goui > .count-badge {
   background-color: var(--fg-main-tp);
   border-radius: 4rem;

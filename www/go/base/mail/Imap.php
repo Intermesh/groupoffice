@@ -1736,7 +1736,9 @@ class Imap extends ImapBodyStruct
 
 					preg_match("'([^/]*)/([^ ;\n\t]*)'i", $message['content_type'], $ct);
 
-					if (isset($ct[2]) && $ct[1] != 'text' && $ct[2] != 'alternative' && $ct[2] != 'related') {
+					// A guess from the content type only. A message that is only a calendar invitation is shown with the
+					// invitation as an attachment. Invitations in a multipart/alternative message aren't detected.
+					if (isset($ct[2]) && (($ct[1] != 'text' && $ct[2] != 'alternative' && $ct[2] != 'related') || (strtolower($ct[1]) == 'text' && strtolower($ct[2]) == 'calendar'))) {
 						$message["has_attachments"] = 1;
 					}
 

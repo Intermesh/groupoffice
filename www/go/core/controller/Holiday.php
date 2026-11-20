@@ -11,7 +11,10 @@ class Holiday extends Controller
 	/**
 	 * Get the public holidays of a holiday set in a period
 	 *
+	 * Pass the country code as "set" (e.g. "NL") or the user's holiday set as "holidaySet" (e.g. "en_gb" or "sv").
+	 *
 	 * @apiPermission Module access: returns public holidays generated from the holiday files shipped with GroupOffice. No user data is read.
+	 * @apiReadOnly
 	 */
 	public function fetch(array $params): array
 	{
@@ -19,7 +22,11 @@ class Holiday extends Controller
 		$from = new DateTime($params['from']);
 		$till = new DateTime($params['till']);
 		$list = [];
-		foreach(HolidayModel::generate($params['set'],$params['lang'],$from, $till) as $holiday){
+		$set = isset($params['holidaySet']) ? HolidayModel::countryForHolidaySet($params['holidaySet']) : $params['set'];
+		if(!isset($set)) {
+			return ['list' => []];
+		}
+		foreach(HolidayModel::generate($set,$params['lang'],$from, $till) as $holiday){
 			$key = $holiday->title .'-'.$holiday->start;
 			if(isset($list[$key])) {
 				if(isset($list[$key]->region)) {

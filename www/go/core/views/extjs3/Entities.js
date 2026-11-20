@@ -63,6 +63,18 @@ go.Entities = (function () {
 			return window.groupofficeCore.entities.getLinkConfigs();
 		},
 
+		/**
+		 * Get link configurations without the entities that are left out of the search in the system settings
+		 */
+		getSearchLinkConfigs: function () {
+			const core = go.Modules.get("core", "core"),
+				excluded = core && core.settings && core.settings.searchExcludedEntities || [];
+
+			return this.getLinkConfigs().filter(function (cfg) {
+				return excluded.indexOf(cfg.entity) === -1;
+			});
+		},
+
 		getLinkIcon: function (entity, filter) {
 			var linkConfig = this.getLinkConfigs().find(function (cfg) {
 

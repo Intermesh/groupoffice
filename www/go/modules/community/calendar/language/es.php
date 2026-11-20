@@ -161,4 +161,5 @@ return array (
     'declined' => '{name} ha rechazado el evento "{title}" {date}',
     'tentative' => '{name} ha respondido provisionalmente al evento "{title}" {date}',
   ),
+  'Print week and workweek in a grid with hours' => 'Imprimir la semana y la semana laboral en una cuadrícula con horas',
 );

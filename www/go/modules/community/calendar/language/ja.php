@@ -151,4 +151,5 @@ return array (
   'Paste ' => '貼り付け',
   'Appointment' => '予定',
   '{name}\'s birthday' => '{name} の誕生日',
+  'Print week and workweek in a grid with hours' => '週と勤務週を時間付きのグリッドで印刷',
 );

@@ -29,31 +29,48 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 		this.getEl().mask();
 
 		if(record.data.entity == "Folder") {
-			if(GO.util.empty(this.attachmentItem)){
-				this.saveAllToItem(record, record.data.entityId);
+			if(this.attachmentHandle) {
+				record.data.files_folder_id = record.data.entityId;
+				this.attachmentHandle(record.data);
+				this.hide();
 			} else {
-				this.saveToItem(record, record.data.entityId);
+				if (GO.util.empty(this.attachmentItem)) {
+					this.saveAllToItem(record, record.data.entityId);
+				} else {
+					this.saveToItem(record, record.data.entityId);
+				}
 			}
 
 			return;
 		} else if (record.data.entity === 'File') {
-			GO.request({
-				url:'files/file/display',
-				params:{
-					id: record.data.entityId
-				},
-				success:function(response, options, result) {
-					// In order for createButton to work:
-					if (!this.entity) {
-						this.entity = record.data.entity;
-					}
-					if (!this.data) {
-						this.data = {id: record.data.entityId};
-					}
-					GO.email.emailFiles(result.data, this);
-				},
-				scope: this
-			});
+
+				GO.request({
+					url: 'files/file/display',
+					params: {
+						id: record.data.entityId
+					},
+					success: function (response, options, result) {
+						// In order for createButton to work:
+						if (!this.entity) {
+							this.entity = record.data.entity;
+						}
+						if (!this.data) {
+							this.data = {id: record.data.entityId};
+						}
+
+
+						if(this.attachmentHandle) {
+							result.data.entity = "File";
+							this.attachmentHandle(result.data);
+							this.hide();
+						} else {
+							GO.email.emailFiles(result.data, this);
+						}
+
+					},
+					scope: this
+				});
+
 
 			return;
 		}

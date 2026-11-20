@@ -191,4 +191,5 @@ return array (
     'declined' => '{name} odmítl(a) událost „{title}“ {date}',
     'tentative' => '{name} si není jistý/á účastí na události „{title}“ {date}',
   ),
+  'Print week and workweek in a grid with hours' => 'Tisknout týden a pracovní týden v mřížce s hodinami',
 );

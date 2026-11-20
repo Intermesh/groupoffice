@@ -690,6 +690,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			} catch(\Exception $e) {
 				$response['deleteSuccess'] = false;
 				$response['deleteFeedback'] = $e->getMessage();
+				$this->logDeleteException($e);
 			}
 
 			if (!isset($response['deleteSuccess'])){
@@ -932,6 +933,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}catch(\Exception $e) {
 			$response['deleteSuccess'] = false;
 			$response['deleteFeedback'] = $e->getMessage();
+			$this->logDeleteException($e);
 		}
 
 		if(!isset($response['deleteSuccess'])){
@@ -1058,6 +1060,18 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	 * @param type $store
 	 * @throws Exception
 	 */
+	/**
+	 * Log an exception of a delete or move to the trash that is shown to the user as feedback
+	 *
+	 * Without it, the cause of a failed delete is only in the dialog the user saw. Missing permissions are expected.
+	 */
+	private function logDeleteException(\Throwable $e): void
+	{
+		if (!$e instanceof AccessDenied) {
+			\go\core\ErrorHandler::logException($e);
+		}
+	}
+
 	private function _processDeletes(array $params, $store=false){
 		if(!$store){
 			$store = \GO\Base\Data\Store::newInstance(Folder::model());
@@ -1116,6 +1130,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}catch(\Exception $e) {
 			$response['deleteSuccess'] = false;
 			$response['deleteFeedback'] = $e->getMessage();
+			$this->logDeleteException($e);
 		}
 
 		if(!isset($response['deleteSuccess'])){

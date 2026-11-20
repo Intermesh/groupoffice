@@ -1,9 +1,13 @@
 import {
 	autocompletechips,
-	checkbox, chips, column,
-	comp, datasourcestore,
-	DefaultEntity, fieldset, listStoreType, storeRecordType,
-	t, table, textarea, TextField,
+	checkbox,
+	column,
+	comp,
+	datasourcestore,
+	fieldset,
+	t,
+	table,
+	TextField,
 	textfield
 } from "@intermesh/goui";
 import {FormWindow, jmapds} from "@intermesh/groupoffice-core";

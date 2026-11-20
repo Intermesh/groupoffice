@@ -959,8 +959,46 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		}
 
+		if (!empty($message->in_reply_to)) {
+			// A reply that was saved as a draft, by the composer or an AI assistant. Keep the thread and mark the message
+			// it replies to as answered when it's sent, like a reply that is sent right away.
+			$response['sendParams']['in_reply_to'] = $message->in_reply_to;
+			if (!empty($params['uid'])) {
+				$replyUid = $this->findUidByMessageId($account, 'INBOX', $message->in_reply_to);
+				if ($replyUid) {
+					$response['sendParams']['reply_uid'] = $replyUid;
+					$response['sendParams']['reply_mailbox'] = 'INBOX';
+					$response['sendParams']['reply_account_id'] = $account->id;
+				}
+			}
+		}
+
 		$response['success'] = true;
 		return $response;
+	}
+
+	/**
+	 * Find the UID of a message by its Message-ID header
+	 *
+	 * @param string $messageId Without the angle brackets
+	 * @return int|null Null when it isn't found or the ID can't be searched safely
+	 */
+	private function findUidByMessageId(Account $account, string $mailbox, string $messageId): ?int
+	{
+		// Only printable characters without quotes or backslashes, so it can't break out of the IMAP search string
+		if (!preg_match('/^[\x21-\x7E]+$/', $messageId) || strpbrk($messageId, '"\\') !== false) {
+			return null;
+		}
+
+		try {
+			$imap = $account->openImapConnection($mailbox);
+			$uids = $imap->search('HEADER Message-ID "<' . $messageId . '>"');
+		} catch (\Exception $e) {
+			\go\core\ErrorHandler::logException($e);
+			return null;
+		}
+
+		return empty($uids) ? null : (int) end($uids);
 	}
 
 	/**
@@ -1823,11 +1861,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 	protected function actionSource(array $params)
 	{
-
 		$account = Account::model()->findByPk($params['account_id']);
+
+		if(!$account) {
+			throw new \go\core\exception\NotFound("Account not found");
+		}
+
 		$imap  = $account->openImapConnection($params['mailbox']);
 
 		$message = ImapMessage::model()->findByUid($account, $params['mailbox'], $params['uid']);
+
+		if(!$message) {
+			throw new NotFound();
+		}
 		
 		$filename = GO\Base\Fs\File::stripInvalidChars(date("Y-m-d_Hi", $message->udate) . "_". $message->from->getAddress()['email'] . "_" .$message->subject);
 		$filename .= empty($params['download']) ? ".txt" :".eml";

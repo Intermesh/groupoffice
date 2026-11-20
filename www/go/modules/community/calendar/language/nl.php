@@ -250,6 +250,7 @@ return array (
 	'Show multiline event blocks' => 'Toon afspraak blokken op meerdere regels',
 	'Show event in category color' => 'Toon afspraak in categoriekleur',
 	'Only when one calendar is selected and the event has one category' => 'Alleen als er één agenda is geselecteerd en de afspraak één categorie heeft',
+	'Print week and workweek in a grid with hours' => 'Week en werkweek afdrukken in een raster met uren',
 	'Past appointments' => 'Verlopen afspraken',
 	'Upcoming appointments' => 'Aankomende afspraken',
   'Add attendees' => 'Deelnemers toevoegen',
@@ -273,4 +274,5 @@ return array (
   'Auto add invites and updates to calendar when enabled' => 'Indien ingeschakeld worden uitnodigingen en updates automatisch aan de agenda toegevoegd',
   'Import calendar from ICS file.' => 'Agenda importeren uit ICS-bestand.',
   'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Maak een exacte kopie van de agenda uit een extern ICS-bestand in de geselecteerde GroupOffice-agenda\'s. Selecteer de agenda\'s waarin geïmporteerd moet worden in de beheerinstellingen van de agenda.',
+  'This event already exists. Open it in your calendar to respond to it.' => 'Deze afspraak bestaat al. Open hem in uw agenda om te reageren.',
 );

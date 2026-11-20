@@ -6,7 +6,7 @@ use go\modules\community\calendar\model;
 
 class ListView extends Calendar {
 
-	/** @var model\Calendar[] the selected calendars  */
+	/** @var array[] the selected calendars with id, name and color, as the footer of the parent class uses them */
 	protected $calendars = [];
 	public $calendarIds = [];
 
@@ -25,7 +25,7 @@ class ListView extends Calendar {
 		$y = $this->GetY();
 		$leftWidth = 140;
 		$rightWidth = $this->getPageWidth() - $this->lMargin - $this->rMargin - $leftWidth;
-		$this->MultiCell($leftWidth, 5, implode(', ', array_map(fn($c) => $c->name, $this->calendars)), 0, 'L');									// Print the name of the calendars that are printed in the view.
+		$this->MultiCell($leftWidth, 5, implode(', ', array_map(fn($c) => $c['name'], $this->calendars)), 0, 'L');									// Print the name of the calendars that are printed in the view.
 
 		$range = $this->day->toUserFormat();
 
@@ -42,14 +42,14 @@ class ListView extends Calendar {
 
 		$calendars = model\Calendar::find()->where(['id'=>$this->calendarIds]);
 		foreach($calendars as $cal) {
-			$this->calendars[$cal->id] = $cal;
+			$this->calendars[$cal->id] = ['id' => $cal->id, 'name' => $cal->name, 'color' => $cal->getColor()];
 		}
 
 		$this->setEvents(model\CalendarEvent::find()->filter([
 			'inCalendars' => $this->calendarIds,
 			'after'=>$this->day->format('Y-m-d'),
 			'before'=>$this->end->add(new \DateInterval("P1D"))->format('Y-m-d')
-		]));
+		])->all());
 
 		$this->SetMargins(10,20,10);
 		$this->setAutoPageBreak(true, 20);
@@ -159,10 +159,10 @@ class ListView extends Calendar {
 	private function quickText(model\CalendarEvent $event): string {
 
 
-		$calendar = $this->calendars[$event->calendarId];
+		$calendar = $this->calendars[$event->calendarId] ?? null;
 		$cal = '';
 		if ($calendar) {
-			$cal = '<span style="color:#' . $calendar->color . ';">' . $calendar->name . '</span>';
+			$cal = '<span style="color:#' . $calendar['color'] . ';">' . $calendar['name'] . '</span>';
 		}
 
 		$lines = [];

@@ -23,4 +23,14 @@ class SchedulePlugin extends Plugin
 	public function scheduleLocalDelivery(Message $iTipMessage)
 	{
 	}
+
+	/**
+	 * Uses a broker that can handle deleting events without a master component.
+	 *
+	 * @return Broker
+	 */
+	protected function createITipBroker(): \Sabre\VObject\ITip\Broker
+	{
+		return new Broker();
+	}
 }

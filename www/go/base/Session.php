@@ -73,12 +73,17 @@ class Session extends Observable{
 
 		// if access token from new JMAP API connected to this session was destroyed then destroy this session too!
 		// this is set in go/core/model/Token.php
+		$token = null;
 		try {
-			if (!empty($this->values['user_id']) && !empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken', '=', $this->values['accessToken'])->single()) {
-				ErrorHandler::log("Destroying session because the access token of the session was not found");
-				$this->values = [];
+			if (!empty($this->values['user_id']) && !empty($this->values['accessToken'])) {
+				$token = go()->getCache()->get('token-' . $this->values['accessToken']) ?: Token::find()->where('accessToken', '=', $this->values['accessToken'])->single();
+				if (!$token) {
+					ErrorHandler::log("Destroying session because the access token of the session was not found");
+					$this->values = [];
+				}
 			}
 		} catch (\Exception $e) {
+			$token = null;
 			$this->values = [];
 			ErrorHandler::logException($e, "Destroying session because of db exception");
 		}
@@ -86,8 +91,10 @@ class Session extends Observable{
 		// copy auth from new framework
 		if(empty($this->values['user_id'])) {
 			$this->copyUserFromAuthState(go()->getAuthState());
+		} else if ($token instanceof Token) {
+			$this->setSecurityTokenOf($token);
 		}
-		
+
 		if(!isset($this->values['security_token'])){
 			
 			//this log here causes endless loop and segfaults
@@ -136,9 +143,28 @@ class Session extends Observable{
 		$this->values['user_id'] = $userId;
 		if ($state instanceof State && ($token = $state->getToken())) {
 			$this->values['accessToken'] = $token->accessToken;
+			$this->setSecurityTokenOf($token);
 		}
 
 		return $userId;
+	}
+
+	/**
+	 * Use the security token that belongs to the access token of this session
+	 *
+	 * PHP cleans up a session long before the access token expires. The session is then restored from the access token,
+	 * and it must get the security token that the client already has. Otherwise the next request of the old framework
+	 * fails and the client asks the user to log in again. {@see Token::getLegacySecurityToken()}
+	 *
+	 * @param Token $token
+	 * @return void
+	 */
+	private function setSecurityTokenOf(Token $token): void
+	{
+		$securityToken = $token->getLegacySecurityToken();
+		if ($securityToken !== null) {
+			$this->values['security_token'] = $securityToken;
+		}
 	}
 
 	public function isActive() {

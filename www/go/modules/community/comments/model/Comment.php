@@ -52,8 +52,18 @@ class Comment extends AclItemEntity {
 	/**
 	 * By default the section is NULL. This property can be used to create multiple comment blocks per entity. 
 	 * This works with a 'section' filter that defaults to NULL.
+	 *
+	 * {@see self::SECTION_DRAFT} is for comments that are written but not posted yet.
 	 */
 	public ?string $section = null;
+
+	/**
+	 * Section of a draft, like a reply to a support ticket that an AI assistant wrote for the user to check
+	 *
+	 * A draft is posted by changing its section to NULL. Only then the entity is told that a comment was added, so a
+	 * draft doesn't change the status of a ticket or send it to the customer.
+	 */
+	const SECTION_DRAFT = 'draft';
 
 	/**
 	 *
@@ -208,6 +218,10 @@ class Comment extends AclItemEntity {
 	/**
 	 * Get the permission level of the current user
 	 *
+	 * Comments in a {@see $section}, like the private notes and drafts of a support ticket, are only for users who may
+	 * change the entity. Users who may only read it, like the customer of a ticket, only see the comments without a
+	 * section.
+	 *
 	 * @return int
 	 */
 	protected function internalGetPermissionLevel(): int
@@ -217,7 +231,12 @@ class Comment extends AclItemEntity {
 			return Acl::LEVEL_MANAGE;
 		}
 
+		$requiredLevel = isset($this->section) ? Acl::LEVEL_WRITE : Acl::LEVEL_READ;
+
 		if($this->isNew()) {
+			if(isset($this->section)) {
+				return $this->findEntity()->hasPermissionLevel($requiredLevel) ? Acl::LEVEL_WRITE : 0;
+			}
 			return $this->findEntity()->getPermissionLevel() ? Acl::LEVEL_WRITE : false;
 		}
 
@@ -225,7 +244,7 @@ class Comment extends AclItemEntity {
 			return Acl::LEVEL_MANAGE;
 		}
 
-		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_CREATE : false;
+		return $this->findEntity()->hasPermissionLevel($requiredLevel) ? Acl::LEVEL_CREATE : false;
 
 	}
 
@@ -260,6 +279,15 @@ class Comment extends AclItemEntity {
 		parent::internalValidate();
 	}
 
+	/**
+	 * Whether a draft is being posted: its section changes from {@see self::SECTION_DRAFT} to another one
+	 */
+	public function isPosted(): bool
+	{
+		return !$this->isNew() && $this->isModified('section') && $this->getOldValue('section') === self::SECTION_DRAFT
+			&& $this->section !== self::SECTION_DRAFT;
+	}
+
 	protected function internalSave(): bool
 	{
 		if($this->isModified('text')) {
@@ -267,11 +295,17 @@ class Comment extends AclItemEntity {
 			$this->findMentions();
 		}
 
+		if($this->isPosted()) {
+			// A draft gets the date it was posted, so it's in the right place in the thread
+			$this->date = new DateTime();
+		}
+		$added = $this->isNew() ? $this->section !== self::SECTION_DRAFT : $this->isPosted();
+
 		if(!parent::internalSave()) {
 			return false;
 		}
 
-		if($this->isNew()) {
+		if($added) {
 			$entity = $this->findEntity();
 			if(method_exists($entity, 'onCommentAdded')) {
 				$entity->onCommentAdded($this);

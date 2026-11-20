@@ -239,8 +239,8 @@ export class CalendarList extends Component<CalendarListEventMap> {
 						target.findChild("sep-subscription")!.hidden = !rights.mayChangeCalendars;
 						target.findChild("unsubscribe")!.hidden = data.id === client.user.calendarPreferences?.personalCalendarId;
 
-						target.findChild("sep-file")!.hidden = !!data.groupId;
-						target.findChild("export")!.hidden = !!data.groupId;
+						// Resources can be exported but not imported, because resource bookings need GroupOffice's handling
+						target.findChild("export")!.disabled = !data.myRights.mayAdmin;
 						target.findChild("import")!.hidden = !!data.groupId;
 					}
 				}

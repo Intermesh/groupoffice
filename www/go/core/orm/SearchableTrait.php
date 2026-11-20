@@ -119,7 +119,10 @@ trait SearchableTrait {
 		$search->modifiedAt = $this->getSearchModifiedAt();
 		$search->rebuild = false;
 
-		if($this->includeInSearch()) {
+		// The search record is always saved because links depend on it. Excluded entities just don't get keywords.
+		$includeInSearch = $this->includeInSearch() && !Search::isExcluded(static::entityType());
+
+		if($includeInSearch) {
 			$keywords = $this->getSearchKeywords();
 
 			if (!isset($keywords)) {
@@ -161,7 +164,7 @@ trait SearchableTrait {
 			throw new Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
 		}
 
-		if(!$isNew || !$this->includeInSearch()) {
+		if(!$isNew || !$includeInSearch) {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 			$search->change(true);
 		}

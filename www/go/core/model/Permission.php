@@ -28,11 +28,15 @@ class Permission extends Property {
 	 * A permission record grants read access, its bits grant the extra module rights.
 	 *
 	 * @param int $moduleId
-	 * @param int $userId
+	 * @param int|null $userId null when no user is logged in, which has no rights
 	 * @return int|null null if none of the user's groups has a permission record for the module, 0 for read access only
 	 */
-	public static function findUserRights(int $moduleId, int $userId): ?int
+	public static function findUserRights(int $moduleId, ?int $userId): ?int
 	{
+		if ($userId === null) {
+			return null;
+		}
+
 		// BIT_OR() returns 0 on an empty set. Group so that no permission record returns no row and single() returns null.
 		$rights = go()->getDbConnection()->selectSingleValue("BIT_OR(rights)")
 			->from("core_permission")

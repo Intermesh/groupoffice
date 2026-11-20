@@ -20,8 +20,10 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	search: function (v) {
 		
 		var filter = {};
+
+		const selections = this.entityGrid.getSelectionModel().getSelections().length ? this.entityGrid.getSelectionModel().getSelections() : this.entityGrid.store.getRange();
 		
-		filter.entities = this.entityGrid.getSelectionModel().getSelections().map(function(r){return {name: r.data.entity, filter: r.data.filter};});
+		filter.entities = selections.map(function(r){return {name: r.data.entity, filter: r.data.filter};});
 		
 		if(this.searchField.getValue() !== "") {
 			filter.text = this.searchField.getValue();			
@@ -91,6 +93,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		});
 
 		this.entityGrid = new go.links.EntityGrid({
+			entities: go.Entities.getSearchLinkConfigs(),
 			width: dp(160),
 			mobile:{
 				width: dp(120),

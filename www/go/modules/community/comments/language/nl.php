@@ -15,4 +15,5 @@ return array (
   'Attach file' => 'Bestand bijvoegen',
 	'Imported from mail' => 'Geïmporteed uit email',
   'You were mentioned in a comment by {creator}.' => 'U bent genoemd in een opmerking door {creator}.',
+  'Send this draft?' => 'Dit concept verzenden?',
 );

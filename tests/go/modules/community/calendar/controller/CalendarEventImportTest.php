@@ -102,6 +102,80 @@ class CalendarEventImportTest extends TestCase
 		$this->assertCount(1, $this->eventIds);
 	}
 
+	/**
+	 * An event in the admin calendar with the given UID. With participants, it's an invitation of the admin to an
+	 * external guest, so it is in no other calendar.
+	 */
+	private function adminEvent(string $uid, bool $withParticipants): CalendarEvent
+	{
+		$event = new CalendarEvent();
+		$event->calendarId = $this->adminCalendarId;
+		$event->uid = $uid;
+		$event->title = 'Meeting';
+		$event->timeZone = 'Europe/Amsterdam';
+		$event->start = (new DateTime('+1 week'))->setTime(10, 0, 0, 0);
+		$event->duration = 'PT1H';
+		if ($withParticipants) {
+			$admin = User::findById(User::ID_SUPER_ADMIN, ['email']);
+			$event->setValues(['participants' => [
+				User::ID_SUPER_ADMIN => ['email' => $admin->email, 'name' => 'Admin', 'roles' => ['owner' => true, 'attendee' => true], 'kind' => 'individual', 'participationStatus' => 'accepted'],
+				'guest@example.com' => ['email' => 'guest@example.com', 'name' => 'Guest', 'roles' => ['attendee' => true], 'kind' => 'individual'],
+			]]);
+		}
+		$this->assertTrue($event->save(), json_encode($event->getValidationErrors()));
+		$this->eventIds[] = $event->id;
+		return $event;
+	}
+
+	private function importAsUser(string $ics, string $uid): object
+	{
+		$blob = Blob::fromString($ics);
+		$blob->name = 'invite.ics';
+		$blob->type = 'text/calendar';
+		$blob->staleAt = new DateTime('+1 hour');
+		$this->assertTrue($blob->save(), var_export($blob->getValidationErrors(), true));
+
+		go()->setAuthState(new TemporaryState($this->user->id));
+		$result = $this->controller()->import(['blobIds' => [$blob->id], 'calendarId' => Calendar::fetchPersonal($this->user->id)]);
+
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		$this->eventIds = array_merge($this->eventIds,
+			CalendarEvent::find()->selectSingleValue('cce.id')->where(['eventdata.uid' => $uid])->all());
+		return $result;
+	}
+
+	private function countEventsWithUid(string $uid): int
+	{
+		return (int) go()->getDbConnection()->selectSingleValue('count(*)')
+			->from('calendar_event')->where(['uid' => $uid])->single();
+	}
+
+	public function testInvitationInAnotherCalendarIsSkipped()
+	{
+		$event = $this->adminEvent(uniqid('impinvite'), true);
+		$ics = ICalendarHelper::toVObject(CalendarEvent::findById($event->id))->serialize();
+
+		$result = $this->importAsUser($ics, $event->uid);
+
+		$this->assertSame(0, $result->saved, 'A copy of the invitation must not be imported');
+		$this->assertSame(1, $result->skipped);
+		$this->assertSame(1, $this->countEventsWithUid($event->uid));
+	}
+
+	public function testPlainEventInAnotherCalendarIsImported()
+	{
+		// Like a holiday that is imported in more than one calendar
+		$uid = uniqid('impplain');
+		$this->adminEvent($uid, false);
+		$start = (new DateTime('+1 week'))->format('Ymd\T100000');
+		$end = (new DateTime('+1 week'))->format('Ymd\T110000');
+
+		$result = $this->importAsUser("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//test//EN\r\nBEGIN:VEVENT\r\nUID:$uid\r\nDTSTART:$start\r\nDTEND:$end\r\nSUMMARY:Holiday\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n", $uid);
+
+		$this->assertSame(1, $result->saved);
+		$this->assertSame(2, $this->countEventsWithUid($uid));
+	}
+
 	public function testBlobIdCannotPointOutsideTheBlobStore()
 	{
 		$this->expectException(NotFound::class);

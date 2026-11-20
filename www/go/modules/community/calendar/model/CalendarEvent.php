@@ -71,6 +71,11 @@ class CalendarEvent extends AclItemEntity {
 
 	const UserProperties = ['keywords', 'color', 'freeBusyStatus', 'useDefaultAlerts', 'veventBlobId'];
 
+	/**
+	 * Details of a private event that only its owner may see. Also hidden in the recurrence overrides.
+	 */
+	const PrivateDetails = ['title', 'description', 'location', 'categoryIds'];
+
 //	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 //	const IgnoredPropertiesInException = [
 //		'uid', 'links', 'method', 'privacy', 'prodId',
@@ -257,6 +262,11 @@ class CalendarEvent extends AclItemEntity {
 	/** The start time of the first occurence in the series, or start time if not recurring */
 	protected $firstOccurrence;
 	protected ?string  $ownerId = null; // find calendar owner to see if Private events needs to be altered
+
+	/**
+	 * Set on an instance of patchedInstance(). It is a new copy of the series, so isNew() can't tell who owns it.
+	 */
+	private ?bool $seriesOwnedByCurrentUser = null;
 
 	public static function customFieldsTableName(): string
 	{
@@ -641,7 +651,9 @@ class CalendarEvent extends AclItemEntity {
 			$patchArray['start'] = new DateTime($recurrenceId);
 		}
 
-		$e = JSON::patch($this->copy(), $patchArray);
+		$copy = $this->copy();
+		$copy->seriesOwnedByCurrentUser = $this->currentUserIsOwner();
+		$e = JSON::patch($copy, $patchArray);
 		$e->recurrenceId = $recurrenceId;
 		$e->excluded = isset($this->recurrenceOverrides[$recurrenceId]) && $this->recurrenceOverrides[$recurrenceId]->excluded;
 		unset($e->recurrenceRule, $e->recurrenceOverrides); // , $e->sentBy, $e->relatedTo,
@@ -671,10 +683,35 @@ class CalendarEvent extends AclItemEntity {
 	{
 		parent::internalValidate();
 
+		if ($this->isNew() && self::$fromClient && $this->scheduledEventWithSameUidExists()) {
+			$this->setValidationError('uid', ErrorCode::UNIQUE,
+				go()->t("This event already exists. Open it in your calendar to respond to it.", 'community', 'calendar'));
+		}
+
 		if (isset($this->onlineMeetingService) && !$this->hasValidationErrors()) {
 			$this->addOnlineMeeting($this->onlineMeetingService);
 			$this->onlineMeetingService = null;
 		}
+	}
+
+	/**
+	 * Whether an event with participants and the same UID is already in a calendar. GroupOffice stores such an event
+	 * once for all calendars it's in, so a client must not create a second copy, for example by adding an invitation
+	 * from an e-mail attachment or by importing it. The participants would get two events and their replies would go to
+	 * the wrong address.
+	 */
+	public function scheduledEventWithSameUidExists(): bool
+	{
+		if (empty($this->uid)) {
+			return false;
+		}
+		return (bool) go()->getDbConnection()->selectSingleValue('e.eventId')
+			->from('calendar_event', 'e')
+			->join('calendar_calendar_event', 'cce', 'cce.eventId = e.eventId')
+			->join('calendar_participant', 'p', 'p.eventId = e.eventId')
+			->where(['e.uid' => $this->uid, 'e.recurrenceId' => $this->recurrenceId])
+			->limit(1)
+			->single();
 	}
 
 	/**
@@ -731,6 +768,10 @@ class CalendarEvent extends AclItemEntity {
 				if (!$this->isOrigin && $this->isModified(self::EventProperties)) {
 					// properties may only change by ITip. client is not allowed to change properties of invites
 					throw new Forbidden('Not allowed to edit anything other than per-user properties when isOrigin is false');
+				}
+
+				if ($this->organizerRoleMoved() && empty(\go\modules\community\calendar\Module::get()->getModel()->getUserRights()->mayChangeOrganizer)) {
+					throw new Forbidden('Not allowed to change the organizer');
 				}
 
 				$currPart = $this->calendarParticipant();
@@ -803,6 +844,9 @@ class CalendarEvent extends AclItemEntity {
 					}
 				}
 				$this->replyTo = $owner->email;
+			} else if ($this->organizerChanged()) {
+				// "Change organizer": replies must go to the new organizer, not to the one who created the event
+				$this->replyTo = $this->organizer()->email;
 			}
 		}
 
@@ -903,6 +947,9 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	public function currentUserIsOwner() {
+		if(isset($this->seriesOwnedByCurrentUser)) {
+			return $this->seriesOwnedByCurrentUser;
+		}
 		return $this->isNew() || $this->ownerId === go()->getUserId() ||
 		 ($this->ownerId === null && $this->createdBy === go()->getUserId());
 	}
@@ -948,6 +995,15 @@ class CalendarEvent extends AclItemEntity {
 			$arr['description'] = '';
 			$arr['location'] = '';
 			$arr['categoryIds'] = [];
+			// An exception of the series may have its own details. Leave them out instead of clearing them, so the
+			// client doesn't send empty values back. RecurrenceOverride::setValues() keeps them when it does.
+			if(!empty($arr['recurrenceOverrides'])) {
+				foreach($arr['recurrenceOverrides'] as $recurrenceId => $patch) {
+					if(is_array($patch)) {
+						$arr['recurrenceOverrides'][$recurrenceId] = array_diff_key($patch, array_flip(self::PrivateDetails));
+					}
+				}
+			}
 		}
 		unset($arr['recurrenceId'], $arr['excluded']);
 		return $arr;
@@ -1183,6 +1239,50 @@ class CalendarEvent extends AclItemEntity {
 		]);
 		$this->participants[$principal->id] = $p;
 		return $p;
+	}
+
+	/**
+	 * Whether another participant became the organizer of this event in this save. Only for events that were created
+	 * in GroupOffice. For an invitation from outside, replyTo is the address of the external organizer.
+	 */
+	private function organizerChanged(): bool
+	{
+		if (!$this->isOrigin) {
+			return false;
+		}
+		$previous = $this->previousOrganizer();
+		$organizer = $this->organizer();
+		return $previous && !empty($organizer->email) && strtolower($previous->email) !== strtolower($organizer->email);
+	}
+
+	/**
+	 * Whether the organizer role was moved to another participant or taken away in this save. This needs the
+	 * "mayChangeOrganizer" right. Removing all participants is not a change of the organizer.
+	 */
+	private function organizerRoleMoved(): bool
+	{
+		$previous = $this->previousOrganizer();
+		if (!$previous || empty($this->participants)) {
+			return false;
+		}
+		$organizer = $this->organizer();
+		return !$organizer || strtolower($previous->email) !== strtolower($organizer->email);
+	}
+
+	/**
+	 * The organizer before this save, when the participants changed
+	 */
+	private function previousOrganizer(): ?Participant
+	{
+		if ($this->isNew() || !$this->isModified('participants')) {
+			return null;
+		}
+		foreach ($this->getOldValue('participants') ?? [] as $old) {
+			if ($old->isOwner()) {
+				return $old;
+			}
+		}
+		return null;
 	}
 
 	public function organizer() : ?Participant {

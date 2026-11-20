@@ -217,6 +217,23 @@ class Token extends Entity {
 	}
 
 	/**
+	 * The security token of the old framework for the session of this token
+	 *
+	 * Derived from the CSRF token, so a session that the server cleaned up and that was restored with this access
+	 * token gets the same security token as the one the client already has. It's a hash, so the CSRF token itself
+	 * doesn't end up in URL's of the old framework.
+	 *
+	 * @return string|null Null when the token has no CSRF token yet
+	 */
+	public function getLegacySecurityToken(): ?string
+	{
+		if (!isset($this->CSRFToken)) {
+			return null;
+		}
+		return hash_hmac('sha256', 'GO\Base\Session::security_token', $this->CSRFToken);
+	}
+
+	/**
 	 * Check if the token is expired.
 	 *
 	 * @return boolean
@@ -465,6 +482,9 @@ class Token extends Entity {
 
 		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;
+		if (($securityToken = $this->getLegacySecurityToken()) !== null) {
+			$_SESSION['GO_SESSION']['security_token'] = $securityToken;
+		}
 	}
 	
 	public function oldLogout() {

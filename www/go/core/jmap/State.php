@@ -312,7 +312,11 @@ class State extends AbstractState {
 			'isAdmin' => $this->isAdmin(),
 			'state' => OldState::model()->getFullClientState($this->getUserId()), //todo optimize
 			'CSRFToken' => $this->getToken()->CSRFToken,
+
+			// The client of the old framework sends it with its requests. {@see Token::getLegacySecurityToken()}
+			'securityToken' => $this->getToken()->getLegacySecurityToken()
 		];
+
 	}
 
 	private function fetchCapabilities() {

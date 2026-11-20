@@ -46,40 +46,58 @@ class Router {
 		if(!isset(self::$args)) {
 			global $argv;
 
-			//array_shift($argv);
-			self::$args = array();
-			$count = count($argv);
-			if ($count > 1) {
-				for ($i = 1; $i < $count; $i++) {
-					$arg = $argv[$i];
-					if (substr($arg, 0, 2) == '--') {
-						$eqPos = strpos($arg, '=');
-						if ($eqPos === false) {
-							$key = substr($arg, 2);
-							self::$args[$key] = self::$args[$key] ?? true;
-						} else {
-							$key = substr($arg, 2, $eqPos - 2);
-							self::$args[$key] = substr($arg, $eqPos + 1);
-						}
-					} else if (substr($arg, 0, 1) == '-') {
-						if (substr($arg, 2, 1) == '=') {
-							$key = substr($arg, 1, 1);
-							self::$args[$key] = substr($arg, 3);
-						} else {
-							$chars = str_split(substr($arg, 1));
-							foreach ($chars as $char) {
-								$key = $char;
-								self::$args[$key] = self::$args[$key] ?? true;
-							}
-						}
-					} else {
-						self::$args[] = $arg;
+			self::$args = self::parse(array_slice($argv ?? [], 1));
+		}
+
+		return self::$args;
+	}
+
+	/**
+	 * Parse a list of command line arguments into named variables.
+	 *
+	 * Options take a value after "=" or a space: `--name=value`, `--name value`, `-c=value` or `-c value`.
+	 * When the next argument starts with "-", the option is a flag and gets the value true. So a negative
+	 * number must be given with "=": `--offset=-1`. Combined short flags like `-qv` never take a value.
+	 *
+	 * Arguments that aren't options are added with numeric keys. The first one is the route.
+	 *
+	 * @param string[] $argv The arguments without the script name
+	 * @return array
+	 */
+	public static function parse(array $argv): array
+	{
+		$args = [];
+		$count = count($argv);
+		for ($i = 0; $i < $count; $i++) {
+			$arg = $argv[$i];
+			$nextIsValue = isset($argv[$i + 1]) && substr($argv[$i + 1], 0, 1) != '-';
+			if (substr($arg, 0, 2) == '--') {
+				$eqPos = strpos($arg, '=');
+				if ($eqPos === false) {
+					$key = substr($arg, 2);
+					$args[$key] = $nextIsValue ? $argv[++$i] : ($args[$key] ?? true);
+				} else {
+					$key = substr($arg, 2, $eqPos - 2);
+					$args[$key] = substr($arg, $eqPos + 1);
+				}
+			} else if (substr($arg, 0, 1) == '-') {
+				if (substr($arg, 2, 1) == '=') {
+					$key = substr($arg, 1, 1);
+					$args[$key] = substr($arg, 3);
+				} else if (strlen($arg) == 2 && $nextIsValue) {
+					$args[substr($arg, 1)] = $argv[++$i];
+				} else {
+					$chars = str_split(substr($arg, 1));
+					foreach ($chars as $char) {
+						$args[$char] = $args[$char] ?? true;
 					}
 				}
+			} else {
+				$args[] = $arg;
 			}
 		}
-		
-		return self::$args;
+
+		return $args;
 	}
 
 	/**
