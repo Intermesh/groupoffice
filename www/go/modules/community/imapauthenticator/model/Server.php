@@ -55,7 +55,10 @@ class Server extends Entity {
 	}
 	
 	
-	public function getSmtpPassword() {
+	/**
+	 * The SMTP password for the e-mail accounts this server creates. It's write only, so it's never sent to the client.
+	 */
+	public function decryptSmtpPassword(): ?string {
 		return isset($this->smtpPassword) ? \go\core\util\Crypt::decrypt($this->smtpPassword) : null;
 	}
 	
