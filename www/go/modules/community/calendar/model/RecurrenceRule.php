@@ -59,7 +59,7 @@ class RecurrenceRule {
 		} catch (Exception $e) {
 			return false;
 		}
-		$ridDT->setTime(0,0,0);
+		$ridDT = $ridDT->setTime(0,0,0);
 
 		$from = $ridDT->modify("-1 day");
 		$until = $ridDT->modify("+1 day");
