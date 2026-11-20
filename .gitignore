@@ -87,3 +87,15 @@ dist
 /www/ca.crt
 /scripts/emaildomaincheck/result.json
 /scripts/ignore/
+
+# Local test credentials (do not commit)
+.claude/test-login.local.json
+
+# Playwright MCP scratch (screenshots/snapshots)
+.playwright-mcp/
+
+# PHPUnit's result cache, wherever a module keeps it
+.phpunit.cache/
+
+# Per-directory MCP server config — local tooling, not part of a module
+.mcp.json
