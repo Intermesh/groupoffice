@@ -480,6 +480,9 @@ public function historyLog(): bool|array
 			throw new Forbidden();
 		}
 		$this->archive = $v;
+		if($v) {
+			$this->enabled = false;
+		}
 	}
 
 	protected function canCreate(): bool
