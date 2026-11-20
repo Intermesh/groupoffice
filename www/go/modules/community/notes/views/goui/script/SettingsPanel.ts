@@ -12,6 +12,7 @@ export class SettingsPanel extends AppSettingsPanel {
 		super();
 
 		this.title = t("Notes");
+		this.icon = "note";
 
 		this.form = datasourceform({
 				dataSource: userDS

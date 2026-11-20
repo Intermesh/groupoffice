@@ -12,6 +12,7 @@ export class UserSettingsPanel extends AppSettingsPanel {
 		super();
 
 		this.title = t("Tasks");
+		this.icon = "check";
 
 		this.form = datasourceform({
 				dataSource: userDS

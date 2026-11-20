@@ -26,6 +26,7 @@ export class SystemSettings extends AppSettingsPanel {
 		super();
 
 		this.title = t('DAV Accounts')
+		this.icon = "manage_accounts";
 
 		const store = datasourcestore({
 			dataSource: jmapds('DavAccount'),

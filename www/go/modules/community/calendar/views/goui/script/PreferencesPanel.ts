@@ -26,6 +26,7 @@ export class PreferencesPanel extends AppSettingsPanel {
 	constructor() {
 		super();
 		this.title = t('Calendar');
+		this.icon = "today";
 		// this.cls = 'fit scroll';
 
 		this.calendarStore = datasourcestore({

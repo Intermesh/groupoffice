@@ -9,6 +9,7 @@ export class UserAddressbookSettingsPanel extends AppSettingsPanel {
 		super();
 
 		this.title = t("Address book");
+		this.icon = "contacts";
 
 		this.form = datasourceform({
 				dataSource: userDS

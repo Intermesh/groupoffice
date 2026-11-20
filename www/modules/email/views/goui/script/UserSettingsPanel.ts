@@ -8,6 +8,7 @@ export class UserSettingsPanel extends AppSettingsPanel {
 		super();
 
 		this.title = t("E-mail");
+		this.icon = "email";
 
 		this.form = datasourceform({
 				dataSource: userDS

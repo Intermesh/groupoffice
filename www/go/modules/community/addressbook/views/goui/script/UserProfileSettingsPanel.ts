@@ -30,6 +30,7 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 		super();
 
 		this.title = t("Profile");
+		this.icon = "person";
 
 		this.form = datasourceform({
 				dataSource: contactDS

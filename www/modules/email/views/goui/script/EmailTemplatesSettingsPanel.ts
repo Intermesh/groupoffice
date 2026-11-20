@@ -29,6 +29,7 @@ export class EmailTemplatesSettingsPanel extends AppSettingsPanel {
 		let win:any = undefined;
 
 		this.title = t("E-mail templates");
+		this.icon = "email";
 		this.legacyApi = new LegacyApi("email", "template");
 
 		this.tbl = table({
