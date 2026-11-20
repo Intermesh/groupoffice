@@ -12,7 +12,7 @@ import {
 	QuoteStripper,
 	StoreComponent,
 	StoreEventMap,
-	t,
+	t, tbar,
 	Window
 } from "@intermesh/goui";
 import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
@@ -234,21 +234,9 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			if (comment.section === "draft") {
 				const mayChange = client.user.isAdmin || writtenByUser;
 				commentComp.items.add(
-					comp({cls: "hbox gap"},
+					tbar({cls: "comment-actions"},
 						// Posting the draft sends it, like a reply to the customer of a support ticket
-						btn({
-							cls: "raised",
-							icon: "send",
-							text: t("Send"),
-							disabled: !mayChange,
-							handler: async () => {
-								if (await Window.confirm(t("Send this draft?"))) {
-									commentDS.update(comment.id, {section: null}).catch((err) => {
-										void Window.error(err);
-									});
-								}
-							}
-						}),
+
 						btn({
 							icon: "edit",
 							text: t("Edit"),
@@ -266,6 +254,20 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 							handler: () => {
 								commentDS.confirmDestroy([comment.id]);
 							}
+						}),
+						'->',
+						btn({
+							cls: "filled primary",
+							icon: "send",
+							text: t("Send"),
+							disabled: !mayChange,
+							handler: async () => {
+								if (await Window.confirm(t("Send this draft?"))) {
+									commentDS.update(comment.id, {section: null}).catch((err) => {
+										void Window.error(err);
+									});
+								}
+							}
 						})
 					)
 				);
@@ -274,7 +276,7 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			if (quote) {
 				commentComp.items.add(
 					btn({
-						cls: "raised",
+						cls: "outlined",
 						text: t("More"),
 						handler: (btn) => {
 							commentComp.html = comment.text;
