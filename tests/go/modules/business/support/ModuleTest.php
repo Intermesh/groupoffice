@@ -195,4 +195,33 @@ class ModuleTest extends TestCase
 
 		$this->assertArrayHasKey('reply', $result['created'], json_encode($result));
 	}
+
+	/**
+	 * The customer must not be able to find out the text of private notes and drafts with the "comment" filter
+	 */
+	public function testCustomerCannotSearchPrivateNotes(): void
+	{
+		$secret = uniqid('secret');
+		$result = $this->createAsAgent([
+			$secret . '-private' => ['section' => 'private'],
+			$secret . '-draft' => ['section' => Comment::SECTION_DRAFT]
+		]);
+		$this->assertCount(2, $result['created'], json_encode($result));
+
+		// The filters of the ticket list in the customer portal, and of the agents
+		$query = function (int $userId, array $filter): array {
+			go()->setAuthState(new TemporaryState($userId));
+			return SupportTicket::find(['id'])
+				->filter(['tasklistId' => 'any'] + $filter)
+				->selectSingleValue('task.id')
+				->all();
+		};
+		$customer = ['customerId' => '{{me}}', 'permissionLevel' => SupportList::ACL_LEVEL_SUBMIT_AS_CUSTOMER];
+		$agent = ['permissionLevel' => Acl::LEVEL_READ];
+		$search = ['comment' => '%' . $secret . '%'];
+
+		$this->assertEquals([self::$ticket->id], $query(self::$customer->id, $customer), 'The customer finds the ticket');
+		$this->assertEquals([], $query(self::$customer->id, $customer + $search));
+		$this->assertEquals([self::$ticket->id], $query(self::$agent->id, $agent + $search));
+	}
 }
