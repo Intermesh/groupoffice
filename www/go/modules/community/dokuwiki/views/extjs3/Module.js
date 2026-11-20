@@ -19,9 +19,5 @@ go.Modules.register("community", 'dokuwiki', {
 
 		go.modules.community.dokuwiki.MainPanel.prototype.title = title;
 		this.addPanel(go.modules.community.dokuwiki.MainPanel);
-	},
-
-	systemSettingsPanels: [
-		"go.modules.community.dokuwiki.SystemSettingsPanel"
-	],
+	}
 });

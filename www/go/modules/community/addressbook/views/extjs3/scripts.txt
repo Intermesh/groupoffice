@@ -25,7 +25,6 @@ AddressesField.js
 PhoneNumbersField.js
 DatesField.js
 UrlsField.js
-SystemSettingsPanel.js
 DuplicateDialog.js
 LabelsDialog.js
 BirthdaysPortlet.js

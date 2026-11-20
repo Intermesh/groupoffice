@@ -1,3 +1,2 @@
 Module.js
 MainPanel.js
-SystemSettingsPanel.js
