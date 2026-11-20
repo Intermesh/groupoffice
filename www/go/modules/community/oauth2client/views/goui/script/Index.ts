@@ -1,4 +1,4 @@
-import {authManager, JmapDataSource, modules,} from "@intermesh/groupoffice-core";
+import {authManager, client, JmapDataSource, modules, moduleSystemSettings} from "@intermesh/groupoffice-core";
 import {BaseEntity, btn, t} from "@intermesh/goui";
 import {Settings} from "./Settings";
 
@@ -11,8 +11,14 @@ modules.register({
 		"Oauth2Client",
 	],
 
-	systemSettingsPanels: [Settings]
-
+	async init() {
+		// The connections can only be changed by administrators, as in the server's Oauth2Client permissions
+		client.on("authenticated", ({session}) => {
+			if (session.isAdmin && session.capabilities["go:community:oauth2client"]) {
+				moduleSystemSettings.addPanel("community", "oauth2client", Settings);
+			}
+		});
+	}
 });
 
 export interface Oauth2Client extends BaseEntity {
