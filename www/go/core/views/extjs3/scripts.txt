@@ -175,10 +175,13 @@ users/UserCombo.js
 users/SelectDialogPanel.js
 
 customfields/FieldSetCombo.js
+customfields/ExportDialog.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
 customfields/DetailPanel.js
+customfields/EntityPanel.js
+customfields/EntityDialog.js
 customfields/CustomFieldRelationGrid.js
 customfields/FieldSetDialog.js
 customfields/type/Text.js
