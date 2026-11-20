@@ -14,7 +14,9 @@ class Auth extends Controller {
 		$s = Module::get()->getSettings();
 		return [
 			'success' => true,
-			'jwt' => $s->createJwtToken($params['room'])
+			'jwt' => $s->jaasEnabled
+				? $s->createJaasJwtToken($params['room'], true)
+				: $s->createJwtToken($params['room'])
 		];
 	}
 }
