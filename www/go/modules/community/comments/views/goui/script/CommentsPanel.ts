@@ -83,6 +83,18 @@ export class CommentsPanel extends Component {
 			}
 		});
 
+		// The store only reloads on changes when its list is visible. A panel that is hidden because it's empty would
+		// never show new comments, like a draft that an AI assistant adds, so it reloads itself.
+		const onCommentsChange = () => {
+			if (this.hideWhenEmpty && this.hidden && this.entityId !== undefined && this.commentList.store.loaded && !this.commentList.store.loading) {
+				void this.commentList.store.reload();
+			}
+		};
+		commentDS.on("change", onCommentsChange);
+		this.on("remove", () => {
+			commentDS.un("change", onCommentsChange);
+		});
+
 		this.commentList.on("listready", () => {
 			if (this.focusEditorOnload) {
 				this.commentEditor.editor.focus();
