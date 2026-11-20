@@ -48,7 +48,8 @@ class EmailToolProvider implements ToolProvider
 		$tools = [
 			new Mailboxes($key),
 			new Query($key),
-			new Get($key)
+			new Get($key),
+			new Attachment($key)
 		];
 		foreach ($items as $item) {
 			if ($item->mayWrite) {

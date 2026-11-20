@@ -100,6 +100,7 @@ class EmailToolsTest extends TestCase
 		$this->assertContains('email_mailboxes', $names);
 		$this->assertContains('email_query', $names);
 		$this->assertContains('email_get', $names);
+		$this->assertContains('email_attachment', $names, 'reading attachments only needs read access');
 		$this->assertNotContains('email_draft', $names, 'drafts need write access');
 
 		$names = $this->toolNames($this->key([[$this->account->id, true]]));
@@ -138,6 +139,27 @@ class EmailToolsTest extends TestCase
 		$result = $this->call($this->key([[$this->account->id + 1000, false]]), 'email_query', ['accountId' => (string) $this->account->id]);
 		$this->assertTrue($result['isError']);
 		$this->assertStringContainsString("isn't allowed for this key", $result['structuredContent']['error']);
+	}
+
+	public function testAttachmentOfAccountThatIsNotPickedIsRefused(): void
+	{
+		$result = $this->call($this->key([[$this->account->id + 1000, false]]), 'email_attachment', [
+			'accountId' => (string) $this->account->id, 'mailbox' => 'INBOX', 'uid' => 1, 'number' => '2'
+		]);
+		$this->assertTrue($result['isError']);
+		$this->assertStringContainsString("isn't allowed for this key", $result['structuredContent']['error']);
+	}
+
+	public function testAttachmentNumberIsValidated(): void
+	{
+		$key = $this->key([[$this->account->id, false]]);
+		foreach (['', '2/../1', '2 BODY[]', '1.', 2] as $number) {
+			$result = $this->call($key, 'email_attachment', [
+				'accountId' => (string) $this->account->id, 'mailbox' => 'INBOX', 'uid' => 1, 'number' => $number
+			]);
+			$this->assertTrue($result['isError'], var_export($number, true));
+			$this->assertStringContainsString('"number" must be', $result['structuredContent']['error']);
+		}
 	}
 
 	public function testDraftNeedsCreatePermission(): void
