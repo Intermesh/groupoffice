@@ -139,11 +139,6 @@ usersettings/AppPasswordsFieldset.js
 usersettings/AppPasswordDialog.js
 
 systemsettings/Panel.js
-systemsettings/GeneralPanel.js
-systemsettings/AppearancePanel.js
-systemsettings/NotificationsPanel.js
-systemsettings/AuthenticationPanel.js
-systemsettings/AuthAllowGroupGrid.js
 
 oauth/ClientGrid.js
 oauth/ClientDialog.js
