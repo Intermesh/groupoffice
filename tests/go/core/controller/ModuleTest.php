@@ -175,7 +175,8 @@ class ModuleTest extends TestCase
 	{
 		go()->setAuthState(new TemporaryState(UserModel::ID_SUPER_ADMIN));
 		$groupId = $this->user->getPersonalGroup()->id;
-		$permissions = json_decode(json_encode(ModuleModel::findById($this->coreId)->permissions), true);
+		$original = json_decode(json_encode(ModuleModel::findById($this->coreId)->permissions), true);
+		$permissions = $original;
 		$permissions[$groupId] = ['rights' => ['mayChangeUsers' => true]];
 
 		try {
@@ -184,7 +185,9 @@ class ModuleTest extends TestCase
 			$this->assertNotEmpty($this->storedCoreRights($groupId));
 			$this->assertTrue(ModuleModel::findById($this->coreId)->getUserRights($this->user->id)->mayChangeUsers);
 		} finally {
-			go()->getDbConnection()->delete('core_permission', ['moduleId' => $this->coreId, 'groupId' => $groupId])->execute();
+			// Through the API, so the cached core module and its ACL don't keep the group, which tearDown() deletes
+			$this->update(UserModel::ID_SUPER_ADMIN, ['permissions' => $original]);
 		}
+		$this->assertNull($this->storedCoreRights($groupId));
 	}
 }
