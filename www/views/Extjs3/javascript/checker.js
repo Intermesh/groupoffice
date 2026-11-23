@@ -268,8 +268,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 		this.lastCount = this.reminderStore.getCount();
 
-		//go.Notifier.showNotifications();
-		//window.groupofficeCore.main.notifier.playSound('reminder');
+		window.groupofficeCore.main.notifier.playSound('reminder');
 
 	},
 	

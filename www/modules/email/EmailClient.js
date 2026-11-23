@@ -1088,6 +1088,8 @@ GO.mainLayout.onReady(function(){
 				category:'message',variant:'info'
 			});
 		}
+
+		window.groupofficeCore.main.notifier.playSound('email');
 	});
 
 });
