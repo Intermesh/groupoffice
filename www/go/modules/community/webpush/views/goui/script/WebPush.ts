@@ -8,7 +8,29 @@ function base64encode(v: ArrayBuffer) {
 }
 
 
+let listening = false;
+
+/**
+ * The service worker gets the verification code of a new subscription by push and passes it on, because it has no
+ * access token for the API. Saving it proves the subscription belongs to this browser.
+ */
+function listenForVerification() {
+	if (listening) {
+		return;
+	}
+	listening = true;
+	navigator.serviceWorker.addEventListener('message', (ev: MessageEvent) => {
+		if (ev.data?.type !== 'pushVerification') {
+			return;
+		}
+		void jmapds('PushSubscription').update(ev.data.pushSubscriptionId, {verificationCode: ev.data.verificationCode})
+			.catch(e => console.error("Couldn't verify the push subscription", e));
+	});
+}
+
 export async function subscribe(registration: ServiceWorkerRegistration) {
+	listenForVerification();
+
 	const applicationServerKey = client.session?.capabilities['urn:ietf:params:jmap:webpush-vapid'].applicationServerKey;
 	if (!applicationServerKey)
 		return false;
@@ -52,9 +74,9 @@ export async function subscribe(registration: ServiceWorkerRegistration) {
 	if (subscriptionChanged || !existing) { // then update server entity
 
 		if (existing) {
-			jmapds('PushSubscription').destroy(existing.id);
+			await jmapds('PushSubscription').destroy(existing.id);
 		}
-		jmapds('PushSubscription').create({
+		await jmapds('PushSubscription').create({
 			url: subscription.endpoint,
 			deviceClientId,
 			keys: {

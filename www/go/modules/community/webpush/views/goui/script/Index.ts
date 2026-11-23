@@ -1,9 +1,9 @@
-import {modules} from "@intermesh/groupoffice-core";
+import {client, modules} from "@intermesh/groupoffice-core";
 import {t as coreT} from "@intermesh/goui";
 import {PreferencesPanel} from "./PreferencesPanel";
 import {subscribe} from "./WebPush";
 
-export const t = (key: string, p = 'community', m = 'calendar') => coreT(key, p, m);
+export const t = (key: string, p = 'community', m = 'webpush') => coreT(key, p, m);
 
 modules.register({
 	package: "community",
@@ -22,17 +22,24 @@ modules.register({
 			const registration = await navigator.serviceWorker.register('sw.js', {
 				updateViaCache: 'none'
 			});
-			registration.addEventListener('updatefound', () => {
-				const worker = registration.installing;
+			if (!('PushManager' in window)) {
+				return;
+			}
 
-				console.log('New service worker found:', worker);
-
-				worker?.addEventListener('statechange', () => {
-					console.log('New SW state:', worker.state);
-				});
-			})
-			if (('PushManager' in window)) {
-				subscribe(registration);
+			// The server key comes with the session, so subscribe after logging in. Subscribing fails when the browser
+			// can't push, like in a private window; the rest of GroupOffice works without it.
+			const trySubscribe = () => {
+				if (!client.session?.capabilities["urn:ietf:params:jmap:webpush-vapid"]) {
+					return;
+				}
+				// Subscribing needs an active service worker, which a new one isn't yet
+				navigator.serviceWorker.ready
+					.then(ready => subscribe(ready))
+					.catch(e => console.warn("Couldn't subscribe to push messages", e));
+			};
+			client.on("authenticated", trySubscribe);
+			if (client.session) {
+				trySubscribe();
 			}
 		}
 	}

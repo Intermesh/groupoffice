@@ -1,119 +1,56 @@
-function post(data) {
-	return fetch('api/', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${token}`,
-		},
-		credentials: 'include',
-		body: JSON.stringify(data),
-	})
-		.then(async response => {
-			console.log('POST RESPONSE', response.status, response.statusText);
+/**
+ * Service worker of the web push module
+ *
+ * It shows the push messages of GroupOffice as notifications. The verification code of a new subscription is passed
+ * to the open GroupOffice page, which saves it, because the service worker has no access token for the API.
+ */
 
-			const text = await response.text();
-			console.log('POST BODY', text);
+self.addEventListener('install', () => {
+	self.skipWaiting();
+});
 
-			if (!response.ok) {
-				throw new Error(`HTTP ${response.status}: ${text}`);
-			}
+self.addEventListener('activate', event => {
+	event.waitUntil(self.clients.claim());
+});
 
-			return response;
-		})
-		.catch(error => {
-			console.error('POST FAILED', error);
-			throw error;
-		});
-}
+self.addEventListener('push', event => {
+	const data = event.data ? event.data.json() : {};
 
-self.addEventListener('push', (event) => {
-	const data = event.data?.json();
-
-	if(data.verificationCode) { // PushVerification
-		console.log(data.verificationCode);
+	if (data.verificationCode) {
 		event.waitUntil(
-			post([
-				["PushSubscription/set", {
-					"update": {
-						[data.pushSubscriptionId]: {"verificationCode": data.verificationCode}
-					}
-				}, "sw0"]
-			])
+			self.clients.matchAll({type: 'window', includeUncontrolled: true}).then(windows => {
+				windows.forEach(w => w.postMessage({
+					type: 'pushVerification',
+					pushSubscriptionId: data.pushSubscriptionId,
+					verificationCode: data.verificationCode
+				}));
+			})
 		);
 		return;
 	}
 
 	event.waitUntil(
-		self.registration.showNotification(data.title, {
-			body: data.text,
-			icon: data.icon ?? 'favicon.ico',
-			tag: data.tag ?? data.id, // deduplicates if same notification arrives twice
-			data,
-			actions: data.actions ?? [
-				{ action: 'accept', title: '✓ Accept' },
-				{ action: 'decline', title: '✗ Decline' },
-			],
+		self.registration.showNotification(data.title || 'GroupOffice', {
+			body: data.body || '',
+			icon: data.icon || 'favicon.ico',
+			// The same alert replaces its earlier notification
+			tag: data.tag || (data.id ? 'alert-' + data.id : undefined),
+			data
 		})
 	);
 });
 
+self.addEventListener('notificationclick', event => {
+	event.notification.close();
+	const url = (event.notification.data && event.notification.data.url) || self.registration.scope;
 
-
-
-
-
- // when debuggiong
-self.addEventListener('install', event => {
-	console.log('NEW SW INSTALL');
-
-	self.skipWaiting();
+	event.waitUntil(
+		self.clients.matchAll({type: 'window', includeUncontrolled: true}).then(windows => {
+			const open = windows.find(w => w.url.startsWith(self.registration.scope));
+			if (open) {
+				return open.focus();
+			}
+			return self.clients.openWindow(url);
+		})
+	);
 });
-
-// self.addEventListener('notificationclick', (event) => {
-// 	event.notification.close();
-//
-// 	const payload = event.notification.data;
-// 	//const action = event.action; // 'accept' | 'decline' | '' (body click)
-//
-// 	event.waitUntil(
-// 		clients.openWindow(payload?.url ?? '/')
-// 	);
-
-	// event.waitUntil((async () => {
-	// 	// 1. If there's a headless handler for this action, call it directly
-	// 	const headless = action && payload.headlessActions?.[action];
-	// 	if (headless) {
-	// 		try {
-	// 			await fetch(headless.url, {
-	// 				method: headless.method,
-	// 				headers: {
-	// 					'Content-Type': 'application/json',
-	// 					'Authorization': `Bearer ${headless.authToken}`,
-	// 				},
-	// 				body: headless.body ? JSON.stringify(headless.body) : undefined,
-	// 			});
-	// 			return; // done, no page needed
-	// 		} catch {
-	// 			// fall through to page if fetch fails
-	// 		}
-	// 	}
-	//
-	// 	// 2. Try to hand off to an open page
-	// 	const windowClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-	// 	const existing = windowClients.find(c => c.url.startsWith(self.location.origin));
-	// 	if (existing) {
-	// 		await existing.focus();
-	// 		existing.postMessage({
-	// 			type: 'NOTIFICATION_CLICK',
-	// 			action,
-	// 			payload,
-	// 		});
-	// 		return;
-	// 	}
-	//
-	// 	// 3. No page open — navigate
-	// 	if (payload.actionUrl && clients.openWindow) {
-	// 		await clients.openWindow(payload.actionUrl);
-	// 	}
-	// })());
-//});
