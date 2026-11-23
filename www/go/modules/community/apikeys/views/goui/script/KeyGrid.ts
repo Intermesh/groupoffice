@@ -6,7 +6,7 @@ import {
 	datecolumn,
 	menu,
 	t,
-	Table, browser, menucolumn
+	Table, browser, menucolumn, Window
 } from "@intermesh/goui";
 import {jmapds} from "@intermesh/groupoffice-core";
 
