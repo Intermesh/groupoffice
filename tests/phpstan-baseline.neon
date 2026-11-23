@@ -7655,12 +7655,6 @@ parameters:
 			path: ../www/go/core/webclient/Extjs3.php
 
 		-
-			message: '#^Call to static method decrypt\(\) on an unknown class go\\core\\webclient\\Crypt\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../www/go/core/webclient/Extjs3.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
