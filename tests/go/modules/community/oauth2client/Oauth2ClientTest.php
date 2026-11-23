@@ -183,4 +183,21 @@ class Oauth2ClientTest extends TestCase
 
 		$this->assertSame(self::SECRET, $this->storedSecret($client->id));
 	}
+
+	/**
+	 * The login screen gets the connections before login, so only the OpenID Connect ones, without the secret
+	 */
+	public function testLoginDataHasOnlyOpenIdClientsWithoutSecret(): void
+	{
+		$openId = $this->newClient(['openId' => true]);
+		$mail = $this->newClient(['openId' => false]);
+
+		$data = Module::get()->getLoginData();
+		$ids = array_column($data['clients'] ?? [], 'id');
+
+		$this->assertContains($openId->id, $ids);
+		$this->assertNotContains($mail->id, $ids);
+		$this->assertStringNotContainsString(self::SECRET, json_encode($data));
+		$this->assertSame(['id', 'name', 'provider'], array_keys($data['clients'][0]));
+	}
 }

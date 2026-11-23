@@ -63,6 +63,23 @@ class Module extends core\Module
 	}
 
 
+	/**
+	 * The connections that may be used to sign in with OpenID Connect, for the sign-in buttons of the login screen
+	 */
+	public function getLoginData(): ?array
+	{
+		$clients = Oauth2Client::find(['id', 'name', 'defaultClientId'])->where('openId', '=', true)->orderBy(['name' => 'ASC'])->all();
+		if (!count($clients)) {
+			return null;
+		}
+
+		return ['clients' => array_map(fn(Oauth2Client $c) => [
+			'id' => $c->id,
+			'name' => $c->name,
+			'provider' => DefaultClient::findById($c->defaultClientId)?->name
+		], $clients)];
+	}
+
 	public function defineListeners()
 	{
 		Account::on(Property::EVENT_MAPPING, static::class, 'onMap');

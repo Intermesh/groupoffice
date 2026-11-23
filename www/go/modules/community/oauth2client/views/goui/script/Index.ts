@@ -44,30 +44,18 @@ export const DefaultClientDS = new JmapDataSource<DefaultClient>("DefaultClient"
 
 
 
+// The connections come with the capabilities, because the API can't be used before login. Only the ones for OpenID
+// Connect are sent.
 authManager.on("login", async ({loginWindow}) => {
+	const data = await modules.getLoginData<{clients: {id: string, name: string, provider: string | null}[]}>("community", "oauth2client");
 
-	loginWindow.mask();
-	try {
-		const clientQuery = await Oauth2ClientDS.query({
-			sort: [{property: "name"}]
-		});
-
-		const clients = await Oauth2ClientDS.get(clientQuery.ids);
-
-		for (const c of clients.list) {
-
-			const defClient = await DefaultClientDS.single(c.defaultClientId!);
-
-			loginWindow.addSignInButton(btn({
-				iconCls: `oauth2client-login-${defClient.name}`,
-				text: t("Sign in with {name}").replace("{name}", c.name),
-				handler: () => {
-					document.location = BaseHref + 'go/modules/community/oauth2client/gauth.php/openid/' + c.id;
-				}
-			}))
-		}
-	}finally {
-		loginWindow.unmask();
-	}
-
+	data?.clients.forEach(c => {
+		loginWindow.addSignInButton(btn({
+			iconCls: c.provider ? `oauth2client-login-${c.provider}` : undefined,
+			text: t("Sign in with {name}").replace("{name}", c.name),
+			handler: () => {
+				document.location = BaseHref + 'go/modules/community/oauth2client/gauth.php/openid/' + c.id;
+			}
+		}))
+	});
 })
