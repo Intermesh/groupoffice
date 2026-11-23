@@ -177,30 +177,6 @@ go.Router = (function () {
 //// configuration
 go.Router.config({ mode: 'hash' });
 
-GO.mainLayout.on("boot", function () {
-
-	go.Router.add(/^recover\/([a-f0-9]{40})-?(.*)/, function (hash, redirectUrl) {
-		var recoveryPanel = new go.login.RecoveryDialog();
-		recoveryPanel.show(hash, redirectUrl);
-	}, false);
-
-	// default route
-	go.Router.add(function () {
-		if (go.User.isLoggedIn()) {
-			if(go.Router.getPath() != GO.settings.start_module) {
-				go.Router.goto(GO.settings.start_module);
-			} else
-			{
-				var firstTab = GO.mainLayout.tabPanel.items.itemAt(0);
-				GO.mainLayout.tabPanel.setActiveTab(firstTab);
-			}
-		}
-	});
-});
-
-
-
-
 window.addEventListener('hashchange', function () {
 	go.Router.previousPath = go.Router.loadedPath;
 	go.Router.check();
