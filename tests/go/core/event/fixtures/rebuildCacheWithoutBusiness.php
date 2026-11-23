@@ -8,7 +8,10 @@
  *
  * - "allowed_modules" leaves out business/*, so {@see \go\core\Module::isAvailable()} is false. Without a loader that's
  *   because {@see \go\core\Module::isLicensed()} fails, but the development container has a loader.
- * - Loading a business class other than Module throws.
+ * - Loading a business class other than Module throws. Except the license classes: business/license is not a module,
+ *   and its classes are only loaded after go()->getEnvironment()->hasIoncube(), which is false without a loader (see
+ *   {@see \go\core\Module::isLicensed()} and GO\Professional\Module::hasLicense()). The development container has a
+ *   loader, so that check can't be simulated here. An upgraded database has pro modules that check their license.
  *
  * The bootstrap then calls go()->rebuildCache(). Prints "OK" when that worked.
  */
@@ -16,7 +19,8 @@
 require __DIR__ . '/../../../../../www/vendor/autoload.php';
 
 spl_autoload_register(static function (string $class): void {
-	if (str_starts_with($class, 'go\\modules\\business\\') && !str_ends_with($class, '\\Module')) {
+	if (str_starts_with($class, 'go\\modules\\business\\') && !str_ends_with($class, '\\Module')
+		&& !str_starts_with($class, 'go\\modules\\business\\license\\')) {
 		throw new RuntimeException("Loaded encoded class $class of an unavailable business module");
 	}
 }, true, true);

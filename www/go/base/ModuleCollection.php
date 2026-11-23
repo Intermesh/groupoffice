@@ -244,7 +244,8 @@ class ModuleCollection extends Model\ModelCollection{
 			if(static::isAllowed($module->name, $module->package) && $module->isAvailable())
 				$modules[] = $module;
 		}
-		if(empty(go()->getSettings()->license) || License::isValid()) {
+		// The license class can't be loaded without a loader
+		if(empty(go()->getSettings()->license) || (go()->getEnvironment()->hasIoncube() && License::isValid())) {
 			\GO::cache()->set($cacheKey, $modules);
 		}
 		
