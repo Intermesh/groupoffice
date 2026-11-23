@@ -958,6 +958,18 @@ abstract class Module extends Singleton implements ArrayableInterface {
 	}
 	
 	/**
+	 * Public data for the web client before login, like the sign-in buttons of the login screen
+	 *
+	 * It's in views/goui/capabilities.php, which everybody can load without logging in. So never return secrets.
+	 *
+	 * @return array|null null when the module has nothing to show before login
+	 */
+	public function getLoginData(): ?array
+	{
+		return null;
+	}
+
+	/**
 	 * Get the module settings
 	 * 
 	 * A module must override this function and implement a \go\core\Settings object

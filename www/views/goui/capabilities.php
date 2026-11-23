@@ -24,6 +24,14 @@ foreach($mods as $mod) {
 //		'folder' => (string)$gouiScript
 	];
 
+	$module = $mod->module();
+	if($module instanceof \go\core\Module && $mod->isAvailable()) {
+		$loginData = $module->getLoginData();
+		if($loginData !== null) {
+			$r['loginData'] = $loginData;
+		}
+	}
+
 	if($gouiScript->exists()) {
 		// @intermesh/addressbook-main is revolved via an importmap
 		$r['entry'] =  "@intermesh/" . ($mod->package ?? "legacy"). "-" . $mod->name; //$baseUrl . $gouiScript->getRelativePath(go()->getEnvironment()->getInstallFolder());
