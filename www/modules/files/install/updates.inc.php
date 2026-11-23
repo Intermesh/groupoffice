@@ -402,3 +402,5 @@ $updates['202609071447'][] = "alter table fs_files
 
 $updates['202609071447'][] = "update fs_files set lock_expires_at = unix_timestamp() + 1800 where locked_user_id > 0;";
 
+// Locks without an expiry time don't expire anymore. Before, WOPI could create these when saving a file that wasn't locked.
+$updates['202611231100'][] = "update fs_files set lock_expires_at = unix_timestamp() + 1800 where locked_user_id > 0 and lock_expires_at is null;";

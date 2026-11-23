@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `timeZone` VARCHAR(45) NULL,
     `syncToDevice` TINYINT(1) NOT NULL DEFAULT 0,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'none',
+    `useCreatorAlerts` TINYINT(1) NULL DEFAULT NULL,
 	`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`

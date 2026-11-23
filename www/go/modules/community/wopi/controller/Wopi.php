@@ -147,13 +147,18 @@ class Wopi extends Controller
 //      throw new Exception(409);
 //    }
 //
-    if($file->isLocked(true) && $file->lock_id != $lockID) {
-      Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
-      throw new Exception(409);
-    } else {
-			// for co-editing set to current user
-			$file->locked_user_id = go()->getUserId();
-			$file->ignoreLockChange = true;
+    if($file->isLocked(true)) {
+      if($file->lock_id != $lockID) {
+        Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
+        throw new Exception(409);
+      }
+
+			// for co-editing set to current user. Only when the file is locked, otherwise this would create a lock without
+			// an expiry time, which doesn't expire. A lock that the user set stays theirs.
+			if(!$file->hasUserLock()) {
+				$file->locked_user_id = go()->getUserId();
+				$file->ignoreLockChange = true;
+			}
 		}
 
 		go()->debug("File lock: " . $file->locked_user_id ." / ". $file->lock_id);
@@ -265,7 +270,7 @@ class Wopi extends Controller
       'UserCanRename' => $canWrite,
       'UserCanNotWriteRelative' => !$canWrite,
       'PostMessageOrigin' => $origin,
-      'LastModifiedTime' => date('c', $file->mtime), // ISO 8601 TIME FORMAT	
+      'LastModifiedTime' => gmdate('Y-m-d\TH:i:s.0000000\Z', $file->mtime), // WOPI round-trip format in UTC, Collabora rejects an offset like +00:00
       'UserFriendlyName' => $user->displayName,
       'HostEditUrl' => Request::get()->getBaseUrl() . "/wopi/edit/" . $this->token->serviceId . "/". $file->id,
       'HostViewUrl' => Request::get()->getBaseUrl() . "/wopi/edit/" . $this->token->serviceId . "/". $file->id,
@@ -296,8 +301,11 @@ class Wopi extends Controller
 
     $oldLockId = Request::get()->getHeader("X-WOPI-OldLock");
 
+    // A lock that expired (for example because the editor crashed and never unlocked) doesn't count
+    $isLocked = $file->isLocked(true);
+
     if($oldLockId) {
-      if(!$file->lock_id) {
+      if(!$isLocked) {
         Response::get()->setHeader("X-WOPI-Lock", "");
         throw new Exception(409);
       }
@@ -306,28 +314,44 @@ class Wopi extends Controller
         throw new Exception(409);
       }
 
-			$file->locked_user_id = 0;
-			$file->lock_id ="";
-
-    }
-
-    $id = Request::get()->getHeader("X-WOPI-Lock");
-
-    if($file->lock_id) {
-      if($file->lock_id == $id) {
-        return;
-      }
+    } else if($isLocked && $file->lock_id != Request::get()->getHeader("X-WOPI-Lock") && !$this->hasOwnUserLock($file)) {
       Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
       throw new Exception(409, "Already locked");
     }
 
-		$file->lock($id);
+    // Locking again with the current lock ID refreshes the lock
+		$this->setLock($file, Request::get()->getHeader("X-WOPI-Lock"));
+
+		go()->debug("WOPI: lock($fileId) = " . $file->lock_id);
+  }
+
+  /**
+   * Check if the current user locked the file with "Lock" in the menu. That user may still edit it.
+   */
+  private function hasOwnUserLock(File $file): bool
+  {
+    return $file->hasUserLock() && $file->locked_user_id == go()->getUserId();
+  }
+
+  /**
+   * Set or refresh the WOPI lock of the file
+   *
+   * A lock that the user set with "Lock" in the menu is kept: it gets the WOPI lock ID, but no expiry time, so it stays
+   * after editing.
+   */
+  private function setLock(File $file, string $id): void
+  {
+    if($file->hasUserLock()) {
+      $file->lock_id = $id;
+    } else {
+      $file->lock($id);
+    }
+
 		if(!$file->save()) {
 			throw new Exception(500, "Failed to save file");
 		}
 
-		go()->debug("WOPI: lock($fileId) = " . $file->lock_id);
-		Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
+		Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
   }
 
   /**
@@ -369,13 +393,7 @@ class Wopi extends Controller
 			throw new Exception(409, "Locked by another");
 		}
 
-		$file->lock($id);
-		if(!$file->save()) {
-			throw new Exception(500, "Failed to save file");
-		}
-
-		Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
-
+		$this->setLock($file, $id);
   }
 
   /**
@@ -401,8 +419,13 @@ class Wopi extends Controller
       throw new Exception(409, "Locked by another user");
     }
 
-		$file->lock_id = "";
-		$file->locked_user_id = 0;
+		if($file->hasUserLock()) {
+			// Keep the lock that the user set with "Lock" in the menu, but not with the lock ID of the editor
+			$file->lock_id = uniqid($file->locked_user_id . "-");
+		} else {
+			$file->lock_id = "";
+			$file->locked_user_id = 0;
+		}
 		if(!$file->save()) {
 			throw new Exception(500, "Failed to save file");
 		}

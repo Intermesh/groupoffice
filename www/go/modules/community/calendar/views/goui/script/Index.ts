@@ -47,6 +47,8 @@ export interface Calendar extends BaseEntity {
 	/** Default time zone for events. If null the user's time zone is used */
 	timeZone: string | null
 	syncToDevice: boolean | null
+	/** Use the alerts that the creator of an event set instead of the default alerts (per user) */
+	useCreatorAlerts: boolean | null
 	defaultAlertsWithTime?: Record<string, CalendarDefaultAlert>
 	defaultAlertsWithoutTime?: Record<string, CalendarDefaultAlert>
 	/** Calendar owner id. Null for shared calendars and resources */

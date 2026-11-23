@@ -860,7 +860,11 @@ class CalendarEvent extends AclItemEntity {
 		if($success) {
 			$this->addToKnownCalendars();
 			$this->removeFromKnownCalendars($removedParticipants);
-			$this->updateAlerts($this->forUserId());
+			if(!$this->isNew() && $this->isModified(['alerts', 'useDefaultAlerts'])) {
+				// Other users may get these alerts, see Calendar::getUseCreatorAlerts()
+				$this->resetICalBlobsOfAllUsers();
+			}
+			$this->updateAlerts();
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
 		}
@@ -1071,9 +1075,9 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
-	 * @param int|null $userId null when nobody is logged in. For example when a participant replies on the public invite page.
+	 * Schedule the alerts of every subscriber of the calendar again when the event or its alerts changed.
 	 */
-	private function updateAlerts(?int $userId) : void {
+	private function updateAlerts() : void {
 		if(!CoreAlert::$enabled) {
 			return;
 		}
@@ -1085,20 +1089,7 @@ class CalendarEvent extends AclItemEntity {
 			// loop all calendar subscribers
 			$subscribers = go()->getDbConnection()->query('select userId from calendar_calendar_user where id = '.$this->calendarId.' AND isSubscribed = 1')->fetchAll(\PDO::FETCH_COLUMN);
 			foreach($subscribers as $subscriber) {
-				CoreAlert::deleteByEntity($this, '1', $subscriber); // this will reschedule if recurring and existing
-
-				// string = int comparison
-				if($subscriber != $userId) { // find only default calendar alerts (if any)
-					$calendar = Calendar::findFor($subscriber, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime'])
-						->where('id', '=', $this->calendarId)->single();
-					$alerts =  ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
-				} else {
-					$alerts = $this->alerts();
-				}
-
-				foreach ($alerts as $alert) {
-					$alert->schedule($this, $subscriber);
-				}
+				$this->rescheduleAlertsFor((int) $subscriber);
 			}
 
 		}
@@ -1106,15 +1097,103 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
+	 * Replace the scheduled alerts of a user for this event with the alerts that apply to the user now.
+	 *
+	 * @param int $userId
+	 * @throws Exception
+	 */
+	public function rescheduleAlertsFor(int $userId): void {
+		CoreAlert::delete(
+			(new Query())
+				->where(['entityTypeId' => self::entityType()->getId(), 'entityId' => $this->id, 'userId' => $userId])
+				->setData(['preventDismiss' => true]) // dismissing would schedule the next occurrence
+		);
+		foreach ($this->alertsFor($userId) as $alert) {
+			$alert->schedule($this, $userId);
+		}
+	}
+
+	/**
+	 * The alerts of the event for the user it was loaded for.
+	 *
+	 * @see alertsFor()
 	 * @return Alert[]
 	 */
-	public function alerts() {
-		if($this->useDefaultAlerts) {
-			$calendar = Calendar::findById($this->calendarId, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime']);
-			return ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
-		} else {
-			return $this->alerts ?? [];
+	public function alerts(): array {
+		return $this->alertsFor($this->forUserId());
+	}
+
+	/**
+	 * The alerts of the event for a user:
+	 *
+	 * 1. The alerts the user set on the event.
+	 * 2. Or the alerts the creator set on the event, when {@see Calendar::getUseCreatorAlerts()} is on for the user. In a
+	 *    calendar with an owner these are the alerts of the owner, because {@see checkScheduleFor()} gives the alerts
+	 *    that someone sets when creating an event to the owner.
+	 * 3. Or the default alerts of the user's calendar.
+	 *
+	 * @param int|null $userId null when nobody is logged in
+	 * @return Alert[]
+	 */
+	public function alertsFor(?int $userId): array {
+		[$useDefaultAlerts, $alerts] = $this->ownAlertsOf($userId);
+		if(!$useDefaultAlerts) {
+			return $alerts;
 		}
+		$inherited = $this->inheritedAlertsFor($userId);
+		return $inherited['creator'] ?? $inherited['default'];
+	}
+
+	/**
+	 * The alerts a user gets when the user didn't set alerts on the event: "default" has the default alerts of the
+	 * user's calendar and "creator" the alerts of the creator, when {@see Calendar::getUseCreatorAlerts()} is on for the
+	 * user and the creator set alerts.
+	 *
+	 * @param int|null $userId null when nobody is logged in
+	 * @return array{default: Alert[], creator?: Alert[]}
+	 */
+	public function inheritedAlertsFor(?int $userId): array {
+		$defaultsProp = $this->showWithoutTime ? 'defaultAlertsWithoutTime' : 'defaultAlertsWithTime';
+		$props = ['id', 'ownerId', 'groupId', 'useCreatorAlerts', $defaultsProp];
+		$query = isset($userId) ? Calendar::findFor($userId, $props) : Calendar::find($props);
+		$calendar = $query->where('id', '=', $this->calendarId)->single();
+		if(!$calendar) {
+			return ['default' => []];
+		}
+
+		$inherited = ['default' => $calendar->$defaultsProp ?? []];
+		if(isset($userId) && $calendar->getUseCreatorAlerts()) {
+			$creatorId = $calendar->getOwnerId() ?? $this->createdBy;
+			if(!empty($creatorId) && $creatorId != $userId) {
+				[$creatorUsesDefaultAlerts, $creatorAlerts] = $this->ownAlertsOf((int) $creatorId);
+				if(!$creatorUsesDefaultAlerts && !empty($creatorAlerts)) {
+					$inherited['creator'] = $creatorAlerts;
+				}
+			}
+		}
+		return $inherited;
+	}
+
+	/**
+	 * Whether a user uses the default alerts on this event and the alerts the user set on it. A user without per-user
+	 * data for the event uses the default alerts.
+	 *
+	 * @param int|null $userId
+	 * @return array{0: bool, 1: Alert[]}
+	 */
+	private function ownAlertsOf(?int $userId): array {
+		if($userId === null || $userId === $this->forUserId()) {
+			return [$this->useDefaultAlerts !== false, $this->alerts ?? []];
+		}
+		if(empty($this->id)) {
+			// not saved yet, so other users have no data for it
+			return [true, []];
+		}
+		$event = self::findFor($userId, ['id', 'useDefaultAlerts', 'alerts'])->where('cce.id', '=', $this->id)->single();
+		if(!$event) {
+			return [true, []];
+		}
+		return [$event->useDefaultAlerts !== false, $event->alerts ?? []];
 	}
 
 	/**
@@ -1178,6 +1257,17 @@ class CalendarEvent extends AclItemEntity {
 	public function resetICalBlobsOfAllUsers(): void
 	{
 		go()->getDbConnection()->update('calendar_event_user', ['veventBlobId' => null], ['eventId' => $this->eventId])->execute();
+	}
+
+	/**
+	 * Remove the stored iCalendar data of a user for this event, so it's generated again on the next request. Use this
+	 * when data of the user changed that is not saved with the event, like the alerts the user inherits.
+	 *
+	 * @param int $userId
+	 */
+	public function resetICalBlobOf(int $userId): void
+	{
+		go()->getDbConnection()->update('calendar_event_user', ['veventBlobId' => null], ['eventId' => $this->eventId, 'userId' => $userId])->execute();
 	}
 
 	/**

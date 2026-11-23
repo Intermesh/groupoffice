@@ -44,7 +44,7 @@ class LocksBackend extends \Sabre\DAV\Locks\Backend\PDO
 						$lockInfo = new LockInfo();
 						$lockInfo->token = $fileModel->lock_id;
 						$lockInfo->owner = "go-" . $fileModel->locked_user_id;
-						$lockInfo->timeout = $fileModel->lock_expires_at - time();
+						$lockInfo->timeout = empty($fileModel->lock_expires_at) ? LockInfo::TIMEOUT_INFINITE : $fileModel->lock_expires_at - time();
 						$lockInfo->created = time();
 						$lockInfo->uri = $uri;
 
