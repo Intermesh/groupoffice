@@ -15,26 +15,16 @@ modules.register({
 
 export const OIDConnectClientDS = new JmapDataSource("OIDConnectClient");
 
+// The clients come with the capabilities, because the API can't be used before login
 authManager.on("login", async ({loginWindow}) => {
+	const data = await modules.getLoginData<{clients: {id: string, name: string}[]}>("community", "oidc");
 
-	loginWindow.mask();
-	try {
-		const clientQuery = await OIDConnectClientDS.query({
-			sort: [{property: "name"}]
-		});
-
-		const clients = await OIDConnectClientDS.get(clientQuery.ids);
-
-		clients.list.forEach(c => {
-			loginWindow.addSignInButton(btn({
-				text: t("Sign in with {name}").replace("{name}", c.name),
-				handler: () => {
-					document.location = BaseHref + 'api/page.php/community/oidc/auth/' + c.id;
-				}
-			}))
-		})
-	}finally {
-		loginWindow.unmask();
-	}
-
+	data?.clients.forEach(c => {
+		loginWindow.addSignInButton(btn({
+			text: t("Sign in with {name}").replace("{name}", c.name),
+			handler: () => {
+				document.location = BaseHref + 'api/page.php/community/oidc/auth/' + c.id;
+			}
+		}))
+	});
 })

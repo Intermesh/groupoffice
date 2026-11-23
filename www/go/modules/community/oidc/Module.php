@@ -2,7 +2,6 @@
 namespace go\modules\community\oidc;
 
 use BadRequestException;
-use go\core\App;
 use go\core\auth\Authenticate;
 use go\core\auth\ExternalUserLink;
 use go\core\http\Response;
@@ -33,10 +32,6 @@ class Module extends \go\core\Module
 		return parent::afterInstall($model);
 	}
 
-	public function defineListeners()
-	{
-		App::on(App::EVENT_HEAD, static::class, 'onHead');
-	}
 	public function pageAuth(int|null $clientId = null)
 	{
 		//disable browser caching
@@ -76,32 +71,17 @@ class Module extends \go\core\Module
 
 
 
-	public static function onHead() {
-		$clients = Client::find()->orderBy(['name' => 'DESC'])->all();
-		if(!count($clients)) {
-			return;
+	/**
+	 * The clients for the sign-in buttons of the login screen
+	 */
+	public function getLoginData(): ?array
+	{
+		$clients = Client::find(['id', 'name'])->orderBy(['name' => 'ASC'])->all();
+		if (!count($clients)) {
+			return null;
 		}
-		echo '<script>Ext.override(go.login.LoginDialog, {
 
-		initComponent: go.login.LoginDialog.prototype.initComponent.createSequence(function () {';
-
-		foreach($clients as $client) {
-			echo '
-			this.addSignInButton({
-				xtype: "button",
-				width: "100%",
-				cls: "oidc-signin-btn",
-				text: t("Sign in with {name}").replace("{name}", "'.addslashes($client->name).'"),
-				handler: function() {
-					document.location = BaseHref + \'api/page.php/community/oidc/auth/'.$client->id.'\';
-				}
-			})
-';
-
-		}
-		echo '})
-	});</script>';
-
+		return ['clients' => array_map(fn(Client $c) => ['id' => $c->id, 'name' => $c->name], $clients)];
 	}
 
 }
