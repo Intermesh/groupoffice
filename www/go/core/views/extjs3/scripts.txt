@@ -130,13 +130,6 @@ permissions/ShareWindow.js
 permissions/AclOverviewGrid.js
 
 
-usersettings/VisibleToPanel.js
-usersettings/AccountSettingsPanel.js
-usersettings/LookAndFeelPanel.js
-usersettings/NotificationPanel.js
-usersettings/UserSettingsDialog.js
-usersettings/AppPasswordsFieldset.js
-usersettings/AppPasswordDialog.js
 
 
 
@@ -170,7 +163,6 @@ groups/GroupMemberWindow.js
 
 users/UserGrid.js
 users/CreateUserAccountPanel.js
-users/UserGroupGrid.js
 users/UserCombo.js
 users/SelectDialogPanel.js
 

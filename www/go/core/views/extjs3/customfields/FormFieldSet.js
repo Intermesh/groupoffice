@@ -188,7 +188,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 		}
 
-		if (form.getXType() == "entityform" || form.ownerCt instanceof go.usersettings.UserSettingsDialog) {
+		if (form.getXType() == "entityform") {
 
 			form.getForm().items.each( (field) => {
 				field.on('change', (field) => {

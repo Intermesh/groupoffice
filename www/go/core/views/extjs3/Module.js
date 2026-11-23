@@ -106,9 +106,6 @@ go.Modules.register("core", 'core', {
 		'SpreadSheetExport'
 	],
 
-	userSettingsPanels: [
-		"go.users.UserGroupGrid"
-	],
 	selectDialogPanels: [
 		"go.users.SelectDialogPanel"
 	],

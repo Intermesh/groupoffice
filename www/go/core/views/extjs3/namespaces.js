@@ -7,7 +7,6 @@ Ext.namespace('go.grid.plugin');
 Ext.namespace('go.form');
 Ext.namespace('go.panels');
 Ext.namespace('go.login');
-Ext.namespace('go.usersettings');
 Ext.namespace('go.links');
 Ext.namespace('go.modules');
 Ext.namespace('go.util');
