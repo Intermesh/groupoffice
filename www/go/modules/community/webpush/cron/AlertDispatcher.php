@@ -2,6 +2,8 @@
 
 namespace go\modules\community\webpush\cron;
 
+use go\core\db\Criteria;
+use go\core\db\Query;
 use go\core\model\Alert;
 use go\core\model\CronJob;
 use go\core\model\CronJobSchedule;
@@ -37,74 +39,54 @@ class AlertDispatcher extends CronJob
 
 	public function run(CronJobSchedule $schedule)
 	{
-
 		$now = new DateTime();
 		$now->setTimezone(new \DateTimeZone("UTC"));
-
-		// Fetch unsent, non-stale alerts with their subscriptions
-//		$alerts = go()->getDbConnection()->query("
-//            SELECT
-//                a.id,
-//                a.entityType,
-//                a.entityId,
-//                a.recurrenceId,
-//                a.staleAt,
-//                a.userId,
-//                s.id as subscriptionId,
-//                s.endpoint,
-//                s.p256dh,
-//                s.auth
-//            FROM core_alert a
-//            JOIN core_push_subscription s ON s.userId = a.userId
-//            WHERE a.triggerAt <= :now
-//              AND a.pushedAt IS NULL
-//              AND a.staleAt > :now
-//        ");
+		// Don't push old alerts, like after the module was switched on
+		$from = (clone $now)->modify('-1 day');
 
 		$alerts = Alert::find()
-			->where('triggerAt', '<=', $now->format('Y-m-d H:i'))
-			->andWhere('staleAt', '>', $now->format('Y-m-d H:i')) // it must be stale at some point
-			->andWhere('isSent', '=', 0);
-		//->andWhere(['tag'=>'1']); // the first alert of the array
+			->where('triggerAt', '<=', $now->format('Y-m-d H:i:s'))
+			->andWhere('triggerAt', '>', $from->format('Y-m-d H:i:s'))
+			->andWhere((new Criteria())
+				->where('staleAt', 'IS', null)
+				->orWhere('staleAt', '>', $now->format('Y-m-d H:i:s')))
+			->andWhere('id', 'NOT IN', (new Query())->select('alertId')->from('webpush_pushed_alert'))
+			->all();
 
-		go()->debug($alerts);
+		$pushed = [];
+		$baseUrl = go()->getSettings()->URL;
+		foreach ($alerts as $alert) {
+			$pushed[] = $alert->id;
 
-		$toMarkSent = [];
-		// find active push subscription.
-		foreach ($alerts as $row) {
-			$searchRecord = $row->getModified();
-			$subscriptions = PushSubscription::find()->where(['userId' => $row->userId])->all();
-			foreach ($subscriptions as $subscription) {
-				$payload = json_encode([
-					'title' => $searchRecord->title,
-					'body' => $searchRecord->description, // todo: use Format.shortDateTime($row['recurrenceId'] || event.start); if available
-					//'url' => $this->getUrl($row),
-					'recurrenceId' => $row['recurrenceId'],
-				]);
-
-				$this->webPush->queue($subscription, $payload);
+			$search = $alert->getSearch();
+			if (!$search) {
+				continue;
 			}
-			$toMarkSent[] = $row['id'];
+
+			foreach (PushSubscription::findActiveForUser($alert->userId) as $subscription) {
+				$this->webPush->queue($subscription, json_encode([
+					'id' => $alert->id,
+					'tag' => 'alert-' . $alert->id,
+					'title' => $search->name,
+					'body' => $search->description,
+					'url' => $baseUrl
+				]));
+			}
 		}
 
 		$results = $this->webPush->flush();
 
-		// Handle failed/expired subscriptions
+		// The browser removed the subscription
 		foreach ($results as $result) {
-			if (!$result['success'] && $result['status'] === 410) {
-				// TODO: CHANGE update so client knows it is unsubscribed
-				// Subscription gone — delete it
+			if (!$result['success'] && in_array($result['status'], [404, 410])) {
 				go()->getDbConnection()
-					->delete('core_push_subscription', ['endpoint' => $result['endpoint']])
+					->delete('core_push_subscription', ['url' => $result['endpoint']])
 					->execute();
 			}
 		}
 
-		if ($toMarkSent) {
-			go()->getDbConnection()
-				->update('core_alert', ['isSent' => 1], ['id' => $toMarkSent])
-				->execute();
+		foreach ($pushed as $alertId) {
+			go()->getDbConnection()->insertIgnore('webpush_pushed_alert', ['alertId' => $alertId])->execute();
 		}
-
 	}
 }
