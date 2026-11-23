@@ -1097,6 +1097,23 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
+	 * Replace the scheduled alerts of a user for this event with the alerts that apply to the user now.
+	 *
+	 * @param int $userId
+	 * @throws Exception
+	 */
+	public function rescheduleAlertsFor(int $userId): void {
+		CoreAlert::delete(
+			(new Query())
+				->where(['entityTypeId' => self::entityType()->getId(), 'entityId' => $this->id, 'userId' => $userId])
+				->setData(['preventDismiss' => true]) // dismissing would schedule the next occurrence
+		);
+		foreach ($this->alertsFor($userId) as $alert) {
+			$alert->schedule($this, $userId);
+		}
+	}
+
+	/**
 	 * The alerts of the event for the user it was loaded for.
 	 *
 	 * @see alertsFor()

@@ -300,12 +300,10 @@ class Calendar extends AclOwnerEntity {
 			$this->color = $this->defaultColor;
 		}
 
-		if($this->isModified('defaultAlertsWithTime')) {
-			$this->updateEventAlerts($this->defaultAlertsWithTime);
-		}
-		if($this->isModified('defaultAlertsWithoutTime')) {
-			$this->updateEventAlerts($this->defaultAlertsWithoutTime, false);
-		}
+		$defaultAlertsModified = [
+			0 => $this->isModified('defaultAlertsWithTime'),
+			1 => $this->isModified('defaultAlertsWithoutTime')
+		];
 		if(!$this->isNew() && $this->id === go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId) {
 			$this->isSubscribed = true; // do not let users unsubscribe there personal calendar
 		}
@@ -316,6 +314,14 @@ class Calendar extends AclOwnerEntity {
 		}
 		$wasNew = $this->isNew();
 		$success = parent::internalSave();
+
+		if($success) {
+			foreach($defaultAlertsModified as $showWithoutTime => $modified) {
+				if($modified) {
+					$this->updateEventAlerts((bool) $showWithoutTime);
+				}
+			}
+		}
 
 		if($wasNew && !empty($this->webcalBlob)) {
 			ICalendarHelper::import([$this->webcalBlob], $this->id, 'ignore');
@@ -333,30 +339,21 @@ class Calendar extends AclOwnerEntity {
 	}
 
 	/**
-	 * @param DefaultAlert[] $defaultAlerts
-	 * @param bool $withTime
-	 * @return void
+	 * Schedule the alerts of the current user again for the future events in this calendar that use the default alerts.
+	 *
+	 * @param bool $showWithoutTime true for the full-day events, false for the events with a time
 	 * @throws \Exception
 	 */
-	private function updateEventAlerts($defaultAlerts, $withTime = true) {
-		// find all future eventIds
-		$ids = CalendarEvent::find(['id'])->filter(['after' => date('Y-m-d\TH:i:s')])
-			->andWhere('showWithoutTime', '=', $withTime?0:1)
-			->andWhere('useDefaultAlerts', '=', 1)
-			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
-		if(empty($ids)) return;
-
-		$type=CalendarEvent::entityType()->getId();
-		// delete there alerts
-		\go\core\model\Alert::delete((new Query())->where('entityId', 'in', $ids)
-			->andWhere('entityTypeId', '=', $type)
-			->andWhere('userId', '=', go()->getUserId()));
-		// create new ones
-		$events = CalendarEvent::find()->where('id','IN', $ids);
+	private function updateEventAlerts(bool $showWithoutTime): void {
+		if(!\go\core\model\Alert::$enabled) {
+			return;
+		}
+		// Users without per-user data for an event use the default alerts.
+		$events = CalendarEvent::find()->filter(['inCalendars' => $this->id, 'after' => date('Y-m-d\TH:i:s')])
+			->andWhere('showWithoutTime', '=', $showWithoutTime ? 1 : 0)
+			->andWhere((new Criteria())->where('useDefaultAlerts', '=', 1)->orWhere('useDefaultAlerts', 'IS', null));
 		foreach($events as $event) {
-			foreach($defaultAlerts as $dalert) {
-				$dalert->schedule($event);
-			}
+			$event->rescheduleAlertsFor(go()->getUserId());
 		}
 	}
 
