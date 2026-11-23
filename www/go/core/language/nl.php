@@ -2242,4 +2242,6 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'When you check an item again, run "Update search index" in Tools to add it to the search index again.' => 'Als u een item weer aanvinkt, voer dan "Zoekindex bijwerken" uit bij Gereedschappen om het weer aan de zoekindex toe te voegen.',
   'Drafts' => 'Concepten',
   'System permissions' => 'Systeemrechten',
+  'You have a valid account but you don\'t have access to any of the modules. Please contact the administrator if you feel this is an error.' => 'U hebt een geldig account, maar u hebt geen toegang tot de modules. Neem contact op met de beheerder als u denkt dat dit een fout is.',
+  'Only the first 2000 permissions are shown, without names. Use the filters to see the names.' => 'Alleen de eerste 2000 rechten worden getoond, zonder namen. Gebruik de filters om de namen te zien.',
 );

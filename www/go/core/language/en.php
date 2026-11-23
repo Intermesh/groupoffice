@@ -461,4 +461,11 @@ If you did not request a new password please delete this mail.',
   'Create desktop notification for new e-mails' => 'Create desktop notification for new e-mails',
   'Employee number' => 'Employee number',
   'System permissions' => 'System permissions',
+  'You have a valid account but you don\'t have access to any of the modules. Please contact the administrator if you feel this is an error.' => 'You have a valid account but you don\'t have access to any of the modules. Please contact the administrator if you feel this is an error.',
+  'Only the first 2000 permissions are shown, without names. Use the filters to see the names.' => 'Only the first 2000 permissions are shown, without names. Use the filters to see the names.',
+  'Version: {version}<br/>
+Copyright (c) 2003-{current_year}, {company_name}<br/>
+All rights reserved.' => 'Version: {version}<br/>
+Copyright (c) 2003-{current_year}, {company_name}<br/>
+All rights reserved.',
 );
