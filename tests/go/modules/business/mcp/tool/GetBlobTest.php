@@ -12,7 +12,8 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../McpFixtureTrait.php';
 
 /**
- * get_blob returns text in parts, decompresses gzip, returns images as image content and refuses other binary files
+ * get_blob returns text in parts, decompresses gzip, extracts the text of documents, returns images as image content
+ * and refuses other binary files
  */
 class GetBlobTest extends TestCase
 {
@@ -169,9 +170,74 @@ class GetBlobTest extends TestCase
 		$this->assertStringStartsWith('not an image ', $result['structuredContent']['text']);
 	}
 
+	/**
+	 * @param array<string, string> $entries Name => content
+	 */
+	private static function zip(array $entries): string
+	{
+		$path = \go\core\fs\File::tempFile('zip')->getPath();
+		try {
+			$zip = new \ZipArchive();
+			$zip->open($path, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+			foreach ($entries as $name => $content) {
+				$zip->addFromString($name, $content);
+			}
+			$zip->close();
+			return file_get_contents($path);
+		} finally {
+			unlink($path);
+		}
+	}
+
+	private static function docx(string $text): string
+	{
+		return self::zip([
+			'[Content_Types].xml' => '<Types/>',
+			// The ID makes the content and so the blob unique
+			'word/document.xml' => '<w:document xmlns:w="w"><w:body><w:p><w:r><w:t>' . $text . '</w:t></w:r></w:p>'
+				. '<w:p><w:r><w:t>' . uniqid() . '</w:t></w:r></w:p></w:body></w:document>'
+		]);
+	}
+
+	public function testDocumentText(): void
+	{
+		$lines = [];
+		for ($i = 1; $i <= 300; $i++) {
+			$lines[] = 'Paragraph ' . $i;
+		}
+		$id = $this->createBlob(self::docx(implode('</w:t></w:r></w:p><w:p><w:r><w:t>', $lines)), 'letter.docx');
+
+		$result = $this->callTool(['blobId' => $id, 'length' => 30]);
+		$this->assertFalse($result['isError'], json_encode($result));
+		$this->assertEquals('docx', $result['structuredContent']['extracted']);
+		$this->assertEquals("Paragraph 1\nParagraph 2\nParagr", $result['structuredContent']['text']);
+		$this->assertTrue($result['structuredContent']['hasMore']);
+
+		$search = $this->callTool(['blobId' => $id, 'search' => 'paragraph 250']);
+		$this->assertEquals(['line' => 250, 'text' => 'Paragraph 250'], $search['structuredContent']['matches'][0]);
+	}
+
+	public function testPdf(): void
+	{
+		$pdf = new \go\core\util\PdfRenderer();
+		$pdf->AddPage();
+		$pdf->Write(10, 'Invoice ' . uniqid());
+		$id = $this->createBlob($pdf->Output('', 'S'), 'invoice.pdf', 'application/pdf');
+
+		$result = $this->callTool(['blobId' => $id]);
+		if (trim((string) shell_exec('command -v pdftotext')) === '') {
+			$this->assertTrue($result['isError']);
+			$this->assertStringContainsString('poppler-utils', $result['structuredContent']['error']);
+		} else {
+			$this->assertFalse($result['isError'], json_encode($result));
+			$this->assertEquals('pdf', $result['structuredContent']['extracted']);
+			$this->assertStringStartsWith("--- Page 1 ---\nInvoice ", $result['structuredContent']['text']);
+		}
+	}
+
 	public function testBinaryIsRefused(): void
 	{
-		$id = $this->createBlob("%PDF-1.4\0\1\2" . uniqid(), 'file.pdf', 'application/pdf');
+		$id = $this->createBlob("\0\1\2\3binary" . uniqid(), 'file.bin');
 		$result = $this->callTool(['blobId' => $id]);
 		$this->assertTrue($result['isError']);
 		$this->assertStringContainsString('binary', $result['structuredContent']['error']);
