@@ -412,3 +412,11 @@ $updates['202611231300'][] = function() {
 	\GO\Files\Cron\DeleteExpiredLinksJob::migrateLegacySchedule();
 	\GO\Files\Cron\NotifyFolderChangesJob::migrateLegacySchedule();
 };
+
+// Show the old cron jobs in the scheduled tasks, switched off when they weren't scheduled in the old system
+$updates['202611231500'][] = function() {
+	\GO\Files\Cron\RecalculateDiskUsageJob::installDisabled("24 2 * * *");
+	\GO\Files\Cron\CorrectQuotaUserJob::installDisabled("0 2 * * *");
+	\GO\Files\Cron\DeleteExpiredLinksJob::installDisabled("0 3 * * *");
+	\GO\Files\Cron\NotifyFolderChangesJob::installDisabled("*/15 * * * *");
+};

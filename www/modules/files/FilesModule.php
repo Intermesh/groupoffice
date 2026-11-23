@@ -213,6 +213,9 @@ class FilesModule extends \GO\Base\Module{
 
 		\GO\Files\Cron\RecalculateDiskUsageJob::install("24 2 * * *");
 		\GO\Files\Cron\CorrectQuotaUserJob::install("0 2 * * *");
+		// Off until an administrator switches them on in the scheduled tasks
+		\GO\Files\Cron\DeleteExpiredLinksJob::installDisabled("0 3 * * *");
+		\GO\Files\Cron\NotifyFolderChangesJob::installDisabled("*/15 * * * *");
 		
 		$template = new \GO\files\Model\Template();
 		$template->name=\GO::t("Microsoft Word document", "files");
