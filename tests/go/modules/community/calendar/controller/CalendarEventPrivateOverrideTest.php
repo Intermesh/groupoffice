@@ -282,4 +282,20 @@ class CalendarEventPrivateOverrideTest extends TestCase
 			$this->assertNotNull(EventModel::findById($this->event->id));
 		}
 	}
+
+	/**
+	 * The invitation goes to the participants, who may see the details, also when someone else sends it
+	 */
+	public function testInvitationHasDetailsWhenSentByOthers(): void
+	{
+		$this->addParticipants();
+
+		go()->setAuthState(new TemporaryState(self::$viewer->id));
+		$event = EventModel::findById($this->event->id);
+		$ics = ICalendarHelper::toInvite('CANCEL', $event)->serialize();
+
+		$this->assertStringContainsString('SUMMARY:Private plan', $ics);
+		$this->assertStringContainsString('DESCRIPTION:Series secret', $ics);
+		$this->assertStringNotContainsString('(Private)', $ics);
+	}
 }

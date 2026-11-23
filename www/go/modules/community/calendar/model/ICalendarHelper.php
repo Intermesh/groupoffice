@@ -138,12 +138,16 @@ class ICalendarHelper {
 				}
 			}
 		}
-		// Others may not see who takes part in a private event. Not in toVEvent(), because the invitations to the
-		// participants use it too.
+		// Others only see the time of a private event, like in CalendarEvent::toArray(). Not in toVEvent(), because the
+		// invitations to the participants use it too. Also for the exceptions, which may have their own details.
 		if($event->showAsPrivate()) {
 			foreach($vcalendar->select('VEVENT') as $vevent) {
-				$vevent->remove('ATTENDEE');
-				$vevent->remove('ORGANIZER');
+				if(isset($vevent->SUMMARY)) {
+					$vevent->SUMMARY = '(' . go()->t('Private', 'community', 'calendar') . ')';
+				}
+				foreach(['DESCRIPTION', 'LOCATION', 'CATEGORIES', 'ATTENDEE', 'ORGANIZER'] as $property) {
+					$vevent->remove($property);
+				}
 			}
 		}
 
@@ -224,13 +228,14 @@ class ICalendarHelper {
 		// Sequence is for updates on the event it's used for ITIP
 		if(isset($event->sequence)) $vevent->SEQUENCE = $event->sequence;
 
-		$showAsPrivate = $event->showAsPrivate();
-		if(!empty($event->title)) $vevent->SUMMARY = $showAsPrivate ? '('.go()->t('Private', 'community', 'calendar').')' : $event->title;
-		if(!empty($event->description) && !$showAsPrivate) $vevent->DESCRIPTION = $event->description;
-		if(!empty($event->location) && !$showAsPrivate) $vevent->LOCATION = $event->location;
+		// The details of a private event are hidden in toVObject(), not here, because the invitations to the participants
+		// use this too
+		if(!empty($event->title)) $vevent->SUMMARY = $event->title;
+		if(!empty($event->description)) $vevent->DESCRIPTION = $event->description;
+		if(!empty($event->location)) $vevent->LOCATION = $event->location;
 
 		if(!empty($event->color)) $vevent->COLOR = $event->color;
-		if(!empty($event->categoryIds) && !$showAsPrivate) $vevent->CATEGORIES = implode(',',$event->categoryNames());
+		if(!empty($event->categoryIds)) $vevent->CATEGORIES = implode(',',$event->categoryNames());
 
 		if(!empty($event->freeBusyStatus) && $event->freeBusyStatus == CalendarEvent::FREEBUSY_FREE) $vevent->TRANSP = "TRANSPARENT";
 
