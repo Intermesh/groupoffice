@@ -139,6 +139,19 @@ class WopiControllerTest extends TestCase
 		$this->assertTrue($this->call($controller, 'checkFileInfo', $this->file1->id)['UserCanWrite']);
 	}
 
+	/**
+	 * Collabora rejects a LastModifiedTime with a time zone offset such as +00:00
+	 */
+	public function testLastModifiedTimeIsUtcRoundTripFormat(): void
+	{
+		$controller = $this->controller($this->writeServiceId, $this->file1);
+
+		$info = $this->call($controller, 'checkFileInfo', $this->file1->id);
+
+		$this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$/', $info['LastModifiedTime']);
+		$this->assertEquals($this->file1->mtime, (new \DateTime($info['LastModifiedTime']))->getTimestamp());
+	}
+
 	public function testReadOnlyServiceRefusesWrites(): void
 	{
 		$controller = $this->controller($this->readServiceId, $this->file1);

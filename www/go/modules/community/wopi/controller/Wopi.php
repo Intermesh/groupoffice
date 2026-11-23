@@ -265,7 +265,7 @@ class Wopi extends Controller
       'UserCanRename' => $canWrite,
       'UserCanNotWriteRelative' => !$canWrite,
       'PostMessageOrigin' => $origin,
-      'LastModifiedTime' => date('c', $file->mtime), // ISO 8601 TIME FORMAT	
+      'LastModifiedTime' => gmdate('Y-m-d\TH:i:s.0000000\Z', $file->mtime), // WOPI round-trip format in UTC, Collabora rejects an offset like +00:00
       'UserFriendlyName' => $user->displayName,
       'HostEditUrl' => Request::get()->getBaseUrl() . "/wopi/edit/" . $this->token->serviceId . "/". $file->id,
       'HostViewUrl' => Request::get()->getBaseUrl() . "/wopi/edit/" . $this->token->serviceId . "/". $file->id,
