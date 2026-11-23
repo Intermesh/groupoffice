@@ -215,6 +215,16 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && (empty($this->lock_expires_at) || time() < $this->lock_expires_at);
 	}
 
+	/**
+	 * Check if the file has a lock that a user set with "Lock" in the menu. It has no expiry time, unlike the locks of
+	 * WOPI, DAV and OnlyOffice, and stays until it is unlocked.
+	 *
+	 * @return bool
+	 */
+	public function hasUserLock(): bool {
+		return !empty($this->locked_user_id) && empty($this->lock_expires_at);
+	}
+
 	public function unlockAllowed(){
 		return ($this->locked_user_id==\GO::user()->id || \GO::user()->isAdmin()) && $this->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION);
 	}

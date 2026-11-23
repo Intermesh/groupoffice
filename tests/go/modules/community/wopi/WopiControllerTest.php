@@ -243,6 +243,36 @@ class WopiControllerTest extends TestCase
 	}
 
 	/**
+	 * The user who locked a file with "Lock" in the menu may edit it, and the lock stays after editing
+	 */
+	public function testOwnManualLockAllowsEditing(): void
+	{
+		$this->file1->locked_user_id = $this->user->id;
+		$this->file1->lock_expires_at = null;
+		$this->assertTrue($this->file1->save());
+
+		$controller = $this->controller($this->writeServiceId, $this->file1);
+		$this->lockAs($controller, 'wopi-session');
+
+		$file = File::model()->findByPk($this->file1->id, false, true);
+		$this->assertEquals('wopi-session', $file->lock_id);
+		$this->assertTrue($file->hasUserLock(), 'The lock must keep having no expiry time');
+
+		// Saving checks the lock ID of the editor
+		$this->call($controller, 'checkLock', $file);
+
+		$this->call($controller, 'refreshLock', $file->id);
+		$this->assertTrue(File::model()->findByPk($file->id, false, true)->hasUserLock(), 'A refresh must not set an expiry time');
+
+		$this->call($controller, 'unlock', $file->id);
+		$file = File::model()->findByPk($file->id, false, true);
+		$this->assertTrue($file->hasUserLock(), 'The lock of the user must stay after editing');
+		$this->assertEquals($this->user->id, $file->locked_user_id);
+		$this->assertNotEquals('wopi-session', $file->lock_id);
+		$this->assertTrue($file->isLocked(true));
+	}
+
+	/**
 	 * Saving an unlocked file through WOPI must not lock it, that lock would have no expiry time
 	 */
 	public function testCheckLockDoesNotLockUnlockedFile(): void
