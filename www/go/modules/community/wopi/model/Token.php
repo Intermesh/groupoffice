@@ -41,7 +41,8 @@ class Token extends Entity {
   {
     if(!isset($this->token)) {
       $this->token = bin2hex(random_bytes(16));
-      $this->expiresAt = new DateTime();
+      // In UTC, because the datetime column is saved without conversion and legacy code may change the default time zone
+      $this->expiresAt = new DateTime('now', new \DateTimeZone('UTC'));
       $this->expiresAt->add(new \DateInterval(self::LIFETIME));
     }
 
