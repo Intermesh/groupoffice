@@ -225,7 +225,7 @@ class Module extends core\Module
 
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
-		if (!$ev || !$ev->getPermissionLevel()) {
+		if (!$ev || !$ev->hasPermissionLevel(Acl::LEVEL_READ)) {
 			throw new Forbidden();
 		}
 
