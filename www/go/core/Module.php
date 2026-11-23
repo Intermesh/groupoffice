@@ -285,19 +285,25 @@ abstract class Module extends Singleton {
 		$oldHist = \go\modules\community\history\Module::$enabled;
 		\go\modules\community\history\Module::$enabled = false;
 
+		// Restore both also after a successful uninstall, or the rest of the process doesn't log changes for JMAP sync
+		// and history
 		try {
-			$ret = $this->beforeUninstall();
+			return $this->beforeUninstall() && $this->uninstallModule();
 		} finally {
-			if(empty($ret)) {
-				\go\core\jmap\Entity::$trackChanges = $oldTC;
-				\go\modules\community\history\Module::$enabled = $oldHist;
-			}
+			\go\core\jmap\Entity::$trackChanges = $oldTC;
+			\go\modules\community\history\Module::$enabled = $oldHist;
 		}
+	}
 
-		if(!$ret) {
-			return false;
-		}
-		
+	/**
+	 * Removes the database tables and the module record, after {@see beforeUninstall()}
+	 *
+	 * @return bool
+	 * @throws NotFound
+	 * @throws Exception
+	 */
+	private function uninstallModule(): bool
+	{
 		$this->uninstallDatabase();
 		
 		$model = model\Module::find()->where(['name' => static::getName(), 'package' => static::getPackage()])->single();
