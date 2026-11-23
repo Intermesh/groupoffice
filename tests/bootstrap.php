@@ -26,6 +26,10 @@ $autoLoader->add('go\\', __DIR__);
 $dataFolder = new \go\core\fs\Folder( '/tmp/phpunit');
 
 require(__DIR__ . "/config.php");
+if (!preg_match('/^[a-zA-Z0-9_]+$/', $config['db_name'])) {
+	throw new Exception("Invalid test database name: " . $config['db_name']);
+}
+$dbName = $config['db_name'];
 $config['file_storage_path'] = $dataFolder->getPath();
 $config['tmpdir'] = $dataFolder->getFolder('tmp')->getPath();
 
@@ -70,8 +74,8 @@ try {
 		}
 
 		try {
-			echo "Dropping database 'groupoffice_phpunit'\n";
-			$pdo->query("DROP DATABASE groupoffice_phpunit");
+			echo "Dropping database '" . $dbName . "'\n";
+			$pdo->query("DROP DATABASE `" . $dbName . "`");
 		}catch(\Exception $e) {
 			echo $e->getMessage() ."\n";
 		}
@@ -84,8 +88,8 @@ try {
 		Property::clearCachedRelationStmts();
 
 
-		echo "Creating database 'groupoffice_phpunit'\n";
-		$pdo->query("CREATE DATABASE groupoffice_phpunit");
+		echo "Creating database '" . $dbName . "'\n";
+		$pdo->query("CREATE DATABASE `" . $dbName . "`");
 		$pdo = null;
 	}
 
@@ -138,7 +142,7 @@ try {
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
         echo "Running upgrade: ";
-		$importCmd = 'mysql --skip-ssl -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go250.sql';
+		$importCmd = 'mysql --skip-ssl -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' ' . escapeshellarg($dbName) . ' < ' . __DIR__ . '/upgradetest/go250.sql';
         echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
@@ -163,7 +167,7 @@ try {
     }
 
   } else {
-		echo "Using existing database 'groupoffice_phpunit'\n";
+		echo "Using existing database '" . $dbName . "'\n";
 	}
 	// The pwned module checks every new password with an online service, which makes tests slow and dependent on the network
 	$pwned = \go\core\model\Module::findByName('community', 'pwned');
