@@ -26,4 +26,9 @@ class PushSubscription extends EntityController {
 	{
 		return $this->defaultSet($params);
 	}
+
+	public function changes($params)
+	{
+		return $this->defaultChanges($params);
+	}
 }

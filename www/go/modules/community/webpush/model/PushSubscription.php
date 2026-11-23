@@ -4,6 +4,7 @@ namespace go\modules\community\webpush\model;
 
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
+use go\core\model\Acl;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
@@ -69,15 +70,60 @@ class PushSubscription extends Entity
 
 	protected static function defineFilters(): Filters
 	{
+		// Expired subscriptions are replaced by the client
 		return parent::defineFilters()->add('default', function (Criteria $criteria, $value, Query $query) {
-			$query->andWhere('createdBy', '=', go()->getAuthState()->getUserId())
-				->andWhere('expires', '>', new DateTime());
+			$query->andWhere('expires', '>', new DateTime());
 		}, 'alwaysUsed');
+	}
+
+	/**
+	 * Users only see their own subscriptions
+	 */
+	public static function applyAclToQuery(\go\core\orm\Query $query, int $level = Acl::LEVEL_READ, int|null $userId = null, array|null $groups = null): \go\core\orm\Query
+	{
+		$query->andWhere($query->getTableAlias() . '.userId', '=', $userId ?? go()->getAuthState()->getUserId());
+		return $query;
+	}
+
+	/**
+	 * Every user may subscribe their own devices, and only change their own subscriptions
+	 */
+	protected function internalGetPermissionLevel(): int
+	{
+		$userId = go()->getAuthState()->getUserId();
+		if (!$userId) {
+			return 0;
+		}
+		if ($this->isNew()) {
+			return Acl::LEVEL_MANAGE;
+		}
+		return (string) $this->userId === (string) $userId ? Acl::LEVEL_MANAGE : 0;
+	}
+
+	protected function canCreate(): bool
+	{
+		return go()->getAuthState()->isAuthenticated();
+	}
+
+	/**
+	 * The subscriptions that may receive push messages: verified and not expired. For the cron job, which has no user.
+	 *
+	 * @return self[]
+	 */
+	public static function findActiveForUser(int|string $userId): array
+	{
+		$query = static::internalFind([], true)
+			->where('userId', '=', $userId)
+			->andWhere('verificationCode', 'IS', null)
+			->andWhere('expires', '>', new DateTime());
+		return $query->all();
 	}
 
 	public function internalSave(): bool
 	{
 		if ($this->isNew()) {
+			// A user can only subscribe for themselves
+			$this->userId = (string) go()->getAuthState()->getUserId();
 			$this->verificationCode = $this->generateVerificationCode();
 			$this->expires = (new DateTime())->add(new \DateInterval('PT1H'));
 			$wasNew = true;
