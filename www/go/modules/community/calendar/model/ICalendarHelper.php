@@ -308,12 +308,13 @@ class ICalendarHelper {
 			if(!empty($recurrenceRule->{$jKey})) {
 				$val = $recurrenceRule->{$jKey};
 				if($jKey == 'until') {
-					if(strlen($val) > 10) { // with time
-						$dt = DateTime::createFromFormat('Y-m-d\TH:i:s', $val, $event->timeZone());
+					// iCalendar requires a date for full-day events and a date with time otherwise
+					$dt = $event->recurrenceUntil();
+					if($event->showWithoutTime) {
+						$val = $dt->format('Ymd');
+					} else {
 						$dt->setTimezone(new \DateTimeZone('UTC'));
 						$val = $dt->format('Ymd\THis\Z');
-					} else {
-						$val = strtr($val, ['-' => '']);
 					}
 				} elseif($jKey == 'byDay') {
 					// paste back together

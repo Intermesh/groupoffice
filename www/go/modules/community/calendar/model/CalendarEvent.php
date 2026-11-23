@@ -574,6 +574,50 @@ class CalendarEvent extends AclItemEntity {
 		$this->recurrenceRule = empty($rule) ? null : json_encode($rule);
 	}
 
+	/**
+	 * The end of the recurrence in the time zone of the event, or null when it has no "until".
+	 *
+	 * An "until" without a time includes that whole day, so a daily event at 9:00 until 2026-03-04 still occurs on the 4th.
+	 * JSCalendar only allows a date with time, but the GroupOffice web client saved dates before.
+	 *
+	 * @return DateTime|null
+	 */
+	public function recurrenceUntil(): ?DateTime
+	{
+		$until = $this->getRecurrenceRule()->until ?? null;
+		if(empty($until)) {
+			return null;
+		}
+		if(strlen($until) == 10) {
+			$until .= $this->showWithoutTime ? ' 00:00:00' : ' 23:59:59';
+		}
+		return new DateTime($until, $this->timeZone());
+	}
+
+	/**
+	 * Store "until" as a date for full-day events and as a date with time for events with a time, like iCalendar
+	 * requires the same type as the start. A date becomes the end of that day, so the event keeps its occurrence on that day.
+	 */
+	private function normalizeRecurrenceUntil(): void
+	{
+		$rule = $this->getRecurrenceRule();
+		if(empty($rule->until)) {
+			return;
+		}
+		if($this->showWithoutTime) {
+			if(strlen($rule->until) == 10) {
+				return;
+			}
+			$rule->until = substr($rule->until, 0, 10);
+		} else {
+			if(strlen($rule->until) != 10) {
+				return;
+			}
+			$rule->until .= 'T23:59:59';
+		}
+		$this->setRecurrenceRule($rule);
+	}
+
 //	public function getTitle() {
 //		return $this->title;
 //	}
@@ -839,6 +883,10 @@ class CalendarEvent extends AclItemEntity {
 		}
 
 		$this->checkScheduleFor();
+
+		if($this->isNew() || $this->isModified(['recurrenceRule', 'showWithoutTime'])) {
+			$this->normalizeRecurrenceUntil();
+		}
 
 		if($this->isNew() || $this->isModified(['start','duration','recurrenceRule','recurrenceOverrides'])) {
 			$this->updateOccurrenceSpan();
@@ -1740,8 +1788,8 @@ class CalendarEvent extends AclItemEntity {
 		}
 		if($this->isModified('recurrenceRule')) {
 			$r = $this->getRecurrenceRule();
-			if (isset($r->until)) {
-				$until = (new DateTime($r->until, $this->timeZone()))->add(new DateInterval($this->duration));
+			if (!empty($r->until)) {
+				$until = $this->recurrenceUntil()->add(new DateInterval($this->duration));
 				if ($this->lastOccurrence === null || $until > $this->lastOccurrence) {
 					$this->lastOccurrence = $until;
 				}
