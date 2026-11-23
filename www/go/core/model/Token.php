@@ -344,10 +344,6 @@ class Token extends Entity {
 			$user->lastLogin = new DateTime("now", new DateTimeZone("UTC"));
 			$user->loginCount++;
 
-			if (isset($_COOKIE['GO_LANGUAGE'])) {
-				$user->language = $_COOKIE['GO_LANGUAGE'];
-			}
-
 			if (!$user->save()) { // nosemgrep: go-setter-persists -- Token has no JMAP set method; called by the server only
 				return false;
 			}

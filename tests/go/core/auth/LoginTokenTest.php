@@ -72,6 +72,22 @@ class LoginTokenTest extends TestCase
 		$this->assertNull(Token::findPendingLogin($token->loginToken));
 	}
 
+	/**
+	 * The language cookie can be left by another user of the browser, so a login doesn't save it as the user's language
+	 */
+	public function testLoginKeepsTheLanguageOfTheUser(): void
+	{
+		go()->getDbConnection()->update('core_user', ['language' => 'nl'], ['id' => $this->user->id])->execute();
+		$_COOKIE['GO_LANGUAGE'] = 'de';
+		try {
+			$this->assertTrue($this->pendingLogin()->setAuthenticated());
+		} finally {
+			unset($_COOKIE['GO_LANGUAGE']);
+		}
+
+		$this->assertSame('nl', User::findById($this->user->id, ['language'])->language);
+	}
+
 	public function testUnknownLoginTokenIsNotFound(): void
 	{
 		$this->assertNull(Token::findPendingLogin('unknown'));

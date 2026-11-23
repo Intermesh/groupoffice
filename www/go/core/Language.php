@@ -58,10 +58,15 @@ class Language {
 		}
 
 		if(!isset($this->isoCode)) {
-			if(isset($_COOKIE['GO_LANGUAGE']) && $this->hasLanguage($_COOKIE['GO_LANGUAGE'])) {
+			// The user's own setting wins. The cookie keeps the language for the login screen, and may be left by
+			// another user of this browser.
+			$userLanguage = go()->getAuthState() && go()->getAuthState()->isAuthenticated() ? go()->getAuthState()->getUser(['language'])->language : null;
+			if(isset($userLanguage) && $this->hasLanguage($userLanguage)) {
+				$this->isoCode = $userLanguage;
+			} else if(isset($_COOKIE['GO_LANGUAGE']) && $this->hasLanguage($_COOKIE['GO_LANGUAGE'])) {
 				$this->isoCode = $_COOKIE['GO_LANGUAGE'];
 			} else {
-				$this->isoCode = go()->getAuthState() && go()->getAuthState()->isAuthenticated() ? go()->getAuthState()->getUser(['language'])->language : $this->getBrowserLanguage();
+				$this->isoCode = $this->getBrowserLanguage();
 			}
 		}
 		return $this->isoCode;
