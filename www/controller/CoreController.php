@@ -12,10 +12,7 @@ namespace GO\Core\Controller;
 
 use GO;
 use GO\Base\Util\Number;
-use go\core\ErrorHandler;
-use go\core\http\Client;
 use go\core\util\DateTime;
-use go\core\util\JSON;
 
 
 class CoreController extends \GO\Base\Controller\AbstractController {
@@ -767,92 +764,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		echo json_encode($response);
 	}
 
-	private function getLatestVersionNumber() {
-		$client = new Client();
-
-		$client->setHeader("Accept", "application/vnd.github+json");
-		$client->setHeader("X-GitHub-Api-Version", "2022-11-28");
-		$response = $client->get("https://api.github.com/repos/intermesh/groupoffice/releases");
-
-		if($response['status'] != 200) {
-			return false;
-		}
-		try {
-			$releases = JSON::decode($response['body']);
-
-			$currentVersion = go()->getVersion();
-			foreach ($releases as $release) {
-
-				if($release->prerelease) {
-					continue;
-				}
-
-				$version = substr($release->tag_name, 1);
-				if (version_compare($currentVersion, $version) == -1) {
-					$currentVersion = $version;
-				}
-			}
-
-			return $currentVersion;
-		} catch(\Throwable $e) {
-			ErrorHandler::logException($e);
-			return false;
-		}
-	}
-	
-	
-	protected function actionAbout($params): array
-	{
-
-		$version = go()->getVersion();
-
-		if(go()->getConfig()['checkForUpdates']) {
-			$latestVersion = $this->getLatestVersionNumber();
-
-			if($latestVersion && $latestVersion != $version) {
-				$version .= ' <span class="success">('. go()->t('update available') .': '. $latestVersion . ')</span>';
-			}
-		}
-
-		$about = strtr(go()->t("Version: {version}<br/>Copyright (c) 2003-{current_year}, {company_name}<br/>All rights reserved."),[
-			'{version}' => $version,
-			'{current_year}' => date('Y'),
-			'{company_name}' => 'Group-Office by Intermesh B.V.',
-			'{product_name}' => go()->getConfig()['product_name']
-		]);
-
-		if(!go()->getAuthState()->isAdmin()) {
-			return [
-				'success' => true,
-				'data' => ['about' => $about] // cut off first line with version
-			];
-		}
-
-		$lastRun = go()->getDbConnection()->selectSingleValue('lastRunAt')
-			->from("core_cron_job")
-			->where('name', '=', 'CalculateDiskUsage')
-			->single();
-
-		$fileUsage = (int) go()->getSettings()->fileStorageUsage;
-		$mailUsage = (int) go()->getSettings()->mailboxUsage;
-		$dbUsage = (int) go()->getSettings()->databaseUsage;
-
-		return [
-			'success' => true,
-			'data' => [
-				'about' => $about,
-				'date' => $lastRun ? $lastRun : go()->t("Never"),
-				'users' => \go\core\model\User::find()->where('enabled=1')->selectSingleValue('count(*)')->single(),
-				'mailbox_usage' => $mailUsage,
-				'file_storage_usage' => $fileUsage,
-				'quota' => intval(go()->getConfig()['quota']) * 1024,
-				'database_usage' => $dbUsage,
-				'total_usage' => $dbUsage + $fileUsage + $mailUsage,
-				'has_usage' => true
-			]
-		];
-	}
-	
 	protected function actionThemes($params){
 		$store = new \GO\Base\Data\ArrayStore();
 		
