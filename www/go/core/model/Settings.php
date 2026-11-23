@@ -850,9 +850,12 @@ class Settings extends core\Settings
 			$this->activeSyncCanConnect = "0"; // We save this into a varchar field, which will save a false as an empty string.
 		}
 
-		if(isset($this->logoId)) {
-			//todo settings should have real columns with real keys?
-			$blob = core\fs\Blob::findById($this->logoId);
+		//todo settings should have real columns with real keys?
+		foreach([$this->logoId ?? null, $this->logoIdDark ?? null] as $logoId) {
+			if(!isset($logoId)) {
+				continue;
+			}
+			$blob = core\fs\Blob::findById($logoId);
 			if($blob && isset($blob->staleAt)) {
 				$blob->staleAt = null;
 				$blob->save();

@@ -110,6 +110,49 @@ class BlobTest extends TestCase
 
 
 
+	/**
+	 * The logos of the system settings aren't referenced by a foreign key, so garbage collection must not see them as unused
+	 */
+	public function testLogosAreUsed()
+	{
+		$settings = go()->getSettings();
+		$oldLogoId = $settings->logoId;
+		$oldLogoIdDark = $settings->logoIdDark;
+
+		$light = Blob::fromString("light logo " . uniqid());
+		$light->type = 'text/plain';
+		$light->name = 'logo.txt';
+		$this->assertTrue($light->save());
+
+		$dark = Blob::fromString("dark logo " . uniqid());
+		$dark->type = 'text/plain';
+		$dark->name = 'logo-dark.txt';
+		$this->assertTrue($dark->save());
+
+		try {
+			$this->assertFalse($light->isUsed());
+			$this->assertFalse($dark->isUsed());
+
+			$settings->logoId = $light->id;
+			$settings->logoIdDark = $dark->id;
+			$this->assertTrue($settings->save());
+
+			$this->assertTrue($light->isUsed());
+			$this->assertTrue($dark->isUsed());
+
+			// Saving the settings makes both logos permanent
+			foreach([$light->id, $dark->id] as $id) {
+				$staleAt = go()->getDbConnection()->selectSingleValue('staleAt')->from('core_blob')->where('id', '=', $id)->single();
+				$this->assertNull($staleAt, "Logo blob $id is still stale");
+			}
+		} finally {
+			$settings->logoId = $oldLogoId;
+			$settings->logoIdDark = $oldLogoIdDark;
+			$settings->save();
+			Blob::delete(['id' => [$light->id, $dark->id]]);
+		}
+	}
+
 	public function testParse() {
 		$id1 = sha1("a");
 		$id2 = sha1("b");

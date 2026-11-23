@@ -141,7 +141,8 @@ class Blob extends orm\Entity {
 	public function isUsed(): bool
 	{
 		//TODO: logo must be referenced somewhere. maybe core_settings was a bad idea because it's not relational.
-		if($this->id == go()->getSettings()->logoId) {
+		$settings = go()->getSettings();
+		if($this->id == $settings->logoId || $this->id == $settings->logoIdDark) {
 			return true;
 		}
 
