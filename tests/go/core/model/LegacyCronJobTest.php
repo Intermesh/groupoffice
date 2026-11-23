@@ -40,12 +40,25 @@ class LegacyCronJobTestOldJob extends AbstractCron
 class LegacyCronJobTest extends TestCase
 {
 	private array $oldIds = [];
+	private ?array $existing = null;
+
+	protected function setUp(): void
+	{
+		// The files module installs this job switched off. Put it back after the test.
+		$schedule = CronJobSchedule::findByName('NotifyFolderChangesJob', 'legacy', 'files');
+		$this->existing = $schedule ? ['expression' => $schedule->expression, 'enabled' => $schedule->enabled] : null;
+	}
 
 	protected function tearDown(): void
 	{
 		$this->deleteSchedule();
 		if ($this->oldIds) {
 			go()->getDbConnection()->delete('go_cron', ['id' => $this->oldIds])->execute();
+		}
+		if ($this->existing) {
+			$schedule = NotifyFolderChangesJob::installDisabled($this->existing['expression']);
+			$schedule->enabled = $this->existing['enabled'];
+			$schedule->save();
 		}
 	}
 
@@ -120,5 +133,20 @@ class LegacyCronJobTest extends TestCase
 		$this->insertOld(['minutes' => 'every']);
 
 		$this->assertNull(NotifyFolderChangesJob::migrateLegacySchedule());
+	}
+
+	public function testInstallDisabledShowsAJobThatIsOff()
+	{
+		$this->deleteSchedule();
+
+		$schedule = NotifyFolderChangesJob::installDisabled('*/15 * * * *');
+		$this->assertFalse($schedule->enabled);
+		$this->assertNull($schedule->nextRunAt);
+
+		// An existing schedule is left as it is
+		$schedule->enabled = true;
+		$this->assertTrue($schedule->save());
+		$this->assertTrue(NotifyFolderChangesJob::installDisabled('0 0 * * *')->enabled);
+		$this->assertSame('*/15 * * * *', CronJobSchedule::findByName('NotifyFolderChangesJob', 'legacy', 'files')->expression);
 	}
 }

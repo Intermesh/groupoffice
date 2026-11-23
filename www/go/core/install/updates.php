@@ -1936,3 +1936,8 @@ $updates['202611131500'][] = "alter table core_alert
 $updates['202611231300'][] = function() {
 	\go\core\cron\EmailReminders::migrateLegacySchedule();
 };
+
+// Show the old cron jobs in the scheduled tasks, switched off when they weren't scheduled in the old system
+$updates['202611231500'][] = function() {
+	\go\core\cron\EmailReminders::installDisabled("*/5 * * * *");
+};

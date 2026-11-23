@@ -54,6 +54,32 @@ abstract class LegacyCronJob extends CronJob
 	}
 
 	/**
+	 * Install the schedule switched off, unless the job is scheduled already
+	 *
+	 * The job then shows in the scheduled tasks of the system settings, where an administrator can switch it on and
+	 * change when it runs.
+	 *
+	 * @param string $expression for example "0 0 * * *"
+	 * @throws Exception
+	 */
+	public static function installDisabled(string $expression): CronJobSchedule
+	{
+		$module = Module::findByClass(static::class);
+		$name = substr(static::class, strrpos(static::class, '\\') + 1);
+		$schedule = CronJobSchedule::find()->where(['moduleId' => $module->id, 'name' => $name])->single();
+		if ($schedule) {
+			return $schedule;
+		}
+
+		$schedule = static::install($expression);
+		$schedule->enabled = false;
+		if (!$schedule->save()) {
+			throw new Exception("Couldn't save cronjob " . $schedule->getValidationErrorsAsString());
+		}
+		return $schedule;
+	}
+
+	/**
 	 * Create the schedule from the old go_cron job of the old class, for an upgrade
 	 *
 	 * The minutes, hours, days, months and weekdays of the old job become the expression. Old jobs were switched off by
