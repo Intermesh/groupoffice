@@ -296,8 +296,11 @@ class Wopi extends Controller
 
     $oldLockId = Request::get()->getHeader("X-WOPI-OldLock");
 
+    // A lock that expired (for example because the editor crashed and never unlocked) doesn't count
+    $isLocked = $file->isLocked(true);
+
     if($oldLockId) {
-      if(!$file->lock_id) {
+      if(!$isLocked) {
         Response::get()->setHeader("X-WOPI-Lock", "");
         throw new Exception(409);
       }
@@ -313,14 +316,12 @@ class Wopi extends Controller
 
     $id = Request::get()->getHeader("X-WOPI-Lock");
 
-    if($file->lock_id) {
-      if($file->lock_id == $id) {
-        return;
-      }
+    if($isLocked && $file->lock_id != $id) {
       Response::get()->setHeader("X-WOPI-Lock",$file->lock_id);
       throw new Exception(409, "Already locked");
     }
 
+    // Locking again with the current lock ID refreshes the lock
 		$file->lock($id);
 		if(!$file->save()) {
 			throw new Exception(500, "Failed to save file");

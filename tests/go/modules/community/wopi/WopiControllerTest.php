@@ -4,6 +4,8 @@ namespace go\modules\community\wopi;
 
 use go\core\auth\TemporaryState;
 use go\core\exception\Forbidden;
+use go\core\http\Exception;
+use go\core\http\Request;
 use go\core\model\User;
 use go\modules\community\wopi\controller\Wopi;
 use go\modules\community\wopi\model\Service;
@@ -58,6 +60,7 @@ class WopiControllerTest extends TestCase
 
 	protected function tearDown(): void
 	{
+		$this->setRequestHeaders(null);
 		go()->setAuthState($this->authState);
 		\GO::session()->setCurrentUser(User::ID_SUPER_ADMIN);
 
@@ -118,6 +121,54 @@ class WopiControllerTest extends TestCase
 	private function call(Wopi $controller, string $method, ...$args)
 	{
 		return (new \ReflectionMethod($controller, $method))->invoke($controller, ...$args);
+	}
+
+	/**
+	 * Set the request headers the controller reads, null reads them from the request again
+	 */
+	private function setRequestHeaders(?array $headers): void
+	{
+		(new \ReflectionProperty(Request::class, 'headers'))->setValue(Request::get(), $headers);
+	}
+
+	private function lockAs(Wopi $controller, string $lockId): void
+	{
+		$this->setRequestHeaders(['x-wopi-lock' => $lockId]);
+		$this->call($controller, 'lock', $this->file1->id);
+	}
+
+	/**
+	 * An editor that crashed never unlocks the file. Its lock must not block a new editing session once it expired.
+	 */
+	public function testExpiredLockIsReplaced(): void
+	{
+		$this->file1->lock('crashed-session');
+		$this->file1->lock_expires_at = time() - 1;
+		$this->assertTrue($this->file1->save());
+
+		$this->lockAs($this->controller($this->writeServiceId, $this->file1), 'new-session');
+
+		$file = File::model()->findByPk($this->file1->id, false, true);
+		$this->assertEquals('new-session', $file->lock_id);
+		$this->assertGreaterThan(time(), $file->lock_expires_at);
+	}
+
+	public function testActiveLockIsRefused(): void
+	{
+		$controller = $this->controller($this->writeServiceId, $this->file1);
+		$this->lockAs($controller, 'first-session');
+
+		// Locking again with the same ID refreshes the lock
+		$this->lockAs($controller, 'first-session');
+
+		try {
+			$this->lockAs($controller, 'second-session');
+			$this->fail('A file with an active lock was locked again');
+		} catch (Exception $e) {
+			$this->assertEquals(409, $e->code);
+		}
+
+		$this->assertEquals('first-session', File::model()->findByPk($this->file1->id, false, true)->lock_id);
 	}
 
 	public function testOtherFileIsRefused(): void
