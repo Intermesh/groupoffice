@@ -156,18 +156,11 @@ go.Router = (function () {
 			return this;
 		},
 
+		/**
+		 * The session is no longer valid. Tells the user and reloads to show the login, once.
+		 */
 		login: function() {
-
-			console.warn('redirect to login');
-			//prevent double calls because that made the page load twict
-			//this caused problems with the remember login cookie being regenerated twice
-			// the user received an invalid cookie theft notice
-			if(!this.redirectingToLogin) {
-				alert( t("Your session is no longer valid. Press OK to authenticate."));
-				this.redirectingToLogin = true;
-				document.location.href = BaseHref;
-
-			}
+			window.groupofficeCore.client.sessionExpired();
 		}
 	});
 
