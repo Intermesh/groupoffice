@@ -150,4 +150,41 @@ class ModuleTest extends TestCase
 		$this->assertArrayNotHasKey($this->coreId, $result['notUpdated'] ?? [], var_export($result['notUpdated'][$this->coreId] ?? null, true));
 		$this->assertSame(Acl::LEVEL_READ, Group::entityType()->getDefaultAcl()[$groupId] ?? null);
 	}
+
+	private function storedCoreRights(int $groupId): ?int
+	{
+		$rights = go()->getDbConnection()->selectSingleValue('rights')->from('core_permission')
+			->where(['moduleId' => $this->coreId, 'groupId' => $groupId])->single();
+		return $rights === null ? null : (int) $rights;
+	}
+
+	/**
+	 * The System permissions page of the system settings sends the core permissions. Only administrators may change
+	 * them, otherwise a user could give themselves the right to change users.
+	 */
+	public function testUserMayNotChangeCorePermissions()
+	{
+		$groupId = $this->user->getPersonalGroup()->id;
+		$result = $this->update($this->user->id, ['permissions' => [$groupId => ['rights' => ['mayChangeUsers' => true]]]]);
+
+		$this->assertSame('forbidden', $result['notUpdated'][$this->coreId]->type ?? null);
+		$this->assertNull($this->storedCoreRights($groupId));
+	}
+
+	public function testAdminMayChangeCorePermissions()
+	{
+		go()->setAuthState(new TemporaryState(UserModel::ID_SUPER_ADMIN));
+		$groupId = $this->user->getPersonalGroup()->id;
+		$permissions = json_decode(json_encode(ModuleModel::findById($this->coreId)->permissions), true);
+		$permissions[$groupId] = ['rights' => ['mayChangeUsers' => true]];
+
+		try {
+			$result = $this->update(UserModel::ID_SUPER_ADMIN, ['permissions' => $permissions]);
+			$this->assertArrayNotHasKey($this->coreId, $result['notUpdated'] ?? [], var_export($result['notUpdated'][$this->coreId] ?? null, true));
+			$this->assertNotEmpty($this->storedCoreRights($groupId));
+			$this->assertTrue(ModuleModel::findById($this->coreId)->getUserRights($this->user->id)->mayChangeUsers);
+		} finally {
+			go()->getDbConnection()->delete('core_permission', ['moduleId' => $this->coreId, 'groupId' => $groupId])->execute();
+		}
+	}
 }

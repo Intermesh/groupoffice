@@ -2241,4 +2241,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Uncheck the items that you don\'t want to find in the search at the top. Their keywords are removed from the search index, which saves space and makes searching faster. Existing links to these items keep working, but you can\'t search for them when you create a link.' => 'Vink de items uit die u niet wilt vinden met het zoeken bovenaan. Hun trefwoorden worden uit de zoekindex verwijderd. Dat bespaart ruimte en maakt het zoeken sneller. Bestaande koppelingen naar deze items blijven werken, maar u kunt ze niet zoeken als u een koppeling maakt.',
   'When you check an item again, run "Update search index" in Tools to add it to the search index again.' => 'Als u een item weer aanvinkt, voer dan "Zoekindex bijwerken" uit bij Gereedschappen om het weer aan de zoekindex toe te voegen.',
   'Drafts' => 'Concepten',
+  'System permissions' => 'Systeemrechten',
 );

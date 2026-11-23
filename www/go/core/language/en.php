@@ -460,4 +460,5 @@ If you did not request a new password please delete this mail.',
   'Drafts' => 'Drafts',
   'Create desktop notification for new e-mails' => 'Create desktop notification for new e-mails',
   'Employee number' => 'Employee number',
+  'System permissions' => 'System permissions',
 );
