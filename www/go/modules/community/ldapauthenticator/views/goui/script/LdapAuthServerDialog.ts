@@ -22,6 +22,7 @@ export class LdapAuthServerDialog extends FormWindow {
 	private syncUsersDelePercFld: NumberField;
 	private syncGroupsDelePercFld: NumberField;
 	private syncGroupsDeleteCb: CheckboxField;
+	private syncGroupsCb!: CheckboxField;
 
 	constructor() {
 		super("LdapAuthServer");
@@ -371,6 +372,7 @@ export class LdapAuthServerDialog extends FormWindow {
 		this.syncGroupsDelePercFld = numberfield({
 			name: "syncGroupsMaxDeletePercentage",
 			label: t("Max delete percentage", "community", "ldapauthenticator"),
+			hidden: true,
 			value: 5,
 			decimals: 0,
 			max: 100
@@ -379,9 +381,10 @@ export class LdapAuthServerDialog extends FormWindow {
 			type: "switch",
 			label: t("Delete groups"),
 			name: "syncGroupsDelete",
+			hidden: true,
 			listeners: {
-				change: ({newValue, oldValue}) => {
-					this.syncGroupsDelePercFld.hidden = !newValue;
+				setvalue: ({newValue}) => {
+					this.syncGroupsDelePercFld.hidden = !newValue || !this.syncGroupsCb?.value;
 				}
 			}
 		});
@@ -401,22 +404,25 @@ export class LdapAuthServerDialog extends FormWindow {
 						}
 						this.syncUsersDeleteCb.disabled = !newValue;
 						this.syncUsersDelePercFld.disabled = !newValue;
-						this.syncGroupsDelePercFld.hidden = !this.syncUsersDeleteCb.value;
 						// this.syncUsersDeleteCb.hidden = !newValue;
 					}
 				}
 			}),
 			this.syncUsersDeleteCb,
 			this.syncUsersDelePercFld,
-			checkbox({
+			this.syncGroupsCb = checkbox({
 				type: "switch",
 				value: false,
 				label: t('Synchronize groups'),
 				name: 'syncGroups',
 				listeners: {
-					change: ({newValue, oldValue}) => {
-						this.syncGroupsDeleteCb.value = !newValue;
-						this.syncGroupsDeleteCb.hidden = !newValue
+					setvalue: ({newValue}) => {
+						this.syncGroupsDeleteCb.hidden = !newValue;
+						this.syncGroupsDelePercFld.hidden = !newValue || !this.syncGroupsDeleteCb.value;
+					},
+					change: () => {
+						// Deleting groups must be switched on deliberately, like in the old ExtJS form
+						this.syncGroupsDeleteCb.value = false;
 					}
 				}
 			}),
