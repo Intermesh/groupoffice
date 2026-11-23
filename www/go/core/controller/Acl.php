@@ -132,7 +132,7 @@ class Acl extends Controller {
 
 		//$level = "CASE ag.level WHEN 10 THEN 'Read' WHEN 20 THEN 'Read/Add' WHEN 30 THEN 'Write' WHEN 40 THEN 'Write/Delete' WHEN 50 THEN 'Manage' ELSE 'Other' END as level";
 		$statement = \go()->getDbConnection()
-			->select('ag.level, a.entityTypeId as typeId, e.name as type, a.entityId, m.name as module, IFNULL(g.isUserGroupFor, 0) as userGroup, g.name as username')
+			->select('ag.level, a.entityTypeId as typeId, e.name as type, a.entityId, m.name as module, m.package, IFNULL(g.isUserGroupFor, 0) as userGroup, g.name as username')
 			->from('core_acl_group', 'ag')
 			->join('core_acl', 'a', 'ag.aclId = a.id')
 			->join('core_group', 'g', 'g.id = ag.groupId')
@@ -190,11 +190,12 @@ class Acl extends Controller {
 					$items = $cls::find()->where('id', 'IN', $ids);
 				}
 				foreach($items as $item) {
-					$names[$item->id] = $item->title();
+					// IDs are only unique per entity type
+					$names[$typeId][$item->id] = $item->title();
 				}
 			}
 			foreach($acgs as $record) {
-				$record->name = isset($names[$record->entityId]) ? $names[$record->entityId] : go()->t("Unknown");
+				$record->name = $names[$record->typeId][$record->entityId] ?? go()->t("Unknown");
 			}
 		}
 
