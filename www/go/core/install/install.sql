@@ -976,7 +976,9 @@ CREATE TABLE `core_oauth_client` (
   `isConfidential` tinyint(1) NOT NULL,
   `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `redirectUri` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `secret` varchar(128) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
+  `secret` varchar(128) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `registration` varchar(16) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `modifiedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1181,11 +1183,18 @@ CREATE TABLE `core_permission` (
           ON UPDATE NO ACTION)
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create index core_change_modSeq_entityTypeId_entityId_destroyed_index
-    on core_change (modSeq, entityTypeId, entityId, destroyed);
+-- create index core_change_modSeq_entityTypeId_entityId_destroyed_index
+--     on core_change (modSeq, entityTypeId, entityId, destroyed);
+--
+-- create index core_change_user_modSeq_userId_entityTypeId_entityId_index
+--     on core_change_user (modSeq, userId, entityTypeId);
 
-create index core_change_user_modSeq_userId_entityTypeId_entityId_index
-    on core_change_user (modSeq, userId, entityTypeId);
+
+ALTER TABLE core_change
+    ADD INDEX aclId_entityTypeId_modSeq (aclId, entityTypeId, modSeq, entityId, destroyed);
+
+ALTER TABLE core_change_user
+    ADD INDEX userId_entityTypeId_modSeq (userId, entityTypeId, modSeq, entityId);
 
 
 alter table core_customfields_field_set

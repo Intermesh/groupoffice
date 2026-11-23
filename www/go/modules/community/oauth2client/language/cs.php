@@ -14,4 +14,10 @@ return array (
   'Client Id' => 'ID klienta',
   'API Project Id' => 'ID API projektu',
   'Use this connection for single signon with OpenID Connect' => 'Použít toto spojení pro SSO s OpenID Connect',
+  'Hello' => 'Dobrý den',
+  'OAuth2 authentication was successful.' => 'Ověření OAuth2 proběhlo úspěšně.',
+  'Click here' => 'Klikněte sem',
+  'to close this window.' => 'pro zavření tohoto okna.',
+  'OAuth2 connection' => 'Připojení OAuth2',
+  'Request or update a refresh token in a separate window.' => 'Vyžádat nebo aktualizovat obnovovací token v samostatném okně.',
 );

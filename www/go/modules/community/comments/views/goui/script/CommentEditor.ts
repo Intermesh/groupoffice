@@ -90,10 +90,10 @@ export class CommentEditor extends Component {
 								img.dataset.blobId = r.id;
 								img.removeAttribute("id");
 							}
-							Notifier.success("Uploaded " + file.name + " successfully");
+							Notifier.success(t("Uploaded {name} successfully").replace("{name}", file.name));
 						}).catch((err) => {
 							console.error(err);
-							Notifier.error("Failed to upload " + file.name);
+							Notifier.error(t("Failed to upload {name}").replace("{name}", file.name));
 						}).finally(() => {
 							root.unmask();
 						});

@@ -28,6 +28,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.el.on('keydown', (e: KeyboardEvent) => {
 			if(e.key == 'Delete') {
 				this.selected.forEach(item => {
+					if(item.isBusyOnly) return;
 					const i = this.viewModel.indexOf(item);
 					if(i > -1) {
 						item.remove();
@@ -175,7 +176,15 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 	protected updateItems() {
 		this.continues = [];
 		this.iterator = 0;
-		this.viewModel.sort((a,b) => a.start.date < b.start.date ? -1 : 1);
+		this.viewModel.sort((a,b) => {
+			if (a.start.date < b.start.date) {
+				return -1;
+			}
+			if (a.start.date > b.start.date) {
+				return 1;
+			}
+			return (a.data.id < b.data.id ? -1 : 1);
+		});
 		for(const [ws, container] of this.weekRows) {
 			container.append(...this.drawWeek(ws));
 			this.slots.forEach((v, i) => {

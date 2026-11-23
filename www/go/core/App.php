@@ -470,6 +470,9 @@ namespace go\core {
 				// IP addresses or CIDR ranges of reverse proxies / load balancers that set "X-Forwarded-For"
 				"trustedProxies" => [],
 				"wopiAllowInternal" => false, // Allow WOPI service URLs that resolve to private/loopback addresses
+				"davclientAllowInternal" => false, // Allow DAV client accounts on servers that resolve to private/loopback addresses
+				"searchMaxExecutionTime" => 10, // Seconds after which the database aborts a global search or links query. 0 for no limit.
+				"passwordHashCost" => null, // bcrypt cost of user passwords, OAuth client secrets and remember me tokens. Null uses the PHP default. Only lower it for tests.
 				"theme" => "Paper",
 				"allow_themes" => true,
 				"file_storage_path" => '/var/lib/groupoffice',
@@ -1123,6 +1126,10 @@ namespace go\core {
 
 			//Avoid session id in url's to prevent session hijacking.
 			ini_set('session.use_only_cookies',1);
+
+			// Don't accept session ID's that weren't created by the server. Otherwise somebody could choose the ID of
+			// another user's session.
+			ini_set('session.use_strict_mode', 1);
 
 			session_set_cookie_params([
 				'httponly' => true,

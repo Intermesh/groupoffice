@@ -3,6 +3,11 @@ return [
 	'name' => 'Calendar',
 	'description' => 'A powerful scheduling calendar for teams and individuals. It helps you organize events, manage availability, and coordinate with others in real-time. With support for recurring events, shared calendars, and automatic invite handling, it simplifies planning across time zones and organizations. The fast, modern web interface offers multiple views to give you full control over tracking personal appointments or managing team schedules. Smart filters and custom views make navigating busy calendars easy.',
 	'CalendarEvent' => 'Event',
+	'Show event in category color' => 'Show event in category color',
+	'Only when one calendar is selected and the event has one category' => 'Only when one calendar is selected and the event has one category',
+	'Print week and workweek in a grid with hours' => 'Print week and workweek in a grid with hours',
+	'Use the notifications of the creator' => 'Use the notifications of the creator',
+	'Get the notifications that the creator set on an event instead of your default notifications' => 'Get the notifications that the creator set on an event instead of your default notifications',
 
 
 	'mayChangeCalendars'=> 'Create/Delete Calendars',
@@ -37,4 +42,7 @@ return [
 		'declined' => 'You have declined the event',
 		'tentative' => 'You are tentative about the event',
 	],
+	'This event already exists. Open it in your calendar to respond to it.' => 'This event already exists. Open it in your calendar to respond to it.',
+	'Only events from the first day of last month onward are published' => 'Only events from the first day of last month onward are published',
+	'Public URL' => 'Public URL',
 ];

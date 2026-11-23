@@ -3,6 +3,8 @@ echo "Converting existing categories from user to calendar\n";
 
 //require_once('../../../../GO.php');
 
+// Upgrade script that converts the categories of all users
+// nosemgrep: go-acl-bypass-not-restored
 \GO::$ignoreAclPermissions=true;
 
 $oldCategories = array();

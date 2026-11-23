@@ -50,7 +50,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			}
 
 			if(v.addressBookId) {
-				this.organizationsField.allowNew.addressBookId = v.addressBookId;
+				this.organizationsField.comboBox.allowNew.addressBookId = v.addressBookId;
 			}
 		}, this);
 	},
@@ -276,24 +276,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						entityStore: "Contact",
 						displayField: "name",
 						valueField: 'id',
-						createDialog: go.modules.community.addressbook.ContactDialog,
-						allowNew: {
-							isOrganization: true,
-							addressBookId: go.User.addressBookSettings.defaultAddressBookId 
-						},
-						comboStoreConfig: {
-							sortInfo: {
-								field: 'name',
-								direction: 'ASC'
-							},
-							filters:  {
-								defaults: {
-									isOrganization: true
-								}
-							}
-						},
-						name: "organizationIds",
-						fieldLabel: t("Organizations")
+						comboBox: new go.modules.community.addressbook.OrganizationCombo({
+							newAddressBookId: go.User.addressBookSettings.defaultAddressBookId
+						}),
+						name: "organizationIds"
 					}),
 
 					this.addressBook = new go.modules.community.addressbook.AddresBookCombo({
@@ -318,7 +304,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							},
 							change: function(cmp, id) {
 								go.customfields.CustomFields.filterFieldSets(this.formPanel);
-								this.organizationsField.allowNew.addressBookId = id;
+								this.organizationsField.comboBox.allowNew.addressBookId = id;
 							}
 						}
 					})

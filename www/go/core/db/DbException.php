@@ -32,6 +32,19 @@ class DbException extends Exception {
 	}
 
 	/**
+	 * Check if the query was aborted because it ran longer than its maximum execution time
+	 *
+	 * MariaDB raises error 1969 when max_statement_time is exceeded, MySQL error 3024 for max_execution_time.
+	 *
+	 * @see Query::maxExecutionTime()
+	 * @return bool
+	 */
+	public function isMaxExecutionTimeExceeded(): bool
+	{
+		return in_array($this->getPrevious()->errorInfo[1] ?? null, [1969, 3024]);
+	}
+
+	/**
 	 * Check if this was a unique key exception
 	 *
 	 * @return bool|string The unique key name

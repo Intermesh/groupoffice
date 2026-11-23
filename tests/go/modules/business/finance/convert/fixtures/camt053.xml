@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<BkToCstmrStmt>
+		<GrpHdr>
+			<MsgId>TEST-1</MsgId>
+			<CreDtTm>2026-11-23T10:00:00</CreDtTm>
+		</GrpHdr>
+		<Stmt>
+			<Id>TEST-STMT-1</Id>
+			<CreDtTm>2026-11-23T10:00:00</CreDtTm>
+			<Acct>
+				<Id>
+					<IBAN>NL91ABNA0417164300</IBAN>
+				</Id>
+			</Acct>
+			<Bal>
+				<Tp>
+					<CdOrPrtry>
+						<Cd>OPBD</Cd>
+					</CdOrPrtry>
+				</Tp>
+				<Amt Ccy="EUR">0.00</Amt>
+				<CdtDbtInd>CRDT</CdtDbtInd>
+				<Dt>
+					<Dt>2026-11-23</Dt>
+				</Dt>
+			</Bal>
+			<Ntry>
+				<Amt Ccy="EUR">12.50</Amt>
+				<CdtDbtInd>CRDT</CdtDbtInd>
+				<Sts>BOOK</Sts>
+				<BookgDt>
+					<Dt>2026-11-23</Dt>
+				</BookgDt>
+				<ValDt>
+					<Dt>2026-11-23</Dt>
+				</ValDt>
+				<BkTxCd/>
+			</Ntry>
+		</Stmt>
+	</BkToCstmrStmt>
+</Document>

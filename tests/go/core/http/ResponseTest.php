@@ -1,6 +1,7 @@
 <?php
 namespace go\core\http;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ResponseTest extends TestCase
@@ -37,5 +38,45 @@ class ResponseTest extends TestCase
 		$header = Response::contentDisposition('attachment', 'résumé.pdf');
 
 		$this->assertSame('attachment; filename="r_sum_.pdf"; filename*=UTF-8\'\'r%C3%A9sum%C3%A9.pdf', $header);
+	}
+
+	public static function contentTypeProvider(): array
+	{
+		return [
+			'html' => ['text/html', false],
+			'html with charset in capitals' => ['TEXT/HTML; charset=utf-8', false],
+			'svg' => ['image/svg+xml', false],
+			'svg without xml' => ['image/svg', false],
+			'xhtml' => ['application/xhtml+xml', false],
+			'text xml' => ['text/xml', false],
+			'application xml' => ['application/xml; charset=utf-8', false],
+			'xsl' => ['text/xsl', false],
+			'xslt' => ['application/xslt+xml', false],
+			'rss' => ['application/rss+xml', false],
+			'mathml' => ['application/mathml+xml', false],
+			'empty' => ['', false],
+			'null' => [null, false],
+			'png' => ['image/png', true],
+			'pdf' => ['application/pdf', true],
+			'plain text' => ['text/plain; charset=utf-8', true],
+			'video' => ['video/mp4', true],
+		];
+	}
+
+	#[DataProvider('contentTypeProvider')]
+	public function testIsSafeInlineContentType(?string $contentType, bool $safe)
+	{
+		$this->assertSame($safe, Response::isSafeInlineContentType($contentType));
+	}
+
+	public function testFileSecurityHeaders()
+	{
+		$this->assertSame(['X-Content-Type-Options' => 'nosniff'], Response::fileSecurityHeaders('text/html', false));
+		$this->assertSame(
+			['X-Content-Type-Options' => 'nosniff', 'Content-Security-Policy' => 'sandbox'],
+			Response::fileSecurityHeaders('image/png', true)
+		);
+		// The PDF viewer of the browser doesn't work in a sandbox
+		$this->assertSame(['X-Content-Type-Options' => 'nosniff'], Response::fileSecurityHeaders('application/pdf', true));
 	}
 }

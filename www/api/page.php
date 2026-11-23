@@ -64,13 +64,13 @@ try {
 		$method = "page" . array_shift($parts);
 
 		//left over are params
-		$ctrlCls = "go\\modules\\" . $package . "\\" . $module . "\\Module";
+		checkPathInput($package . '/' . $module);
 
-		checkPathInput($ctrlCls);
-
-		if (!class_exists($ctrlCls)) {
+		// only installed and enabled modules
+		$ctrlCls = \go\core\Module::findClassForRequest((string) $package, (string) $module);
+		if (!isset($ctrlCls)) {
 			http_response_code(404);
-			exit("Class '$ctrlCls' not found");
+			exit("Not found");
 		}
 
 		$c = $ctrlCls::get();

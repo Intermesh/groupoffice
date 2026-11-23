@@ -18,6 +18,7 @@
 
 namespace go\core\dav\davacl;
 
+use go\core\db\Criteria;
 use go\core\model\Acl;
 use go\core\model\User;
 use Sabre\DAV\PropPatch;
@@ -158,33 +159,40 @@ class PrincipalBackend extends AbstractBackend {
 			return [];
 		}
 
+		if(empty($searchProperties)) {
+			return [];
+		}
+
 		$query = User::find(['username'])
 			->filter(['permissionLevel' => Acl::LEVEL_READ])
 			->selectSingleValue('username');
+
+		// Keep the search conditions in a separate group so an "anyof" OR can't bypass the ACL condition above
+		$search = new Criteria();
 
 		foreach ($searchProperties as $property => $value) {
 
 			switch ($property) {
 				case '{DAV:}displayname' :
-					if($test == "allof") {
-						$query->where('displayName', 'LIKE', '%' . $value . '%');
-					} else {
-						$query->orWhere('displayName', 'LIKE', '%' . $value . '%');
-					}
+					$column = 'displayName';
 					break;
 
 				case '{http://sabredav.org/ns}email-address':
-					if($test == "allof") {
-						$query->where('email', 'LIKE', '%' . $value . '%');
-					} else {
-						$query->orWhere('email', 'LIKE', '%' . $value . '%');
-					}
+					$column = 'email';
 					break;
 				default :
 					// Unsupported property
 					return [];
 			}
+
+			if($test == "allof") {
+				$search->andWhere($column, 'LIKE', '%' . $value . '%');
+			} else {
+				$search->orWhere($column, 'LIKE', '%' . $value . '%');
+			}
 		}
+
+		$query->andWhere($search);
 
 //		go()->debug($query);
 

@@ -121,4 +121,5 @@ return array (
   'Website Manager' => 'Gestionnaire de site Web',
   'moduleSettings' => 'Propriétés du module',
   'globalProperties' => 'Propriétés globales',
+  'Global properties' => 'Propriétés globales',
 );

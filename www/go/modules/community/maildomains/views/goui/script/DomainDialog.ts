@@ -1,5 +1,6 @@
 import {checkbox, fieldset, numberfield, t, textfield} from "@intermesh/goui";
-import {FormWindow, principalcombo} from "@intermesh/groupoffice-core";
+import {client, FormWindow, principalcombo} from "@intermesh/groupoffice-core";
+import {autoExpungeField} from "./AutoExpungeField.js";
 
 export class DomainDialog extends FormWindow {
 
@@ -23,7 +24,9 @@ export class DomainDialog extends FormWindow {
 					name: "userId",
 					id: "userId",
 					label: t("User"),
-					required: true
+					required: true,
+					entity: "User",
+					value: client.user.id
 				}),
 				textfield({
 					name: "domain",
@@ -57,16 +60,6 @@ export class DomainDialog extends FormWindow {
 				}),
 
 				numberfield({
-					name: "defaultQuota",
-					id: "defaultQuota",
-					label: t("Default quota (MB)"),
-					multiplier: 1 / (1024 * 1024), // convert bytes to MB
-					decimals: 0,
-					required: true,
-					value: 0
-				}),
-
-				numberfield({
 					name: "totalQuota",
 					id: "totalQuota",
 					label: t("Max quota (MB)"),
@@ -87,6 +80,25 @@ export class DomainDialog extends FormWindow {
 					id: "backupMx",
 					type: "switch"
 				})
+			),
+
+			fieldset({legend: t("Mailbox defaults")},
+				numberfield({
+					name: "defaultQuota",
+					id: "defaultQuota",
+					label: t("Default quota (MB)"),
+					multiplier: 1 / (1024 * 1024), // convert bytes to MB
+					decimals: 0,
+					required: true,
+					value: 0
+				}),
+				checkbox({
+					label: t("Enable Full Text Search"),
+					name: "defaultFts",
+					id: "defaultFts",
+					type: "switch"
+				}),
+				autoExpungeField("defaultAutoExpunge")
 			)
 		);
 		this.addSharePanel();

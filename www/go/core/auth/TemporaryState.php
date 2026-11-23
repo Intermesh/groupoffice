@@ -6,7 +6,10 @@ use go\core\model\User;
 
 /**
  * TemporaryState class
- * 
+ *
+ * WARNING: Be careful with using this. When used in a JMAP method clients can run more methods in the same authenticated
+ * state.
+ *
  * Temporary state that will last for one script run.
  * It doesn't require a token in the database. It's used in *DAV / AS modules that
  * authenticate on each request.

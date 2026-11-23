@@ -29,4 +29,14 @@ return array (
   'Notebooks' => 'Notitieboeken',
   'Address books' => 'Adresboeken',
   'Tasklists' => 'Taaklijsten',
+  '** 2-Factor authentication **' => '** Tweestapsverificatie **',
+  '2fa-body' => 'Hallo,
+
+Log in bij {product_name} om het instellen van uw account te voltooien:
+
+{URL}
+
+Met vriendelijke groet,
+
+{TITLE}',
 );

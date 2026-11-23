@@ -5,4 +5,6 @@ return array (
   'Tasklist' => 'Aufgabenliste',
   'Select category' => 'Kategorie auswählen',
   'Remind me' => 'Erinnern',
+  'Call' => 'Anruf',
+  'Scheduled call at %s' => 'Geplanter Anruf um %s',
 );

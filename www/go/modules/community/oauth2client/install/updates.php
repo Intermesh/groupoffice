@@ -32,3 +32,10 @@ $updates['202311271619'][] = "create table if not exists oauth2client_openid_use
 $updates['202311271619'][] = function() {
 	Authenticator::register();
 };
+
+// The subject (user ID) at the identity provider. Users are found by it instead of by their e-mail address.
+$updates['202611111200'][] = "alter table oauth2client_openid_user
+    add sub varchar(255) collate ascii_bin null;";
+
+$updates['202611111200'][] = "create unique index oauth2client_openid_user_clientId_sub_uindex
+    on oauth2client_openid_user (clientId, sub);";

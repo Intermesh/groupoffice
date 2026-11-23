@@ -40,6 +40,7 @@ namespace GO\Base\Controller;
 use Exception;
 use GO;
 use GO\Base\Data\JsonResponse;
+use GO\Base\Db\ActiveRecord;
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\CliOnly;
 use GO\Base\Exception\MissingParameter;
@@ -187,15 +188,24 @@ abstract class AbstractController extends Observable {
 	 */
 	protected function checkSecurityToken()
 	{
-		// When using JMAP API requests without cookies don't check CSRF
+		// Requests that authenticate with an "Authorization: Bearer" header can't be made by other websites, so they
+		// don't need the token. When the JMAP state isn't authenticated, for example because its CSRF check failed, a
+		// session user that came from an access token still needs it.
 		$state = go()->getAuthState();
-		$usingCookies = (!($state instanceof State) || $state->isAuthenticatedUsingCookie());
+		if ($state instanceof State) {
+			$usingCookies = !$state->isAuthenticatedUsingHeader() &&
+				($state->isAuthenticatedUsingCookie() || !empty(GO::session()->values['accessToken']));
+		} else {
+			$usingCookies = true;
+		}
+		$requestToken = $_REQUEST['security_token'] ?? null;
+		$sessionToken = GO::session()->values['security_token'] ?? null;
 		if (
       $usingCookies &&
 			!GO::config()->debug &&
 			!GO::config()->disable_security_token_check &&
 			!empty($_REQUEST['r']) &&
-			(!isset($_REQUEST['security_token']) || $_REQUEST['security_token'] != GO::session()->values['security_token'])
+			(!is_string($requestToken) || !is_string($sessionToken) || !hash_equals($sessionToken, $requestToken))
 		) {
 			throw new SecurityTokenMismatch();
 		} else {
@@ -267,8 +277,37 @@ abstract class AbstractController extends Observable {
 	}
 	
 	
-	
-	
+
+	/**
+	 * Get the model for a class name given by the client.
+	 *
+	 * Only models protected by an ACL may be used. Models without an ACL pass every permission check in
+	 * ActiveRecord, so only admins may use them.
+	 *
+	 * @param string $modelName Class name or entity name
+	 * @return ActiveRecord
+	 * @throws AccessDenied
+	 */
+	protected function getRequestedModel(string $modelName): ActiveRecord {
+		if(!class_exists($modelName)) {
+			$entityType = \go\core\orm\EntityType::findByName($modelName);
+			if($entityType) {
+				$modelName = $entityType->getClassName();
+			}
+		}
+
+		if(!class_exists($modelName) || !is_subclass_of($modelName, ActiveRecord::class)) {
+			throw new AccessDenied();
+		}
+
+		$model = $modelName::model();
+		if(!$model->aclField() && !GO::user()->isAdmin()) {
+			throw new AccessDenied();
+		}
+
+		return $model;
+	}
+
 	/**
 	 * Checks if a user is logged in, if the user has permission to the module and if the user has access to a specific action.
 	 * 
@@ -281,8 +320,9 @@ abstract class AbstractController extends Observable {
 		
 		if(!in_array($action, $allowGuests) && !in_array('*', $allowGuests)){			
 			//check for logged in user
-			if(!GO::user()){					
-				return false;	
+			if(!GO::user()){
+				$this->denyReason = 'no user in session';
+				return false;
 			}
 			
 			$this->checkSecurityToken();
@@ -297,13 +337,69 @@ abstract class AbstractController extends Observable {
 			{
 				// return !!go()->getAuthState()->getClassPermissionLevel(static::class);
 				$module = $this->getModule();		
-				if(!$module || !$module->permissionLevel)
+				if(!$module || !$module->permissionLevel) {
+					$this->denyReason = 'no module permission';
 					return false;
+				}
 			}
 		}
-		
-		return $this->_checkRequiredPermissionLevels($action);
-		
+
+		if(!$this->_checkRequiredPermissionLevels($action)) {
+			$this->denyReason = 'required permission level';
+			return false;
+		}
+		return true;
+
+	}
+
+	/**
+	 * Why {@see _checkPermission()} denied the request, for {@see logDenied()}
+	 *
+	 * @var string|null
+	 */
+	private $denyReason = null;
+
+	/**
+	 * Write a denied request to the error log
+	 *
+	 * AccessDenied and SecurityTokenMismatch are not logged otherwise, so without debug mode there was no way to tell
+	 * which check denied a request, for example when opening an attachment of a shared e-mail account fails now and then.
+	 * No tokens are logged, only whether they were sent.
+	 *
+	 * @param \Throwable $e
+	 * @param array $params The parameters of the action
+	 * @return void
+	 */
+	private function logDenied(\Throwable $e, array $params): void
+	{
+		try {
+			$caller = $e->getTrace()[0] ?? [];
+			$where = $this->denyReason ?? (basename($e->getFile()) . ':' . $e->getLine() .
+				(isset($caller['file']) ? ' called from ' . basename($caller['file']) . ':' . ($caller['line'] ?? '?') : ''));
+
+			$context = [];
+			foreach (['account_id', 'id', 'mailbox'] as $key) {
+				if (isset($params[$key]) && is_scalar($params[$key])) {
+					$context[] = $key . '=' . substr((string) $params[$key], 0, 100);
+				}
+			}
+
+			$session = GO::session()->values;
+			\go\core\ErrorHandler::log(sprintf(
+				'%s in %s for user %s: %s. %s Session user: %s, session access token: %s, access token cookie: %s, security token sent: %s',
+				get_class($e),
+				$_REQUEST['r'] ?? (static::class . '::' . $this->getAction()),
+				GO::user()->id ?? 'none',
+				$where,
+				$context ? '(' . implode(', ', $context) . ')' : '',
+				empty($session['user_id']) ? 'no' : 'yes',
+				empty($session['accessToken']) ? 'no' : 'yes',
+				empty($_COOKIE['accessToken']) ? 'no' : 'yes',
+				empty($_REQUEST['security_token']) ? 'no' : 'yes'
+			));
+		} catch (\Throwable $logError) {
+			// Logging must never change the response
+		}
 	}
 	
 	/**
@@ -356,6 +452,7 @@ abstract class AbstractController extends Observable {
 		if(!method_exists($this, $methodName))
 			throw new NotFound();
 		
+		$oldIgnore = null;
 		try {
 			if($checkPermissions && !$this->_checkPermission($action)){
 				$cls = get_class($this);
@@ -395,16 +492,13 @@ abstract class AbstractController extends Observable {
 			
 			if($render && isset($response))
 				$this->render($action, $response);
-			
-			//restore old value for acl permissions if this method was allowed for guests.
-			if(isset($oldIgnore))
-				GO::setIgnoreAclPermissions($oldIgnore);
 
 			return $response;
 			
 		}
 		catch(SecurityTokenMismatch $e) {
 			GO::debug("EXCEPTION: ".(string) $e);
+			$this->logDenied($e, $params);
 
 			$response = new JsonResponse();
 
@@ -418,6 +512,7 @@ abstract class AbstractController extends Observable {
 		}
 		catch(AccessDenied $e) {
 			GO::debug("EXCEPTION: ".(string) $e);
+			$this->logDenied($e, $params);
 
 			$response = new JsonResponse();
 
@@ -466,6 +561,11 @@ abstract class AbstractController extends Observable {
 			}
 
 			$this->view->render('Exception', array('response'=>$response));
+		}
+		finally {
+			//restore old value for acl permissions if this method was allowed for guests, also when the action failed.
+			if(isset($oldIgnore))
+				GO::setIgnoreAclPermissions($oldIgnore);
 		}
 	}
 	

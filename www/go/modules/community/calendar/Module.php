@@ -161,39 +161,83 @@ class Module extends core\Module
 	private function outputIcs(Calendar $calendar, $after = null) {
 		set_time_limit(0);
 
+		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
+		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
+
+		$ics = self::ics($calendar, $after);
+		// the header throws an exception for an invalid time zone, before the output buffers are closed
+		echo $ics->current();
+		while(ob_get_level() > 0) {
+			ob_end_flush();
+		}
+
+		for($ics->next(); $ics->valid(); $ics->next()) {
+			echo $ics->current();
+			flush();
+		}
+	}
+
+	/**
+	 * The iCalendar export of a calendar in parts: the header, each event and the end
+	 *
+	 * The events are read one by one, so a large calendar can be streamed.
+	 *
+	 * @param Calendar $calendar
+	 * @param string|null $after Only events after this date (Y-m-d)
+	 * @return \Generator<string>
+	 */
+	private static function ics(Calendar $calendar, ?string $after = null): \Generator
+	{
+		yield self::icsHeader($calendar);
+
 		$events = CalendarEvent::find()->filter(['inCalendars' => $calendar->id]);
 		if($after !== null) {
 			$events->filter(['after' => $after]);
 		}
-		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
-		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
-
-		echo "BEGIN:VCALENDAR\r\n";
-		echo "VERSION:2.0\r\n";
-		echo "PRODID:".str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD)."\r\n";
-		echo "METHOD:PUBLISH\r\n";
-
-		if ($calendar->timeZone) {
-			echo "X-WR-TIMEZONE:" . $calendar->timeZone . "\r\n";
-			$tz = new model\VTimezone($calendar->timeZone);
-			echo $tz->serialize();
-		}
-
-		if($calendar->description) echo "X-WR-CALDESC:". $calendar->description. "\r\n";
-		ob_end_flush();
-
 		foreach($events as $ev) {
 			$vcal = ICalendarHelper::toVObject($ev);
+			$part = '';
 			foreach($vcal->VEVENT as $vevent) {
-				echo $vevent->serialize();
+				$part .= $vevent->serialize();
 			}
-			flush();
+			yield $part;
 		}
-		echo "END:VCALENDAR\r\n";
+		yield "END:VCALENDAR\r\n";
+	}
+
+	/**
+	 * The start of an iCalendar export of a calendar, up to the events
+	 *
+	 * The properties are escaped by VObject, so a description with a line break or ";" can't add properties or events.
+	 *
+	 * @param Calendar $calendar
+	 * @return string
+	 */
+	private static function icsHeader(Calendar $calendar): string
+	{
+		$vcalendar = new \Sabre\VObject\Component\VCalendar();
+
+		$ics = "BEGIN:VCALENDAR\r\n";
+		$ics .= "VERSION:2.0\r\n";
+		$ics .= "PRODID:".str_replace('{VERSION}', go()->getVersion(),CalendarEvent::PROD)."\r\n";
+		$ics .= "METHOD:PUBLISH\r\n";
+
+		if ($calendar->timeZone) {
+			// throws an exception for an invalid time zone
+			$tz = new model\VTimezone($calendar->timeZone);
+			$ics .= $vcalendar->createProperty("X-WR-TIMEZONE", $calendar->timeZone)->serialize();
+			$ics .= $tz->serialize();
+		}
+
+		if($calendar->description) {
+			$ics .= $vcalendar->createProperty("X-WR-CALDESC", $calendar->description)->serialize();
+		}
+
+		return $ics;
 	}
 
 	// https://uri/path/api/page.php/community/calendar/ics/key
-	public function pageIcs($key) {
+	public function pageIcs(string $key) {
 		// No auth needed but publishKey most be known to read
 		$calendar = Calendar::find()->where(['publishKey' => $key])->single();
 		if($calendar) {
@@ -205,7 +249,7 @@ class Module extends core\Module
 
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
-		if (!$ev || !$ev->getPermissionLevel()) {
+		if (!$ev || !$ev->hasPermissionLevel(Acl::LEVEL_READ)) {
 			throw new Forbidden();
 		}
 
@@ -227,9 +271,13 @@ class Module extends core\Module
 			throw new Forbidden();
 		}
 
-		return Calendar::find()->selectSingleValue('calendar_calendar.id')
+		$calendars = Calendar::find()->selectSingleValue('calendar_calendar.id')
 			//->join('calendar_calendar_user', 'cu','cu.userId = '.go()->getUserId().' AND cu.calendarId = t.id')
-			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
+			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true);
+		// Users may subscribe to calendars with free / busy permission only. Those aren't printed, because the reports
+		// print the details of the events.
+		Calendar::applyAclToQuery($calendars, Acl::LEVEL_READ);
+		return $calendars->all();
 	}
 
 	public function pagePrint($type,$date) {
@@ -246,6 +294,11 @@ class Module extends core\Module
 
 	public function pagePrintRange($type,$days, $date) {
 		$calendarIds = $this->visibleCalendarIds();
+
+		$days = (int) $days;
+		if($days < 1 || $days > 366) {
+			throw new core\http\Exception(400, "Invalid number of days");
+		}
 
 		$this->printWeeks(new \DateTime($date),$days, $calendarIds);
 	}
@@ -311,7 +364,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = Calendar::find(['name'])->selectSingleValue('name')->where(['id'=>$id])->single();
 		}
-		$report->Output($report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
+		$report->Output('calendar_week_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf');
 	}
 
 	private function printWeeks($date, $amount, $calendarIds) {
@@ -336,12 +389,12 @@ class Module extends core\Module
 		$report->printMonth = false;
 
 
-		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'COALESCE(caluser.color, calendar_calendar.defaultColor) AS color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
 		$report->calendars = array_column($rows, null, 'id');
 		$report->setEvents($events);
 		$report->render();
 
-		$report->Output($report->Output('calendar_weeks_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf'));
+		$report->Output('calendar_weeks_'.$start->format('Y-m-d').'_'.$end->format('Y-m-d').'.pdf');
 	}
 
 	private function printMonth($date, $calendarIds) {
@@ -350,7 +403,7 @@ class Module extends core\Module
 		$dates = $report->getStartEndOfMonth($date->format("n"), $date->format("Y"));
 		$report->day = $dates[0];
 		$report->end = $dates[1];
-		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
+		$rows = Calendar::find()->select(['calendar_calendar.id AS id', 'name', 'COALESCE(caluser.color, calendar_calendar.defaultColor) AS color'])->where(['id' => $calendarIds])->fetchMode(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE)->all();
 		$report->calendars = array_column($rows, null, 'id');
 		foreach($report->calendars as $id => $attr) {
 
@@ -363,7 +416,7 @@ class Module extends core\Module
 			$report->render();
 			$report->calendarName = $attr['name'];
 		}
-		$report->Output($report->Output('calendar_month_'.$date->format('Y-m').'.pdf'));
+		$report->Output('calendar_month_'.$date->format('Y-m').'.pdf');
 	}
 
 
@@ -418,15 +471,6 @@ class Module extends core\Module
 
 		return parent::afterInstall($model);
 	}
-
-//	protected function rights(): array
-//	{
-//		return [
-//			'mayChangeCalendars', // allows AddressBook/set (hide ui elements that use this)
-//			'mayExportItems', // Allows users to export contacts
-//		];
-//	}
-
 
 	public function demo(Generator $faker)
 	{

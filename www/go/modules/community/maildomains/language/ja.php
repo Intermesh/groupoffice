@@ -48,7 +48,6 @@ return array (
   'Mail domains' => 'メールドメイン',
   'Mail hostname' => 'メールサーバー',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'メールのサーバー名を確認します。PTR(逆引き)、SPF、MXに使用されます。',
-  'The minimum length for this field is {max}' => 'このフィールドの最大文字数は{max}文字です。[原文はminimum]',
   'The passwords do not match' => 'パスワードが一致しません',
   'Domain owner' => 'ドメイン所有者',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => '有効にした場合、このユーザーはuser@example.com*thisuser@example.comという形式を使ってドメイン内のすべてのメールボックスにログインできます。',

@@ -10,6 +10,7 @@ namespace go\modules\community\tasks\controller;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\core\model\Module as CoreModule;
 use go\modules\community\tasks\model;
 
@@ -39,6 +40,23 @@ class TaskList extends EntityController
 		return $this->defaultSet($params);
 	}
 
+	/**
+	 * Renaming a list or changing its permissions needs manage permission on the list. The module right
+	 * "mayChangeTasklists" is only needed to create and delete lists.
+	 *
+	 * User properties, like the subscription, may be changed by everyone who can read the list.
+	 */
+	protected function canUpdate(Entity $entity): bool
+	{
+		if(!$this->onlyUserPropsModified($entity) && !$entity->hasPermissionLevel(Acl::LEVEL_MANAGE)) {
+			return false;
+		}
+		return parent::canUpdate($entity);
+	}
+
+	/**
+	 * Deleting a list needs the module right "mayChangeTasklists" and manage permission on the list.
+	 */
 	protected function canDestroy(Entity $entity): bool
 	{
 		if(!$this->rights->mayChangeTasklists) {

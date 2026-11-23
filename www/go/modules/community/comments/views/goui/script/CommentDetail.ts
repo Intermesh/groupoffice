@@ -42,7 +42,7 @@ export class CommentDetail extends DetailPanel {
 					hr(),
 					btn({
 						icon: "delete",
-						text: "Delete",
+						text: t("Delete"),
 						handler: () => {
 							void commentDS.confirmDestroy([this.entity!.id]);
 						}

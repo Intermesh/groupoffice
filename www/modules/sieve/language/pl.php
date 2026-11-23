@@ -118,4 +118,13 @@ return array (
   'Mailing list' => 'Mailing list',
   'Is from mailing list' => 'Is from mailing list',
   'exist' => 'exist',
+  'Sieve filter port number' => 'Numer portu filtrów Sieve',
+  'Use secure connection for (Sieve) email filters' => 'Używaj bezpiecznego połączenia dla filtrów e-mail (Sieve)',
+  'Standard vacation rule' => 'Standardowa reguła urlopowa',
+  'I am on vacation' => 'Jestem na urlopie',
+  'I am away' => 'Jestem nieobecny',
+  'Stop needs to be on the end!' => 'Stop musi być na końcu!',
+  'Reject with message:' => 'Odrzuć z wiadomością:',
+  'Set a custom subject' => 'Ustaw własny temat',
+  'The filter contains an invalid value' => 'Filtr zawiera nieprawidłową wartość',
 );

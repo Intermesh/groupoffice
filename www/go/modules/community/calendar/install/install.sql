@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_user` (
     `timeZone` VARCHAR(45) NULL,
     `syncToDevice` TINYINT(1) NOT NULL DEFAULT 0,
     `includeInAvailability` ENUM('all', 'attending', 'none') NOT NULL DEFAULT 'none',
+    `useCreatorAlerts` TINYINT(1) NULL DEFAULT NULL,
 	`modSeq` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`, `userId`),
     CONSTRAINT `fk_calendar_calendar_user_calendar_calendar1`
@@ -138,7 +139,6 @@ CREATE TABLE IF NOT EXISTS `calendar_event` (
     `isOrigin` TINYINT(1) NOT NULL DEFAULT 1,
 	  `recurrenceId` VARCHAR(24) DEFAULT NULL,
 		`etag` VARCHAR(100) NULL,
-		`uri` VARCHAR(512) NULL,
 	  `replyTo` VARCHAR(100),
 	  `requestStatus` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`eventId`),
@@ -161,8 +161,10 @@ CREATE TABLE IF NOT EXISTS `calendar_calendar_event` (
      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
      `eventId` INT UNSIGNED NOT NULL,
      `calendarId` INT UNSIGNED NOT NULL,
+     `uri` VARCHAR(512) NULL,
      PRIMARY KEY (`id`),
     INDEX `calendar_calendar_event_calendar_event_idx` (`calendarId` ASC, `eventId` ASC),
+    INDEX `calendar_calendar_event_uri_idx` (`calendarId` ASC, `uri`(191) ASC),
 		 UNIQUE INDEX `event_once_per_calendar` (`eventId` ASC, `calendarId` ASC),
     CONSTRAINT `fk_calendar_calendar_event_calendar_event1`
     FOREIGN KEY (`eventId`)
@@ -382,6 +384,8 @@ CREATE TABLE calendar_preferences (
 	lastProcessedUid		  BIGINT DEFAULT 1 NOT NULL,
 	showDeclined          TINYINT(1) DEFAULT 1 NOT NULL,
 	multiLine          TINYINT(1) DEFAULT 0 NOT NULL,
+	showCategoryColor  TINYINT(1) DEFAULT 0 NOT NULL,
+	printWeekInGrid    TINYINT(1) DEFAULT 0 NOT NULL,
 	showWeekNumbers				TINYINT(1) DEFAULT 1 NOT NULL,
 	birthdaysAreVisible   TINYINT(1) DEFAULT 0 NOT NULL,
 	tasksAreVisible       TINYINT(1) DEFAULT 0 NOT NULL,

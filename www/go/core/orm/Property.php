@@ -352,12 +352,12 @@ abstract class Property extends Model {
 	/**
 	 * Check if a property was fetched in the {@see Entity::find()} method.
 	 *
-	 * @param string $propName
+	 * @param string[] $propName
 	 * @return bool
 	 */
-	public function isFetched(string $propName): bool
+	public function isFetched(string ...$propName): bool
 	{
-		return in_array($propName, $this->fetchProperties);
+		return count(array_diff($propName, $this->fetchProperties)) === 0;
 	}
 
 	/**

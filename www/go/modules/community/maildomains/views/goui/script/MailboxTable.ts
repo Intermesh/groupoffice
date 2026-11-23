@@ -1,15 +1,16 @@
 import {btn, column, datasourcestore, DataSourceStore, datecolumn, Format, hr, menu, t, Table} from "@intermesh/goui";
-import {jmapds} from "@intermesh/groupoffice-core";
+import {jmapds, principalDS} from "@intermesh/groupoffice-core";
 import {MailboxDialog} from "./MailboxDialog.js";
 
 export class MailboxTable extends Table<DataSourceStore> {
 	constructor() {
 		const store = datasourcestore({
 			dataSource: jmapds("MailBox"),
-			queryParams: {
-				limit: 50
-			},
-			sort: [{property: "username", isAscending: true}]
+			sort: [{property: "username", isAscending: true}],
+			relations: {
+				creator: {path: "createdBy", dataSource: principalDS},
+				modifier: {path: "createdBy", dataSource: principalDS}
+			}
 		});
 		const columns = [
 			column({
@@ -68,34 +69,26 @@ export class MailboxTable extends Table<DataSourceStore> {
 				header: t("Created at"),
 				id: "createdAt",
 				hidden: true,
-				width: 150,
 				sortable: true
 			}),
 			column({
 				header: t("Created by"),
-				id: "creator",
+				id: "creator/name",
 				hidden: true,
 				sortable: true,
-				resizable: true,
-				renderer: (v) => {
-					return v.name;
-				}
+				resizable: true
 			}),
 			datecolumn({
 				header: t("Modified at"),
 				id: "modifiedAt",
-				width: 150,
 				hidden: true,
 				sortable: true
 			}),
 			column({
 				header: t("Modified by"),
-				id: "modifier",
+				id: "modifier/name",
 				hidden: true,
-				resizable: true,
-				renderer: (v) => {
-					return v.name;
-				}
+				resizable: true
 			}),
 
 			column({
@@ -137,5 +130,9 @@ export class MailboxTable extends Table<DataSourceStore> {
 		this.rowSelectionConfig =  {
 			multiSelect: true
 		};
+		this.scrollLoad = true;
+
+		this.stateId = "maildomains-mailbox-table";
+
 	}
 }

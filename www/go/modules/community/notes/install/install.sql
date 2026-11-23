@@ -11,6 +11,7 @@ CREATE TABLE `notes_note` (
   `modifiedBy` int(11) NULL,
   `name` varchar(100) NOT NULL,
   `content` MEDIUMTEXT,
+  `type` enum('html','markdown') NOT NULL DEFAULT 'html',
   `filesFolderId` int(11) DEFAULT NULL,
   `password` varchar(255) DEFAULT '',
   `createdAt` datetime DEFAULT NULL,
@@ -106,7 +107,8 @@ CREATE TABLE `notes_user_settings` (
    `userId` int(11) NOT NULL,
    `defaultNoteBookId` int(11) DEFAULT NULL,
    `rememberLastItems` tinyint(1) DEFAULT 0,
-   `lastNoteBookIds` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT ''
+   `lastNoteBookIds` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+   `defaultType` enum('html','markdown') NOT NULL DEFAULT 'html'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

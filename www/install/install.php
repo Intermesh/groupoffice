@@ -84,6 +84,8 @@ if (!empty($_POST)) {
 		App::get()->getInstaller()->install($admin);
 
 		//install not yet refactored modules
+		// Fresh install: the modules are installed for the whole system. The request ends after the install.
+		// nosemgrep: go-acl-bypass-not-restored
 		GO::$ignoreAclPermissions = true;
 		$modules = GO::modules()->getAvailableModules();
 
@@ -145,6 +147,9 @@ if (!empty($_POST)) {
 
 
 		User::findById(1)->legacyOnSave();
+
+		// Log in the new administrator. The license page that follows requires an administrator.
+		(new core\auth\Authenticate())->setAuthenticated(User::findById(1));
 
         if(go()->getEnvironment()->hasIoncube() && \go\modules\business\license\model\License::isValid()) {
             header("Location: finished.php");

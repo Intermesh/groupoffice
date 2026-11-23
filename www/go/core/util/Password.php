@@ -5,6 +5,21 @@ namespace go\core\util;
 final class Password
 {
 	/**
+	 * Hash a password or secret to store it, with password_hash() and the default algorithm.
+	 *
+	 * Uses PHP's default cost unless the config option "passwordHashCost" is set. The tests set a low cost because
+	 * they create many users, OAuth clients and remember me logins.
+	 *
+	 * @param string $password
+	 * @return string
+	 */
+	public static function hash(string $password): string
+	{
+		$cost = go()->getConfig()['passwordHashCost'] ?? null;
+		return password_hash($password, PASSWORD_DEFAULT, isset($cost) ? ['cost' => (int) $cost] : []);
+	}
+
+	/**
 	 * Generate a random password on the server side.
 	 *
 	 * Normally used for temporary password resets, e.g. for mail migrations. The default password length is as per the

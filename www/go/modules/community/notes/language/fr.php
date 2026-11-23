@@ -20,4 +20,13 @@ return array (
   'Default note book' => 'Carnet de notes par defaut',
   'Enter password to decrypt' => 'Entrer mot de passe pour decrypter',
   'Encrypted data' => 'Données Cryptées',
+  'Cannot decrypt' => 'Impossible de déchiffrer',
+  'Display options for notebooks' => 'Options d\'affichage des carnets de notes',
+  'Encrypt' => 'Chiffrer',
+  'Passwords do not match' => 'Les mots de passe ne correspondent pas',
+  'Remember last selected note book' => 'Mémoriser le dernier carnet de notes sélectionné',
+  'notes' => 'notes',
+  'Switch between HTML and Markdown editor' => 'Basculer entre l\'éditeur HTML et Markdown',
+  'Switching the editor will clear the content. Are you sure?' => 'Changer d\'éditeur effacera le contenu. Êtes-vous sûr ?',
+  'Default editor for new notes' => 'Éditeur par défaut pour les nouvelles notes',
 );

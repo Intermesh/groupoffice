@@ -45,9 +45,9 @@
 				<?php foreach($pager->getItems() as $i => $ticket): ?>
 					<tr class="<?php echo($i%2)?'even':'odd'; ?>">
 						<td><?php echo '<a href="'.\Site::urlManager()->createUrl("tickets/externalpage/ticket",array("ticket_number"=>$ticket->ticket_number,"ticket_verifier"=>$ticket->ticket_verifier)).'">'.$ticket->ticket_number.'</a>'; ?></td>
-						<td><?php echo $ticket->subject; ?></td>
-						<td><?php echo $ticket->getStatusName(); ?></td>
-						<td><?php echo $ticket->agent?$ticket->agent->name:""; ?></td>
+						<td><?php echo htmlspecialchars((string) ($ticket->subject), ENT_QUOTES, 'UTF-8'); ?></td>
+						<td><?php echo htmlspecialchars((string) ($ticket->getStatusName()), ENT_QUOTES, 'UTF-8'); ?></td>
+						<td><?php echo htmlspecialchars((string) ($ticket->agent?$ticket->agent->name:""), ENT_QUOTES, 'UTF-8'); ?></td>
 						<td><?php echo $ticket->getAttribute("ctime","formatted"); ?></td>
 					</tr>
 				<?php endforeach; ?>

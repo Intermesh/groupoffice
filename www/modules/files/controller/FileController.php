@@ -5,10 +5,10 @@ namespace GO\Files\Controller;
 
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
-use go\core\exception\Forbidden;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\http\Response;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use GO\Email\Model\Account;
 use GO\Files\Model\File;
@@ -109,6 +109,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	 * @param integer $id id of the user to recalculate used space for
 	 */
 	protected function actionRecalculateDiskUsage($id=false) {
+		// Maintenance for administrators
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		
 		\GO::session()->closeWriting();
 		
@@ -129,6 +133,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	}
 	
 	protected function actionCorrectQuotaUser() {
+		// Maintenance for administrators
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		$time_start = microtime(true); 
 		$count = 0;
 		
@@ -304,7 +312,24 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		if(isset($params['lock'])){
 			//GOTA sends lock parameter It does not know the user ID.
-			$model->locked_user_id=empty($params['lock']) ? 0 : \GO::user()->id;
+			$params['locked_user_id'] = $params['lock'];
+		}
+
+		// The expiry of a lock is set by the server only
+		unset($params['lock_expires_at'], $params['lock_id']);
+
+		if(isset($params['locked_user_id'])) {
+			// A lock that the user sets with "Lock" in the menu or GOTA doesn't expire, unlike the locks of WOPI, DAV and
+			// OnlyOffice. A user can only lock a file in their own name.
+			if(empty($params['locked_user_id'])) {
+				$model->locked_user_id = 0;
+				$model->lock_id = "";
+			} else {
+				$model->locked_user_id = \GO::user()->id;
+				$model->lock_id = uniqid(\GO::user()->id . "-");
+			}
+			$model->lock_expires_at = null;
+			unset($params['locked_user_id']);
 		}
 		
 		
@@ -340,6 +365,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);
+		// The name is cleaned with stripInvalidChars().
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File(\GO::config()->file_storage_path . $tmpFolder->path.'/'.$params['filename']);
 		$file->parent()->create();
 
@@ -351,6 +378,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			}
 		}else
 		{
+			// The temporary folder is per user and GO\Base\Fs\File rejects ".." in paths.
+			// nosemgrep: go-path-from-request
 			$tmpfile = new \GO\Base\Fs\File(\GO::config()->tmpdir.$params['tmp_file']);
 			$file = $tmpfile->copy($file->parent(), $file->name());
 			if(!$file) {
@@ -372,11 +401,13 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	
 	protected function actionHandlers($params){
 		if(!empty($params['path'])){
-			$folder = \GO\Files\Model\Folder::model()->findByPath(dirname($params['path']));
-			$file = $folder->hasFile(\GO\Base\Fs\File::utf8Basename($params['path']));
+			$file = File::model()->findReadableByPath($params['path']);
 		}else
 		{
-			$file = \GO\Files\Model\File::model()->findByPk($params['id'], false, true);
+			$file = File::model()->findByPk($params['id']);
+			if(!$file) {
+				throw new NotFound();
+			}
 		}
 
 		if(empty($params['all'])){
@@ -427,6 +458,10 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 		if(!$file){
 			throw new \Exception("File not found");
+		}
+
+		if(!$file->hasPermissionLevel(Acl::LEVEL_READ)) {
+			throw new AccessDenied();
 		}
 		
 		$response = [
@@ -490,6 +525,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			}
 
 //			\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
+			// Also refuses a link in one of the parent folders
+			$file->fsFile->checkFileStoragePath();
+
 			$file->open();
 
 			$this->fireEvent('beforedownload', array(
@@ -503,16 +541,11 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			}
 
 			//Supports range download
+			// Path of a file model from the database.
+			// nosemgrep: go-path-from-request
 			$coreFsFile = new \go\core\fs\File($file->fsFile->path());
 
-			if($coreFsFile->isLink())
-				throw new Forbidden("Symlinks are forbidden");
-
-			// prevent html to render on same domain having access to all global JS stuff
-			if($coreFsFile->getContentType() == 'text/html' || $coreFsFile->getContentType() == 'image/svg+xml') {
-				$inline = false;
-			}
-
+			// HTML, SVG and XML are downloaded even when $inline is true. See Response::isSafeInlineContentType().
 			$coreFsFile->output(true, !array_key_exists('cache', $params) || !empty($params['cache']), [], $inline);
 
 		}catch(NotFound $e) {
@@ -541,7 +574,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		$response=array();
 		
-		$file = \GO\Files\Model\File::model()->findByPk($params['id']);
+		$file = $this->findFileForDownloadLink($params['id']);
 		
 		$url = $file->getEmailDownloadURL(true,\GO\Base\Util\Date::date_add($params['expire_time'],1),$params['delete_when_expired']);
 		
@@ -551,6 +584,26 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		return $response;
 		
 	}	
+
+	/**
+	 * Creating a download link or getting an existing one requires read permission on the file.
+	 *
+	 * @param mixed $id
+	 * @return File
+	 * @throws AccessDenied
+	 * @throws NotFound
+	 */
+	private function findFileForDownloadLink($id): File
+	{
+		$file = File::model()->findByPk($id);
+		if(!$file) {
+			throw new NotFound();
+		}
+		if(!$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new AccessDenied();
+		}
+		return $file;
+	}
 	
 	/**
 	 * This action will generate multiple Email Download link and return a JSON
@@ -566,7 +619,11 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionEmailDownloadLink($params){
 		$msgController = new MessageController();
 		$templateContent = $msgController->loadTemplate($params);
-		$files = \GO\Files\Model\File::model()->findByAttribute('id', json_decode($params['ids']));
+		$ids = json_decode($params['ids'], true);
+		if(!is_array($ids) || empty($ids)) {
+			throw new NotFound();
+		}
+		$files = array_map(fn($id) => $this->findFileForDownloadLink($id), $ids);
 		
 		$html=$params['content_type']=='html';
 		$bodyindex = $html ? 'htmlbody' : 'plainbody';
@@ -577,7 +634,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		foreach($files as $file) {
 			$url = $file->getEmailDownloadURL($html,\GO\Base\Util\Date::date_add($params['expire_time'],1),$params['delete_when_expired']);
-			$linktext .= $html ?  '<li><a href="'.$url.'">'.$file->name.'</a></li>'.$lb : $url.$lb;
+			$linktext .= $html ?  '<li><a href="'.$url.'">'.htmlspecialchars($file->name, ENT_QUOTES, 'UTF-8').'</a></li>'.$lb : $url.$lb;
 		}
 		$linktext .= $html ? "</ul>" : "\n";
 		$text .= ' ('.\GO::t("possible until", "files").' '.\GO\Base\Util\Date::get_timestamp(\GO\Base\Util\Date::date_add($file->expire_time,-1), false).')'.$lb;
@@ -672,6 +729,18 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	/**
+	 * Get the format to convert to from the request. It's used as file extension, so only letters and digits are kept.
+	 *
+	 * @param array $params
+	 * @return string
+	 */
+	private static function convertFormat(array $params): string
+	{
+		$format = !empty($params['format']) ? preg_replace('/[^a-z0-9]/i', '', (string) $params['format']) : '';
+		return $format === '' ? 'pdf' : $format;
+	}
+
+	/**
 	 * @param $params
 	 * @throws AccessDenied
 	 * @throws \go\core\exception\NotFound
@@ -679,7 +748,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	public function actionConvert($params)
 	{
 		$fileId = !empty($params['id']) ? $params['id'] : 0;
-		$format = !empty($params['format']) ? $params['format'] : 'pdf';
+		$format = self::convertFormat($params);
 
 		//check if file exists
 		$fileRecord = \GO\Files\Model\File::model()->findByPk($fileId);
@@ -687,8 +756,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			throw new \go\core\exception\NotFound();
 		}
 
-		//check user permissions
-		if (!\GO::user() || !$fileRecord->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+		//check user permissions. The converted file is added to the folder of the file.
+		if (!\GO::user() || !$fileRecord->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION) || !$fileRecord->folder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
 			throw new AccessDenied();
 		}
 
@@ -720,7 +789,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	public function actionConvertAndDownload($params)
 	{
 		$fileId = !empty($params['id']) ? $params['id'] : 0;
-		$format = !empty($params['format']) ? $params['format'] : 'pdf';
+		$format = self::convertFormat($params);
 
 		//check if file exists
 		$fileRecord = \GO\Files\Model\File::model()->findByPk($fileId);
@@ -733,8 +802,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			throw new AccessDenied();
 		}
 
-		//create temporary file
-		$tmpFile = \GO\Base\Fs\File::tempFile();
+		//create temporary file with the extension so the content type of the output is known
+		$tmpFile = \GO\Base\Fs\File::tempFile('', $format);
 
 		//convert file -> put output to temporary
 		$fileRecord->convertTo($tmpFile, $format);
@@ -743,13 +812,16 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$nameWithoutExtension = $fileRecord->fsFile->nameWithoutExtension();
 		$outputFileName = $nameWithoutExtension . '.' . $format;
 
+		// HTML, SVG and XML are downloaded. See Response::isSafeInlineContentType().
+		$inline = \go\core\http\Response::isSafeInlineContentType($tmpFile->mimeType());
+
 		//override previous headers because tempoary
 		$extraHeaders = [
-			'Content-Disposition' => 'inline; filename="' . $outputFileName . '"',
+			'Content-Disposition' => \go\core\http\Response::contentDisposition($inline ? 'inline' : 'attachment', $outputFileName),
 		];
 
 		//download
-		\GO\Base\Util\Http::outputDownloadHeaders($tmpFile, true, !empty($params['cache']), $extraHeaders);
+		\GO\Base\Util\Http::outputDownloadHeaders($tmpFile, $inline, !empty($params['cache']), $extraHeaders);
 		$tmpFile->output();
 	}
 }

@@ -54,6 +54,8 @@ class AbstractModelController extends AbstractController {
 
 		$model = $this->getModelFromParams($params);
 
+		$params = $this->removeProtectedAttributes($model, $params);
+
 		$ret = $this->beforeSubmit($response, $model, $params);
 		
 		if($ret!==false)
@@ -79,28 +81,8 @@ class AbstractModelController extends AbstractController {
 					//where 1 is the id of the model
 
 					$linkProps = explode(':', $params['link']);			
-					$linkModel = \GO::getModel($linkProps[0])->findByPk($linkProps[1]);
+					$linkModel = $this->getRequestedModel($linkProps[0])->findByPk($linkProps[1]);
 					$model->link($linkModel);			
-				}
-
-				if(!empty($_FILES['importFiles'])){
-
-					$attachments = $_FILES['importFiles'];
-					$count = count($attachments['name']);
-
-					$params['enclosure'] = $params['importEnclosure'];
-					$params['delimiter'] = $params['importDelimiter'];
-
-					for($i=0;$i<$count;$i++){
-						if(is_uploaded_file($attachments['tmp_name'][$i])) {
-							$params['file']= $attachments['tmp_name'][$i];
-							//$params['model'] = $params['importModel'];
-
-							$controller = new $params['importController'];
-
-							$controller->run("import",$params,false);
-						}
-					}
 				}
 
 
@@ -126,6 +108,36 @@ class AbstractModelController extends AbstractController {
 			}	
 		}
 		return $response;
+	}
+
+	/**
+	 * Remove the owner (user_id) and the ACL of a model from the attributes that the client submitted.
+	 *
+	 * For a model with its own ACL, user_id is the owner of the ACL. Changing the ACL id would give the model the
+	 * permissions of another item, and deleting the model would delete that ACL. Only admins may change these, for
+	 * example the user of an e-mail account. On models that use the ACL of another model, like a time entry of a project,
+	 * user_id is just data and stays.
+	 *
+	 * @param \GO\Base\Db\ActiveRecord $model
+	 * @param array $attributes submitted attributes
+	 * @return array the attributes without the protected ones
+	 */
+	protected function removeProtectedAttributes(\GO\Base\Db\ActiveRecord $model, array $attributes): array
+	{
+		if(\GO::user() && \GO::user()->isAdmin()) {
+			return $attributes;
+		}
+
+		if($model->aclField() && !$model->isJoinedAclField) {
+			unset($attributes[$model->aclField()], $attributes['user_id']);
+		}
+
+		if($model->aclOverwrite()) {
+			// overwriting the ACL is done with the "overwriteAcl" attribute, never by setting the id
+			unset($attributes[$model->aclOverwrite()]);
+		}
+
+		return $attributes;
 	}
 
 	/**
@@ -667,6 +679,10 @@ class AbstractModelController extends AbstractController {
 	 */
 	protected function actionExport($params) {	
 		
+		if(!empty($params['type']) && !\GO\Base\Export\AbstractExport::isExportClass($params['type'])) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		\GO::setMaxExecutionTime(0);
 
 
@@ -792,10 +808,14 @@ class AbstractModelController extends AbstractController {
 				$select = ','.$select;
 						
 			// Custom field columns are added by joinCustomFields() in ActiveRecord::find()
+			// The fields are set by the server code, not by the request.
+			// nosemgrep: go-sql-from-request
 			$findParams->select('t.*'.$select);
 		}
 		
 		if(!empty($params['type']))
+			// Checked with AbstractExport::isExportClass() in the beginning of this method.
+			// nosemgrep: go-class-from-request
 			$export = new $params['type']($store, $columnModel,$model, $findParams, $showHeader, $humanHeaders, $title, $orientation, $extraParams);
 		else
 			$export = new \GO\Base\Export\ExportCSV($store, $columnModel, $model, $findParams, $showHeader, $humanHeaders, $title, $orientation, $extraParams); // The default Export is the CSV outputter.
@@ -805,6 +825,15 @@ class AbstractModelController extends AbstractController {
 	
 	protected function beforeExport(&$store, &$columnModel,&$model, &$findParams, &$showHeader, &$humanHeaders, &$title, &$orientation, &$extraParams){
 		
+	}
+
+	/**
+	 * Only the command line may import a file that is on the server, otherwise it must be uploaded
+	 *
+	 * @return bool
+	 */
+	protected function mayImportServerFile(): bool {
+		return \GO::environment()->isCli();
 	}
 	
 	/**
@@ -832,16 +861,27 @@ class AbstractModelController extends AbstractController {
 		$attributeIndexMap = isset($params['attributeIndexMap'])
 			? $attributeIndexMap = json_decode($params['attributeIndexMap'],true)
 			: array();
-		
+
+		// The file is converted and its records are imported, so over the web it must be a file the user uploaded
+		if(!$this->mayImportServerFile() && !is_uploaded_file($params['file'] ?? '')) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		if (!isset($params['importType']))
+			$params['importType'] = 'Csv';
+
+		if(!in_array($params['importType'], ['Csv', 'Xls'], true)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
 		if(is_file($params['file'])){
-						
-			if (!isset($params['importType']))
-				$params['importType'] = 'Csv';
-			
+
 			$fileClassName = 'GO\\Base\\Fs\\'.$params['importType'].'File';
 			if ($params['importType']=='Xls' && !empty($params['maxColumnNr']))
-				$importFile = new $fileClassName($params['file'],$params['maxColumnNr']);
+				$importFile = new \GO\Base\Fs\XlsFile($params['file'],$params['maxColumnNr']);
 			else
+				// importType is checked against Csv and Xls above.
+				// nosemgrep: go-class-from-request
 				$importFile = new $fileClassName($params['file']);
 		
 			if(!empty($params['delimiter']))
@@ -1108,12 +1148,26 @@ class AbstractModelController extends AbstractController {
 		}
 		
 		$mergeModels = json_decode($params['merge_models'], true);
-		
-		$targetModel = \GO::getModel($params['model_name'])->findByPk($params['target_model_id']);
-		
+
+		$model = $this->getRequestedModel($params['model_name']);
+		$targetModel = $model->findByPk($params['target_model_id']);
+		$delete = !empty($params['delete_merge_models']);
+
+		// Merging moves links, files and comments before the merged models are deleted, so check all permissions first
+		if(!$targetModel || !$targetModel->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+		$models = [];
 		foreach($mergeModels as $id){
-			$mergeModel = \GO::getModel($params['model_name'])->findByPk($id);
-			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), !empty($params['delete_merge_models']));			
+			$mergeModel = $model->findByPk($id);
+			if(!$mergeModel || !$mergeModel->checkPermissionLevel($delete ? \GO\Base\Model\Acl::DELETE_PERMISSION : \GO\Base\Model\Acl::WRITE_PERMISSION)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+			$models[] = $mergeModel;
+		}
+
+		foreach($models as $mergeModel){
+			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), $delete);
 		}
 		
 		return array('success'=>true);
@@ -1126,7 +1180,7 @@ class AbstractModelController extends AbstractController {
 		$sort = 0;
 		foreach ($records as $attributes) {
 			$model = \GO::getModel($this->model)->findByPk($attributes['id']);
-			$model->setAttributes($attributes);
+			$model->setAttributes($this->removeProtectedAttributes($model, $attributes));
 			
 			if($model->getSortOrderColumn())
 				$model->{$model->getSortOrderColumn()} = $sort;

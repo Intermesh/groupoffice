@@ -88,6 +88,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 	public function actionRemoveEmpty() {
+		// Maintenance for administrators. Deletes the empty folders of all users.
+		if(!$this->isCli() && (!\GO::user() || !\GO::user()->isAdmin())) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		\GO\Base\Fs\File::setAllowDeletes(false);
 		GO::session()->runAsRoot();
@@ -139,18 +143,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return $count;
 	}
 
-	protected function actionGetURL($path){
-		
-		if (substr($path,0,1)=='/')
-			$path = substr($path,1);
-		if (substr($path,-1,1)=='/')
-			$path = substr($path,0,-1);
-		
-		$folderModel = Folder::model()->findByPath($path,true);
-		
-		return array('success'=>true,'url'=>  \GO\Base\Util\Http::addParamsToUrl($folderModel->getExternalURL(),array('GOSID'=>session_id(), 'security_token'=>\GO::session()->values['security_token'])));
-	}
-	
 	protected function actionCache($params){
 		\GO\Files\Model\SharedRootFolder::model()->rebuildCache(\GO::user()->id);
 	}
@@ -437,7 +429,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						if ($projectsFolder) {
 							$node = $this->_folderToNode($projectsFolder, $expandFolderIds, false, $showFiles);
 							$node['path'] = $projectsFolder->path;
-							$node['text'] = \GO::t("projects", "projects");
+							$node['text'] = \GO::t("Projects", "projects2");
 							$response[] = $node;
 						}
 					}
@@ -698,14 +690,20 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			} catch(\Exception $e) {
 				$response['deleteSuccess'] = false;
 				$response['deleteFeedback'] = $e->getMessage();
+				$this->logDeleteException($e);
 			}
 
 			if (!isset($response['deleteSuccess'])){
 				$response['deleteSuccess'] = true;
 			}
-		} else {
-			$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
+
+			// Pasting into the trash is moving to the trash, which is done above with the delete permission of every
+			// item. Nothing is copied or moved into the trash folder itself.
+			unset(\GO::session()->values['files']['pasteIds']);
+			return $response;
 		}
+
+		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
 
 		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION))
 			throw new \GO\Base\Exception\AccessDenied();
@@ -935,6 +933,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}catch(\Exception $e) {
 			$response['deleteSuccess'] = false;
 			$response['deleteFeedback'] = $e->getMessage();
+			$this->logDeleteException($e);
 		}
 
 		if(!isset($response['deleteSuccess'])){
@@ -1061,6 +1060,18 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	 * @param type $store
 	 * @throws Exception
 	 */
+	/**
+	 * Log an exception of a delete or move to the trash that is shown to the user as feedback
+	 *
+	 * Without it, the cause of a failed delete is only in the dialog the user saw. Missing permissions are expected.
+	 */
+	private function logDeleteException(\Throwable $e): void
+	{
+		if (!$e instanceof AccessDenied) {
+			\go\core\ErrorHandler::logException($e);
+		}
+	}
+
 	private function _processDeletes(array $params, $store=false){
 		if(!$store){
 			$store = \GO\Base\Data\Store::newInstance(Folder::model());
@@ -1082,18 +1093,25 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (isset($params['trash_keys'])) {
 			$ids = $this->_splitFolderAndFileIds(json_decode($params['trash_keys'], true));
 
+				// moveToTrash() checks the delete permission. All items are checked before anything is moved too, so
+				// nothing is trashed when one of them may not be deleted.
+				$items = [];
 				foreach ($ids['folders'] as $folderId) {
-					$f = Folder::model()->findByPk($folderId);
-					if ($f) {
-						$f->moveToTrash();
+					$items[] = Folder::model()->findByPk($folderId);
+				}
+				foreach ($ids['files'] as $fileId) {
+					$items[] = File::model()->findByPk($fileId);
+				}
+				$items = array_filter($items);
+
+				foreach ($items as $f) {
+					if(!$f->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+						throw new AccessDenied();
 					}
 				}
 
-				foreach ($ids['files'] as $fileId) {
-					$f = File::model()->findByPk($fileId);
-					if ($f) {
-						$f->moveToTrash();
-					}
+				foreach ($items as $f) {
+					$f->moveToTrash();
 				}
 		}
 	}
@@ -1112,6 +1130,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		}catch(\Exception $e) {
 			$response['deleteSuccess'] = false;
 			$response['deleteFeedback'] = $e->getMessage();
+			$this->logDeleteException($e);
 		}
 
 		if(!isset($response['deleteSuccess'])){
@@ -1391,6 +1410,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			throw new Forbidden();
 		}
 
+		// Creating the folder saves the entity, so it requires write permission like for legacy models
+		$folderExists = !empty($entity->filesFolderId) && Folder::model()->findByPk($entity->filesFolderId, false, true);
+		if(!$folderExists && !$entity->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+
 		$folder = Folder::model()->findForEntity($entity);
 		return [
 			"success" => true,
@@ -1419,8 +1444,23 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			return $this->checkEntityFolder($params);
 		}
 
-		$obj = new $cls(false);
-		$model = $obj->findByPk($params['id'],false, true);
+		// Only models that have a files folder
+		// Checked with is_a() on this line.
+		// nosemgrep: go-class-from-request
+		if(!is_string($cls) || !is_a($cls, \GO\Base\Db\ActiveRecord::class, true) || !$cls::model()->hasFiles()) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		$model = $cls::model()->findByPk($params['id']);
+		if(!$model) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
+		// Creating the folder of the model requires write permission on the model
+		$folderExists = $model->files_folder_id > 0 && Folder::model()->findByPk($model->files_folder_id, false, true);
+		if(!$folderExists && !$model->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
 
 		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
 		$folder = Folder::model()->findByPk($folderId);
@@ -1526,8 +1566,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	private function processPaths($paths, Folder $currentFolder, $overwrite, &$response) {
 
-		$removeBlobs = [];
-
 		while ($tmpfile = array_shift($paths)){
 			if(!is_string($tmpfile)) {
 				// its a json object with blob data
@@ -1536,6 +1574,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				$tmpfile = Blob::buildPath($blob->id);
 			} else{
 				unset($blob);
+
+				// A path may only point to the user's own temporary files. It could be any file on the server otherwise.
+				if(!(new \GO\Base\Fs\File($tmpfile))->isTempFile()) {
+					throw new \GO\Base\Exception\AccessDenied();
+				}
 			}
 
 			$destinationFolder = $currentFolder;
@@ -1552,7 +1595,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					if(isset($blob->subfolder)) {
 						while($fname = array_shift($blob->subfolder)){
 
-							$fname = StringUtil::normalize($fname);
+							// Client input: never allow path separators or "..".
+							$fname = StringUtil::normalize(FileSystemObject::stripInvalidChars((string) $fname));
 
 							if($f = $destinationFolder->hasFolder($fname)) {
 								$destinationFolder = $f;
@@ -1561,7 +1605,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 							}
 						}
 					}
-					$filename = $blob->name;
+					// Client input: never allow path separators or "..".
+					$filename = FileSystemObject::stripInvalidChars((string) $blob->name);
 
 				}
 
@@ -1638,7 +1683,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		$workingFolder = Folder::model()->findByPk($params['working_folder_id']);
 		$destinationFolder = Folder::model()->findByPk($params['destination_folder_id']);
+		// Checked with checkFileStoragePath() below.
+		// nosemgrep: go-path-from-request
 		$archiveFile = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$destinationFolder->path . '/' . $params['archive_name'] . '.zip');
+		$archiveFile->checkFileStoragePath();
 
 		if(!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)){
 			throw new AccessDenied();
@@ -1663,7 +1711,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			}
 
 			$path = \GO::config()->file_storage_path.$sources[$i];			
-			$sourceObjects[]=\GO\Base\Fs\Base::createFromPath($path);
+			$sourceObject = \GO\Base\Fs\Base::createFromPath($path);
+			$sourceObject->checkFileStoragePath();
+			$sourceObjects[] = $sourceObject;
 		}
 
 		if(\GO\Base\Fs\Zip::create($archiveFile, $workingFolder->fsFolder, $sourceObjects)){
@@ -1781,70 +1831,159 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			throw new \GO\Base\Exception\AccessDenied("No permission to write in the target folder.");
 		}
 
-		$workingPath = \GO::config()->file_storage_path.$workingFolder->path;
-		chdir($workingPath);
+		$workingFsFolder = $workingFolder->fsFolder;
+		$workingFsFolder->checkFileStoragePath();
 
+		if(!is_array($sources)) {
+			throw new \Exception("Invalid request");
+		}
 
-		while ($filePath = array_shift($sources)) {
-			$file = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$filePath);
-			switch(strtolower($file->extension())) {
-				case 'zip':					
-					
-					$folder = \GO\Base\Fs\Folder::tempFolder(uniqid());
-					
-					if(class_exists("\ZipArchive")){
-						$zip = new \ZipArchive;
-						$zip->open($file->path());
-						$zip->extractTo($folder->path());									
-						$this->_convertZipEncoding($folder);
-					}else
-					{
-						chdir($folder->path());					
-						$cmd = \GO::config()->cmd_unzip.' -n '.escapeshellarg($file->path());
-						exec($cmd, $output, $ret);
-						if($ret!=0)
-						{
-							throw new \Exception("Could not decompress\n".implode("\n",$output));
-						}
-					}
-					
-					$items = $folder->ls();
-					
-					foreach($items as $item){
-						$item->move(new \GO\Base\Fs\Folder($workingPath));
-					}
-					
-					$folder->delete();
-					
-					break;
-				case 'gz':
-				case 'tgz':
-					$cmd = \GO::config()->cmd_tar.' zxf '.escapeshellarg($file->path());
-					exec($cmd, $output, $ret);
+		// Check all archives first, so nothing is extracted when one of them may not be read
+		$files = [];
+		foreach($sources as $filePath) {
+			$fileModel = \GO\Files\Model\File::model()->findReadableByPath($filePath);
+			$fileModel->fsFile->checkFileStoragePath();
+			$files[] = $fileModel->fsFile;
+		}
 
-					if($ret!=0)
-					{
-						throw new \Exception("Could not decompress\n".implode("\n",$output));
-					}
-					break;
-
-				case 'tar':
-					$cmd = \GO::config()->cmd_tar.' xf '.escapeshellarg($file->path());
-					
-					exec($cmd, $output, $ret);
-
-					if($ret!=0)
-					{
-						throw new \Exception("Could not decompress\n".implode("\n",$output));
-					}
-					break;
+		foreach ($files as $file) {
+			// Extract in a staging folder so links and other special files in the archive never end up in the file storage
+			$stagingFolder = \GO\Base\Fs\Folder::tempFolder(uniqid('decompress'));
+			try {
+				$this->extractArchive($file, $stagingFolder);
+				$this->removeUnsafeItems($stagingFolder);
+				if(strtolower($file->extension()) == 'zip') {
+					$this->_convertZipEncoding($stagingFolder);
+				}
+				$this->importExtracted($stagingFolder, $workingFsFolder);
+			} finally {
+				// deleting a link removes the link only, not what it points to
+				$stagingFolder->delete();
 			}
 		}
-		
+
 		$workingFolder->syncFilesystem(true);
 
 		return array('success'=>true);
 
+	}
+
+	/**
+	 * Extract an archive into an empty folder
+	 *
+	 * @throws \Exception
+	 */
+	private function extractArchive(\GO\Base\Fs\File $file, \GO\Base\Fs\Folder $destination): void
+	{
+		switch(strtolower($file->extension())) {
+			case 'zip':
+				if(class_exists("\ZipArchive")){
+					$zip = new \ZipArchive;
+					if($zip->open($file->path()) !== true) {
+						throw new \Exception("Could not decompress");
+					}
+					$zip->extractTo($destination->path());
+					$zip->close();
+				} else {
+					$cmd = \GO::config()->cmd_unzip.' -n '.escapeshellarg($file->path()).' -d '.escapeshellarg($destination->path());
+					exec($cmd, $output, $ret);
+					if($ret!=0) {
+						throw new \Exception("Could not decompress\n".implode("\n",$output));
+					}
+				}
+				break;
+
+			case 'gz':
+			case 'tgz':
+			case 'tar':
+				$flags = strtolower($file->extension()) == 'tar' ? '' : 'z';
+
+				// Refuse archives with anything else than files and folders, like (hard) links or devices. A hard link
+				// through a link extracted earlier would share its data with a file outside the archive.
+				exec(\GO::config()->cmd_tar.' -t'.$flags.'vf '.escapeshellarg($file->path()), $output, $ret);
+				if($ret!=0) {
+					throw new \Exception("Could not decompress\n".implode("\n",$output));
+				}
+				foreach($output as $line) {
+					if($line !== '' && $line[0] !== '-' && $line[0] !== 'd') {
+						throw new \Exception(\GO::t("The archive contains links or other special files and can't be decompressed", "files"));
+					}
+				}
+
+				$output = [];
+				$cmd = \GO::config()->cmd_tar.' -x'.$flags.'f '.escapeshellarg($file->path()).' --no-same-owner --no-same-permissions -C '.escapeshellarg($destination->path());
+				exec($cmd, $output, $ret);
+				if($ret!=0) {
+					throw new \Exception("Could not decompress\n".implode("\n",$output));
+				}
+				break;
+
+			default:
+				throw new \Exception("Unsupported archive type");
+		}
+	}
+
+	/**
+	 * Remove symbolic links and everything that isn't a regular file or folder from an extracted archive
+	 *
+	 * @throws \Exception when a file has more than one hard link, because writing it would change another file too
+	 */
+	private function removeUnsafeItems(\GO\Base\Fs\Folder $folder): void
+	{
+		$dir = @opendir($folder->path());
+		if(!$dir) {
+			return;
+		}
+		while(false !== ($name = readdir($dir))) {
+			if($name === '.' || $name === '..') {
+				continue;
+			}
+			$path = $folder->path() . '/' . $name;
+			// check for links first, because is_dir() and is_file() follow them
+			if(is_link($path)) {
+				unlink($path);
+			} else if(is_dir($path)) {
+				$this->removeUnsafeItems(new \GO\Base\Fs\Folder($path));
+			} else if(!is_file($path)) {
+				unlink($path);
+			} else if(stat($path)['nlink'] > 1) {
+				closedir($dir);
+				throw new \Exception(\GO::t("The archive contains links or other special files and can't be decompressed", "files"));
+			}
+		}
+		closedir($dir);
+	}
+
+	/**
+	 * Move the extracted files and folders into the destination, merging with folders that already exist.
+	 *
+	 * Hidden files are skipped like the file storage does.
+	 *
+	 * @throws \GO\Base\Exception\AccessDenied when an existing item in the destination is a link
+	 */
+	private function importExtracted(\GO\Base\Fs\Folder $source, \GO\Base\Fs\Folder $destination): void
+	{
+		foreach($source->ls() as $item) {
+			$target = $destination->path() . '/' . $item->name();
+			if(is_link($target)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+
+			if($item->isFolder()) {
+				$targetFolder = new \GO\Base\Fs\Folder($target);
+				if(!$targetFolder->exists()) {
+					$targetFolder->create();
+				} else if(!is_dir($target)) {
+					continue;
+				}
+				$this->importExtracted($item, $targetFolder);
+			} else {
+				if(is_dir($target)) {
+					continue;
+				}
+				$item->move($destination);
+			}
+		}
 	}
 	
 	private function _convertZipEncoding(\GO\Base\Fs\Folder $folder, $charset='CP850'){
@@ -1897,9 +2036,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	protected function actionImages($params){
 		if(isset($params["id"])){
 			$currentFile = \GO\Files\Model\File::model()->findByPk($params["id"]);
+			if(!$currentFile) {
+				throw new \GO\Base\Exception\NotFound();
+			}
 		}else
 		{
-			$currentFile = \GO\Files\Model\File::model()->findByPath($params["path"]);
+			// The images of the folder are listed, so the user must be allowed to read it
+			$currentFile = \GO\Files\Model\File::model()->findReadableByPath($params["path"] ?? '');
 		}
 
 		$folder = $currentFile->folder();

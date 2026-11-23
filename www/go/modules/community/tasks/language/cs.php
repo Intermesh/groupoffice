@@ -74,4 +74,9 @@ return array (
   'List: None' => 'Seznam: žádný',
   'Message' => 'Zpráva',
   'Display options for lists' => 'Zobraz možnosti pro seznamy',
+  'Task list' => 'Seznam úkolů',
+  'Show in calendar' => 'Zobrazit v kalendáři',
+  'Tasks in this list will be shown in the calendar' => 'Úkoly z tohoto seznamu se zobrazí v kalendáři',
+  'Tasklists' => 'Seznamy úkolů',
+  'This task already has booked hours or progress' => 'Na tomto úkolu již jsou vykázané hodiny nebo postup',
 );

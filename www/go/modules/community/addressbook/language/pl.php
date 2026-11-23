@@ -132,4 +132,7 @@ return array (
   'Last contact at' => 'Data ostatniego kontaktu',
   'Photo blob ID' => 'ID zdjęcia (blob)',
   'ICD' => 'ICD',
+  'vCard importer' => 'Importer vCard',
+  'Please select at least two items to merge.' => 'Wybierz co najmniej dwie pozycje do scalenia.',
+  'Please select a company' => 'Wybierz firmę',
 );

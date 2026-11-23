@@ -53,8 +53,9 @@ class StringHelper {
 	
 	/**
 	 * Convert non ascii characters to chars that come close to them.
-	 * @param type $string
-	 * @return type 
+	 * @param string $string
+	 * @return string
+	 * @throws Exception when the string cannot be converted
 	 */
 		public static function utf8ToASCII($string) {
 
@@ -812,7 +813,8 @@ class StringHelper {
 		// Remove namespaced elements (we do not need them)
 		$data = preg_replace('#</*\w+:\w[^>]*+>#i', '', $data);
 
-		return $data;
+		// The regular expressions above can be fooled, eg. by <svg/onload=...>. Parse the HTML to remove what's left.
+		return \go\core\util\StringUtil::removeActiveContent($data);
 	}
 	
 	/**

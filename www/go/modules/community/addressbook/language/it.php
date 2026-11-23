@@ -160,4 +160,6 @@ return array (
   'Add to group' => 'Aggiungi a gruppi',
   'Delete %d items' => 'Elimina %d elementi',
   'Please select at least two items to merge.' => 'Seleziona almeno due elementi da fondere',
+  'vCard importer' => 'Importazione vCard',
+  'Please select a company' => 'Seleziona un\'azienda',
 );

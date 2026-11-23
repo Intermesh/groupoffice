@@ -70,4 +70,12 @@ return array (
   'SSL' => 'SSL',
   'Mod rewrite' => 'Mod rewrite',
   'Mod rewrite base path' => 'Mod rewrite Basispfad',
+  'An email with recover instructions is send to the following email address:' => 'Eine E-Mail mit Anweisungen zur Wiederherstellung wurde an folgende E-Mail-Adresse gesendet:',
+  'Fill in your email address in the form below, and you\'ll recieve a link to recover your password within minutes.' => 'Geben Sie im folgenden Formular Ihre E-Mail-Adresse ein. Sie erhalten innerhalb weniger Minuten einen Link zur Wiederherstellung Ihres Kennworts.',
+  'Forgot password?' => 'Kennwort vergessen?',
+  'Menu\'s' => 'Menüs',
+  'No email given!' => 'Keine E-Mail-Adresse angegeben!',
+  'No user found with the given email address!' => 'Kein Benutzer mit der angegebenen E-Mail-Adresse gefunden!',
+  'The provided usertoken is not valid!' => 'Das angegebene Benutzertoken ist ungültig!',
+  'Your password is successfully reset.' => 'Ihr Kennwort wurde erfolgreich zurückgesetzt.',
 );

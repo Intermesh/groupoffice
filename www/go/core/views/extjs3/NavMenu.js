@@ -40,7 +40,7 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 	//overClass:'x-view-over',
 	itemSelector:'div.go-nav-item',
 	tpl:'<tpl for=".">\
-					<div class="go-nav-item {cls}"><i class="icon {iconCls}">{icon}</i>\
+					<div class="go-nav-item {cls}"><i class="icon {iconCls}">{[values.icon ?? ""]}</i>\
 					<span>{name}</span>\
 					<tpl if="values.badge">\
 					<span class="badge right">{badge}</span>\

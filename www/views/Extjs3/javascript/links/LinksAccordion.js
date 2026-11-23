@@ -36,7 +36,7 @@ GO.LinksAccordion = Ext.extend(Ext.Panel, {
 		if(go.Modules.isAvailable("community", "notes"))
 		{
 			var noteLinksPanel = new GO.grid.LinksGrid({
-				title:t("Notes", "notes"),
+				title:t("Notes", "notes", "community"),
 				noSearchField:true
 			});
 			noteLinksPanel.store.baseParams.types=Ext.encode([4]);

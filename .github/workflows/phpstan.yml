@@ -1,0 +1,34 @@
+# Runs PHPStan (tests/phpstan.neon) on every push and pull request. Errors that existed before are in
+# tests/phpstan-baseline.neon, so only new errors fail the check.
+# Make "PHPStan" a required check in the branch protection settings to block merging pull requests with new errors.
+name: PHPStan
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The PHP version of the development container. phpVersion in phpstan.neon makes PHPStan check against PHP 8.2.
+      # With short_open_tag on, PHP parses "<?xml" in templates as PHP and PHPStan stops with a syntax error.
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          ini-values: short_open_tag=Off, memory_limit=2G
+          coverage: none
+
+      # The PHP extensions are only needed to run GroupOffice, not to analyse it.
+      - name: Install dependencies
+        run: |
+          composer install --working-dir=www --no-interaction --no-progress --ignore-platform-reqs
+          composer install --working-dir=www/go/modules/community/maildomains --no-interaction --no-progress --ignore-platform-reqs
+
+      - name: Analyse
+        working-directory: www
+        run: ./vendor/bin/phpstan analyse -c ../tests/phpstan.neon --memory-limit=2G --no-progress --error-format=github

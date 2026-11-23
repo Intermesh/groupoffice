@@ -42,6 +42,21 @@ class Settings extends core\Settings
 		return implode('.',$jwt);
 	}
 
+	/**
+	 * Link to join a new meeting in a random room, with a JWT when the server requires one
+	 *
+	 * @return string
+	 */
+	public function createMeetingUri(): string
+	{
+		$room = core\util\StringUtil::random(8);
+		$uri = $this->videoUri . $room;
+		if ($this->videoJwtEnabled) {
+			$uri .= '?jwt=' . $this->createJwtToken($room);
+		}
+		return $uri;
+	}
+
 
 
 	public function save(): bool

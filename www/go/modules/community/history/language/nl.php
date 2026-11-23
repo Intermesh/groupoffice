@@ -20,4 +20,5 @@ return array (
   'Delete entries after' => 'Verwijderer records na',
   'Request ID' => 'ID aanvragen',
   'Entity ID' => 'Identiteit van de entiteit',
+  'Datum' => 'Datum',
 );

@@ -25,7 +25,11 @@ class SmimeModule extends \GO\Base\Module{
 	}
 	
 	public static function deleteUser($user) {		
-		Model\PublicCertificate::model()->deleteByAttribute('user_id', $user->id);
+		// The certificates of the deleted user are removed by whoever deletes the user
+		$stmt = Model\PublicCertificate::model()->findByAttribute('user_id', $user->id, \GO\Base\Db\FindParams::newInstance()->ignoreAcl());
+		foreach($stmt as $cert) {
+			$cert->delete(true);
+		}
 	}
 
 

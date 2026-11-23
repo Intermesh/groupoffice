@@ -20,16 +20,41 @@ class RouterTest extends TestCase
 
 	private function callRouter(string $method, array $params = []): array
 	{
+		[$output, $responses] = $this->callRouterMulti([[$method, $params, 'c1']]);
+		return [$output, end($responses)];
+	}
+
+	/**
+	 * Run several method calls in one request
+	 *
+	 * @return array [output, responses of these calls]
+	 */
+	private function callRouterMulti(array $calls): array
+	{
 		// not logged in, like an anonymous web request
 		unset($_COOKIE['accessToken']);
 		go()->setAuthState(new State());
 
 		ob_start();
-		(new Router())->run([[$method, $params, 'c1']], false);
+		(new Router())->run($calls, false);
 		$output = ob_get_clean();
 
-		$data = Response::get()->getData();
-		return [$output, end($data)];
+		return [$output, array_slice(Response::get()->getData(), -count($calls))];
+	}
+
+	/**
+	 * The history stores the request ID with a change, so a caller like an AI assistant can be recognized
+	 */
+	public function testRequestIdPrefix(): void
+	{
+		$router = new Router();
+		$router->requestIdPrefix = 'MCP: Test assistant';
+		$router->run([['Core/echo', ['a' => 1], 'c1']], false);
+
+		$this->assertSame('MCP: Test assistant JMAP Core/echo', go()->getDebugger()->getRequestId());
+
+		(new Router())->run([['Core/echo', [], 'c2']], false);
+		$this->assertSame('JMAP Core/echo', go()->getDebugger()->getRequestId());
 	}
 
 	public static function cliMethods(): array
@@ -58,5 +83,114 @@ class RouterTest extends TestCase
 		[, $response] = $this->callRouter('Core/echo', ['foo' => 'bar']);
 
 		$this->assertSame(['foo' => 'bar'], $response[1]);
+	}
+
+	public static function invalidMethods(): array
+	{
+		return [
+			// magic methods
+			['User/__construct'],
+			['community/notes/Note/__construct'],
+			// a "\" in the route could reach classes outside the controller namespace
+			['community/notes/controller\\Note/query'],
+		];
+	}
+
+	#[DataProvider('invalidMethods')]
+	public function testOnlyPublicControllerMethodsAreRouted(string $method)
+	{
+		[$output, $response] = $this->callRouter($method);
+
+		$this->assertSame('', $output, 'The controller method must not have run');
+		$this->assertSame('error', $response[0]);
+		$this->assertStringContainsString('Bad request', $response[1]['message']);
+	}
+
+	public function testControllerAuthenticates()
+	{
+		[, $response] = $this->callRouter('User/get');
+
+		$this->assertSame('error', $response[0]);
+		$this->assertStringContainsString('Unauthorized', $response[1]['message']);
+	}
+
+	public static function switchUserMethods(): array
+	{
+		return [
+			['community/test/SwitchUser/whoAmI'],
+			['community/test/SwitchUser/fail'],
+		];
+	}
+
+	/**
+	 * A controller that authenticates with its own token, like WOPI, must not authenticate the next methods
+	 */
+	#[DataProvider('switchUserMethods')]
+	public function testMethodCannotChangeUserForNextMethods(string $method)
+	{
+		[, $responses] = $this->callRouterMulti([
+			[$method, [], 'c1'],
+			['User/get', ['ids' => [1]], 'c2']
+		]);
+
+		$this->assertSame('error', $responses[1][0]);
+		$this->assertStringContainsString('Unauthorized', $responses[1][1]['message']);
+		$this->assertFalse(go()->getAuthState()->isAuthenticated());
+	}
+
+	public function testMethodCannotChangeLegacySessionUser()
+	{
+		$hadSession = isset($_SESSION['GO_SESSION']);
+		$hadUserId = $hadSession && array_key_exists('user_id', $_SESSION['GO_SESSION']);
+		$userId = $_SESSION['GO_SESSION']['user_id'] ?? null;
+		unset($_SESSION['GO_SESSION']['user_id']);
+
+		try {
+			[, $responses] = $this->callRouterMulti([['community/test/SwitchUser/whoAmI', [], 'c1']]);
+
+			// The method itself ran as the switched user
+			$this->assertEquals(1, $responses[0][1]['legacyUserId']);
+			$this->assertArrayNotHasKey('user_id', $_SESSION['GO_SESSION']);
+		} finally {
+			if ($hadUserId) {
+				$_SESSION['GO_SESSION']['user_id'] = $userId;
+			} else if(!$hadSession) {
+				unset($_SESSION['GO_SESSION']);
+			}
+		}
+	}
+
+	public function testEntityControllerClass(): void
+	{
+		$this->assertEquals(
+			\go\modules\community\notes\controller\Note::class,
+			Router::entityControllerClass(\go\modules\community\notes\model\Note::entityType())
+		);
+	}
+
+	public function testGetEntityMethods(): void
+	{
+		$methods = Router::getEntityMethods(\go\modules\community\notes\model\Note::entityType());
+
+		foreach (['get', 'query', 'set', 'changes'] as $method) {
+			$this->assertArrayHasKey($method, $methods);
+		}
+		$this->assertEquals(Router::STANDARD_METHODS['get'], $methods['get']);
+
+		// Constructors, static and non public methods can't be called through JMAP
+		$this->assertArrayNotHasKey('__construct', $methods);
+		$this->assertArrayNotHasKey('onEntitySave', $methods);
+		$this->assertArrayNotHasKey('canDestroy', $methods);
+	}
+
+	public function testListedMethodsAreRoutable(): void
+	{
+		$type = \go\modules\community\notes\model\Note::entityType();
+		$controller = Router::entityControllerClass($type);
+
+		$this->assertTrue(Router::isRoutableController($controller));
+		foreach (array_keys(Router::getEntityMethods($type)) as $method) {
+			$this->assertTrue((new \ReflectionMethod($controller, $method))->isPublic(), $method);
+		}
 	}
 }

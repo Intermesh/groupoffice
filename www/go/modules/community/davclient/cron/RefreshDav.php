@@ -16,12 +16,12 @@ class RefreshDav extends CronJob
 
 	public function getLabel()
 	{
-		return \go()->t('Fetch data from caldav servers', 'davclient', 'community');
+		return \go()->t('Fetch data from caldav servers', 'community', 'davclient');
 	}
 
 	public function getDescription()
 	{
-		return \go()->t('Auto refresh', 'davclient', 'community');
+		return \go()->t('Auto refresh', 'community', 'davclient');
 	}
 
 	public function run(CronJobSchedule $schedule)

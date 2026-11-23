@@ -200,7 +200,7 @@ class Token extends Entity {
 				$client->status = 'allowed';
 			}
 			$client->lastSeen = $this->lastActiveAt;
-			if($client->save()) {
+			if($client->save()) { // nosemgrep: go-setter-persists -- private helper, not an API property
 				$this->clientId = $client->id;
 			} else {
 				throw new Exception('Failed to save the client identity'.var_export($client->getValidationErrors(), true));
@@ -214,6 +214,23 @@ class Token extends Entity {
 	private static function generateToken(): string
 	{
 		return uniqid().bin2hex(random_bytes(16));
+	}
+
+	/**
+	 * The security token of the old framework for the session of this token
+	 *
+	 * Derived from the CSRF token, so a session that the server cleaned up and that was restored with this access
+	 * token gets the same security token as the one the client already has. It's a hash, so the CSRF token itself
+	 * doesn't end up in URL's of the old framework.
+	 *
+	 * @return string|null Null when the token has no CSRF token yet
+	 */
+	public function getLegacySecurityToken(): ?string
+	{
+		if (!isset($this->CSRFToken)) {
+			return null;
+		}
+		return hash_hmac('sha256', 'GO\Base\Session::security_token', $this->CSRFToken);
 	}
 
 	/**
@@ -331,7 +348,7 @@ class Token extends Entity {
 				$user->language = $_COOKIE['GO_LANGUAGE'];
 			}
 
-			if (!$user->save()) {
+			if (!$user->save()) { // nosemgrep: go-setter-persists -- Token has no JMAP set method; called by the server only
 				return false;
 			}
 		}
@@ -343,6 +360,87 @@ class Token extends Entity {
 		
 		// Create accessToken and set expire time
 		return true;						
+	}
+
+	/**
+	 * Seconds that a token which another server created for a direct login can be handed over. {@see findHandoff()}
+	 */
+	const HANDOFF_LIFETIME = 300;
+
+	/**
+	 * Find a token that another server created to log in directly by posting its access token to index.php
+	 *
+	 * Used by the multi_instance module, which creates a token in the database of the instance that expires an hour
+	 * after it was created. Only such tokens are accepted, and only for {@see HANDOFF_LIFETIME} seconds. The token of a
+	 * normal login expires a day after it was last used, so another website can't log a user in to its own account by
+	 * posting the access token of its own login. Use {@see rotate()} after accepting it, so it can only be used once.
+	 *
+	 * @param string $accessToken
+	 * @return Token|null
+	 * @throws Exception
+	 */
+	public static function findHandoff(string $accessToken): ?Token
+	{
+		// Read before loading the token, because loading an authenticated token extends its expiry time
+		$times = go()->getDbConnection()
+			->select('createdAt, expiresAt')
+			->from('core_auth_token')
+			->where('accessToken', '=', $accessToken)
+			->single();
+
+		if (!$times || empty($times['expiresAt'])) {
+			return null;
+		}
+
+		$utc = new DateTimeZone("UTC");
+		$createdAt = (new DateTime($times['createdAt'], $utc))->getTimestamp();
+		$expiresAt = (new DateTime($times['expiresAt'], $utc))->getTimestamp();
+		// A minute of slack for the clocks of the servers
+		if ($createdAt < time() - self::HANDOFF_LIFETIME || $expiresAt - $createdAt > 3660) {
+			return null;
+		}
+
+		$token = static::find()->where(['accessToken' => $accessToken])->single();
+		if (!$token || !$token->isAuthenticated()) {
+			return null;
+		}
+		return $token;
+	}
+
+	/**
+	 * Replace the access token and CSRF token, so the old ones can't be used anymore
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function rotate(): bool
+	{
+		if (isset($this->accessToken)) {
+			go()->getCache()->delete('token-' . $this->accessToken);
+		}
+		$this->accessToken = null;
+		$this->CSRFToken = null;
+
+		return $this->refresh();
+	}
+
+	/**
+	 * Find the token of a login that isn't finished yet by its login token
+	 *
+	 * The login token is only valid for {@see LOGIN_LIFETIME} and only until the login is finished. Otherwise it could
+	 * be used to get the access token and CSRF token again.
+	 *
+	 * @param string $loginToken
+	 * @return Token|null
+	 * @throws Exception
+	 */
+	public static function findPendingLogin(string $loginToken): ?Token
+	{
+		$token = static::find()->where(['loginToken' => $loginToken])->single();
+		if (!$token || $token->isExpired() || isset($token->accessToken)) {
+			return null;
+		}
+		return $token;
 	}
 
 	/**
@@ -376,8 +474,17 @@ class Token extends Entity {
 			$_SESSION['GO_SESSION'] = [];
 		}			
 
+		// A new session ID when the user of the session is set or changes, so an ID that was known before the login
+		// can't be used for the logged in session.
+		if(($_SESSION['GO_SESSION']['user_id'] ?? null) != $this->userId && session_status() == PHP_SESSION_ACTIVE && !headers_sent()) {
+			session_regenerate_id(true);
+		}
+
 		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;
+		if (($securityToken = $this->getLegacySecurityToken()) !== null) {
+			$_SESSION['GO_SESSION']['security_token'] = $securityToken;
+		}
 	}
 	
 	public function oldLogout() {
@@ -414,7 +521,7 @@ class Token extends Entity {
 	public function setPassedAuthenticator(array $authenticators): bool
 	{
 		$this->passedAuthenticators = trim(implode('|',$authenticators),'|');
-		return $this->save();
+		return $this->save(); // nosemgrep: go-setter-persists -- Token has no JMAP set method; called by the server only
 	}
 	
 	/**
@@ -546,14 +653,45 @@ class Token extends Entity {
 	 */
 	public static function logoutEveryoneButAdmins(): bool
 	{
-		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
-		$q = (new Query)
-			->where('expiresAt', '!=', null)
-			->where('userId', 'NOT IN ', $admins);
+		$query = function() {
+			$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
+			return (new Query)
+				->where('expiresAt', '!=', null)
+				->where('userId', 'NOT IN ', $admins);
+		};
 
 		ErrorHandler::log("Logout everyone but admins is used!");
 
-		return self::delete($q) && RememberMe::delete($q);
+		return self::deleteWithRetry(self::class, $query) && self::deleteWithRetry(RememberMe::class, $query);
+	}
+
+	/**
+	 * Delete entities and retry when a concurrent transaction changed one of the records
+	 * since this transaction's snapshot was taken (MariaDB error 1020 "Record has changed since last read").
+	 *
+	 * Each attempt waits a little longer so the conflicting transaction, for example a request that
+	 * updates the token's lastActiveAt, can finish first. A retry only helps when the delete runs in its own
+	 * transaction, because an outer transaction keeps its old snapshot. In that case the exception is thrown at once.
+	 *
+	 * @param class-string<Entity> $cls The entity to delete, Token or RememberMe
+	 * @param callable(): Query $query Returns a new delete query for every attempt
+	 * @param int $attempts Maximum number of attempts
+	 * @return bool
+	 * @throws Throwable
+	 */
+	private static function deleteWithRetry(string $cls, callable $query, int $attempts = 5): bool
+	{
+		for ($i = 1; ; $i++) {
+			try {
+				return $cls::delete($query());
+			} catch (DbException $e) {
+				if (!$e->isRecordChanged() || $i >= $attempts || go()->getDbConnection()->inTransaction()) {
+					throw $e;
+				}
+				go()->debug("Record changed while deleting " . $cls . ", retrying (" . $i . "/" . $attempts . ")");
+				usleep(100000 * $i);
+			}
+		}
 	}
 
 	/**

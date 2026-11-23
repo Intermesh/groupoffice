@@ -82,7 +82,7 @@ go.AuthenticationManager = (function () {
 						go.Jmap.processDebugResponse(result.debug, 'auth');
 					}
           
-          this.userAuthenticators = result.authenticators || [];
+          			this.userAuthenticators = result.authenticators || [];
 					this.loginToken = result.loginToken;
 					this.username = result.username;
 

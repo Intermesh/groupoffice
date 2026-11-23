@@ -9,6 +9,8 @@ use go\core\model\Module;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
+use go\core\util\Color;
+use go\core\validate\ErrorCode;
 
 /**
  * Category model
@@ -50,6 +52,14 @@ class Category extends Entity {
 		if($this->isNew() )  {
 			$this->ownerId = go()->getUserId();
 		}
+	}
+
+	protected function internalValidate()
+	{
+		if($this->isModified('color') && !empty($this->color) && !Color::isHex($this->color)) {
+			$this->setValidationError('color', ErrorCode::MALFORMED, 'Color must be a hexadecimal value');
+		}
+		parent::internalValidate();
 	}
 
 	protected function internalGetPermissionLevel(): int

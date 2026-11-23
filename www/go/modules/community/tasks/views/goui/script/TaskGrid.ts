@@ -168,7 +168,7 @@ export class TaskGrid extends Table<DataSourceStore> {
 				}),
 				column({
 					id: "project",
-					header: t("Project", "projects3", "business"),
+					header: t("Project", "business", "projects3"),
 					width: 160,
 					sortable: true,
 					renderer: (columnValue) => {

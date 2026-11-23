@@ -73,12 +73,9 @@
 		
 		<?php if(!$ticket->isClosed()): ?>
 		
-			<?php $uploader = new \GO\Site\Widget\Plupload\Widget(); ?>
-		
 			<h3><?php echo \GO::t("Your message", "defaultsite"); ?></h3>
 
 			<?php echo $form->textArea($message,'content',array('required'=>true)); ?>
-			<?php echo $uploader->render(); ?>
 			<div class="button-bar">
 				<?php echo $form->submitButton(\GO::t("Add Comment", "defaultsite"),array('id'=>'submit-ticket-button', 'class'=>'button')); ?>
 			</div>

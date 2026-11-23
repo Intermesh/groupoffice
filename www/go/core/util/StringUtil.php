@@ -620,8 +620,9 @@ END;
 	public static function detectXSS(string $string, ?bool $withStyle = false): bool
 	{
 		if($withStyle) {
-			// remove GO injected style
-			$string = preg_replace('/<style id="groupoffice-extracted-style">.*<\/style>/usi', '', $string);
+			// remove GO injected style. It's at the start, see sanitizeHtml(). Only up to the first end tag so a copy of
+			// the opening tag in the content can't hide what comes after it.
+			$string = preg_replace('/^<style id="groupoffice-extracted-style">.*?<\/style>/usi', '', $string, 1);
 		}
 // Keep a copy of the original string before cleaning up
 		$orig = $string;
@@ -987,9 +988,9 @@ END;
 		ini_set('pcre.backtrack_limit',  3000000 );
 
 
-		//remove strange white spaces in tags first
-		//sometimes things like this happen <style> </ style >
-		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
+		//remove strange white spaces and attributes in end tags first
+		//sometimes things like this happen <style> </ style >. Browsers also end an element at </style x> or </style/>.
+		$html = preg_replace("'</[\s]*([\w]*)(?:[\s/][^>]*)?>'u","</$1>", $html);
 
 		// extract style before removing comments because sometimes style is wrapped in a comment
 		// <style><!-- body{} --></style>
@@ -1052,9 +1053,9 @@ END;
 //		preg_match_all($regex, $html, $matched_tags, PREG_SET_ORDER);
 //		preg_replace($regex, '$1', $html);
 
-		$html = preg_replace_callback('#<([^>]+)>#u', function($matches) {
-			return "<" . preg_replace('#\s(?:on|xmlns)[^\s]+#iu', "", $matches[1]) . ">";
-		}, $html);
+		// Remove event handlers like onerror, javascript: URLs etc. This parses the HTML, because regular expressions can
+		// be fooled. For example by <svg/onload=...> or by a ">" in a quoted attribute value.
+		$html = self::removeActiveContent($html);
 
 
 		//remove high z-indexes
@@ -1069,7 +1070,7 @@ END;
 
 
 		if(!empty($styles)) {
-
+			$styles = self::escapeStyleContent($styles);
 
 			if(str_contains($styles, $prefix)) {
 				$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="groupoffice-msg-' . $prefix . '">' . $html . '</div>';
@@ -1084,6 +1085,125 @@ END;
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Elements that are removed with their content by removeActiveContent(). SVG and MathML are removed because their
+	 * content is parsed differently by browsers, which can bring back removed scripts.
+	 */
+	const ACTIVE_CONTENT_ELEMENTS = ['script', 'iframe', 'frame', 'frameset', 'object', 'embed', 'applet', 'base', 'svg',
+		'math', 'noscript', 'noembed', 'noframes', 'xmp', 'plaintext', 'template', 'meta', 'link'];
+
+	/**
+	 * Attributes that may contain a URL
+	 */
+	const URL_ATTRIBUTES = ['href', 'src', 'action', 'formaction', 'background', 'lowsrc', 'dynsrc', 'data', 'poster',
+		'srcset', 'cite', 'longdesc', 'usemap', 'xlink:href'];
+
+	/**
+	 * Remove everything from HTML that can run scripts: script elements, event handler attributes like onerror,
+	 * javascript: URLs and CSS expressions.
+	 *
+	 * The HTML is parsed with DOMDocument and written again, so all attributes are properly quoted. Regular expressions
+	 * can't do this safely. For example in <img alt=">" onerror=...> the first ">" is part of the attribute value.
+	 *
+	 * @param string $html
+	 * @return string
+	 */
+	public static function removeActiveContent(string $html): string
+	{
+		if (trim($html) === '') {
+			return $html;
+		}
+
+		$doc = new \DOMDocument();
+		$useErrors = libxml_use_internal_errors(true);
+		// The XML declaration makes libxml read the HTML as UTF-8. The wrapper element gives one root to read back.
+		$loaded = $doc->loadHTML('<?xml encoding="UTF-8"><div id="go-active-content-root">' . $html . '</div>',
+			LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET | LIBXML_PARSEHUGE);
+		libxml_clear_errors();
+		libxml_use_internal_errors($useErrors);
+
+		$root = $loaded ? $doc->getElementById('go-active-content-root') : null;
+		if (!$root) {
+			// Can't be parsed. Don't return something that wasn't checked.
+			return htmlspecialchars($html, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+		}
+
+		$xpath = new \DOMXPath($doc);
+
+		// Comments can contain conditional comments for old browsers
+		foreach (iterator_to_array($xpath->query('//comment()', $root)) as $comment) {
+			$comment->parentNode->removeChild($comment);
+		}
+
+		foreach (iterator_to_array($xpath->query('.//*', $root)) as $element) {
+			/** @var \DOMElement $element */
+			if (!$element->parentNode) {
+				continue; // inside an element that was removed
+			}
+
+			if (in_array(strtolower($element->localName ?? $element->nodeName), self::ACTIVE_CONTENT_ELEMENTS)) {
+				$element->parentNode->removeChild($element);
+				continue;
+			}
+
+			if (strtolower($element->localName ?? $element->nodeName) === 'style') {
+				$element->textContent = self::escapeStyleContent($element->textContent);
+			}
+
+			foreach (iterator_to_array($element->attributes) as $attribute) {
+				/** @var \DOMAttr $attribute */
+				$name = strtolower($attribute->nodeName);
+				if (self::isActiveAttribute($name, $attribute->value)) {
+					$element->removeAttributeNode($attribute);
+				}
+			}
+		}
+
+		$result = '';
+		foreach ($root->childNodes as $child) {
+			$result .= $doc->saveHTML($child);
+		}
+		return $result;
+	}
+
+	/**
+	 * Make CSS safe to put inside a <style> element.
+	 *
+	 * The browser ends a style element at the first "</style", also inside a CSS string or comment, and parses the
+	 * rest as HTML. "<" isn't needed in CSS outside strings, so it's replaced with the CSS escape "\3c ", which is still
+	 * "<" inside a CSS string.
+	 *
+	 * @param string $css
+	 * @return string
+	 */
+	public static function escapeStyleContent(string $css): string
+	{
+		return str_replace('<', '\\3c ', $css);
+	}
+
+	private static function isActiveAttribute(string $name, string $value): bool
+	{
+		// Event handlers and namespaces
+		if (str_starts_with($name, 'on') || str_starts_with($name, 'xmlns') || $name === 'formaction') {
+			return true;
+		}
+
+		// Browsers ignore control characters and white space in the protocol, eg. "java\tscript:"
+		$normalized = strtolower(preg_replace('/[\x00-\x20]+/', '', $value));
+
+		if (in_array($name, self::URL_ATTRIBUTES) || str_contains($name, ':')) {
+			if (preg_match('/(?:^|,)(?:java|vb|live)script:|^mocha:|^data:(?!image\/(?:png|gif|jpe?g|webp|bmp);)/', $normalized)) {
+				return true;
+			}
+		}
+
+		if ($name === 'style' && preg_match('/expression\(|javascript:|vbscript:|behavior:|-moz-binding/', $normalized)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static function extractStyles(string $html, string $prefixId): string
@@ -1285,6 +1405,46 @@ END;
 		}
 
 		return floatval($number);
+	}
+
+	/**
+	 * Make a value safe for a CSV file that may be opened in a spreadsheet application
+	 *
+	 * Spreadsheet applications run text that starts with "=", "+", "-", "@", a tab or a carriage return as a
+	 * formula (CSV injection), for example to open a link or start a program. Such text gets a "'" in front so it's
+	 * shown as text. Numbers, also formatted ones like "-1.234,56", and phone numbers like "+31 (0)20 1234567" are
+	 * kept as they are, because they can't call a function. Values that are not a string are returned unchanged.
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public static function escapeCsvFormula(mixed $value): mixed
+	{
+		if (!is_string($value) || $value === '' || strpbrk($value[0], "=+-@\t\r") === false) {
+			return $value;
+		}
+
+		if (preg_match("/^[+-]?[0-9][0-9.,' ()\\/-]*$/", $value)) {
+			return $value;
+		}
+
+		return "'" . $value;
+	}
+
+	/**
+	 * Remove the "'" that {@see escapeCsvFormula()} added, so exported data can be imported again unchanged
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public static function unescapeCsvFormula(mixed $value): mixed
+	{
+		if (!is_string($value) || !str_starts_with($value, "'")) {
+			return $value;
+		}
+
+		$unescaped = substr($value, 1);
+		return self::escapeCsvFormula($unescaped) === $value ? $unescaped : $value;
 	}
 
 }

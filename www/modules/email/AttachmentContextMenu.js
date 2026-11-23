@@ -53,7 +53,7 @@ GO.email.AttachmentContextMenu = function(config)
 					},
 					scope: this
 				});
-		const fmur= go.Modules.get("legacy", "files").userRights;
+		const fmur= go.Modules.get("legacy", "files")?.userRights;
 		if (fmur && fmur.mayAccessMainPanel) {
 			config.items.push(this.saveButton);
 		}

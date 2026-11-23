@@ -26,6 +26,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 
 		
 		this.entityGrid = new go.links.EntityGrid({
+			entities: go.Entities.getSearchLinkConfigs(),
 			width: dp(160),
 			mobile:{
 				width: dp(120)
@@ -38,7 +39,10 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 
 		
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
-			this.search(this.lastQ);
+			// Only search again when results are shown. Otherwise restoring the saved selection would send a query.
+			if(!this.collapsed) {
+				this.search(this.lastQ);
+			}
 		}, this, {buffer: 1}); //add buffer because it clears selection first	
 
 		Ext.apply(this, {

@@ -65,7 +65,6 @@ return array (
   'Quota' => 'Limit',
   'Error exporting mailboxes' => 'Błąd podczas eksportu skrzynek pocztowych',
   'Export domain:' => 'Eksportuj domenę:',
-  'The minimum length for this field is {max}' => 'Minimalna długość tego pola to {max}',
   'The passwords do not match' => 'Hasła się nie zgadzają',
   'Domain owner' => 'Właściciel domeny',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => 'Po włączeniu tej opcji użytkownik może logować się do wszystkich skrzynek domeny używając user@example.com*thisuser@example.com',

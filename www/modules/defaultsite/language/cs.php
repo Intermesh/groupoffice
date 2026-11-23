@@ -62,4 +62,13 @@ return array (
   'description' => 'Modul, který vytvoří výchozí šablonu pro stránky.',
   'Status' => 'Status',
   'Agent' => 'Agent',
+  'Your password is expired' => 'Platnost Vašeho hesla vypršela',
+  'You are required to change your password.' => 'Musíte si změnit heslo.',
+  'Default site' => 'Výchozí web',
+  'The given username is incorrect' => 'Zadané uživatelské jméno je nesprávné',
+  'Please fill in all fields' => 'Vyplňte prosím všechna pole',
+  'The password and the password confirmation do not match' => 'Heslo a potvrzení hesla se neshodují',
+  'The new password may not be the same as the old password' => 'Nové heslo nesmí být stejné jako původní heslo',
+  'The new password could not be saved. Please contact the administrator of the system' => 'Nové heslo se nepodařilo uložit. Kontaktujte prosím administrátora systému',
+  'The password you have given is incorrect' => 'Zadané heslo je nesprávné',
 );

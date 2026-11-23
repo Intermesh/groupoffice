@@ -1,4 +1,4 @@
-import {AclItemEntity, AclOwnerEntity, client, JmapDataSource, modules, router} from "@intermesh/groupoffice-core";
+import {AclItemEntity, AclOwnerEntity, client, JmapDataSource, modules, router, TextType} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
 import {EntityID, t, translate} from "@intermesh/goui";
 import {SettingsPanel} from "./SettingsPanel.js";
@@ -122,6 +122,7 @@ modules.register({
 export interface Note extends AclItemEntity {
 	name: string,
 	content: string
+	type: TextType
 	noteBookId: EntityID
 }
 

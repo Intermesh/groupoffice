@@ -3,7 +3,7 @@ go.modules.community.oauth2client.SystemSettingsPanel = Ext.extend(go.systemsett
 	hasPermission: function() {
 		return go.User.isAdmin;
 	},
-	title: t("OAuth2 Client Settings","oauth2_client", "community"),
+	title: t("OAuth2 Client Settings", "oauth2client", "community"),
 	iconCls: 'ic-refresh',
 	labelWidth: 125,
 	itemId: "oauth2client", //makes it routable

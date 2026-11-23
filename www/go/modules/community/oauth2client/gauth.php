@@ -17,6 +17,8 @@ require($dir . 'GO.php');
 $state = new State();
 //not possible with oauth flow.
 State::$CSRFcheck = false;
+// The OpenID login and its callback are used before the user is logged in
+Oauth2Client::$isPageRequest = true;
 
 (new Router())
 	->addRoute('/authenticate\/([0-9]+)/', 'GET', Oauth2Client::class, 'auth')

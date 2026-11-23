@@ -104,7 +104,7 @@ abstract class Base extends Model {
 		}
 		
 		if($this->field->isModified("databaseName") && preg_match('/[^a-zA-Z_0-9]/', $this->field->databaseName)) {
-			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, go()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
+			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, go()->t("Invalid database name. Only use alpha numeric chars and underscores."));
 			return false;
 		}
 

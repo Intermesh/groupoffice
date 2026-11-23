@@ -8,18 +8,13 @@
 	font-family: 'Icons';
 	font-style: normal;
 	font-weight: 400;
-	//src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
-	src: local("Material Icons"),
-	local("MaterialIcons-Regular"),
-	url(#{theme.$resourcePath}fonts/icons.woff2) format("woff2"), // Super Modern
-		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
-	url(#{theme.$resourcePath}fonts/icons.ttf) format("truetype"); // Android, Safari, iOS
+	src: url(../../../goui/dist/goui/resources/iconfont/MaterialSymbolsOutlined.woff2)
 }
 
 i.icon {
 	@extend %icon;
 	background-size: contain;
-	width:utils.dp(24);
+	width: utils.dp(24);
 	height: utils.dp(24);
 }
 
@@ -1053,6 +1048,8 @@ $material-icons : (
 	restore,
 	restore_page,
 	ring_volume,
+	robot,
+	robot_2,
 	room,
 	room_service,
 	rotate_90_degrees_ccw,
@@ -1124,6 +1121,7 @@ $material-icons : (
 	skip_previous,
 	slideshow,
 	slow_motion_video,
+	smart_toy,
 	smartphone,
 	smoke_free,
 	smoking_rooms,

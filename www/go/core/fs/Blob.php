@@ -5,16 +5,13 @@ namespace go\core\fs;
 use Exception;
 use go\core\db\Table;
 use go\core\http\Response;
-use go\core\jmap\Request;
+use go\core\orm;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Mapping;
 use go\core\orm\Query;
-use go\core\orm;
 use go\core\util\DateTime;
-
 use go\core\webclient\Extjs3;
-use PDO;
-use ReflectionException;
+use InvalidArgumentException;
 use function GO;
 
 /**
@@ -97,6 +94,12 @@ class Blob extends orm\Entity {
 	private $hardLink = false;
 
 	private $strContent;
+
+	/**
+	 * Set when a factory like fromFile() found an existing blob with the same content. It may be someone else's
+	 * attachment, so saving must not rename it.
+	 */
+	private bool $keepStoredMetaData = false;
 
 
 	protected function init()
@@ -207,6 +210,8 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = $file->getSize();
 
+		} else {
+			$blob->keepStoredMetaData = true;
 		}
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
@@ -242,6 +247,42 @@ class Blob extends orm\Entity {
 	}
 
 	/**
+	 * Store an uploaded file
+	 *
+	 * A blob with the same content may exist already, like someone else's attachment. It keeps its name, type and date:
+	 * the returned blob has the name and type of this upload, but they're only saved for a new blob. The temporary file is
+	 * removed.
+	 *
+	 * @param File $tmpFile The uploaded temporary file
+	 * @param string $name File name given by the client
+	 * @param DateTime $modifiedAt Modification time given by the client
+	 * @return self
+	 * @throws Exception
+	 */
+	public static function fromUpload(File $tmpFile, string $name, DateTime $modifiedAt): Blob
+	{
+		$blob = self::fromTmp($tmpFile);
+		$blob->name = $name;
+		$blob->modifiedAt = $modifiedAt;
+
+		if ($blob->isNew()) {
+			if (!$blob->save()) {
+				throw new Exception("Could not save file: " . $blob->getValidationErrorsAsString());
+			}
+		} else if (!file_exists($blob->path())) {
+			// Restore the missing file of the existing blob
+			if (!is_dir(dirname($blob->path()))) {
+				mkdir(dirname($blob->path()), 0775, true);
+			}
+			$tmpFile->move(new File($blob->path()));
+		} else {
+			$tmpFile->delete();
+		}
+
+		return $blob;
+	}
+
+	/**
 	 * Create from string
 	 *
 	 * @example
@@ -264,6 +305,8 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = mb_strlen($string, '8bit');
 			$blob->strContent = $string;
+		} else {
+			$blob->keepStoredMetaData = true;
 		}
 		return $blob;
 	}
@@ -315,8 +358,24 @@ class Blob extends orm\Entity {
 				file_put_contents($this->path(), $this->strContent);
 			}
 		}
-		
-		return parent::internalSave();
+
+		if (!$this->keepStoredMetaData || $this->isNew()) {
+			return parent::internalSave();
+		}
+
+		// An existing blob found by its content keeps its stored name, type and date. The caller still sees its own.
+		$own = [];
+		foreach (['name', 'type', 'modifiedAt'] as $prop) {
+			if ($this->isModified($prop)) {
+				$own[$prop] = $this->$prop;
+				$this->$prop = $this->getOldValue($prop);
+			}
+		}
+		$success = parent::internalSave();
+		foreach ($own as $prop => $value) {
+			$this->$prop = $value;
+		}
+		return $success;
 	}
 
 	/**
@@ -376,10 +435,33 @@ class Blob extends orm\Entity {
 	}
 
 	/**
+	 * Check if the value has the format of a blob ID, a SHA-1 hash in lowercase hex.
+	 *
+	 * @param mixed $id
+	 * @return bool
+	 */
+	public static function isValidId(mixed $id): bool
+	{
+		return is_string($id) && preg_match('/^[a-f0-9]{40}\z/', $id) === 1;
+	}
+
+	/**
+	 * Get the path of a blob in the data folder.
+	 *
+	 * Blob IDs are SHA-1 hashes. Other values are refused because callers may pass IDs from the client and something
+	 * like "../../etc/passwd" would point outside the blob folder.
+	 *
+	 * @param string $id
+	 * @return string
+	 * @throws InvalidArgumentException When the ID is not a SHA-1 hash
 	 * @throws Exception
 	 */
-	static function buildPath($id): string
+	static function buildPath(string $id): string
 	{
+		if (!self::isValidId($id)) {
+			throw new InvalidArgumentException("Invalid blob ID");
+		}
+
 		$dir = substr($id,0,2) . DIRECTORY_SEPARATOR .substr($id,2,2). DIRECTORY_SEPARATOR;
 		return go()->getDataFolder()->getPath() . DIRECTORY_SEPARATOR . 'data'. DIRECTORY_SEPARATOR . $dir . $id;
 	}
@@ -407,40 +489,47 @@ class Blob extends orm\Entity {
 	}
 
 	/**
-	 * Parse blob id's inserted as images in HTML content.
+	 * Parse blob id's inserted as images or links in HTML or Markdown content.
 	 *
-	 * @param ?string $html
+	 * Finds blob download URL's and data-blob-id attributes. eg.
+	 *
+	 * ```
+	 * <img src="https://example.com/api/download.php?blob=<blobId>">
+	 * <img data-blob-id="<blobId>" src="...">
+	 * ![image.png](https://example.com/api/download.php?blob=<blobId>)
+	 * ```
+	 *
+	 * @param ?string $content HTML or Markdown
 	 * @param bool $checkIfExists Verify if the blob exists in the database
 	 * @return string[] Array of blob ID's
 	 */
-	public static function parseFromHtml(?string $html, bool $checkIfExists = false): array
+	public static function parse(?string $content, bool $checkIfExists = false): array
 	{
-//		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
-//			return [];
-//		}
-
-		if(empty($html)) {
+		if(empty($content)) {
 			return [];
 		}
 
-		$matches = [];
-
-		if(preg_match_all('/blob=([^>&"]*)"[^>]*>/i', $html, $urlMatches)) {
-			$matches = $urlMatches[1];
+		// blob ID's are SHA1 hashes. The ";" is for HTML encoded URL's with "&amp;blob=".
+		if(!preg_match_all('/(?:[?&;]blob=|data-blob-id=")([a-f0-9]{40})(?![a-f0-9])/i', $content, $matches)) {
+			return [];
 		}
 
-		if(preg_match_all('/data-blob-id="([^"]*)"/', $html, $dataBlobIdMatches)){
-			$matches = array_merge($matches, $dataBlobIdMatches[1]);
-		}
-
-		$matches =  array_unique($matches);
+		$blobIds = array_values(array_unique(array_map('strtolower', $matches[1])));
 
 		if($checkIfExists) {
-			$matches = array_filter($matches, function($blobId) {
+			$blobIds = array_values(array_filter($blobIds, function($blobId) {
 				return Blob::exists($blobId);
-			});
+			}));
 		}
-		return $matches;
+		return $blobIds;
+	}
+
+	/**
+	 * @deprecated Use {@see parse()}
+	 */
+	public static function parseFromHtml(?string $html, bool $checkIfExists = false): array
+	{
+		return self::parse($html, $checkIfExists);
 	}
 
 	public static function parseTmpFilesFromHtml(?string &$html) {
@@ -473,7 +562,7 @@ class Blob extends orm\Entity {
 	 * Useful when attaching inline images for example:
 	 *
 	 * ````
-	 * $blobIds = \go\core\fs\Blob::parseFromHtml($body);
+	 * $blobIds = \go\core\fs\Blob::parse($body);
 	 * foreach($blobIds as $blobId) {
 	 *  $blob = \go\core\fs\Blob::findById($blobId);
 	 *
@@ -502,6 +591,10 @@ class Blob extends orm\Entity {
 	 * @throws Exception
 	 */
 	public function output($inline = false) {
+		// prevent html to render on same domain having access to all global JS stuff
+		if($inline && !Response::isSafeInlineContentType($this->type)) {
+			$inline = false;
+		}
 		$disp = $inline ? 'inline' : 'attachment';
 
 		$this->getFile()->output(true, true, [

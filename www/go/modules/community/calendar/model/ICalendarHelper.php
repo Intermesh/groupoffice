@@ -13,6 +13,7 @@ use Generator;
 use go\core\db\Expression;
 use go\core\ErrorHandler;
 use go\core\exception\JsonPointerException;
+use go\core\exception\NotFound;
 use go\core\fs\Blob;
 use go\core\model\Principal;
 use go\core\util\DateTime;
@@ -137,6 +138,21 @@ class ICalendarHelper {
 				}
 			}
 		}
+		// Others only see the time of a private event, like in CalendarEvent::toArray(). Not in toVEvent(), because the
+		// invitations to the participants use it too. Also for the exceptions, which may have their own details.
+		if($event->showAsPrivate()) {
+			foreach($vcalendar->select('VEVENT') as $vevent) {
+				if(isset($vevent->SUMMARY)) {
+					$vevent->SUMMARY = '(' . go()->t('Private', 'community', 'calendar') . ')';
+				}
+				$hidden = $event->managesResource() ? ['DESCRIPTION', 'LOCATION', 'CATEGORIES'] :
+					['DESCRIPTION', 'LOCATION', 'CATEGORIES', 'ATTENDEE', 'ORGANIZER'];
+				foreach($hidden as $property) {
+					$vevent->remove($property);
+				}
+			}
+		}
+
 		// this will remove the invalid UTF-8 characters for XML response in caldav.
 		$vcalendar->validate(VObject\Node::REPAIR);
 
@@ -214,13 +230,14 @@ class ICalendarHelper {
 		// Sequence is for updates on the event it's used for ITIP
 		if(isset($event->sequence)) $vevent->SEQUENCE = $event->sequence;
 
-		$showAsPrivate = $event->isPrivate() && !$event->currentUserIsOwner();
-		if(!empty($event->title)) $vevent->SUMMARY = $showAsPrivate ? '('.go()->t('Private', 'community', 'calendar').')' : $event->title;
-		if(!empty($event->description) && !$showAsPrivate) $vevent->DESCRIPTION = $event->description;
-		if(!empty($event->location) && !$showAsPrivate) $vevent->LOCATION = $event->location;
+		// The details of a private event are hidden in toVObject(), not here, because the invitations to the participants
+		// use this too
+		if(!empty($event->title)) $vevent->SUMMARY = $event->title;
+		if(!empty($event->description)) $vevent->DESCRIPTION = $event->description;
+		if(!empty($event->location)) $vevent->LOCATION = $event->location;
 
 		if(!empty($event->color)) $vevent->COLOR = $event->color;
-		if(!empty($event->categoryIds) && !$showAsPrivate) $vevent->CATEGORIES = implode(',',$event->categoryNames());
+		if(!empty($event->categoryIds)) $vevent->CATEGORIES = implode(',',$event->categoryNames());
 
 		if(!empty($event->freeBusyStatus) && $event->freeBusyStatus == CalendarEvent::FREEBUSY_FREE) $vevent->TRANSP = "TRANSPARENT";
 
@@ -245,14 +262,17 @@ class ICalendarHelper {
 			//ENUM('individual', 'group', 'location', 'resource','unknown') NOT NULL,
 			$attr['CUTYPE'] = $participant->kind == 'location' ? "ROOM" : strtoupper($participant->kind);
 		}
-		foreach ($participant->getRoles() as $role => $true) {
-			if (in_array($role, self::$roleMap)) {
-				$attr['ROLE'] = self::$roleMap[$role];
-				break;
+		$isOwner = !empty($participant->isOwner());
+		if(!$isOwner) { // ROLE is not a parameter of ORGANIZER
+			foreach ($participant->getRoles() as $role => $true) {
+				if (isset(self::$roleMap[$role])) {
+					$attr['ROLE'] = self::$roleMap[$role];
+					break;
+				}
 			}
 		}
 		return [
-			!empty($participant->isOwner()) ? 'ORGANIZER' : 'ATTENDEE',
+			$isOwner ? 'ORGANIZER' : 'ATTENDEE',
 			'mailto:'.strtolower($participant->email),
 			$attr
 		];
@@ -349,7 +369,12 @@ class ICalendarHelper {
 	static function calendarEventFromFile(string $blobId, array|null $values = null): Generator
 	{
 		$groups = []; // uid => [vevent strings]
-		foreach(self::veventSplitter(Blob::buildPath($blobId)) as $uid => $vevent) {
+		// Find the blob so the ID can't be used to read another file
+		$blob = Blob::findById($blobId);
+		if(!$blob) {
+			throw new NotFound("Blob not found");
+		}
+		foreach(self::veventSplitter($blob->getFile()->getPath()) as $uid => $vevent) {
 			$groups[$uid][] = $vevent;
 		}
 
@@ -404,7 +429,8 @@ class ICalendarHelper {
 
 				if($uid === 'new') {
 					$ev->uid = UUID::v4();
-				} else if($uid === 'check' && isset($existing[$ev->uid])) {
+				} else if($uid === 'check' && (isset($existing[$ev->uid]) || $ev->scheduledEventWithSameUidExists())) {
+					// An invitation that is already in another calendar must not be added again as a copy
 					$r->skipped++;
 					continue;
 					// check if exists
@@ -520,11 +546,22 @@ class ICalendarHelper {
 				$event->setRecurrenceRule(self::parseRrule($vevent->RRULE, $event));
 				if(!empty($vevent->EXDATE)) {
 					foreach ($vevent->EXDATE as $exdate) {
-						$rId = $exdate->getDateTime()->format('Y-m-d\TH:i:s');
-						if(!isset($event->recurrenceOverrides[$rId])) {
-							$event->recurrenceOverrides[$rId] = new RecurrenceOverride($event);
+						// Some clients send an empty "EXDATE;TZID=Europe/Berlin:" which sabre can't parse
+						if(trim((string)$exdate) === '') {
+							continue;
 						}
-						$event->recurrenceOverrides[$rId]->setValues(['excluded'=>true]);
+						try {
+							$exdates = $exdate->getDateTimes(); // one EXDATE can hold multiple comma separated dates
+						} catch (VObject\InvalidDataException $e) {
+							continue;
+						}
+						foreach($exdates as $dt) {
+							$rId = $dt->format('Y-m-d\TH:i:s');
+							if(!isset($event->recurrenceOverrides[$rId])) {
+								$event->recurrenceOverrides[$rId] = new RecurrenceOverride($event);
+							}
+							$event->recurrenceOverrides[$rId]->setValues(['excluded'=>true]);
+						}
 					}
 				}
 			}
@@ -533,20 +570,7 @@ class ICalendarHelper {
 				if(!empty($names))
 					$event->categoryIdsByName($names);
 			}
-			if(isset($vevent->VALARM)) {
-				$event->alerts = [];
-				foreach ($vevent->VALARM as $valarm) {
-					$a = (new Alert($event))->setValues([
-						'action' => (string)$valarm->ACTION,
-						'trigger' => ('DATE-TIME' === (string) $valarm->TRIGGER['VALUE']) ?
-							['when' => $valarm->TRIGGER->getDateTime()] : // non-relative trigger
-							['offset' => (string)$valarm->TRIGGER, 'relativeTo' => 'start']
-					]);
-					if(isset($valarm->ACKNOWLEDGED))
-						$a->acknowledged = $valarm->ACKNOWLEDGED->getDateTime();
-					$event->alerts[] = $a;
-				}
-			}
+			self::parseAlerts($vevent, $event);
 		}
 		//Attach exceptions found in VCALENDAR
 		foreach($exceptions as $props) {
@@ -587,6 +611,91 @@ class ICalendarHelper {
 		return $blob;
 	}
 
+	/**
+	 * Replace the alerts of the event with the VALARM components of the VEVENT. Alerts are per user. When the VEVENT has
+	 * no VALARM, the alerts are left as they are.
+	 *
+	 * @param VEvent $vevent
+	 * @param CalendarEvent $event
+	 */
+	static function parseAlerts(VEvent $vevent, CalendarEvent $event): void
+	{
+		if(!isset($vevent->VALARM)) {
+			return;
+		}
+		$alerts = [];
+		foreach ($vevent->VALARM as $valarm) {
+			$a = (new Alert($event))->setValues([
+				'action' => (string)$valarm->ACTION,
+				'trigger' => ('DATE-TIME' === (string) $valarm->TRIGGER['VALUE']) ?
+					['when' => $valarm->TRIGGER->getDateTime()] : // non-relative trigger
+					['offset' => (string)$valarm->TRIGGER, 'relativeTo' => 'start']
+			]);
+			if(isset($valarm->ACKNOWLEDGED))
+				$a->acknowledged = $valarm->ACKNOWLEDGED->getDateTime();
+			$alerts[] = $a;
+		}
+
+		// Clients send the alerts back that they got, also when these are the default alerts of the calendar or the
+		// alerts of the creator. Keep using those, so the alerts follow when the defaults or the creator's alerts change.
+		// Both are checked, because the client may still have the alerts from before the user turned
+		// Calendar::getUseCreatorAlerts() on or off. That doesn't change the event, so the client didn't fetch it again.
+		if(!$event->isNew() && $event->useDefaultAlerts !== false) {
+			foreach($event->inheritedAlertsFor($event->forUserId()) as $inherited) {
+				if(self::sameAlerts($alerts, $inherited)) {
+					return;
+				}
+			}
+		}
+		$event->alerts = $alerts;
+	}
+
+	/**
+	 * Whether two lists of alerts trigger at the same times with the same actions
+	 *
+	 * @param Alert[] $a
+	 * @param Alert[] $b
+	 * @return bool
+	 */
+	private static function sameAlerts(array $a, array $b): bool
+	{
+		$keys = function(array $alerts): array {
+			$keys = array_map(function(Alert $alert) {
+				$trigger = $alert->getTrigger();
+				if(isset($trigger['offset'])) {
+					try {
+						$offset = $trigger['offset'];
+						$sign = $offset[0] === '-' ? -1 : 1;
+						$interval = new \DateInterval(ltrim($offset, '+-'));
+						$time = 'offset:' . $sign * ((($interval->d * 24 + $interval->h) * 60 + $interval->i) * 60 + $interval->s);
+					} catch(\Exception $e) {
+						$time = 'offset:' . $trigger['offset'];
+					}
+				} else {
+					$when = $trigger['when'] ?? null;
+					$time = 'when:' . ($when instanceof \DateTimeInterface ? $when->getTimestamp() : strtotime((string) $when));
+				}
+				return strtolower($alert->action) . '|' . $time;
+			}, $alerts);
+			sort($keys);
+			return $keys;
+		};
+		return $keys($a) === $keys($b);
+	}
+
+	/**
+	 * The free / busy status from the TRANSP property of a VEVENT. Busy when it's not transparent.
+	 *
+	 * @param VEvent $vevent
+	 * @return string
+	 */
+	static function parseFreeBusyStatus(VEvent $vevent): string
+	{
+		$transp = $vevent->select('TRANSP');
+		return !empty($transp) && strtoupper((string)$transp[0]) === 'TRANSPARENT' ?
+			CalendarEvent::FREEBUSY_FREE : CalendarEvent::FREEBUSY_BUSY;
+	}
+
 	static private function parseAttendee($vattendee) {
 		$key = str_ireplace('mailto:', '',(string)$vattendee);
 		$principalIds = Principal::findIdsByEmail($key);
@@ -610,11 +719,11 @@ class ICalendarHelper {
 		if(!empty($vattendee['PARTSTAT'])) {
 			$p->participationStatus = strtolower($vattendee['PARTSTAT']);
 		}
-		if(!empty($vattendee['ROLE'])) {
+		if($vattendee->name === 'ATTENDEE') {
 			$map = array_flip(self::$roleMap);
-			if (in_array((string)$vattendee['ROLE'], $map)) {
-				$p->roles = [$map[(string)$vattendee['ROLE']] => true];
-			}
+			$role = strtoupper((string)$vattendee['ROLE']);
+			// REQ-PARTICIPANT is the default when ROLE is missing (RFC 5545)
+			$p->roles = [$map[$role] ?? 'attendee' => true];
 		}
 		return [
 			$principalIds[0] ?? $key,
@@ -644,6 +753,9 @@ class ICalendarHelper {
 		}
 		if(!empty($vevent->CLASS)) $props->privacy = array_flip(self::$privacyMap)[(string)$vevent->CLASS] ?? 'public';
 		if(!empty($vevent->COLOR)) $props->color = (string)$vevent->COLOR;
+		if(isset($vevent->TRANSP)) {
+			$props->freeBusyStatus = self::parseFreeBusyStatus($vevent);
+		}
 		if(!empty($vevent->DURATION)) {
 			$props->duration = (string)$vevent->DURATION;
 		} else if (!empty($vevent->DTEND) && !empty($props->start)) {

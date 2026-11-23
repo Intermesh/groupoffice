@@ -32,4 +32,7 @@ return array (
   'Encrypt' => 'Verschlüsseln',
   'Passwords do not match' => 'Die Kennwörter stimmen nicht überein',
   'notes' => 'Notizen',
+  'Switch between HTML and Markdown editor' => 'Zwischen HTML- und Markdown-Editor wechseln',
+  'Switching the editor will clear the content. Are you sure?' => 'Beim Wechseln des Editors wird der Inhalt gelöscht. Sind Sie sicher?',
+  'Default editor for new notes' => 'Standardeditor für neue Notizen',
 );

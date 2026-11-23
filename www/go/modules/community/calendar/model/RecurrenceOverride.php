@@ -137,8 +137,21 @@ class RecurrenceOverride extends Property
 		// We get into this function if the clients sends the patch object in full. ie. "recurrenceOverrides/20240901T090000/": {...}
 		// we need to reset the props otherwise there's no way of removing props from this patch object.
 		// see also https://jmap.io/spec-calendars.html#calendareventset 5.8.1 Patching
+		$old = $this->props;
 		$this->props = new stdClass;
-		return parent::setValues($values, $checkAPIRights);
+		parent::setValues($values, $checkAPIRights);
+
+		// Others don't get the details of a private event (see CalendarEvent::toArray()), so they don't send them
+		// back when they change the occurrence. Keep them unless they're given.
+		if(!$this->isNew() && isset($old) && empty($values['excluded']) && $this->owner->showAsPrivate()) {
+			foreach((array) $old as $prop => $value) {
+				if(CalendarEvent::isPrivateDetail((string) $prop) && !array_key_exists($prop, $values)) {
+					$this->props->$prop = $value;
+				}
+			}
+			$this->patch = json_encode($this->props);
+		}
+		return $this;
 	}
 
 	public function setValue(string $propName, $value, bool $checkAPIRights = true): Model

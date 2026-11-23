@@ -47,4 +47,11 @@ return array (
   'valid' => 'platné',
   'since' => 'od',
   'Certificate' => 'Certifikát',
+  'This certificate already exists' => 'Tento certifikát již existuje',
+  'The SMIME password was incorrect.' => 'Heslo SMIME bylo nesprávné.',
+  'Could not read p12 file:' => 'Soubor p12 se nepodařilo přečíst:',
+  'The certificate must be in PEM format' => 'Certifikát musí být ve formátu PEM',
+  'No OCSP URI found' => 'Nebyla nalezena URI OCSP',
+  'No issuer URI found' => 'Nebyla nalezena URI vydavatele',
+  'The certificate has been revoked!' => 'Certifikát byl zneplatněn!',
 );

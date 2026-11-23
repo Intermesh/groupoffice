@@ -151,12 +151,16 @@ abstract class AclOwnerEntity extends AclEntity {
 			return parent::internalGetPermissionLevel();
 		}
 
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+
 		if(!isset($this->{static::$aclColumnName})) {
 			ErrorHandler::log(static::$aclColumnName .' not set for ' . static::class . '::' . $this->id());
 			$this->permissionLevel = 	(go()->getAuthState() && go()->getAuthState()->isAdmin()) ? Acl::LEVEL_MANAGE : 0;
 		} else if(!isset($this->permissionLevel)) {
 			$this->permissionLevel =
-				(go()->getAuthState() && go()->getAuthState()->isAdmin()) ?
+				(go()->getAuthState()->isAdmin()) ?
 					Acl::LEVEL_MANAGE :
 					Acl::getUserPermissionLevel($this->{static::$aclColumnName}, go()->getAuthState()->getUserId());
 		}

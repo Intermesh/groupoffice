@@ -7,11 +7,13 @@ use DateTimeZone;
 use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\db\Query;
+use go\core\model\Acl;
 use go\core\fs\Blob;
 use go\core\model\User;
 use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
+use go\core\util\Markdown;
 use GO\Files\Model\Folder;
 use go\modules\community\comments\model\Comment;
 use Throwable;
@@ -129,7 +131,6 @@ use function GO;
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
  * ```
-
  * [assign contact = 1 | entity:Contact]
  * ```
  *
@@ -172,16 +173,20 @@ use function GO;
  * ````
  *
  *
- * @example Find entities
+ * Find entities
+ * -------------
  *
+ * @example find all users
  * ```
- * {{|find:User:username|select:"sum(loginCount) as total"|first|prop:total}}
- * ```
- *
- * ```
- * {{|find:User:username|where:username:$username|first|prop:username}}';
+ * {{|find:User}}
  * ```
  *
+ * @example find all users but only username, and displayName
+ * ```
+ * {{|find:User:username,displayName}}
+ * ```
+ *
+ * Only entities the current user may read are returned.
  */
 class TemplateParser {	
 
@@ -238,8 +243,6 @@ class TemplateParser {
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('prop', [$this, "filterProp"]);
 		$this->addFilter('find', [$this, "filterFind"]);
-		$this->addFilter('select', [$this, "filterSelect"]);
-		$this->addFilter('where', [$this, "filterWhere"]);
 
 
 		$this->addFilter('entityFiles', [$this, "filterEntityFiles"]);
@@ -350,7 +353,7 @@ class TemplateParser {
 			$format = $this->config['dateFormat'];
 		}
 
-		$date->setTimezone(new DateTimeZone($this->_currentUser()->timezone));
+		$date->setTimezone(new DateTimeZone($this->_currentUser() ? $this->_currentUser()->timezone : go()->getSettings()->defaultTimezone));
 
 		return $date->format($format);
 	}
@@ -399,7 +402,11 @@ class TemplateParser {
 		if($cls === "GO\Projects2\Model\Project") {
 			$cls .= "Entity";
 		}
-		return $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
+		$entity = $cls::findById($id, !empty($properties) ? explode(",", $properties) : []);
+		if(!$entity || !$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+			return null;
+		}
+		return $entity;
 	}
 
 	/**
@@ -429,7 +436,8 @@ class TemplateParser {
 		if (is_a($cls, ActiveRecord::class, true)) {
 			return $cls::model()->findByAttribute($key, $id);
 		} else {
-			return $cls::find($properties ?? [], true)->where([$key => $id])->all();
+			$query = $cls::find($properties ?? [], true)->where([$key => $id]);
+			return $cls::applyAclToQuery($query, Acl::LEVEL_READ)->all();
 		}
 	}
 
@@ -437,21 +445,15 @@ class TemplateParser {
 
 	private function filterFind(string $entityName, $properties = "") {
 		$et = EntityType::findByName($entityName);
+		if(!$et) {
+			return null;
+		}
 
 		$cls = $et->getClassName();
 
 		$props = empty($properties) ? [] : explode(",", $properties);
 
-		return $cls::find($props, true);
-	}
-
-
-	private function filterSelect(\go\core\orm\Query $query, string $select) {
-		return $query->select($select)->fetchMode(\PDO::FETCH_ASSOC);
-	}
-
-	private function filterWhere(\go\core\orm\Query $query, string $field, mixed $value, $comparator = '=') {
-		return $query->where($field, $comparator, $value);
+		return $cls::applyAclToQuery($cls::find($props, true), Acl::LEVEL_READ);
 	}
 
 	/**
@@ -473,10 +475,7 @@ class TemplateParser {
 
 	private function filterMarkDown(?string $text): string
 	{
-		$pd = new \Parsedown();
-		$pd->setSafeMode(true);
-		$pd->setBreaksEnabled(true);
-		return $pd->text($text);
+		return Markdown::toHtml($text);
 	}
 
 
@@ -1225,7 +1224,7 @@ class TemplateParser {
 
 			$args = array_map(function($a) {
 				if(substr($a, 0, 1) == '$') {
-					return $this->models[substr($a, 1)] ?? null;
+					return $this->getVar(substr($a, 1));
 				}
 				return str_replace('\$', '$', $a);
 			}, $args);

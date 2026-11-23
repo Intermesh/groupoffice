@@ -77,7 +77,6 @@ return array (
   'DNS check completed' => 'DNS kontrola dokončena',
   'Mail hostname' => 'Jméno e-mailového severu',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'Jméno e-mailového severu. Používá se pro kontroly PTR, SPF a MX.',
-  'The minimum length for this field is {max}' => 'Minimální délka pro toto pole je {max}',
   'The passwords do not match' => 'Hesla se neshodují',
   'Domain owner' => 'Majitel domény',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => 'Pokud je tato možnost povolena, tento uživatel se může přihlásit ke všem poštovním schránkám v doméně pomocí adresy user@example.com*thisuser@example.com',

@@ -17,6 +17,8 @@ class Acl extends Controller {
 	
 	/**
 	 * Reset ACL permissions to the defaults
+	 *
+	 * @apiPermission Only administrators.
 	 */
 	public function reset($params) {
 
@@ -117,6 +119,11 @@ class Acl extends Controller {
 		return [];
 	}
 
+	/**
+	 * List the permissions that users and groups have on entities, at most 2000
+	 *
+	 * @apiPermission Only administrators.
+	 */
 	public function overview($params) {
 
 		if(!go()->getAuthState()->isAdmin()) {

@@ -74,11 +74,11 @@ return array (
   'DNS check completed' => 'DNS-controle voltooid',
   'Mail hostname' => 'E-mailhostnaam',
   'The hostname of the mail system. Used for PTR, SPF and MX checks.' => 'De hostnaam van het mailsysteem. Gebruikt voor PTR, SPF en MX controles.',
-  'The minimum length for this field is {max}' => 'De minimale lengte voor dit veld is {max}',
   'The passwords do not match' => 'De wachtwoorden komen niet overeen',
   'Domain owner' => 'Domeineigenaar',
   'When enabled this user can login to all mailboxes of the domain using user@example.com*thisuser@example.com' => 'Wanneer ingeschakeld kan deze gebruiker zich aanmelden bij alle mailboxen van het domein via user@example.com*thisuser@example.com',
   'Auto expunge' => 'Automatisch verwijderen',
   'Automatically delete mail from the Trash and Spam folder after a period of time.' => 'Verwijder automatisch e-mail uit de map Prullenbak en Spam na een periode.',
   'Expunge after days' => 'Ontruimen na dagen',
+  'Mailbox defaults' => 'Standaardwaarden mailboxen',
 );

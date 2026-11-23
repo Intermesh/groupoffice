@@ -15,7 +15,9 @@ use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\model\User;
 use go\core\orm\Query;
+use go\core\util\Crypt;
 use go\core\util\DateTime;
+use PDO;
 
 /**
  * Class Authenticate
@@ -244,7 +246,7 @@ class Authenticate
 		foreach($this->throttleKeys($username, $scope) as $key => $max) {
 			$state = go()->getCache()->get($key);
 			if($state && $state['lockedUntil'] > time()) {
-				throw new Forbidden($scope === 'recovery' ?
+				throw new Forbidden($scope === 'recovery' || $scope === 'recover' ?
 					go()->t("Too many password recovery requests. Please try again later.") :
 					go()->t("Too many failed login attempts. Please try again later."));
 			}
@@ -276,6 +278,23 @@ class Authenticate
 		}
 	}
 
+	/**
+	 * Fail a password login that is rejected before an authenticator checks it.
+	 *
+	 * Does a password_verify for timing attacks as this would be done for a valid user.
+	 */
+	private function failWithoutAuthenticator(string $username): false
+	{
+		// nosemgrep: detected-bcrypt-hash
+		password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
+
+		User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+
+		$this->logFailure($username);
+
+		return false;
+	}
+
 	private function logFailure(string $username, string $scope = 'password'): void
 	{
 		$this->registerFailure($username, $scope);
@@ -302,9 +321,18 @@ class Authenticate
 
 		$this->checkThrottle($username);
 
-		$cacheKey = 'login-' . md5($username . '|' . $password);
+		if ($password === '') {
+			// An LDAP server may accept a bind with a valid DN and an empty password as an "unauthenticated bind"
+			// (RFC 4513 5.1.2). Never pass an empty password to an authenticator.
+			return $this->failWithoutAuthenticator($username);
+		}
+
+		// Keyed with the server key, so the cache can't be used to check passwords
+		$cacheKey = 'login-' . Crypt::hmac($username . '|' . $password);
 
 		if (!go()->getSettings()->maintenanceMode && $cache = go()->getCache()->get($cacheKey)) {
+			// The user may have been disabled or the IP address may not be allowed since the login was cached
+			$this->assertUserIdMayLogin($cache[0]->id);
 			$this->clearThrottle($username);
 			$this->usedPasswordAuthenticator = $cache[1];
 			return $cache[0];
@@ -313,19 +341,8 @@ class Authenticate
 		$authenticator = $this->getPrimaryAuthenticatorForUser($username);
 
 		if (!$authenticator) {
-
 			// If we get here then the given username doesn't exist.
-			// Do a password_verify for timing attacks as this would be done for a
-			// valid user.
-
-			// nosemgrep: detected-bcrypt-hash
-			password_verify("randomboguspasswordstring", '$2y$10$wkP8uDjY/tt5GNrfJJO9SOknqStW0POBn5Z4zpctuQkMP7pibTz2m');
-
-			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
-
-			$this->logFailure($username);
-
-			return false;
+			return $this->failWithoutAuthenticator($username);
 		}
 
 		$this->usedPasswordAuthenticator = $authenticator;
@@ -571,19 +588,27 @@ class Authenticate
 		return true;
 	}
 
-	public function recovery($hash)
+	/**
+	 * Find the user of a password recovery hash that was sent less than an hour ago
+	 *
+	 * @param mixed $hash The hash from the request. Only a string of 40 lowercase hexadecimal characters is accepted,
+	 *  as created by {@see User::sendRecoveryMail()}. A number would otherwise be compared numerically with the column
+	 *  by MySQL and match a hash that starts with the same digits.
+	 * @return false|User
+	 * @throws Exception
+	 */
+	public function recovery(mixed $hash): false|User
 	{
-		if (empty($hash)) {
+		if (!is_string($hash) || !preg_match('/^[0-9a-f]{40}$/', $hash)) {
 			return false;
 		}
 		$oneHourAgo = new DateTime('-1 hour');
 		$user = User::find()
 			->where('recoveryHash = :hash AND recoverySendAt > :time')
-			->bind([
-				':hash' => $hash,
-				':time' => $oneHourAgo->format(Column::DATETIME_FORMAT)
-			])->single();
-		if (empty($user)) {
+			->bind(':hash', $hash, PDO::PARAM_STR)
+			->bind(':time', $oneHourAgo->format(Column::DATETIME_FORMAT))
+			->single();
+		if (empty($user) || !$user->checkRecoveryHash($hash)) {
 			return false;
 		}
 		return $user;
@@ -594,6 +619,8 @@ class Authenticate
 	 */
 	public function logout(): bool
 	{
+		// Otherwise the remember me login keeps working for anyone who has a copy of the cookie
+		RememberMe::deleteByCookie();
 		RememberMe::unsetCookie();
 		$state = new JmapState();
 		$token = $state->getToken();

@@ -341,6 +341,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						//give "authenticated" listeners above a change to add routes
 						me.addDefaultRoutes();
 						go.Router.check();
+
+						// api/oauth.php asks the user to approve an application that registered itself. After the
+						// "authenticated" listeners, so modules have added their panels.
+						if(new URLSearchParams(window.location.search).get('oauthConsent')) {
+							window.groupofficeCore.oauthConsent.open();
+						}
 					})
 				});
 			});

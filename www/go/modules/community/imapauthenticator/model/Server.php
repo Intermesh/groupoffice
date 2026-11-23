@@ -6,6 +6,20 @@ use go\core\orm\Query;
 use go\core\jmap\Entity;
 
 class Server extends Entity {
+
+	/**
+	 * Only for managers of the module. The server settings are used to log in all users.
+	 *
+	 * @return int
+	 */
+	protected function internalGetPermissionLevel(): int
+	{
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+
+		return \go\modules\community\imapauthenticator\Module::get()->getModel()->getUserRights()->mayManage ? \go\core\model\Acl::LEVEL_MANAGE : 0;
+	}
 	
 	public ?string $id;
 	public string $imapHostname;
@@ -41,7 +55,10 @@ class Server extends Entity {
 	}
 	
 	
-	public function getSmtpPassword() {
+	/**
+	 * The SMTP password for the e-mail accounts this server creates. It's write only, so it's never sent to the client.
+	 */
+	public function decryptSmtpPassword(): ?string {
 		return isset($this->smtpPassword) ? \go\core\util\Crypt::decrypt($this->smtpPassword) : null;
 	}
 	

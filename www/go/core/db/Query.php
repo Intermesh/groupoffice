@@ -5,6 +5,7 @@ namespace go\core\db;
 use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
+use go\core\ErrorHandler;
 use IteratorAggregate;
 use JsonSerializable;
 use PDO;
@@ -327,6 +328,55 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		$this->noCache = $v;
 
 		return $this;
+	}
+
+	private bool $disableSemiJoin = false;
+
+	/**
+	 * Turn off the semi-join optimization of the server while this query executes
+	 *
+	 * Use it for "IN (subquery)" filters that MariaDB may turn into a semi-join that reads far more rows than needed.
+	 * For example an ACL filter with an ORDER BY and LIMIT, which can then walk an index of the sort column
+	 * instead of fetching and sorting every row the user can read. The previous optimizer_switch is restored
+	 * after execution.
+	 *
+	 * @param bool $v
+	 * @return $this
+	 */
+	public function disableSemiJoin(bool $v = true): static
+	{
+		$this->disableSemiJoin = $v;
+
+		return $this;
+	}
+
+	public function getDisableSemiJoin(): bool
+	{
+		return $this->disableSemiJoin;
+	}
+
+	private ?float $maxExecutionTime = null;
+
+	/**
+	 * Abort the query when it runs longer than this number of seconds
+	 *
+	 * Sets max_statement_time (MariaDB) or max_execution_time (MySQL) while this query executes and restores the
+	 * previous value afterwards. On timeout execute() throws a DbException for which
+	 * {@see DbException::isMaxExecutionTimeExceeded()} returns true.
+	 *
+	 * @param float|null $seconds null or 0 for no limit
+	 * @return $this
+	 */
+	public function maxExecutionTime(?float $seconds): static
+	{
+		$this->maxExecutionTime = $seconds;
+
+		return $this;
+	}
+
+	public function getMaxExecutionTime(): ?float
+	{
+		return $this->maxExecutionTime;
 	}
 	
 	private $unions = [];
@@ -678,14 +728,65 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    */
 	public function execute(): Statement
 	{
-		
+		$restoreSql = $this->applySessionOptions();
+
 		try {
 			$stmt = $this->createStatement();
 			$stmt->execute();
 		} catch(PDOException $e) {
 			throw new DbException($e, $this);
+		} finally {
+			if(isset($restoreSql)) {
+				$this->getDbConnection()->exec($restoreSql);
+			}
 		}
 		return $stmt;
+	}
+
+	/**
+	 * Sets the session variables for disableSemiJoin() and maxExecutionTime()
+	 *
+	 * The current values are saved in user variables first.
+	 *
+	 * @return string|null The SQL that restores the previous values, or null when nothing was changed
+	 */
+	private function applySessionOptions(): ?string
+	{
+		$save = [];
+		$set = [];
+		$restore = [];
+
+		if($this->disableSemiJoin) {
+			$save[] = "@goOptimizerSwitch = @@SESSION.optimizer_switch";
+			$set[] = "SESSION optimizer_switch = 'semijoin=off'";
+			$restore[] = "SESSION optimizer_switch = @goOptimizerSwitch";
+		}
+
+		if($this->maxExecutionTime > 0) {
+			if(go()->getDatabase()->isMariaDB()) {
+				$var = "max_statement_time"; // seconds
+				$value = sprintf('%.3F', $this->maxExecutionTime); // %F is locale independent and never uses an exponent
+			} else {
+				$var = "max_execution_time"; // milliseconds, only applies to SELECT
+				$value = (int) round($this->maxExecutionTime * 1000);
+			}
+			$save[] = "@goMaxExecutionTime = @@SESSION." . $var;
+			$set[] = "SESSION " . $var . " = " . $value;
+			$restore[] = "SESSION " . $var . " = @goMaxExecutionTime";
+		}
+
+		if(empty($set)) {
+			return null;
+		}
+
+		try {
+			// assignments run from left to right, so the old values are saved before they change
+			$this->getDbConnection()->exec("SET " . implode(", ", array_merge($save, $set)));
+			return "SET " . implode(", ", $restore);
+		} catch(DbException $e) {
+			ErrorHandler::log("Could not set session options for query: " . $e->getMessage());
+			return null;
+		}
 	}
 
   /**

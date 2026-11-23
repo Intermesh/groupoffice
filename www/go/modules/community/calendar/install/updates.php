@@ -521,3 +521,36 @@ $updates['202610121000'][] = "UPDATE core_principal p
 	JOIN core_user u ON u.id = rg.defaultOwnerId
 	SET p.email = u.email, p.description = IFNULL(c.description, u.displayName)
 	WHERE c.groupId IS NOT NULL;";
+
+// The CalDAV uri is per calendar. An event is stored once for all calendars it's in, and every CalDAV client must keep
+// the name it used for its copy.
+$updates['202611091200'][] = "ALTER TABLE `calendar_calendar_event`
+	ADD `uri` VARCHAR(512) NULL AFTER `calendarId`,
+	ADD INDEX `calendar_calendar_event_uri_idx` (`calendarId` ASC, `uri`(191) ASC);";
+
+$updates['202611091200'][] = "UPDATE calendar_calendar_event cce
+	JOIN calendar_event e ON e.eventId = cce.eventId
+	SET cce.uri = e.uri;";
+
+$updates['202611091200'][] = "ALTER TABLE `calendar_event` DROP COLUMN `uri`;";
+
+$updates['202611091200'][] = "delete from calendar_schedule_object;";
+
+$updates['202611121200'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN showCategoryColor TINYINT(1) DEFAULT 0 NOT NULL AFTER `multiLine`;";
+
+$updates['202611181200'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN printWeekInGrid TINYINT(1) DEFAULT 0 NOT NULL AFTER `showCategoryColor`;";
+
+// Subscribers of a calendar can choose to get the notifications that the creator of an event set #37829
+$updates['202611231200'][] = "ALTER TABLE `calendar_calendar_user` ADD COLUMN `useCreatorAlerts` TINYINT(1) NULL DEFAULT NULL AFTER `includeInAvailability`;";
+
+// The cached iCalendar data of a private event may contain the participants, which others may no longer see. The data
+// of the owners is kept, because it may be the original data of an invitation.
+$updates['202611231300'][] = "UPDATE calendar_event_user eu
+	JOIN calendar_event e ON e.eventId = eu.eventId
+	SET eu.veventBlobId = NULL
+	WHERE e.privacy != 'public'
+	AND NOT EXISTS (
+		SELECT 1 FROM calendar_calendar_event cce
+		JOIN calendar_calendar cal ON cal.id = cce.calendarId
+		WHERE cce.eventId = e.eventId AND cal.ownerId = eu.userId
+	);";

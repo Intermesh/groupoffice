@@ -314,6 +314,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$this->_checkParentId();
 
+		// The name is appended to the parent path on disk, so it must not contain a path separator or be "..".
+		if(($this->getIsNew() || $this->isModified('name')) && !\go\core\fs\FileSystemObject::isValidName((string) $this->name)) {
+			$this->setValidationError('name', \GO::t("Invalid file or folder name", "files"));
+		}
+
 		if($this->parent_id==0 && $this->acl_id==0){
 			//top level folders are readonly to everyone.
 			$this->readonly=1;
@@ -377,12 +382,23 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	protected function beforeDelete()
 	{
+		// Never delete files elsewhere on the server through a link
+		if(!Folder::$deleteInDatabaseOnly) {
+			$this->fsFolder->checkFileStoragePath();
+		}
+
 		FileSystemObject::checkDeleteAllowed(new \go\core\fs\Folder($this->fsFolder->path()));
 
 		return parent::beforeDelete();
 	}
 
 	protected function beforeSave() {
+
+		// Never create, rename or move through a link to a folder elsewhere on the server
+		$this->fsFolder->checkFileStoragePath();
+		if(!$this->isNew && ($this->isModified('name') || $this->isModified('parent_id')) && $this->_getOldFsFolder()) {
+			$this->_getOldFsFolder()->checkFileStoragePath();
+		}
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
 		$this->checkNormalization();
@@ -403,7 +419,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		}
 
 		if(!$this->systemSave && !$this->isNew && $this->readonly){
-			if($this->isModified('name') || $this->isModified('folder_id'))
+			if($this->isModified('name') || $this->isModified('parent_id'))
 				return false;
 		}
 
@@ -608,9 +624,16 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array(), $returnLastFound = false) {
 
 
-		$oldIgnoreAcl = \GO::$ignoreAclPermissions;
-		\GO::$ignoreAclPermissions=true;
+		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
+		try {
+			return $this->internalFindByPath($relpath, $autoCreate, $autoCreateAttributes, $returnLastFound);
+		} finally {
+			// always restore it, also when creating a folder fails. Otherwise permissions are ignored for the rest of the request.
+			\GO::setIgnoreAclPermissions($oldIgnoreAcl);
+		}
+	}
 
+	private function internalFindByPath($relpath, $autoCreate, $autoCreateAttributes, $returnLastFound) {
 		$folder=false;
 		if (substr($relpath, -1) == '/') {
 			$relpath = substr($relpath, 0, -1);
@@ -668,9 +691,36 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$parent_id = $folder->id;
 		}
 
-		\GO::$ignoreAclPermissions=$oldIgnoreAcl;
-
 		return $folder;
+	}
+
+	/**
+	 * Find a folder by a path that comes from the client and create it if it doesn't exist.
+	 *
+	 * The current user needs the given permission level on an existing folder. A missing folder is only created when the
+	 * user may create folders in the nearest existing parent folder.
+	 *
+	 * @param string $relpath Relative path from \GO::config()->file_storage_path
+	 * @param int $level Permission level required on the folder if it exists
+	 * @return Folder
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function findOrCreateByPathWithPermission(string $relpath, int $level = \GO\Base\Model\Acl::READ_PERMISSION): Folder
+	{
+		$folder = $this->findByPath($relpath);
+		if($folder) {
+			if(!$folder->checkPermissionLevel($level)) {
+				throw new \GO\Base\Exception\AccessDenied();
+			}
+			return $folder;
+		}
+
+		$parent = $this->findByPath($relpath, false, [], true);
+		if(!$parent || !$parent->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $this->findByPath($relpath, true);
 	}
 	/**
 	 * Return the home folder of a user.
@@ -796,13 +846,17 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param \GO\Base\Fs\File $file
 	 * @param boolean $appendNumberToNameIfExists Set if a number needs to be added to the name if the file already exists.
 	 * @return File
+	 * @throws \Exception When the file can't be moved. Then no record is added and the file stays where it was.
 	 */
 	public function addFilesystemFile(\GO\Base\Fs\File $file, $appendNumberToNameIfExists=false, $newFilename = false){
 
 		if(!File::checkQuota($file->size()))
 			throw new \GO\Base\Exception\InsufficientDiskspace();
 
-		$file->move($this->fsFolder, $newFilename, false, $appendNumberToNameIfExists);
+		// Without this check a record would be added for a file that isn't in the folder
+		if(!$file->move($this->fsFolder, $newFilename, false, $appendNumberToNameIfExists)) {
+			throw new \Exception("Could not move file " . $file->name() . " to folder " . $this->path);
+		}
 		$file->setDefaultPermissions();
 		return $this->addFile($file->name());
 	}
@@ -813,9 +867,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @param \GO\Base\Fs\File $file
 	 * @return File
+	 * @throws \Exception When the folder can't be moved. Then no record is added.
 	 */
 	public function addFilesystemFolder(\GO\Base\Fs\Folder $folder){
-		$folder->move($this->fsFolder);
+		if(!$folder->move($this->fsFolder)) {
+			throw new \Exception("Could not move folder " . $folder->name() . " to folder " . $this->path);
+		}
 		return $this->addFolder($folder->name(), true);
 	}
 
@@ -824,11 +881,14 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 *
 	 * @param array $filesArrayItem Item from the $_FILES array
 	 * @return boolean
+	 * @throws \Exception When the file can't be moved, for example because it wasn't uploaded. Then no record is added.
 	 */
 	public function addUploadedFile($filesArrayItem){
 
 		$fsFile = new \GO\Base\Fs\File($filesArrayItem['tmp_name']);
-		$fsFile->move($this->fsFolder, $filesArrayItem['name'], true, true);
+		if(!$fsFile->move($this->fsFolder, $filesArrayItem['name'], true, true)) {
+			throw new \Exception("Could not move uploaded file " . $filesArrayItem['name'] . " to folder " . $this->path);
+		}
 
 		return $this->addFile($fsFile->name());
 	}
@@ -872,13 +932,35 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
 
 		$oldCache = \GO::$disableModelCache;
+		$oldFileDeleteInDatabaseOnly = File::$deleteInDatabaseOnly;
+		$oldFolderDeleteInDatabaseOnly = Folder::$deleteInDatabaseOnly;
 
 		GO::$disableModelCache=$recurseAll;
+
+		try {
+			$this->internalSyncFilesystem($recurseAll, $recurseOneLevel);
+		} finally {
+			// always restore these, also when the sync fails. Otherwise permissions are ignored for the rest of the request.
+			\GO::$disableModelCache=$oldCache;
+
+			\GO::setIgnoreAclPermissions($oldIgnoreAcl);
+
+			File::$deleteInDatabaseOnly=$oldFileDeleteInDatabaseOnly;
+			Folder::$deleteInDatabaseOnly=$oldFolderDeleteInDatabaseOnly;
+		}
+	}
+
+	private function internalSyncFilesystem(bool $recurseAll, bool $recurseOneLevel): void {
 
 		if ($this->fsFolder->exists()) {
 			$items = $this->fsFolder->ls();
 
 			foreach ($items as $item) {
+				// Links can point anywhere on the server, so they are never added to the file storage
+				if ($item->isLink()) {
+					\GO::debug("syncFilesystem skips symbolic link " . $item->path());
+					continue;
+				}
 				if ($item->isFile()) {
 					$file = $this->hasFile($item->name());
 					if (!$file) {
@@ -913,35 +995,25 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 
 		//make sure no filesystem items are deleted. Sometimes folders are stored as files somehow.
-		$oldFileDeleteInDatabaseOnly = File::$deleteInDatabaseOnly;
-		$oldFolderDeleteInDatabaseOnly = Folder::$deleteInDatabaseOnly;
-		
 		File::$deleteInDatabaseOnly=true;
 		Folder::$deleteInDatabaseOnly=true;
 
 		$stmt= $this->folders();
 		while($folder = $stmt->fetch()){
-				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile()) {
+				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile() || $folder->fsFolder->isLink()) {
 					$folder->delete(true);
 				}
 		}
 
 		$stmt= $this->files();
 		while($file = $stmt->fetch()){
-				if(!$file->fsFile->exists() || $file->fsFile->isFolder()) {
+				if(!$file->fsFile->exists() || $file->fsFile->isFolder() || $file->fsFile->isLink()) {
 					$file->delete(true);
 				}
 		}
 
 		$this->mtime=$this->fsFolder->mtime();
 		$this->save(true);
-
-		\GO::$disableModelCache=$oldCache;
-
-		\GO::setIgnoreAclPermissions($oldIgnoreAcl);
-		
-		File::$deleteInDatabaseOnly=$oldFileDeleteInDatabaseOnly;
-		Folder::$deleteInDatabaseOnly=$oldFolderDeleteInDatabaseOnly;
 	}
 
 	/**
@@ -1166,6 +1238,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @return boolean
 	 */
 	public function copy($destinationFolder, $newName=false){
+
+		$this->fsFolder->checkFileStoragePath();
 
 		if(\GO::config()->debug)
 			\GO::debug("Copy folder ".$this->path." to ".$destinationFolder->path);
@@ -1567,13 +1641,39 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function moveToTrash(): void
 	{
+		if($this->readonly) {
+			throw new Exception(\GO::t("You can't delete this system folder", "files"));
+		}
+
+		// Moving to the trash is deleting, so it requires delete permission
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		$this->fsFolder->checkFileStoragePath();
+
 		$trashFolder = Folder::model()->findByPath('trash');
+		$originalParent = $this->parent;
+		$originalPath = $this->fsFolder->path();
 
-		\GO\Files\Model\TrashedItem::model()->saveForFolder($this);
+		// Only create the trash record when the folder was moved
+		go()->getDbConnection()->beginTransaction();
+		try {
+			if (!$this->move($trashFolder, true, true) || !$this->fsFolder->move($trashFolder->fsFolder, false, false)) {
+				throw new Exception("Unable to move current folder to trash");
+			}
 
-		$this->move($trashFolder, true, true);
-		if (!$this->fsFolder->move($trashFolder->fsFolder, false, false)) {
-			throw new Exception("Unable to move current folder to trash");
+			\GO\Files\Model\TrashedItem::model()->saveForFolder($this, $originalParent);
+
+			go()->getDbConnection()->commit();
+		} catch (\Throwable $e) {
+			go()->getDbConnection()->rollBack();
+			// The folder may already have been moved, or renamed when its name exists in the trash
+			\GO\Files\Model\TrashedItem::moveBackOnDisk($originalPath, [
+				$trashFolder->fsFolder->path() . '/' . $this->name,
+				dirname($originalPath) . '/' . $this->name
+			]);
+			throw $e;
 		}
 	}
 }

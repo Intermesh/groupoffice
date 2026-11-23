@@ -172,4 +172,7 @@ return array (
   'Index character' => 'Indexteken',
   'Icon' => 'Pictogram',
   'Address' => 'Address',
+  'Please select a company' => 'Selecteer een bedrijf',
+  'Please select at least two items to merge.' => 'Selecteer ten minste twee items om samen te voegen.',
+  'vCard importer' => 'vCard-importeerder',
 );

@@ -4,6 +4,7 @@ namespace go\core\data\convert;
 use Exception;
 use go\core\db\DbException;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
@@ -315,7 +316,9 @@ abstract class AbstractConverter {
 						continue;
 					}
 
-					if ($entity->hasPermissionLevel(Acl::LEVEL_CREATE)) {
+					// Updating an existing item requires write permission. If it's moved to another container then write
+					// permission is required on both.
+					if ($entity->hasPermissionLevel($entity->isNew() ? Acl::LEVEL_CREATE : Acl::LEVEL_WRITE)) {
 						$entity->save();
 					} else {
 						$msg = "Item " . $this->index . ": access denied";
@@ -348,7 +351,8 @@ abstract class AbstractConverter {
 					EntityType::push();
 
 					$this->notifyCount(true, $response['count'], count($response['errors']));
-				} catch (Exception $e) {
+				} catch (Throwable $e) {
+					// Also catch errors (e.g. a TypeError from invalid data) so one bad item doesn't end the import
 					ErrorHandler::logException($e);
 					$response['errors'][] = "Item " . $this->index . ": " . $e->getMessage();
 				}
@@ -363,6 +367,9 @@ abstract class AbstractConverter {
 		}catch(\Throwable $e) {
 
 			ErrorHandler::logException($e, "Failed to import file");
+
+			$response['success'] = false;
+			$response['errors'][] = $e->getMessage();
 
 			$this->notifyError(true, $e->getMessage());
 		}
@@ -465,6 +472,10 @@ abstract class AbstractConverter {
 
 				try {
 					$entity = $this->entityClass::findById($entityId);
+
+					if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
+						throw new Forbidden();
+					}
 
 					$this->exportEntity($entity);
 

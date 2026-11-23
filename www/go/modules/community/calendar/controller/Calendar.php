@@ -43,6 +43,11 @@ class Calendar extends EntityController {
 	}
 
 	/**
+	 * Get the default calendar of the user and create it when it doesn't exist
+	 *
+	 * @apiNoParams
+	 * @apiResponse {success: bool, calendarId: string, calendar: Calendar}
+	 * @apiPermission Module access: returns or creates the default calendar owned by the user.
 	 * @param $params
 	 * @return array
 	 * @throws \go\core\db\DbException
@@ -60,10 +65,24 @@ class Calendar extends EntityController {
 
 	}
 
+	/**
+	 * Import the events of a webcal subscription again, replacing the events in the calendar
+	 *
+	 * @apiParam string calendarId Required. ID of the calendar. Requires write permission.
+	 * @apiPermission Write permission on the calendar.
+	 * @param array $params
+	 * @throws Forbidden
+	 */
 	public function reload($params) {
 		$cal = model\Calendar::findById($params['calendarId']);
-		if($cal)
+		if($cal) {
+
+			if(!$cal->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+				throw new Forbidden("You do not have permission to read this calendar");
+			}
+
 			return $cal->importWebcal();
+		}
 		return ['success' => false];
 	}
 
@@ -74,6 +93,16 @@ class Calendar extends EntityController {
 	protected function canCreate(Entity $entity): bool
 	{
 		return $this->rights->mayChangeCalendars;
+	}
+
+	/**
+	 * Users with free / busy permission may get the calendar, to subscribe to it and see its busy events. The query
+	 * still returns readable calendars only, unless the client asks for the free / busy level with the
+	 * "permissionLevel" filter. {@see model\Calendar::toArray()} leaves out what they may not see.
+	 */
+	protected function canRead(Entity $entity): bool
+	{
+		return $entity->hasPermissionLevel(model\Calendar::LEVEL_FREEBUSY);
 	}
 
 	protected function canDestroy(Entity $entity): bool

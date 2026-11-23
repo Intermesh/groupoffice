@@ -106,7 +106,7 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		$this->Cell($width, 5, (new DateTime())->toUserFormat(true), 0,0,'R');
 	}
 
-	public function setEvents($events){
+	public function setEvents(array $events) : void {
 		$start = $this->day;
 		$this->early = [];
 		$this->late = [];
@@ -114,9 +114,13 @@ abstract class Calendar extends \go\core\util\PdfRenderer {
 		foreach($events as $event) {
 			if($event->isRecurring()) {
 				foreach(RecurrenceRule::expand($event, $start->format('Y-m-d'), $this->end->format('Y-m-d')) as $instance) {
+					// The details of private events of others must not be printed. Also for each instance, because
+					// recurrence overrides may set the title again.
+					$instance->hidePrivateDetails();
 					$this->add($instance->start(false, go()->getAuthState()->getUser()->timezone)->format('Y-m-d\TH:i:s').'-'.$event->id, $instance);
 				}
 			} else {
+				$event->hidePrivateDetails();
 				$this->add($event->start(false, go()->getAuthState()->getUser()->timezone)->format('Y-m-d\TH:i:s').'-'.$event->id, $event);
 			}
 		}

@@ -121,6 +121,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			this.addPanel(go.systemsettings.AppearancePanel);
 			this.addPanel(go.systemsettings.NotificationsPanel);
 			this.addPanel(go.systemsettings.AuthenticationPanel);
+			this.addPanel(go.systemsettings.SearchPanel);
 			this.addPanel(go.defaultpermissions.SystemSettingsPanel);
 		}
 		let c = go.User.capabilities['go:core:core'] || {};

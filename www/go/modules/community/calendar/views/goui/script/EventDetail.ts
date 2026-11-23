@@ -175,7 +175,7 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 								if (v.email == this.item?.calendarPrincipal?.email) {
 									type = ' (' + (this.item!.calendarPrincipal?.email === client.user.email ? t('You') : t('This')) + ')';
 								}
-								let name = v.name ? v.name + (v.email ? type + '<br>' + v.email : '') : v.email + type;
+								let name = v.name ? v.name.htmlEncode() + (v.email ? type + '<br>' + v.email.htmlEncode() : '') : Format.htmlEncode(v.email) + type;
 
 								return containerfield({cls: 'hbox', style: {alignItems: 'center', cursor: 'default'}},
 									comp({tagName: 'i', cls: 'icon', html: userIcon, style: {margin: '0 8px'}}),
@@ -305,8 +305,13 @@ export class EventDetail extends DetailPanel<CalendarEvent> {
 	 */
 	async load(id:EntityID): Promise<this> {
 		// const r = await super.load(id);
+		if (!calendarStore.loaded) {
+			await calendarStore.load();
+		}
 
-		if(!calendarStore.loaded) await calendarStore.load();
+		if (!this.entity) {
+			await super.load(id);
+		}
 
 		const item = (new CalendarItem({
 			key: id + "",

@@ -6,4 +6,8 @@ return array (
   'API Keys' => 'Claves API',
   'API keys can be used for other services to connect to the API. A website feeding contact information for example.' => 'Las claves API pueden utilizarse para que otros servicios se conecten a la API. Por ejemplo, un sitio web que facilite información de contacto.',
   'Copy token to clipboard' => 'Copiar token al portapapeles',
+  'API key' => 'Clave API',
+  'API keys' => 'Claves API',
+  'Access token' => 'Token de acceso',
+  'Copy the access token now. It\'s not possible to view it again.' => 'Copie ahora el token de acceso. No será posible volver a verlo.',
 );

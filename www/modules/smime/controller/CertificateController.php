@@ -18,6 +18,11 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 
 	protected function getStoreParams($params)
 	{
+		// Permission check on the account
+		if(!\GO\Email\Model\Account::model()->findByPk($params['account_id'] ?? 0)) {
+			throw new \GO\Base\Exception\NotFound();
+		}
+
 		$fp = \GO\Base\Db\FindParams::newInstance()->order(['valid_until','id'], ['DESC','DESC']);
 		$fp->getCriteria()->addCondition('account_id', $params['account_id']);
 		return $fp;
@@ -36,6 +41,8 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 
 		$filename = str_replace(array('@', '.'), '-', $account->getDefaultAlias()->email) . '.p12';
 
+		// Name from the e-mail address of the account, only used for the download headers.
+		// nosemgrep: go-path-from-request
 		$file = new \GO\Base\Fs\File($filename);
 		\GO\Base\Util\Http::outputDownloadHeaders($file);
 
@@ -97,6 +104,11 @@ class CertificateController extends \GO\Base\Controller\AbstractModelController 
 	 * @return array
 	 */
 	public function actionCheckPassword($params) {
+
+		// Permission check on the account. Smime doesn't check it.
+		if(!\GO\Email\Model\Account::model()->findByPk($params['account_id'] ?? 0)) {
+			throw new \GO\Base\Exception\NotFound();
+		}
 
 		$smime = new Smime($params['account_id']);
 

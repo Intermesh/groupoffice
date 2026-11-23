@@ -42,7 +42,7 @@ export class OIDConnectClientDialog extends FormWindow {
 				}),
 
 				textfield({
-					label: "Redirect URI",
+					label: t("Redirect URI"),
 					readOnly: true,
 					value: client.pageUrl("community/oidc/auth"),
 					hint: t("Use this redirect URI in your provider's App registration"),

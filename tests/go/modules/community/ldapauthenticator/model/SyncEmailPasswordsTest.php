@@ -64,7 +64,8 @@ class SyncEmailPasswordsTest extends TestCase
 
 	private function reload(): Account
 	{
-		return Account::model()->findByPk($this->account->id, false, true);
+		// without the model cache, which still has the account as it was created in setUp()
+		return Account::model()->findByPk($this->account->id, false, true, true);
 	}
 
 	public function testPasswordsAreUpdated(): void

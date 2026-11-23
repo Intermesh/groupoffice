@@ -18,6 +18,8 @@ use go\core\orm\Mapping;
 use go\core\orm\PrincipalTrait;
 use go\core\orm\Query;
 use go\core\orm\Relation;
+use go\core\util\Color;
+use go\core\validate\ErrorCode;
 
 /**
  * Calendar entity
@@ -33,16 +35,22 @@ class Calendar extends AclOwnerEntity {
 		queryMissingPrincipals as protected traitMissingPrincipals;
 	}
 
+	/**
+	 * Permission level to see the free / busy information of a calendar. Below Acl::LEVEL_READ.
+	 */
+	const LEVEL_FREEBUSY = 5;
+
 	/* Include In Availability */
 	const All = 'all';
 	const Attending = 'attending';
 	const None = 'none';
 
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'includeInAvailability'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'includeInAvailability', 'useCreatorAlerts'];
 
 	public ?string $id;
 	/** @var string The user-visible name of the calendar */
 	public string $name;
+	/** Free text about the calendar */
 	public ?string $description;
 	/** @var ?string Any valid CSS color value. The color to be used when displaying events associated with the calendar */
 	public ?string $color = null;
@@ -64,7 +72,13 @@ class Calendar extends AclOwnerEntity {
 	/** @var ?string default for event. If NULL client will use the Users default timeZone  */
 	public ?string $timeZone = null;
 
+	/** Whether the calendar is synchronized to the user's devices, like phones with CalDAV or ActiveSync */
 	public ?bool $syncToDevice = null;
+
+	/**
+	 * Per user, null when the user didn't choose. {@see getUseCreatorAlerts()}
+	 */
+	protected ?bool $useCreatorAlerts = null;
 
 	protected ?string $defaultColor = null;
 
@@ -88,11 +102,14 @@ class Calendar extends AclOwnerEntity {
 	 */
 	protected ?int $ownerId = null;
 	public ?string $createdBy;
+	/** URL of an external iCalendar feed the calendar is read from. Null for a normal calendar. */
 	public ?string $webcalUri = null;
 	protected ?string $webcalHash = null;
 
+	/** ID of the resource group when the calendar is a resource, like a meeting room. Null for other calendars. */
 	public ?string $groupId;
 
+	/** When set, the calendar is published read only on a public URL with this key */
 	public ?string $publishKey;
 	protected ?string $highestItemModSeq;
 
@@ -243,12 +260,32 @@ class Calendar extends AclOwnerEntity {
 		return !empty($this->ownerId);
 	}
 
+	/**
+	 * Use the alerts that the creator of an event set on it instead of the default alerts. In a calendar with an owner
+	 * these are the alerts of the owner, because the alerts that someone sets when creating an event go to the owner.
+	 *
+	 * Per user. When the user didn't choose, it's on for a calendar without an owner, like a team calendar, and off for
+	 * a personal calendar and a resource.
+	 *
+	 * @return bool
+	 */
+	public function getUseCreatorAlerts(): bool {
+		return $this->useCreatorAlerts ?? (!$this->isOwned() && empty($this->groupId));
+	}
+
+	public function setUseCreatorAlerts(?bool $value): void {
+		$this->useCreatorAlerts = $value;
+	}
+
 	protected function internalValidate()
 	{
 		if($this->isNew()) {
 			if(isset($this->webcalUri) && !$this->fetchWebcalBlob()) {
 				$this->setValidationError('webcalUri', 404, 'Could not download webcal file');
 			}
+		}
+		if($this->isModified('color') && !empty($this->color) && !Color::isHex($this->color)) {
+			$this->setValidationError('color', ErrorCode::MALFORMED, 'Color must be a hexadecimal value');
 		}
 		parent::internalValidate();
 	}
@@ -285,12 +322,11 @@ class Calendar extends AclOwnerEntity {
 			$this->color = $this->defaultColor;
 		}
 
-		if($this->isModified('defaultAlertsWithTime')) {
-			$this->updateEventAlerts($this->defaultAlertsWithTime);
-		}
-		if($this->isModified('defaultAlertsWithoutTime')) {
-			$this->updateEventAlerts($this->defaultAlertsWithoutTime, false);
-		}
+		$defaultAlertsModified = [
+			0 => $this->isModified('defaultAlertsWithTime'),
+			1 => $this->isModified('defaultAlertsWithoutTime')
+		];
+		$useCreatorAlertsModified = !$this->isNew() && $this->isModified('useCreatorAlerts');
 		if(!$this->isNew() && $this->id === go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId) {
 			$this->isSubscribed = true; // do not let users unsubscribe there personal calendar
 		}
@@ -301,6 +337,18 @@ class Calendar extends AclOwnerEntity {
 		}
 		$wasNew = $this->isNew();
 		$success = parent::internalSave();
+
+		if($success) {
+			if($useCreatorAlertsModified) {
+				$this->updateEventAlerts();
+			} else {
+				foreach ($defaultAlertsModified as $showWithoutTime => $modified) {
+					if ($modified) {
+						$this->updateEventAlerts((bool)$showWithoutTime);
+					}
+				}
+			}
+		}
 
 		if($wasNew && !empty($this->webcalBlob)) {
 			ICalendarHelper::import([$this->webcalBlob], $this->id, 'ignore');
@@ -318,31 +366,43 @@ class Calendar extends AclOwnerEntity {
 	}
 
 	/**
-	 * @param DefaultAlert[] $defaultAlerts
-	 * @param bool $withTime
-	 * @return void
+	 * Schedule the alerts of the current user again for the future events in this calendar that use the default alerts.
+	 *
+	 * @param bool|null $showWithoutTime true for the full-day events, false for the events with a time, null for both
 	 * @throws \Exception
 	 */
-	private function updateEventAlerts($defaultAlerts, $withTime = true) {
-		// find all future eventIds
-		$ids = CalendarEvent::find(['id'])->filter(['after' => date('Y-m-d\TH:i:s')])
-			->andWhere('showWithoutTime', '=', $withTime?0:1)
-			->andWhere('useDefaultAlerts', '=', 1)
-			->fetchMode(\PDO::FETCH_COLUMN, 0)->all();
-		if(empty($ids)) return;
-
-		$type=CalendarEvent::entityType()->getId();
-		// delete there alerts
-		\go\core\model\Alert::delete((new Query())->where('entityId', 'in', $ids)
-			->andWhere('entityTypeId', '=', $type)
-			->andWhere('userId', '=', go()->getUserId()));
-		// create new ones
-		$events = CalendarEvent::find()->where('id','IN', $ids);
+	private function updateEventAlerts(?bool $showWithoutTime = null): void {
+		if(!\go\core\model\Alert::$enabled) {
+			return;
+		}
+		// Users without per-user data for an event use the default alerts.
+		$events = CalendarEvent::find()->filter(['inCalendars' => $this->id, 'after' => date('Y-m-d\TH:i:s')])
+			->andWhere((new Criteria())->where('useDefaultAlerts', '=', 1)->orWhere('useDefaultAlerts', 'IS', null));
+		if(isset($showWithoutTime)) {
+			$events->andWhere('showWithoutTime', '=', $showWithoutTime ? 1 : 0);
+		}
 		foreach($events as $event) {
-			foreach($defaultAlerts as $dalert) {
-				$dalert->schedule($event);
+			$event->rescheduleAlertsFor(go()->getUserId());
+			// The VALARMs for CalDAV are generated again on the next request
+			$event->resetICalBlobOf(go()->getUserId());
+		}
+	}
+
+	/**
+	 * Users that may only read the free / busy information don't get the public URL or the webcal URL, which give the
+	 * details of the events, nor who the calendar is shared with
+	 */
+	public function toArray(array|null $properties = null): array
+	{
+		$arr = parent::toArray($properties);
+		if($this->getPermissionLevel() < Acl::LEVEL_READ) {
+			foreach(['publishKey', 'webcalUri', 'acl'] as $prop) {
+				if(array_key_exists($prop, $arr)) {
+					$arr[$prop] = null;
+				}
 			}
 		}
+		return $arr;
 	}
 
 	public function getMyRights() {

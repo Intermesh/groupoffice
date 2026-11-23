@@ -58,6 +58,7 @@ export interface CalendarEvent extends BaseEntity {
 	modifier: any
 	creator: any
 	createdAt: string
+	createdBy?: string
 	modifiedAt: string
 	location?:string
 	description?:string
@@ -95,6 +96,12 @@ export class CalendarItem {
 
 	static clipboard?: CalendarItem;
 
+	/** User preference to show events in their category color. Set by Main. */
+	static showCategoryColor = false;
+
+	/** The number of calendars currently shown. Set by Main. */
+	static visibleCalendarCount = 0;
+
 	/**
 	 * Provider index type
 	 * eg. "event", "birthday", "task" etc.
@@ -129,10 +136,11 @@ export class CalendarItem {
 		Object.assign(this,obj);
 
 		this.patched = ObjectUtil.patch(structuredClone(obj.data), obj.override) as CalendarEvent;
-		 if(obj.recurrenceId && (!obj.override || !obj.override.start))
-		 	this.patched.start = obj.recurrenceId;
+		if(obj.recurrenceId && (!obj.override || !obj.override.start)) {
+			this.patched.start = obj.recurrenceId;
+		}
  		// if(obj.override)
-		 // 	debugger;
+		// debugger;
 		if(!obj.start) {
 			this.start = DateTime.createFromFormat(this.patched.start, this.data.showWithoutTime ? "Y-m-d": "Y-m-dTH:i:s" , this.patched.timeZone)!; // ignore stored timezone
 			if(!this.start) {
@@ -272,8 +280,31 @@ export class CalendarItem {
 		return this.calendarPrincipal?.participationStatus === 'needs-action' && !this.isOwner;
 	}
 
-	get color() {
+	/**
+	 * The color of the calendar this item is in
+	 */
+	get calendarColor() {
 		return this.cal?.color || this.defaultColor || '356772';
+	}
+
+	/**
+	 * The color to display the item in. This is the calendar color, unless the user enabled "showCategoryColor",
+	 * exactly one calendar is visible and the event has exactly one category.
+	 */
+	get color() {
+		return this.categoryColor ?? this.calendarColor;
+	}
+
+	private get categoryColor(): string | undefined {
+		if(!CalendarItem.showCategoryColor || CalendarItem.visibleCalendarCount !== 1 || this.provider !== 'event') {
+			return undefined;
+		}
+		// count the ids, not the resolved categories. Not every category might be loaded.
+		const ids = this.patched.categoryIds;
+		if(!ids || ids.length !== 1) {
+			return undefined;
+		}
+		return this.categories.find(c => c.id == ids[0])?.color || undefined;
 	}
 
 	get participants() {
@@ -506,12 +537,39 @@ export class CalendarItem {
 		return !hasOwner || this.calendarPrincipal?.roles?.owner || false;
 	}
 
+	/**
+	 * The user may only read the free / busy information of the calendar. The server sends the time only.
+	 */
+	get isBusyOnly() {
+		return this.cal.myRights?.mayReadItems === false;
+	}
+
+	/**
+	 * The server left out the details: a busy only event, or a private event of someone else
+	 */
+	get detailsHidden() {
+		return this.isBusyOnly || this.showsAsPrivate;
+	}
+
+	/**
+	 * A private event of someone else. The server leaves out its details. Like CalendarEvent::showAsPrivate() on the
+	 * server: the owner of the calendar, or the creator when the calendar has no owner, sees everything.
+	 */
+	get showsAsPrivate() {
+		if(!this.data.id || !this.data.privacy || this.data.privacy === 'public') {
+			return false;
+		}
+		const ownerId = this.cal.ownerId;
+		return ownerId ? ownerId != client.user.id : this.data.createdBy != client.user.id;
+	}
+
 	get mayChange() {
-		return (this.isNew() || (this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
+		// A private event of someone else is read only, as its details aren't shown
+		return (this.isNew() || (this.cal.myRights.mayWriteOwn && this.isOwner && !this.showsAsPrivate)) && !this.readOnly;
 	}
 
 	get mayMove() { // or remove
-		return this.cal.myRights.mayWriteAll && !this.readOnly; // change calendar or delete single instance/full series
+		return this.cal.myRights.mayWriteAll && !this.readOnly && !this.showsAsPrivate; // change calendar or delete single instance/full series
 	}
 
 	private _calendarPrincipal:Participant|undefined;
@@ -558,7 +616,7 @@ export class CalendarItem {
 	}
 
 	get quickText(): string {
-		const cal = this.cal ? ('<sup style="color:#'+this.cal.color+';">'+(this.cal.name || t("Unknown"))+'</sup>') : '';
+		const cal = this.cal ? ('<sup style="color:#'+Format.htmlEncode(this.cal.color)+';">'+(this.cal.name || t("Unknown")).htmlEncode()+'</sup>') : '';
 		const lines = [
 			'<h2 style="padding:0;margin:0;">' + this.title.htmlEncode() + '</h2>' + cal + "<br />",
 			this.humanReadableDate().join("<br>"), "<br />"
@@ -587,7 +645,7 @@ export class CalendarItem {
 		if(this.categories.length) {
 			const cats = [];
 			for (const cat of this.categories) {
-				cats.push(`<span><i class="cat" style="color: #${cat.color};"></i> ${cat.name.htmlEncode()}</span>`);
+				cats.push(`<span><i class="cat" style="color: #${Format.htmlEncode(cat.color)};"></i> ${cat.name.htmlEncode()}</span>`);
 			}
 
 			lines.push('<div class="categories">' + cats.join("") + '</div>');
@@ -612,14 +670,38 @@ export class CalendarItem {
 	}
 
 	private formatLocation(l:string) {
-		l = l.htmlEncode();
-		const withUris = Format.convertUrisToAnchors(l);
+		const encoded = l.htmlEncode(),
+			withUris = Format.convertUrisToAnchors(l);
 
-		if(withUris != l) {
+		if(withUris != encoded) {
 			return withUris;
 		} else {
-			return `<a rel="noopener noreferrer" href="maps:q=${l}">${l}</a>`;
+			return `<a rel="noopener noreferrer" href="maps:q=${encoded}">${encoded}</a>`;
 		}
+	}
+
+	/**
+	 * Compact date span in the user's date and time format, e.g. "Wed, 04-11-2026, 08:15 - 10:00"
+	 */
+	get compactDate(): string {
+		const withTime = !this.data.showWithoutTime,
+			end = this.end.clone(),
+			weekday = new Intl.DateTimeFormat(navigator.language, {weekday: 'short'}),
+			day = (d: DateTime) => weekday.format(d.date).replace(/\.$/, '') + ', ' + d.format(Format.dateFormat),
+			time = (d: DateTime) => withTime ? ', ' + Format.time(d, true) : '';
+
+		if(!withTime) {
+			// the end of an event without time is exclusive
+			end.addSeconds(-1);
+		}
+
+		let str = day(this.start) + time(this.start);
+		if(this.start.format('Ymd') !== end.format('Ymd')) {
+			str += ' - ' + day(end) + time(end);
+		} else if(withTime) {
+			str += ' - ' + Format.time(end, true);
+		}
+		return str;
 	}
 
 	private humanReadableDate() {
@@ -1049,6 +1131,7 @@ export class CalendarItem {
 	}
 
 	remove() {
+
 		if(!this.mayChange && !this.mayMove) {
 			if(this.cal.myRights.mayWriteAll && !this.isOwner) {
 				// this is an invite
@@ -1056,10 +1139,16 @@ export class CalendarItem {
 			}
 			return;
 		}
-		if(!this.isOwner && this.mayMove && this.isRecurring) {
+		if(!this.isOwner && this.calendarPrincipal && !this.isDeclined) {
+			// Removing an invite declines it. The event is kept, so opening the invitation again does not add it back in.
+			// Declined events are hidden unless "Show events that you have declined" is on, where they can be deleted.
+			if(!this.isRecurring) {
+				this.updateParticipation("declined");
+				return;
+			}
 			const w = win({title: t('This event is part of a recurring invite'), modal: true, width: 540,},
 				comp({cls:'pad',
-					html: t('Do you want to decline this occurrence or remove the entire series from your calendar?'),
+					html: t('Do you want to decline this occurrence or the entire series?'),
 				}),tbar({},
 					btn({
 						text: t('Decline this instance'),
@@ -1070,15 +1159,23 @@ export class CalendarItem {
 							w.close();
 						}
 					}),'->',btn({
-						text: t('Remove entire series'), // the series
-						handler: _b => { this.removeSeries(); w.close(); }
+						text: t('Decline entire series'),
+						handler: _b => {
+							this.calendarPrincipal!.participationStatus = 'declined';
+							this.patchSeries({participants: this.participants});
+							w.close();
+						}
 					})
 				)
 			)
 			w.show();
+			return;
 		}
 
-		if(!this.isRecurring) {
+		if(!this.isOwner && this.isRecurring) {
+			// an already declined recurring invite
+			this.removeSeries();
+		} else if(!this.isRecurring) {
 			this.confirmScheduleMessage(false, () => {
 				eventDS.destroy(this.data.id).catch(e => Window.error(e))
 				Object.values(this.divs).forEach(d => d.remove())

@@ -76,6 +76,12 @@ class Authenticator extends PrimaryAuthenticator
 	 */
 	public function authenticate(string $username, string $password): bool|User
 	{
+		// A bind with a valid DN and an empty password is an "unauthenticated bind" (RFC 4513 5.1.2) that succeeds
+		// without checking a password when the server allows it.
+		if ($password === '') {
+			go()->debug("Empty password");
+			return false;
+		}
 
 		list($ldapUsername, $domain) = $this->splitUserName($username);
 
@@ -131,7 +137,7 @@ class Authenticator extends PrimaryAuthenticator
 					$dt = new DateTime();
 					$dt->setTimezone(new \DateTimeZone(go()->getSettings()->defaultTimezone));
 					$dt->add(new DateInterval('PT10M'));
-					$o->expiresAt = $dt;
+					$o->expireAt($dt);
 					$user->otp = $o;
 				}
 			} else {
@@ -333,7 +339,7 @@ class Authenticator extends PrimaryAuthenticator
 			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_allow_self_signed = !$server->smtpValidateCertificate;
 			$account->smtp_username = $server->smtpUsername;
-			$account->smtp_password = $smtpPassword ?? $server->smtpPassword;
+			$account->smtp_password = $smtpPassword ?? $server->readSmtpPassword();
 			$account->smtp_host = $server->smtpHostname;
 			$account->smtp_port = $server->smtpPort;
 			$account->smtp_encryption = $server->smtpEncryption ?? "";

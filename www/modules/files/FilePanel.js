@@ -131,7 +131,6 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 	},
 
 	renderPdfPreview: async function (url) {
-		let webRoot = GO.settings.config.full_url;
 		let canvas = document.getElementById('pdf-preview-canvas');
 		if (!canvas) return;
 
@@ -161,8 +160,8 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 		if (typeof window.pdfjsLib !== 'undefined') {
 			renderPdf();
 		} else {
-			import(webRoot + 'node_modules/pdfjs-dist/build/pdf.mjs').then((pdfjsLib) => {
-				pdfjsLib.GlobalWorkerOptions.workerSrc = webRoot + 'node_modules/pdfjs-dist/build/pdf.worker.mjs';
+			import(document.location.origin + BaseHref + '/node_modules/pdfjs-dist/build/pdf.mjs').then((pdfjsLib) => {
+				pdfjsLib.GlobalWorkerOptions.workerSrc = document.location.origin + BaseHref + 'node_modules/pdfjs-dist/build/pdf.worker.mjs';
 				window.pdfjsLib = pdfjsLib;
 
 				renderPdf();

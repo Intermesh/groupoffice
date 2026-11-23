@@ -2,12 +2,17 @@ import {FormWindow} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 import {colorfield, hiddenfield, select, textarea, textfield} from "@intermesh/goui";
 import {resourceGroupStore} from "./ResourcesWindow.js";
+import {publishFields} from "./PublishField.js";
 
 export class ResourceWindow extends FormWindow {
 	constructor() {
 		super('Calendar');
 		this.title = t('Resource');
 		this.maximizable = false;
+
+		const {publishField, items: publishItems} = publishFields(this.form, () => {
+			this.closeOnSave = false;
+		});
 
 		this.generalTab.cls = 'flow pad';
 		this.generalTab.items.add(
@@ -23,10 +28,18 @@ export class ResourceWindow extends FormWindow {
 			textfield({name: 'name', flex: 1, label: t('Name')}),
 			colorfield({name: 'color', width: 100, value: '69554f'}),
 			textarea({name: 'description', label: t('Description')}),
-			hiddenfield({name: 'includeInAvailability', value: 'all'})
+			hiddenfield({name: 'includeInAvailability', value: 'all'}),
 			//checkbox({disabled:true, name:'needsApproval', label: t('Needs approval')})
+			...publishItems
 		);
 
+		// No publish switch for new resources, and only the admins of the resource may publish it
+		publishField.hidden = true;
+		this.form.on('beforeload', ({data}) => {
+			// because this may be set to false during publish
+			this.closeOnSave = true;
+			publishField.hidden = !data.id || !data.myRights?.mayAdmin;
+		});
 
 		this.on('ready', async ({currentId}) => {
 			await resourceGroupStore.load();

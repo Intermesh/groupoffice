@@ -178,7 +178,7 @@ class Router{
 		}
 		
 		try{
-			// nosemgrep: tainted-object-instantiation
+			// nosemgrep: tainted-object-instantiation, go-class-from-request
 			$this->_controller = new $controllerClass;
 
 			$this->_controller->run($action, $params);		

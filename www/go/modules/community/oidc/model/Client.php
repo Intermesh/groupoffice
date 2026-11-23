@@ -80,7 +80,9 @@ class Client extends Entity {
 				'urlAccessToken'    => $wellKnown['token_endpoint'],
 				'urlResourceOwnerDetails' => $wellKnown['userinfo_endpoint'],
 				'scopes'            => ['openid', 'profile', 'email'],
-				'scopeSeparator' => ' '
+				'scopeSeparator' => ' ',
+				// Proof Key for Code Exchange, when the provider supports it
+				'pkceMethod' => in_array(GenericProvider::PKCE_METHOD_S256, $wellKnown['code_challenge_methods_supported'] ?? []) ? GenericProvider::PKCE_METHOD_S256 : null
 			]);
 		}
 		return $this->oidc;
@@ -106,11 +108,19 @@ class Client extends Entity {
 		// If we have an authorization code then proceed to request a token
 		if (isset($_REQUEST['code'])) {
 
-			if (!isset($_REQUEST['state']) || ($_REQUEST['state'] !== $this->getOIDCState())) {
+			// The state and PKCE verifier can only be used once
+			$state = $this->getOIDCState();
+			$pkceCode = $_SESSION['oidc_pkce'] ?? null;
+			unset($_SESSION['oidc_state'], $_SESSION['oidc_pkce']);
+
+			if ($state === "" || !isset($_REQUEST['state']) || !is_string($_REQUEST['state']) || !hash_equals($state, $_REQUEST['state'])) {
 				throw new Exception('Unable to determine state');
 			}
 
 			$provider = $this->getProvider();
+			if (!empty($pkceCode)) {
+				$provider->setPkceCode($pkceCode);
+			}
 			$this->accessToken = $provider->getAccessToken('authorization_code', [
 				'code' => $_REQUEST['code']
 			]);
@@ -125,6 +135,7 @@ class Client extends Entity {
 		]);
 
 		$this->setOIDCState($provider->getState());
+		$_SESSION['oidc_pkce'] = $provider->getPkceCode();
 
 		header('Location: ' . $authorizationUrl);
 		exit();
@@ -143,7 +154,8 @@ class Client extends Entity {
 	}
 
 	private function getOIDCState() : string {
-		return $_SESSION['oidc_state'] ?? "";
+		$state = $_SESSION['oidc_state'] ?? "";
+		return is_string($state) ? $state : "";
 	}
 
 	private function setOIDCState(string $state) {

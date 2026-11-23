@@ -177,8 +177,11 @@ try {
 			break;
 
 		case 'recover':
-			$user = $auth->recovery($data['hash']);
+			// Wrong hashes are counted per IP address, so they can't be guessed
+			$auth->checkThrottle('recover', 'recover');
+			$user = $auth->recovery($data['hash'] ?? null);
 			if (empty($user)) {
+				$auth->registerFailure('recover', 'recover');
 				output(['success' => false]);
 			}
 			if (!empty($data['newPassword'])) {
@@ -199,11 +202,20 @@ try {
 			/** @var ?Token $token */
 			$token = null;
 
+			// JSON can contain numbers and arrays. An array would be used as a list of tokens to look up.
+			foreach (['accessToken', 'rememberMeToken', 'loginToken'] as $key) {
+				if (isset($data[$key]) && !is_string($data[$key])) {
+					output(["error" => "Invalid token given"], 400, "Invalid token given");
+				}
+			}
+
 			if (isset($data['accessToken'])) {
 				$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
 				if ($token && $token->isAuthenticated()) {
 					$auth->assertUserIdMayLogin($token->userId);
 					$token->refresh();
+				} else {
+					$token = null;
 				}
 			} else if(isset($data['rememberMeToken'])) {
 				// Process remember me persistent cookie. This is not used by the browser. The browser verifies the remember me token in index.php with a cookie.
@@ -220,11 +232,8 @@ try {
 					output(["error" => "Invalid remember me token"], 400, "Invalid remember me token");
 				}
 			} elseif (isset($data['loginToken'])) {
-				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
-				// The login token is only valid for Token::LOGIN_LIFETIME. Expired ones stay in the database until garbage collection.
-				if ($token && $token->isExpired()) {
-					$token = null;
-				}
+				// Not after the login was finished or when it expired. Expired ones stay in the database until garbage collection.
+				$token = Token::findPendingLogin($data['loginToken']);
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {
@@ -311,9 +320,13 @@ try {
 			foreach ($testedAuthenticators as $authenticator) {
 				$errors = $authenticator->getValidationErrors();
 				if (!empty($errors)) {
+					// $authenticator is an authenticator object, not a class name from the client
+					// nosemgrep: go-class-from-request
 					$validationErrors[$authenticator::id()] = $errors;
+				// nosemgrep: go-class-from-request
 				} else if (in_array($authenticator::id(), $authenticators)) {
 					//no validation errors set but failed. Return a default error
+					// nosemgrep: go-class-from-request
 					$validationErrors[$authenticator::id()] = [$authenticator::id() . ' ' . go()->t('failed')];
 				}
 			}

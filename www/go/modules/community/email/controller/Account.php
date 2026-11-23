@@ -71,6 +71,7 @@ class Account extends EntityController
 	 * reset.
 	 * Note: you have to send a valid API key in order to do this
 	 *
+	 * @apiPermission Write permission on each account, checked by Account/set (defaultSet()).
 	 * @param array $params
 	 * @return ArrayObject
 	 * @throws InvalidArguments|NotFound

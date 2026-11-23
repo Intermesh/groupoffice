@@ -24,10 +24,6 @@
 				</tr>
 			<?php endif; ?>
 				
-			<td>
-				<td><label><?php echo \GO::t("Remember me", "defaultsite"); ?></label></td>
-				<td><input type="checkbox" name="rememberMe" value="rememberMe"></td>
-			</tr>
 		</table>
 			
 		<div class="button-bar">

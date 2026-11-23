@@ -40,7 +40,30 @@ class ReminderController extends \GO\Base\Controller\AbstractModelController{
 						->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('manual','1'));
 	}
 		
+	/**
+	 * This module manages manual reminders. The reminders of events and tasks of other users must not be read or changed.
+	 *
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function checkManual($model): void {
+		if(!$model || (!$model->isNew && !$model->manual)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+	}
+
+	protected function beforeDisplay(&$response, &$model, &$params) {
+		$this->checkManual($model);
+		return parent::beforeDisplay($response, $model, $params);
+	}
+
+	protected function beforeDelete(&$response, &$model, &$params) {
+		$this->checkManual($model);
+		return parent::beforeDelete($response, $model, $params);
+	}
+
 	protected function beforeSubmit(&$response, &$model, &$params) {
+		$this->checkManual($model);
+
 		if(!empty($params['link']))
 		{
 			$link = explode(':', $params['link']);
@@ -66,70 +89,79 @@ class ReminderController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected function actionReminderUsers($params) {
 		
-		\GO::setIgnoreAclPermissions();
-		
 		$reminderModel = \GO\Base\Model\Reminder::model()->findByPk($params['reminder_id']);
-		$response['success'] = true;
-		$response['total'] = 0;
-		$response['results'] = array();
-		$addUserIds = isset($params['add_users']) ? json_decode($params['add_users']) : array();
-		$delUserIds = isset($params['delete_keys']) ? json_decode($params['delete_keys']) : array();
-		$addGroupIds = isset($params['add_groups']) ? json_decode($params['add_groups']) : array();
-		
-		try {
-			$response['deleteSuccess']=true;
-			foreach($delUserIds as $delUserId)
-			{
-				$reminderModel->removeManyMany('users', $delUserId);
-			}
-		} catch(\Exception $e) {
-			$response['deleteSuccess']=false;
-			$response['deleteFeedback']=$e->getMessage();
-		}
+		$this->checkManual($reminderModel);
 
-		foreach ($addGroupIds as $addGroupId) {
-			$groupModel = \GO\Base\Model\Group::model()->findByPk($addGroupId);
-			$stmt = $groupModel->users;
-			while ($userModel = $stmt->fetch()) {
-				if (!in_array($userModel->id,$addUserIds)) {
-					$addUserIds[] = $userModel->id;
+		// Groups and users that the current user can't read are added here. Only switch the ACL off for this action,
+		// so it doesn't stay off for the rest of the request.
+		$oldIgnore = \GO::setIgnoreAclPermissions();
+		try {
+			$response['success'] = true;
+			$response['total'] = 0;
+			$response['results'] = array();
+			$addUserIds = isset($params['add_users']) ? json_decode($params['add_users']) : array();
+			$delUserIds = isset($params['delete_keys']) ? json_decode($params['delete_keys']) : array();
+			$addGroupIds = isset($params['add_groups']) ? json_decode($params['add_groups']) : array();
+		
+			try {
+				$response['deleteSuccess']=true;
+				foreach($delUserIds as $delUserId)
+				{
+					$reminderModel->removeManyMany('users', $delUserId);
+				}
+			} catch(\Exception $e) {
+				$response['deleteSuccess']=false;
+				$response['deleteFeedback']=$e->getMessage();
+			}
+
+			foreach ($addGroupIds as $addGroupId) {
+				$groupModel = \GO\Base\Model\Group::model()->findByPk($addGroupId);
+				$stmt = $groupModel->users;
+				while ($userModel = $stmt->fetch()) {
+					if (!in_array($userModel->id,$addUserIds)) {
+						$addUserIds[] = $userModel->id;
+					}
 				}
 			}
-		}
 		
-		foreach ($addUserIds as $addUserId) {
-			$remUserModel = \GO\Base\Model\ReminderUser::model()
-				->findSingleByAttributes(array(
-					'user_id' => $addUserId,
-					'reminder_id' => $reminderModel->id
-				));
-			if (empty($remUserModel))
-				$remUserModel = new \GO\Base\Model\ReminderUser();
+			foreach ($addUserIds as $addUserId) {
+				$remUserModel = \GO\Base\Model\ReminderUser::model()
+					->findSingleByAttributes(array(
+						'user_id' => $addUserId,
+						'reminder_id' => $reminderModel->id
+					));
+				if (empty($remUserModel))
+					$remUserModel = new \GO\Base\Model\ReminderUser();
 			
-			$remUserModel->setAttributes(array(
-					'reminder_id'	=> $reminderModel->id,
-					'user_id' => $addUserId,
-					'time' => $reminderModel->time
-				));
-			$remUserModel->save();
-		}
-		
-		if (!empty($reminderModel->users)) {
-			$stmt = $reminderModel->users;
-			while ($remUserModel = $stmt->fetch()) {
-				$response['results'][] = array(
-					'id' => $remUserModel->id,
-					'name' => $remUserModel->name
-				);
-				$response['total']+=1;
+				$remUserModel->setAttributes(array(
+						'reminder_id'	=> $reminderModel->id,
+						'user_id' => $addUserId,
+						'time' => $reminderModel->time
+					));
+				$remUserModel->save();
 			}
-		}
 		
-		return $response;
+			if (!empty($reminderModel->users)) {
+				$stmt = $reminderModel->users;
+				while ($remUserModel = $stmt->fetch()) {
+					$response['results'][] = array(
+						'id' => $remUserModel->id,
+						'name' => $remUserModel->name
+					);
+					$response['total']+=1;
+				}
+			}
+		
+			return $response;
+		} finally {
+			\GO::setIgnoreAclPermissions($oldIgnore);
+		}
 		
 	}
 
 	protected function beforeLoad(&$response, &$model, &$params) {
+		$this->checkManual($model);
+
 		if($model->model_id>0){
 			$modelType = \GO\Base\Model\ModelType::model()->findByPk($model->model_type_id);
 			

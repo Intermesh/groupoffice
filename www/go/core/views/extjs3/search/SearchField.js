@@ -9,11 +9,24 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
   spellCheck: false,
   // enableKeyEvents: true,
 
+  /**
+   * Search automatically while typing from this number of characters. Shorter queries are only sent on enter.
+   */
+  minChars: 3,
+
   onTriggerClick: function () {
     this.setValue("");
-    this.search();
+    if(this.searchTask) {
+      this.searchTask.cancel();
+    }
+    if(this.panel) {
+      this.panel.collapse();
+    }
   },
   search : function () {
+    if(this.searchTask) {
+      this.searchTask.cancel();
+    }
     this.clearInvalid();
     this.syncPanelSize();
     this.panel.expand();  
@@ -40,13 +53,13 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
       scope: this,
 
       render: function() {
-        var dqTask = new Ext.util.DelayedTask(this.search, this);
-  
+        this.searchTask = new Ext.util.DelayedTask(this.search, this);
+
         this.panel = new go.search.Panel({
             searchField: this,
             listeners: {
-              searchexception: function() {
-                this.markInvalid(t("Invalid search query"));
+              searchexception: function(panel, response) {
+                this.markInvalid(response && response.type === "queryTimeout" ? response.message : t("Invalid search query"));
               },
               scope: this
             }
@@ -55,8 +68,12 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
           this.syncPanelSize();  
           
           this.getEl().on("input", function () {
-            dqTask.delay(500);
-          });
+            if(this.getValue().trim().length >= this.minChars) {
+              this.searchTask.delay(500);
+            } else {
+              this.searchTask.cancel();
+            }
+          }, this);
       },
 
       destroy : function() {
@@ -76,6 +93,12 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
         switch (e.getKey()) {
           case e.ESC:
             this.panel.collapse();
+            break;
+
+          case e.ENTER:
+            // search right away, also when shorter than minChars
+            e.stopEvent();
+            this.search();
             break;
   
           case e.DOWN:

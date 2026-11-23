@@ -4,10 +4,12 @@ namespace go\modules\community\oauth2client\controller;
 
 
 use go\core\auth\Authenticate;
+use go\core\auth\ExternalUserLink;
 use go\core\ErrorHandler;
+use go\core\exception\Forbidden;
 use go\core\http\Exception;
 use go\core\jmap\EntityController;
-use go\core\model\User;
+use go\core\model\Acl;
 use go\core\webclient\Extjs3;
 use go\modules\community\email\model\Account;
 use go\modules\community\oauth2client\model;
@@ -23,12 +25,31 @@ use TheNetworg\OAuth2\Client\Token\AccessToken;
 final class Oauth2Client extends EntityController
 {
 
+	/**
+	 * Set by gauth.php. The OpenID login and its callback are used before the user is logged in.
+	 */
+	public static bool $isPageRequest = false;
+
 	protected function authenticate()
 	{
-		return true;
+		if (self::$isPageRequest) {
+			return;
+		}
+
+		// Users without access to the module need to read the clients to choose one for their e-mail account. Only
+		// administrators can change them.
+		if (!go()->getAuthState()->isAuthenticated()) {
+			throw new Exception(401, "Unauthorized");
+		}
+		$this->rights = $this->getClassRights();
 	}
 
-	public function entityClass(): string
+	/**
+	 * The class name of the entity this controller is for
+	 *
+	 * @return string
+	 */
+	protected function entityClass(): string
 	{
 		return model\Oauth2Client::class;
 	}
@@ -58,6 +79,7 @@ final class Oauth2Client extends EntityController
 	 *
 	 * Recieve token, add refreshtoken and expiry date to current OAuth2 account record
 	 *
+	 * @noapi Browser redirect from the OAuth2 provider via gauth.php
 	 * @throws Exception
 	 * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
 	 */
@@ -70,14 +92,19 @@ final class Oauth2Client extends EntityController
 			throw new Exception(500, 'A session variable is missing. Please retry with a new session.');
 		}
 
-		if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+		if (empty($_GET['state']) || !is_string($_GET['state']) || !is_string($_SESSION['oauth2state']) || !hash_equals($_SESSION['oauth2state'], $_GET['state'])) {
 
 			// State is invalid, possible CSRF attack in progress
 			unset($_SESSION['oauth2state']);
 			unset($_SESSION['accountId']);
 			\GO::session()->closeWriting();
 			throw new Exception(500, 'Invalid state');
-		} else if(!empty($_SESSION['accountId'])) {
+		}
+
+		// The state can only be used once
+		unset($_SESSION['oauth2state']);
+
+		if(!empty($_SESSION['accountId'])) {
 			$this->callbackEmailAccount();
 		} else {
 			$this->callbackOpenId();
@@ -116,10 +143,8 @@ final class Oauth2Client extends EntityController
 	}
 
 	private function createUser(array $response, AccessTokenInterface $token, model\Oauth2Client $client) {
-		$user = User::findOrCreateByUsername($response['email'], $response['email'], $response['name']);
-
-		//register as oauth user
-		go()->getDbConnection()->insertIgnore("oauth2client_openid_user", ['userId' => $user->id, 'clientId' => $client->id])->execute();
+		// Found by the subject at the provider. The e-mail address is only used to link a user the first time.
+		$user = (new ExternalUserLink('oauth2client_openid_user', $client->id))->findOrCreateUser($response);
 
 		$auth = new Authenticate();
 		$auth->setAuthenticated($user);
@@ -190,7 +215,9 @@ final class Oauth2Client extends EntityController
 			throw new Exception(500, "Unable to save token");
 		}
 
-		$this->auth($account->id);
+		// The user was logged in by this request, but the auth state doesn't know that yet. So don't use auth() that
+		// checks the permissions. The user owns this account.
+		$this->redirectToProvider($acct);
 //		header("Location: " . go()->getSettings()->URL);
 
 	}
@@ -198,6 +225,12 @@ final class Oauth2Client extends EntityController
 
 	private function callbackEmailAccount() {
 		$accountId = $_SESSION['accountId'];
+
+		$acct = Account::findById($accountId);
+		if(!$acct || !$acct->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+
 		$provider = $this->getProvider($accountId);
 
 		// Try to get an access token (using the authorization code grant)
@@ -267,15 +300,32 @@ final class Oauth2Client extends EntityController
 	/**
 	 * Authenticate using google Oauth settings for current account ID
 	 *
+	 * @noapi Browser redirect to the OAuth2 provider via gauth.php
 	 * @param int $accountId
 	 * @throws Exception
 	 */
 	public function auth(int $accountId)
 	{
-		$_SESSION['accountId'] = $accountId;
+		$acct = Account::findById($accountId);
+		if(!$acct || !$acct->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			throw new Forbidden();
+		}
+
+		$this->redirectToProvider($acct);
+	}
+
+	/**
+	 * Redirect to the OAuth2 provider to authorize the account. The callback stores the token in this account.
+	 *
+	 * @param Account $acct
+	 * @throws Exception
+	 */
+	private function redirectToProvider(Account $acct): void
+	{
+		// Only set after the permission check because the callback saves the token in this account
+		$_SESSION['accountId'] = $acct->id;
 
 		$provider = false;
-		$acct = Account::findById($accountId);
 		if ($acctSettings = $acct->oauth2_account) {
 			$client = model\Oauth2Client::findById($acctSettings->oauth2ClientId);
 
@@ -331,11 +381,15 @@ final class Oauth2Client extends EntityController
 	}
 
 	/**
+	 * Log in with OpenID Connect by redirecting the browser to the OAuth2 provider
+	 *
 	 * http://localhost/go/modules/commmunity/oauth2client/gauth.php/openid
 	 *
 	 *
 	 * sadshs-Ssd3-sd&
 	 *
+	 * @apiPermission Module access: starts the OpenID Connect login of the caller's own session. The redirect contains the public client ID but no secret.
+	 * @noapi Browser redirect to the OAuth2 provider via gauth.php
 	 * @return void
 	 * @throws \go\core\exception\NotFound
 	 */

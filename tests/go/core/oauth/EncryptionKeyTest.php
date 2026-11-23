@@ -61,10 +61,13 @@ class EncryptionKeyTest extends TestCase
 	 */
 	public function testNoKeyIsHardcodedInTheServer()
 	{
-		$source = file_get_contents(__DIR__ . '/../../../../www/api/oauth.php');
+		foreach (['api/oauth.php', 'go/core/oauth/server/OAuthServer.php'] as $file) {
+			$source = file_get_contents(__DIR__ . '/../../../../www/' . $file);
+			$this->assertNotFalse($source);
+			$this->assertStringNotContainsString(self::OLD_HARDCODED_KEY, $source, $file);
+		}
 
-		$this->assertNotFalse($source);
-		$this->assertStringNotContainsString(self::OLD_HARDCODED_KEY, $source);
+		// The server is built in OAuthServer
 		$this->assertStringContainsString('EncryptionKey::get()', $source);
 	}
 }

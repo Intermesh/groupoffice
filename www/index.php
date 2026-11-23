@@ -69,6 +69,16 @@ function userMayLogin($userId): bool {
 
 
 try {
+
+    // Block Apple's exchange accounts that will create a massive amount of requests on the server if we don't stop it here
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+    if (str_starts_with($ua, 'AppleExchangeWebServices')) {
+        http_response_code(404);
+        exit;
+    }
+
+
   //initialize autoloading of library
   require('GO.php');  
 	
@@ -105,10 +115,12 @@ try {
 			date_default_timezone_set('UTC');
 			//used for direct token login from multi_instance module
 			//this token is used in Extjs3.clientSettings() too
-			$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
+			// Only a short-lived token made for this. Otherwise another website could log the user in to its own account.
+			$token = is_string($_POST['accessToken']) ? Token::findHandoff($_POST['accessToken']) : null;
 			// isAuthenticated() also checks the expiry. An expired token must not be revived.
-			if($token && $token->isAuthenticated() && userMayLogin($token->userId)) {
+			if($token && $token->isAuthenticated() && userMayLogin($token->userId) && $token->rotate()) {
 
+                $_POST['accessToken'] = $token->accessToken;
                 go()->getAuthState()->setToken($token);
 				$token->setAuthenticated();
 				$token->setCookie();

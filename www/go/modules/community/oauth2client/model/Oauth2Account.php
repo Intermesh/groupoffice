@@ -27,6 +27,16 @@ final class Oauth2Account extends Property
 	 */
 	public $expires;
 
+	/**
+	 * The tokens are left out: everyone who may read the e-mail account would get access to the mailbox with them
+	 */
+	public function toArray(?array $properties = null): array
+	{
+		$arr = parent::toArray($properties);
+		unset($arr['token'], $arr['refreshToken']);
+		return $arr;
+	}
+
 	protected static function defineMapping() :Mapping
 	{
 		return parent::defineMapping()

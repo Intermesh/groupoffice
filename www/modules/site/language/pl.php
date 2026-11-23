@@ -67,4 +67,12 @@ return array (
   'Are you sure that you want to create a menu item from this content item?' => 'Czy na pewno chcesz utworzyć element menu z tego elementu zawartości?',
   'Menu' => 'Menu',
   'Slug' => 'Slug',
+  'Forgot password?' => 'Nie pamiętasz hasła?',
+  'Fill in your email address in the form below, and you\'ll recieve a link to recover your password within minutes.' => 'Wpisz swój adres e-mail w poniższym formularzu, a w ciągu kilku minut otrzymasz link do odzyskania hasła.',
+  'No user found with the given email address!' => 'Nie znaleziono użytkownika o podanym adresie e-mail!',
+  'An email with recover instructions is send to the following email address:' => 'Wiadomość z instrukcjami odzyskiwania została wysłana na następujący adres e-mail:',
+  'No email given!' => 'Nie podano adresu e-mail!',
+  'Your password is successfully reset.' => 'Twoje hasło zostało zresetowane.',
+  'The provided usertoken is not valid!' => 'Podany token użytkownika jest nieprawidłowy!',
+  'Menu\'s' => 'Menu',
 );

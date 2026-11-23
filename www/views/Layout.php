@@ -43,7 +43,7 @@ $lang = go()->getLanguage()->getIsoCode();
 <?php endif; ?>
     <title><?= $goTitle; ?><?= isset($title) ? ' - ' . $title : "" ?></title>
 
-    <link rel="preload" href="<?= $themeUrl;?>fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
+<!--    <link rel="preload" href="--><?php //= $themeUrl;?><!--fonts/icons.woff2" as="font" type="font/woff2" crossorigin>-->
     <link rel="stylesheet" media="print, screen"  href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>">
     <link rel="stylesheet" href="<?= $webclient->getBaseUrl();?>views/goui/dist/groupoffice-core/style/<?= $webclient->gouiStyleSheet ?>?v=<?= $cssMtime; ?>">
 

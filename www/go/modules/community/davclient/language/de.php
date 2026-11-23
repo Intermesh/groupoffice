@@ -19,4 +19,8 @@ return array (
   'Server' => 'Server',
   'Sync now' => 'Jetzt synchronisieren',
   'Remove from sync' => 'Vom Sync entfernen',
+  'Every 15 minutes' => 'Alle 15 Minuten',
+  'Sync' => 'Sync',
+  'Fetch data from caldav servers' => 'Daten von CalDAV-Servern abrufen',
+  'Auto refresh' => 'Automatisch aktualisieren',
 );

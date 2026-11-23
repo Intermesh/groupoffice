@@ -1398,6 +1398,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$joins = "";
 		if (!empty($params['linkModel'])) { //passed in case of a MANY_MANY relation query
+			// only a model class may be created here, never any class
+			if(!is_string($params['linkModel']) || !is_subclass_of($params['linkModel'], self::class)) {
+				throw new \Exception("Invalid linkModel");
+			}
       $linkModel = new $params['linkModel'];
       $primaryKeys = $linkModel->primaryKey();
 
@@ -3529,7 +3533,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$acl->ownedBy=$user_id;
 		$acl->entityTypeId = $this->entityType()->getId();
 		$acl->entityId = $this->id;
-		if(!$acl->save()) {
+		if(!$acl->save()) { // nosemgrep: go-setter-persists -- legacy ActiveRecord, not set through JMAP
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
 		}
 
@@ -3657,6 +3661,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		$search->entityId = $this->id;
 		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
+
+		// The search record is always saved because links depend on it. Excluded entities just don't get keywords.
+		if(\go\core\model\Search::isExcluded(static::entityType())) {
+			$isNew = $search->isNew();
+			$search->rebuild = false;
+			$search->cutPropertiesToColumnLength();
+			if(!$search->save()) {
+				throw new SaveException($search);
+			}
+			if(!$isNew) {
+				go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
+			}
+			return true;
+		}
 
 		$keywords = $this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr));
 		$keywords = array_filter($keywords, function($word) {

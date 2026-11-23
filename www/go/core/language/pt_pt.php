@@ -354,7 +354,6 @@ return array (
   'contains' => 'contém',
   'starts with' => 'inicia com',
   'ends with' => 'termina com',
-  'Emtpy' => 'Vazio',
   'is before, today plus' => 'é antes, mais hoje',
   'is after, today plus' => 'é depois, mais hoje',
   'is before' => 'é antes de',

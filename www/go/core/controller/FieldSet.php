@@ -99,6 +99,10 @@ class FieldSet extends EntityController {
 	 * Export all customfields for the chosen Fieldsets to a json-file with the ability to import in on other instance of GroupOffice
 	 * The JSON file is saved in a blob which will be downloaded in the browser.
 	 *
+	 * @apiParam string entity Required. Name of the entity the field sets belong to. Also used as the file name.
+	 * @apiParam string[] fieldSetIds Required. IDs of the field sets to export
+	 * @apiResponse {success: bool, blobId: string} The blob ID of the JSON file. Requires the "mayChangeCustomFields" permission.
+	 * @apiPermission The "mayChangeCustomFields" permission.
 	 * @param $params
 	 * @return array
 	 * @throws \ReflectionException
@@ -110,7 +114,7 @@ class FieldSet extends EntityController {
 		}
 
 		$jsonArray = ['entity' => $params['entity'], 'goVersion' => go()->getVersion(), 'fieldSets' => []];
-		$fieldSets = model\FieldSet::findByIds($params['fieldSetIds']);
+		$fieldSets = model\FieldSet::findByIds($params['fieldSetIds']); // nosemgrep: go-entity-from-params-without-acl -- mayChangeCustomFields is checked above and grants access to all field sets
 		$fieldSetArray = [];
 		foreach ($fieldSets as $fieldSet) {
 			$fields = model\Field::find()->where('fieldSetId', '=', $fieldSet->id)->orderBy(['sortOrder' => 'asc']);
@@ -175,6 +179,10 @@ class FieldSet extends EntityController {
 	 *
 	 * For fields which you the multiselect options they are also imported with new ID's
 	 *
+	 * @apiParam string blobId Required. ID of the uploaded JSON file
+	 * @apiParam string entity Required. Name of the entity to import the field sets for
+	 * @apiResponse {success: bool, feedback: string} Feedback lists the imported, merged and skipped fields. Requires the "mayChangeCustomFields" permission.
+	 * @apiPermission The "mayChangeCustomFields" permission.
 	 * @param $params
 	 * @return array
 	 */
@@ -184,7 +192,14 @@ class FieldSet extends EntityController {
 			throw new Forbidden();
 		}
 
-		$blob = Blob::findById($params['blobId']);
+		$blob = Blob::findById($params['blobId'] ?? '');
+		if(!$blob) {
+			throw new \go\core\exception\NotFound();
+		}
+		if(!\go\core\orm\EntityType::existsByName($params['entity'] ?? '')) {
+			throw new \go\core\jmap\exception\InvalidArguments("Unknown entity");
+		}
+		$e = \go\core\orm\EntityType::findByName($params['entity']);
 		$json = $blob->getFile()->getContents();
 		$jsonArray = json_decode($json, true);
 		if (false && $jsonArray['goVersion'] !== go()->getVersion()) {
@@ -200,7 +215,6 @@ class FieldSet extends EntityController {
 			foreach ($jsonArray['fieldSets'] as $fieldSetArray) {
 				$fieldSet = (object)$fieldSetArray;
 				// check if fieldSet->name exists
-				$e = \go\core\orm\EntityType::findByName($params['entity']);
 				$newFieldSet = model\FieldSet::find()
 					->where('entityId', '=', $e->getId())
 					->where('name', '=', $fieldSet->name)

@@ -73,4 +73,108 @@ class FileTest extends TestCase
 		$file = File::tempFile('');
 		$this->assertSame(go()->getTmpFolder()->getPath(), dirname($file->getPath()));
 	}
+
+	private const OUTPUT_HEADERS = ['Content-Type', 'Content-Length', 'Content-Disposition', 'Content-Transfer-Encoding',
+		'X-Content-Type-Options', 'Content-Security-Policy', 'Cache-Control', 'Expires', 'Pragma', 'Last-Modified'];
+
+	/**
+	 * Set the download headers of a temporary file with this content and return them
+	 */
+	private function outputHeaders(string $name, string $data, array $headers = [], bool $inline = true): array
+	{
+		$file = File::tempFile($name);
+		$file->putContents($data);
+		$r = \go\core\http\Response::get();
+		try {
+			$file->setOutputHeaders(false, $headers, $inline);
+			$result = [];
+			foreach (self::OUTPUT_HEADERS as $header) {
+				$result[$header] = $r->getHeader($header)[0] ?? null;
+			}
+			return $result;
+		} finally {
+			foreach (self::OUTPUT_HEADERS as $header) {
+				$r->removeHeader($header);
+			}
+			$file->delete();
+		}
+	}
+
+	public static function scriptFileProvider(): array
+	{
+		$xhtml = '<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><script>alert(1)</script></html>';
+		return [
+			'xhtml without extension' => ['file', $xhtml],
+			'xhtml with xml extension' => ['file.xml', $xhtml],
+			'xhtml with txt extension' => ['file.txt', $xhtml],
+			'html' => ['file.html', '<html><body><script>alert(1)</script></body></html>'],
+			'svg' => ['file.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'],
+		];
+	}
+
+	/**
+	 * Files that can run scripts are downloaded, also when the content type is detected from the contents
+	 */
+	#[DataProvider('scriptFileProvider')]
+	public function testScriptFileIsNotShownInline(string $name, string $data)
+	{
+		$headers = $this->outputHeaders($name, $data);
+
+		$this->assertFalse(\go\core\http\Response::isSafeInlineContentType($headers['Content-Type']), $headers['Content-Type']);
+		$this->assertStringStartsWith('attachment;', $headers['Content-Disposition']);
+		$this->assertSame('nosniff', $headers['X-Content-Type-Options']);
+	}
+
+	public function testInlineDispositionHeaderOfHtmlIsRefused()
+	{
+		$headers = $this->outputHeaders('file.html', '<p>x</p>', [
+			'Content-Type' => 'text/html; charset=utf-8',
+			'Content-Disposition' => 'inline; filename="file.html"'
+		]);
+
+		$this->assertSame('attachment; filename="file.html"', $headers['Content-Disposition']);
+		$this->assertSame('nosniff', $headers['X-Content-Type-Options']);
+	}
+
+	public function testPlainTextIsShownInlineInSandbox()
+	{
+		$headers = $this->outputHeaders('file.txt', 'Hello');
+
+		$this->assertSame('text/plain', $headers['Content-Type']);
+		$this->assertStringStartsWith('inline;', $headers['Content-Disposition']);
+		$this->assertSame('nosniff', $headers['X-Content-Type-Options']);
+		$this->assertSame('sandbox', $headers['Content-Security-Policy']);
+	}
+
+	public static function utf8Texts(): array
+	{
+		return [
+			['Bestätigt'],
+			["'Confirmed' => 'Confirmé',"],
+			['één geïnstalleerd'],
+			['Plain ASCII'],
+		];
+	}
+
+	/**
+	 * Short UTF-8 texts with a few accents were taken for SJIS, so "ä" became "ﾃ､"
+	 */
+	#[DataProvider('utf8Texts')]
+	public function testConvertToUtf8KeepsUtf8(string $text)
+	{
+		$file = File::tempFile('csv');
+		$file->putContents($text);
+		$file->convertToUtf8();
+		$this->assertSame($text, $file->getContents());
+		$file->delete();
+	}
+
+	public function testConvertToUtf8ConvertsLatin1()
+	{
+		$file = File::tempFile('csv');
+		$file->putContents(mb_convert_encoding('Bestätigt café', 'ISO-8859-1', 'UTF-8'));
+		$file->convertToUtf8();
+		$this->assertSame('Bestätigt café', $file->getContents());
+		$file->delete();
+	}
 }

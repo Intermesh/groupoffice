@@ -52,7 +52,8 @@ class Database {
 
 	public function isMariaDB(): bool
 	{
-		return str_contains($this->queryVersion(), 'mariadb');
+		// VERSION() returns for example "10.11.19-MariaDB-0+deb12u1"
+		return stripos($this->queryVersion(), 'mariadb') !== false;
 	}
 
 	/**

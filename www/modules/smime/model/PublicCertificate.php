@@ -23,8 +23,9 @@ use GO\Base\Db\FindCriteria;
 use GO\Base\Db\FindParams;
 use GO\Base\Exception\NotFound;
 use GO\Base\Fs\File;
-use GO\Base\Util\HttpClient;
 use GO\Base\Util\StringHelper;
+use go\core\fs\File as CoreFile;
+use go\core\http\Client;
 
 /**
  * The PublicCertificate model
@@ -43,6 +44,25 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 	public function tableName() {
 		return 'smi_certs';
+	}
+
+	/**
+	 * A public certificate belongs to a user. Only the owner and administrators may read, change or delete it.
+	 *
+	 * @param int $level
+	 * @return bool
+	 */
+	public function checkPermissionLevel($level) {
+		if(\GO::$ignoreAclPermissions) {
+			return true;
+		}
+
+		$userId = go()->getAuthState()->getUserId();
+		if(!$userId) {
+			return false;
+		}
+
+		return go()->getAuthState()->isAdmin() || $this->user_id == $userId;
 	}
 
 	static function import($certData, $emails) {
@@ -255,9 +275,33 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 		//Do OCSP
 
-		$cmd = "timeout 5 openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($publicCertFile->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
-		go()->debug("Running: $cmd");
-		exec ($cmd, $output,$ret);
+		// The OCSP URI comes from the certificate, so openssl may not request it. It's sent with the HTTP client that only
+		// connects to public addresses.
+		$requestFile = File::tempFile('ocsp-request');
+		$responseFile = File::tempFile('ocsp-response');
+		try {
+			$cmd = "openssl ocsp -no_nonce -issuer " . escapeshellarg($issuerPemFile->path()) . " -cert " . escapeshellarg($publicCertFile->path()) . " -reqout " . escapeshellarg($requestFile->path());
+			go()->debug("Running: $cmd");
+			exec($cmd, $requestOutput, $ret);
+			if($ret != 0) {
+				throw new \Exception( "OSCP request failed");
+			}
+
+			$response = self::httpClient()
+				->setHeader('Content-Type', 'application/ocsp-request')
+				->post($ocspURI, $requestFile->getContents());
+			if($response['status'] != 200) {
+				throw new \Exception( "OSCP request failed");
+			}
+			$responseFile->putContents($response['body']);
+
+			$cmd = "openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($publicCertFile->path())." -respin ". escapeshellarg($responseFile->path()) ." -CAfile ". escapeshellarg($issuerPemFile->path());
+			go()->debug("Running: $cmd");
+			exec ($cmd, $output,$ret);
+		} finally {
+			$requestFile->delete();
+			$responseFile->delete();
+		}
 
 		if($ret != 0) {
 			throw new \Exception( "OSCP request failed");
@@ -292,20 +336,23 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 
 	private function getIssuerPemFileFromURI($issuerURI) {
 
-		$issuerDerFile = File::tempFile('issuer.der');
+		$issuerDerFile = CoreFile::tempFile('der');
 		$issuerPemFile = File::tempFile('issuer.pem');
-		$c = new HttpClient();
-		if(!$c->downloadFile($issuerURI, $issuerDerFile))
-		{
-			throw new \Exception( "Failed to download issuer certificate");
+		try {
+			self::httpClient()->download($issuerURI, $issuerDerFile);
+			if(!$issuerDerFile->exists() || !$issuerDerFile->getSize()) {
+				throw new \Exception( "Failed to download issuer certificate");
+			}
+
+			//Convert DER to pem
+			//openssl x509 -inform DER -in issuer.crt -out issuer.pem
+
+			$cmd = "openssl x509 -inform DER -in ". escapeshellarg($issuerDerFile->getPath()) ." -out " .escapeshellarg($issuerPemFile->path());
+			go()->debug("Running: $cmd");
+			exec($cmd, $output, $ret);
+		} finally {
+			$issuerDerFile->delete();
 		}
-
-		//Convert DER to pem
-		//openssl x509 -inform DER -in issuer.crt -out issuer.pem
-
-		$cmd = "openssl x509 -inform DER -in ". escapeshellarg($issuerDerFile->path()) ." -out " .escapeshellarg($issuerPemFile->path());
-		go()->debug("Running: $cmd");
-		exec($cmd, $output, $ret);
 
 		if($ret != 0) {
 			throw new \Exception( "Failed to convert issuer certificate");
@@ -316,6 +363,21 @@ class PublicCertificate extends \GO\Base\Db\ActiveRecord {
 		}
 
 		return $issuerPemFile;
+	}
+
+	/**
+	 * HTTP client for the issuer and OCSP URI's of a certificate.
+	 *
+	 * Certificates can come from anyone, for example from a signed e-mail, so only public addresses may be requested.
+	 *
+	 * @return Client
+	 */
+	private static function httpClient(): Client {
+		$client = new Client();
+		$client->globalRangeOnly = true;
+		$client->maxResponseSize = 1024 * 1024;
+		$client->setOption(CURLOPT_TIMEOUT, 10);
+		return $client;
 	}
 
 }

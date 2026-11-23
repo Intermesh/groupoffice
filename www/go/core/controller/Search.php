@@ -27,6 +27,14 @@ class Search extends EntityController {
 		return model\Search::class;
 	}
 
+	/**
+	 * Search e-mail addresses of contacts and users, 20 results per call
+	 *
+	 * @apiParam {text?: string} filter Text to search in the e-mail address and name
+	 * @apiParam int position Offset of the first result. Defaults to 0.
+	 * @apiResponse {list: object[]} The results with entityId, entity ("Contact" or "User"), email, type, name, photoBlobId and extra (department)
+	 * @apiPermission Users are filtered on the ACL of their user group (Acl::applyToQuery()) and contacts on the ACL of their address book (Contact::applyAclToQuery()).
+	 */
 	public function email(array $params)
 	{
 		$q = $params['filter']['text'] ?? null;
@@ -143,6 +151,11 @@ class Search extends EntityController {
 				->groupBy([])
 				->select("search.id")
 				->removeJoin('core_entity', 'e');
+
+		$excluded = model\Search::getExcludedEntityTypeIds();
+		if(!empty($excluded)) {
+			$query->andWhere('search.entityTypeId', 'NOT IN', $excluded);
+		}
 
 		return $query;
 	}

@@ -67,7 +67,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						[t("Due in seven days"), 'filter_7', 'purple', '7days'],
 						[t("All"), 'assignment', 'red', 'all'],
 						[t("Unscheduled"), 'event_busy', 'blue', 'unscheduled'],
-						[t("Scheduled"), 'events', 'orange', 'scheduled'],
+						[t("Scheduled"), 'event', 'orange', 'scheduled'],
 
 					]
 				})

@@ -54,7 +54,7 @@ class Week extends Calendar {
 		
 	}
 
-	public function setEvents($events) {
+	public function setEvents(array $events) : void {
 		parent::setEvents($events);
 		$this->events = array_values($this->events);
 	}

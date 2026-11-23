@@ -14,7 +14,10 @@ create table oidc_user
 (
     clientId int unsigned not null,
     userId   int          not null,
+    sub      varchar(255) collate ascii_bin null,
     primary key (userId, clientId),
+    constraint oidc_user_clientId_sub_uindex
+        unique (clientId, sub),
     constraint oidc_user_core_user_id_fk
         foreign key (userId) references core_user (id)
             on delete cascade,

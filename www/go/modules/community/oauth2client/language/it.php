@@ -14,4 +14,10 @@ return array (
   'API Project Id' => 'API Project ID',
   'Use this connection for single signon with OpenID Connect' => 'Usa questa connessione per SSO con OpenID Connect',
   'OAuth2 client' => 'Client OAuth2',
+  'Hello' => 'Ciao',
+  'OAuth2 authentication was successful.' => 'Autenticazione OAuth2 riuscita.',
+  'Click here' => 'Clicca qui',
+  'to close this window.' => 'per chiudere questa finestra.',
+  'OAuth2 connection' => 'Connessione OAuth2',
+  'Request or update a refresh token in a separate window.' => 'Richiedi o aggiorna un refresh token in una finestra separata.',
 );

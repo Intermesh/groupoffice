@@ -62,4 +62,13 @@ return array (
   'name' => 'Sitio predeterminado',
   'description' => 'Módulo de plantillas para la creación de sitios web predeterminados',
   'Ticket' => 'Ticket',
+  'Default site' => 'Sitio predeterminado',
+  'Please fill in all fields' => 'Rellene todos los campos',
+  'The given username is incorrect' => 'El nombre de usuario indicado es incorrecto',
+  'The new password could not be saved. Please contact the administrator of the system' => 'No se pudo guardar la nueva contraseña. Póngase en contacto con el administrador del sistema',
+  'The new password may not be the same as the old password' => 'La nueva contraseña no puede ser igual a la anterior',
+  'The password and the password confirmation do not match' => 'La contraseña y la confirmación de la contraseña no coinciden',
+  'The password you have given is incorrect' => 'La contraseña indicada es incorrecta',
+  'You are required to change your password.' => 'Debe cambiar su contraseña.',
+  'Your password is expired' => 'Su contraseña ha caducado',
 );

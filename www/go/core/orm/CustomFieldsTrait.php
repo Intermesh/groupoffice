@@ -130,7 +130,7 @@ trait CustomFieldsTrait {
 	 	$m = go()->getCache()->get($cacheKey);
 		if($m === null) {
 			$m = array();
-			foreach(Field::find(['id', 'databaseName', 'fieldSetId', 'type', 'options', 'required'], true)
+			foreach(Field::find(['id', 'name', 'databaseName', 'fieldSetId', 'type', 'options', 'required'], true)
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
 						->where(['fs.entityId' => $id]) as $field) {
 				$m[$field->databaseName] = $field;
@@ -221,6 +221,10 @@ trait CustomFieldsTrait {
 			if(!empty($field->databaseName)) {
 				if (!$filters->hasFilter($field->databaseName)) {
 					$field->getDataType()->defineFilter($filters);
+					if ($filters->hasFilter($field->databaseName)) {
+						// name may be missing in models cached before it was selected
+						$filters->describe(isset($field->name) ? 'Custom field "' . $field->name . '" (' . $field->type . ').' : 'Custom field (' . $field->type . ').');
+					}
 				}
 			}
 		}		

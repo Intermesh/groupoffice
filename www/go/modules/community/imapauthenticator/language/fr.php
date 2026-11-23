@@ -11,4 +11,6 @@ return array (
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'Activer cette option si les identifiants SMTP sont identiques à ceux de l\'IMAP',
   'User options' => 'Options utilisateur',
   'Users will automatically be added to these groups' => 'Les utilisateurs seront automatiquement ajoutés à ce groupe',
+  'Use a \'*\' to match all domains.' => 'Utilisez \'*\' pour correspondre à tous les domaines.',
+  'Users must login with their full e-mail adress. Enable this option if the IMAP expects. the username without domain.' => 'Les utilisateurs doivent se connecter avec leur adresse e-mail complète. Activez cette option si le serveur IMAP attend le nom d\'utilisateur sans domaine.',
 );

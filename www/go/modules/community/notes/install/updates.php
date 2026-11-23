@@ -154,3 +154,5 @@ $updates['202104021322'][] = "ALTER TABLE `notes_user_settings` ADD (`rememberLa
 
 $updates['202205101237'][] = "update notes_note set filesFolderId = null where filesFolderId=0;";
 $updates['202308011518'][] = "ALTER TABLE `notes_note` CHANGE COLUMN `content` `content` MEDIUMTEXT NULL DEFAULT NULL ;";
+$updates['202610271200'][] = "ALTER TABLE `notes_note` ADD `type` enum('html','markdown') NOT NULL DEFAULT 'html' AFTER `content`;";
+$updates['202610271200'][] = "ALTER TABLE `notes_user_settings` ADD `defaultType` enum('html','markdown') NOT NULL DEFAULT 'html';";

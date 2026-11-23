@@ -21,6 +21,11 @@ import {commentDS} from "./Index.js";
 export class CommentsPanel extends Component {
 	public focusEditorOnload = false;
 
+	/**
+	 * Hide the panel when there are no comments, like the drafts of a ticket
+	 */
+	public hideWhenEmpty = false;
+
 	private readonly commentList!: CommentList;
 	private readonly commentEditor!: CommentEditor;
 	private readonly countBadge!: Component;
@@ -68,6 +73,26 @@ export class CommentsPanel extends Component {
 			hidden: true,
 			text: "",
 			cls: "count-badge"
+		});
+
+		this.commentList.store.on("load", () => {
+			const count = this.commentList.store.count();
+			this.countBadge.text = count.toString();
+			if (this.hideWhenEmpty) {
+				this.hidden = count === 0;
+			}
+		});
+
+		// The store only reloads on changes when its list is visible. A panel that is hidden because it's empty would
+		// never show new comments, like a draft that an AI assistant adds, so it reloads itself.
+		const onCommentsChange = () => {
+			if (this.hideWhenEmpty && this.hidden && this.entityId !== undefined && this.commentList.store.loaded && !this.commentList.store.loading) {
+				void this.commentList.store.reload();
+			}
+		};
+		commentDS.on("change", onCommentsChange);
+		this.on("remove", () => {
+			commentDS.un("change", onCommentsChange);
 		});
 
 		this.commentList.on("listready", () => {
@@ -193,7 +218,6 @@ export class CommentsPanel extends Component {
 		this.commentEditor.editor.clearInvalid();
 
 		await this.commentList.store.load();
-		this.countBadge.text = this.commentList.store.count().toString();
 		this.disabled = false;
 	}
 }

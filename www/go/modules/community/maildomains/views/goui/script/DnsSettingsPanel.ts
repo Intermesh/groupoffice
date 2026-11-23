@@ -102,7 +102,7 @@ export class DnsSettingsPanel extends Component {
 							btn({
 								style: {alignSelf: "top"},
 								icon: "delete",
-								title: "Delete",
+								title: t("Delete"),
 								handler: async (btn) => {
 
 									const confirmed = await Window.confirm(t("Are you sure you want to delete the selected item?"));

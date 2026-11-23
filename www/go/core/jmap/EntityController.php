@@ -11,6 +11,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\fs\File;
 use go\core\http\PostResponseProcessor;
 use go\core\jmap\exception\CannotCalculateChanges;
+use go\core\jmap\exception\QueryTimeout;
 use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
 use go\core\App;
@@ -333,6 +334,8 @@ abstract class EntityController extends Controller {
 			$msg = $e->getPrevious()->getMessage();
 			if(strpos($msg, '42S22') !== false && strpos($msg, 'order clause') !== false) {
 				throw new UnsupportedSort();
+			} else if($e->isMaxExecutionTimeExceeded()) {
+				throw new QueryTimeout();
 			} else{
 				throw $e;
 			}
@@ -462,7 +465,7 @@ abstract class EntityController extends Controller {
 
 		} else
 		{
-			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly);
+			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly); // nosemgrep: go-entity-from-params-without-acl -- defaultGet() checks canRead() for every entity
 		}
 
 		return $query;	
@@ -590,6 +593,10 @@ abstract class EntityController extends Controller {
 	 * we must also return those in the client or it won't sync them because the chage occurred in the same modseq.
 	 */
 	private function trackSaves() {
+		// Discard saves tracked outside this set request (e.g. by an earlier set in the same process) so they don't leak into the response
+		static::$createdEntitities = [];
+		static::$updatedEntitities = [];
+
 		$cls = $this->entityClass();
 		$cls::on(Entity::EVENT_SAVE, static::class, 'onEntitySave');		
 	}
@@ -798,10 +805,29 @@ abstract class EntityController extends Controller {
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		if($ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity)) {
+		$ret = self::fireEvent(self::EVENT_BEFORE_CAN_UPDATE, $entity);
+
+		if(isset($ret)) {
 			return $ret;
 		}
+
 		return ($entity->hasPermissionLevel(Acl::LEVEL_WRITE) || $this->onlyUserPropsModified($entity)) && $this->checkAclChange($entity);
+	}
+
+	/**
+	 * Override this to refuse an update before the client's changes are applied to the entity.
+	 *
+	 * Use it when the permission doesn't depend on the new values. Applying the changes may already modify shared
+	 * objects, for example a JSON pointer patch like "settings/defaultGroups" on a Module writes into the settings
+	 * singleton, so a refusal in canUpdate() comes too late for those.
+	 *
+	 * @param Entity $entity The entity as it is stored, without the client's changes
+	 * @param array $properties The changes sent by the client
+	 * @return bool
+	 */
+	protected function canUpdateBeforePatch(Entity $entity, array $properties): bool
+	{
+		return true;
 	}
 
 	/**
@@ -850,6 +876,11 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 			
+			if(!$this->canUpdateBeforePatch($entity, $properties)) {
+				$result['notUpdated'][$id] = new SetError("forbidden", go()->t("Permission denied"));
+				continue;
+			}
+
 			//create snapshot of props client should be aware of
 			$clientProps = JSON::patch($entity->toArray(), $properties);
 			
@@ -874,7 +905,13 @@ abstract class EntityController extends Controller {
 			//if($entity::getMapping()->getQuery() != null) {
 				$entity = $this->getEntity($id);
 			//}
-			
+
+			if(!$entity) {
+				// The item was saved, but the user can't read it anymore. For example when it was moved to another container.
+				$result['updated'][$id] = null;
+				continue;
+			}
+
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
 			$entityProps = new ArrayObject($entity->toArray());			
 			$diff = $entityProps->diff($clientProps);
@@ -889,9 +926,19 @@ abstract class EntityController extends Controller {
 			$result['updated'][$id] = empty($diff) ? null : $diff;
 		}
 	}
-	
+
+	/**
+	 * Joachim says: only with manage permissions you can fully destroy an AclOWnerEntity
+	 * Item entities still depend on the DELETE permission.
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 */
 	protected function canDestroy(Entity $entity): bool
 	{
+		if (is_a($entity, AclOwnerEntity::class)) {
+			return $entity->hasPermissionLevel(Acl::LEVEL_MANAGE);
+		}
 		return $entity->hasPermissionLevel(Acl::LEVEL_DELETE);
 	}
 
@@ -1130,7 +1177,7 @@ abstract class EntityController extends Controller {
 			$entityClass = $this->entityClass();
 			$mapping = ImportMapping::findByChecksum($entityClass::entityType()->getId(), $checkSum);
 		} else if(!empty($params['id'])) {
-			$mapping = ImportMapping::findById($params['id']);
+			$mapping = ImportMapping::findById($params['id']); // nosemgrep: go-entity-from-params-without-acl -- an import mapping is the column mapping of a CSV file for an entity type, not user data
 		}
 
 		if(!empty($mapping)) {

@@ -11,6 +11,7 @@ class NoteBook extends AclOwnerEntity {
 	
 	public ?string $id;
 	public ?string $createdBy;
+	/** Name of the note book */
 	public string $name;
 	public ?string $filesFolderId;
 	

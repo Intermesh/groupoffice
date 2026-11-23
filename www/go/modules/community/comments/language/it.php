@@ -13,5 +13,4 @@ return array (
   'You have an unsaved comment. Are you sure you want to discard the comment?' => 'Hai un commento non salvato, sei certo di volerlo scartare?',
   'A comment was made by {creator}' => 'Un commento è stato inserito da {creator}',
   'You were mentioned in a comment by {creator}.' => 'Sei stato menzionato in un commento da {creator}.',
-  'You were mentioned in a comment by  {creator}.' => 'Sei stato menzionato in un commento da  {creator}.',
 );

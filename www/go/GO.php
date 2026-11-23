@@ -438,17 +438,6 @@ class GO{
 				$path = strtolower(implode('/', $arr));
 				$location =$path.'/'.$file;
 				$filePath = dirname(dirname(__FILE__)) . '/'.$location;
-			} else if(substr($className,0,4)=='GOFS'){
-						
-				$arr = explode('\\', $className);
-				
-				array_shift($arr);
-				
-				$file = array_pop($arr).'.php';
-				$path = strtolower(implode('/', $arr));
-				$location =$path.'/'.$file;
-				$filePath = \GO::config()->file_storage_path.'php/'.$location;	
-				
 			} else {
 				$forGO = substr($className,0,3)=='GO\\';
 
@@ -543,9 +532,6 @@ class GO{
 
 		if(!defined('GO_LOADED')){ //check if old Group-Office.php was loaded
 
-			//set umask to 0 so we can create new files with mask defined in \GO::config()->file_create_mode
-			umask(0);
-			
 			//We use UTF8 by default.
 			mb_internal_encoding("UTF-8");
 		}
@@ -633,7 +619,7 @@ class GO{
 		
 		$user = isset(\GO::session()->values['username']) ? \GO::session()->values['username'] : 'notloggedin';
 		$agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'unknown';
-		$ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
+		$ip = \go\core\http\Request::get()->getRemoteIpAddress() ?? 'unknown';
 		
 		$errorMsg .= "\nUser: ".$user." Agent: ".$agent." IP: ".$ip."\n";
 		

@@ -64,7 +64,7 @@ $aclPlugin->hideNodesFromListings = true;
 //$aclPlugin->adminPrincipals = ['principals/admin'];
 
 $server->addPlugin($aclPlugin);
-$server->addPlugin(new CalDAV\Schedule\Plugin());
+$server->addPlugin(new go\core\dav\schedule\SchedulePlugin());
 $server->addPlugin(new go\core\dav\schedule\IMipPlugin(go()->getSettings()->systemEmail));
 $server->addPlugin(new Browser\Plugin(false)); // Support for html frontend// iCalendar Export Plugin
 $server->addPlugin( new ICSExportPlugin());

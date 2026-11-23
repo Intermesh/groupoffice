@@ -1,10 +1,7 @@
 /* global Ext, go, GO */
 
-/**
- * 
- * @type |||
- */
-go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
+(function() {
+var cfg = {
 	fieldLabel: t("Contact"),
 	hiddenName: 'contactId',
 	anchor: '100%',
@@ -27,7 +24,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 		if(this.allowNew == undefined) {
 			this.allowNew = {
 				isOrganization: this.isOrganization,
-				addressBookId: go.User.addressBookSettings.defaultAddressBookId
+				addressBookId: this.newAddressBookId || go.User.addressBookSettings.defaultAddressBookId
 			};
 		}
 
@@ -56,7 +53,8 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 					"photoBlobId", {name: "addressbook", type: "relation"}, {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
 				entityStore: "Contact",
 				sortInfo: {
-					field: go.User.addressBookSettings.sortBy,
+					// organizations have no first or last name to sort on
+					field: this.isOrganization === true ? 'name' : go.User.addressBookSettings.sortBy,
 					direction: 'ASC' 
 				},
 				filters: {
@@ -102,7 +100,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 			}
 		 );
 
-		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);
+		this.supr().initComponent.call(this);
 
 	},
 
@@ -116,6 +114,32 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	// 	debugger;
 	// 	return this.supr().setValue(v);
 	// }
-});
+};
+
+go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, cfg);
+go.modules.community.addressbook.ContactComboReset = Ext.extend(go.form.ComboBoxReset, cfg);
+
+/**
+ * Combo box for the organizations chips of a contact.
+ *
+ * Searches the organizations of all address books the user can read and shows the address book of each result,
+ * so organizations with the same name in different (personal) address books can be told apart.
+ *
+ * Set newAddressBookId to the address book where new organizations are created.
+ */
+go.modules.community.addressbook.OrganizationCombo = Ext.extend(go.form.ComboBox, Ext.apply({}, {
+	fieldLabel: t("Organizations"),
+	hiddenName: null,
+	submit: false,
+	isOrganization: true,
+	permissionLevel: go.permissionLevels.read,
+	emptyText: t("Please select..."),
+	selectOnFocus: true,
+	collapseOnSelect: true,
+	value: ""
+}, cfg));
 
 Ext.reg("contactcombo", go.modules.community.addressbook.ContactCombo);
+Ext.reg("contactcomboreset", go.modules.community.addressbook.ContactComboReset);
+
+})();

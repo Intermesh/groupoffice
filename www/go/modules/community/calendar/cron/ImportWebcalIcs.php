@@ -26,7 +26,7 @@ class ImportWebcalIcs extends CronJob {
 	 * @return String
 	 */
 	public function getLabel(){
-		return go()->t("Import calendar from ICS file.", 'calendar', 'community');
+		return go()->t("Import calendar from ICS file.", 'community', 'calendar');
 	}
 
 	/**
@@ -35,7 +35,7 @@ class ImportWebcalIcs extends CronJob {
 	 * @return String
 	 */
 	public function getDescription(){
-		return go()->t("Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar's administration settings.", 'calendar', 'community');
+		return go()->t("Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar's administration settings.", 'community', 'calendar');
 	}
 
 	/**

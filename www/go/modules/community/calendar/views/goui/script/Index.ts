@@ -1,6 +1,6 @@
 import {client, jmapds, modules, principalDS, router} from "@intermesh/groupoffice-core";
 import {Main} from "./Main.js";
-import {BaseEntity, datasourcestore, DateTime, E, t as coreT, translate, Window, EntityID} from "@intermesh/goui";
+import {BaseEntity, datasourcestore, DateTime, E, Format, t as coreT, translate, Window, EntityID} from "@intermesh/goui";
 import {CalendarEvent, CalendarItem} from "./CalendarItem.js";
 import {EventDetail, EventDetailWindow} from "./EventDetail.js";
 import {PreferencesPanel} from "./PreferencesPanel";
@@ -47,6 +47,8 @@ export interface Calendar extends BaseEntity {
 	/** Default time zone for events. If null the user's time zone is used */
 	timeZone: string | null
 	syncToDevice: boolean | null
+	/** Use the alerts that the creator of an event set instead of the default alerts (per user) */
+	useCreatorAlerts: boolean | null
 	defaultAlertsWithTime?: Record<string, CalendarDefaultAlert>
 	defaultAlertsWithoutTime?: Record<string, CalendarDefaultAlert>
 	/** Calendar owner id. Null for shared calendars and resources */
@@ -76,7 +78,8 @@ export const calendarStore = datasourcestore({
 	filters: {
 		default: {
 			isSubscribed: true,
-			davaccountId : null
+			davaccountId : null,
+			permissionLevel: 5 // also calendars of which the user may only see the free / busy information
 		}
 	},
 	sort: [{property:'groupId'},{property:'sortOrder'},{property:'name'}],
@@ -476,8 +479,8 @@ modules.register(  {
 								}
 							}
 						}
-						panelCfg.title = alertConfig.entity.title;
-						panelCfg.items = [{html: msg  }];
+						panelCfg.title = Format.htmlEncode(alertConfig.entity.title);
+						panelCfg.items = [{html: msg.htmlEncode()}];
 						panelCfg.notificationBody = msg ; // for desktop notifications (no html)
 						return panelCfg;
 					});

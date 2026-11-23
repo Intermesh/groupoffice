@@ -49,27 +49,27 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 			'<td style="width:70px"><b>'+t("From", "email")+'</b></td>'+
 
-			'<td>: {from} &lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;">{sender}</a>&gt;</td>'+
+			'<td>: {from:htmlEncode} &lt;<a href="{[this.mailtoHref(values.from, values.sender)]}">{sender:htmlEncode}</a>&gt;</td>'+
 
 			'</tr>'+
 			'<tr><td><b>'+t("Subject", "email")+'</b></td><td>: {subject}</td></tr>'+
 			'<tr><td><b>'+t("Date")+'</b></td><td>: {date}</td></tr>'+
 			'<tr><td><b>'+t("To", "email")+'</b></td><td>: '+
 			'<tpl for="to">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal:htmlEncode} <tpl if="email.length">&lt;<a href="{[this.mailtoHref(values.personal, values.email)]}">{email:htmlEncode}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'<tpl if="cc.length">'+
 			'<tr><td><b>'+t("CC", "email")+'</b></td><td>: '+
 			'<tpl for="cc">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal:htmlEncode} <tpl if="email.length">&lt;<a href="{[this.mailtoHref(values.personal, values.email)]}">{email:htmlEncode}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
 			'<tpl if="bcc.length">'+
 			'<tr><td><b>'+t("BCC", "email")+'</b></td><td>: '+
 			'<tpl for="bcc">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal:htmlEncode} <tpl if="email.length">&lt;<a href="{[this.mailtoHref(values.personal, values.email)]}">{email:htmlEncode}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
@@ -88,10 +88,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<div class="em-attachments" id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
-				templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
+				templateStr += '<a class="filetype-link filetype-{extension:htmlEncode}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
 				templateStr += '</tpl>'+
 				'<tpl if="extension!=\'vcf\'">'+
-				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a><i id="'+this.attachmentsId+'_more_{[xindex-1]}" class="icon ic-more-vert"></i> '+
+				'<a class="filetype-link filetype-{extension:htmlEncode}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a><i id="'+this.attachmentsId+'_more_{[xindex-1]}" class="icon ic-more-vert"></i> '+
 				'</tpl>'+
 			'</tpl>'+
 
@@ -111,7 +111,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 					'<div class="go-icon-list"><p class="more-btn"><i class="label entity {[this.linkIconCls(values)]}"></i> ' +
 					'<a href="#email"  onclick="const win = new go.links.LinkDetailWindow({entity\:\'{entity}\'});win.load({model_id});">'+
 					// '{name}</a> <label>{description}</label>' +
-					'{name}</a> <label>{[this.getLabel(values)]}</label>' +
+					'{name:htmlEncode}</a> <label>{[this.getLabel(values)]}</label>' +
 					'{[this.addDeleteBtn(values)]}</p>' +
 					'</div>' +
 				'</tpl>'+
@@ -128,13 +128,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tpl if="labels.length">' +
 				'<div class="em-message-labels-container">' +
 				'<tpl for="labels">'+
-					'<span style="background-color: #{color}">{name}</span>' +
+					'<span style="background-color: #{color:htmlEncode}">{name:htmlEncode}</span>' +
 				'</tpl>'+
 				'</div>' +
 				'<div style="clear: both"></div>' +
 			'</tpl>' +
 			
-			'<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;" class="avatar" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</a>'+
+			'<a href="{[this.mailtoHref(values.from, values.sender)]}" class="avatar" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</a>'+
 
 		'</div><ul class="actions"></ul>';
 
@@ -145,13 +145,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'</tpl>'+
 			'<tpl if="values.isInSpamFolder==\'0\';">'+
 				'<div class="message-move">'+
-					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
+					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToSpam(\'{values.uid}\',\'{[this.addSlashes(values.mailbox)]}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
 				'</div>'+
 			'</tpl>';
 
 		templateStr += '<div id="'+this.bodyId+'" class="message-body go-html-formatted">{htmlbody:raw}'+
 			'<tpl if="body_truncated">'+
-			'<br /><a href="javascript:GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);" class="normal-link">'+t("The actual message is larger than can be shown here. Click here to see the entire message.", "email")+'</a>'+
+			'<br /><a href="#" onclick="GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);return false;" class="normal-link">'+t("The actual message is larger than can be shown here. Click here to see the entire message.", "email")+'</a>'+
 			'</tpl>'+
 			'</div>';
 
@@ -168,10 +168,20 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				if(!v) {
 					return "cursor:pointer;";
 				}
-				return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;cursor:pointer;background-color: #" + v.color;;
+				return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;cursor:pointer;background-color: #" + Ext.util.Format.htmlEncode(v.color);
 			},
 
 			defaultFormatFunc : false,
+
+			/**
+			 * Build a mailto link for the href attribute. The name and address come from the message headers, so they
+			 * are URL encoded and HTML encoded. EmailClient decodes them when the link is clicked.
+			 */
+			mailtoHref: function(personal, email) {
+				personal = (personal || "").replace(/["\\]/g, "");
+				const address = personal ? '"' + personal + '" <' + (email || "") + '>' : (email || "");
+				return Ext.util.Format.htmlEncode("mailto:" + encodeURIComponent(address));
+			},
             linkIconCls: function (link) {
                 return go.Entities.getLinkIcon(link.entity, link.filter);
 
@@ -186,20 +196,23 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
                 if(link.entity === "Task") {
                     const arDesc = link.description.split(":");
                     if(!arDesc.length) {
-                        return link.description || ""; // We always return something
+                        return Ext.util.Format.htmlEncode(link.description || ""); // We always return something
                     }
-                    return "<strong>"+arDesc[0]+"</strong>:"+(arDesc[1] || ""); // Let's not bother with more than one colon
+                    return "<strong>"+Ext.util.Format.htmlEncode(arDesc[0])+"</strong>:"+Ext.util.Format.htmlEncode(arDesc[1] || ""); // Let's not bother with more than one colon
                 }
-                return link.description;
+                return Ext.util.Format.htmlEncode(link.description);
             },
 			addDeleteBtn: function(link) {
 				return '<a class="icon" onclick="GO.email.unlink('+link.link_id+');">delete</a>';
 			},
+			/**
+			 * Escape a value for a JavaScript string in an HTML attribute
+			 */
 			addSlashes : function(str)
 			{
 				str = GO.util.html_entity_decode(str, 'ENT_QUOTES');
 				str = GO.util.add_slashes(str);
-				return str;
+				return Ext.util.Format.htmlEncode(str);
 			},
 
 		});

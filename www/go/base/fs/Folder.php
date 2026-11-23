@@ -175,6 +175,10 @@ class Folder extends Base {
 				
 		if(!$newFolderName)
 			$newFolderName=$this->name();
+
+		if(!\go\core\fs\FileSystemObject::isValidName($newFolderName)) {
+			throw new \InvalidArgumentException("Invalid folder name");
+		}
 		
 		$newPath = $destinationFolder->path().'/'.$newFolderName;		
 				
@@ -236,6 +240,10 @@ class Folder extends Base {
 		
 		if(!$newFolderName)
 			$newFolderName=$this->name();
+
+		if(!\go\core\fs\FileSystemObject::isValidName($newFolderName)) {
+			throw new \InvalidArgumentException("Invalid folder name");
+		}
 		
 		\GO::debug('folder::copy: '.$this->path().' > '.$destinationFolder->path().'/'.$newFolderName);
 		
@@ -245,6 +253,10 @@ class Folder extends Base {
 		
 		$ls = $this->ls(true);
 		foreach($ls as $fsObject){
+			// Don't copy what a link points to. It can be anywhere on the server.
+			if($fsObject->isLink()) {
+				continue;
+			}
 			if($fsObject->isFolder()){				
 				//$newDestinationFolder= new Folder($destinationFolder->path().'/'.$this->name());				
 				$fsObject->copy($copiedFolder);
@@ -275,14 +287,12 @@ class Folder extends Base {
 			$permissionsMode=octdec(\GO::config()->folder_create_mode);		
 		
 		if(is_dir($this->path)){
-			
-			//was trying to chmod /tmp. Best way is to leave existing folders alone.
-//			if(!chmod($this->path, $permissionsMode))
-//				\GO::debug("chmod failed on ".$this->path);
 			return true;
 		}		
 		try {
 			if (mkdir($this->path, $permissionsMode, true)) {
+				// mkdir() applies the system umask, so set the mode explicitly
+				chmod($this->path, $permissionsMode);
 				if (\GO::config()->file_change_group)
 					chgrp($this->path, \GO::config()->file_change_group);
 

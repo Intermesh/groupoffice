@@ -22,7 +22,8 @@ GO.email.TemplateCombo = Ext.extend(go.form.ComboBoxReset, {
             //custom template
             tpl: new Ext.XTemplate(
                 '<tpl for=".">',
-                '<div ext:qtip="{name} ({user_name})" class="x-combo-list-item">{name} ({user_name})</div>',
+                // name is HTML encoded by the server. The tooltip is HTML, so it's encoded again for the attribute.
+                '<div ext:qtip="{name:htmlEncode} ({[Ext.util.Format.htmlEncode(Ext.util.Format.htmlEncode(values.user_name))]})" class="x-combo-list-item">{name} ({user_name:htmlEncode})</div>',
                 '</tpl>',
             ),
         });

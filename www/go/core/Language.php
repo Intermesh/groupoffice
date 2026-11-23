@@ -278,6 +278,21 @@ class Language {
 		return isset($this->data[$package]) && isset($this->data[$package][$module]) && isset($this->data[$package][$module][$str]);
 	}
 
+	/**
+	 * Get the translations in the language file of a module, without the English texts that {@see getTranslation()} uses
+	 * when the language file has no translation. Used to find missing translations.
+	 *
+	 * @param string $isoCode The language, like "nl"
+	 * @param string $package
+	 * @param string $module
+	 * @return array English text => translation. Empty when the module has no file for the language.
+	 * @throws \Exception When the file doesn't return an array
+	 */
+	public function getFileTranslations(string $isoCode, string $package = 'core', string $module = 'core'): array {
+		$file = $this->findLangFile($isoCode, $package, $module);
+		return $file->exists() ? $this->loadFile($file) : [];
+	}
+
 
 	private function loadSection($package = 'core', $module = 'core') {
 		if (!isset($this->data[$package])) {
@@ -311,11 +326,6 @@ class Language {
 				if ($file->exists()) {
 					$langData->mergeRecursive($this->loadFile($file));
 				}
-			}
-
-			$file = $this->findLangOverride($isoCode, $package, $module);
-			if ($file && $file->exists()) {
-				$langData->mergeRecursive($this->loadFile($file));
 			}
 
 			foreach ($langData as $key => $translation) {
@@ -389,25 +399,6 @@ class Language {
 			$folder = Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $module .'/language');
 		}
 
-		return $folder->getFile($lang . '.php');
-	}
-
-	/**
-	 * 
-	 * @param string $lang
-	 * @param string $module
-	 * @param string $basesection
-	 * @return File
-	 */
-	private function findLangOverride($lang, $package, $module) {
-
-		if(Installer::isInProgress()) {
-			return false;
-		}
-		$admin = User::findById(1, ['homeDir']);
-
-		$folder = go()->getDataFolder()->getFolder($admin->homeDir. '/language/' . $package . '/' .$module);
-		
 		return $folder->getFile($lang . '.php');
 	}
 

@@ -38,6 +38,8 @@ class Writer extends Reader{
 //		foreach ($fields as $k => $field)
 //			$fields[$k] = str_replace(array($this->delimiter,$this->enclosure),array(' ',''),$field);
 
+		$fields = array_map([\go\core\util\StringUtil::class, 'escapeCsvFormula'], $fields);
+
     try {
       if (isset($this->enclosure)) {
         return fputcsv($this->fp, $fields, $this->delimiter, $this->enclosure, "");

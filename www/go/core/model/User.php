@@ -31,6 +31,7 @@ use go\core\exception\Forbidden;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\ClassFinder;
 use go\core\util\DateTime;
+use go\core\util\Password;
 use go\core\validate\ErrorCode;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
@@ -62,6 +63,12 @@ class User extends AclItemEntity {
 	 * @see filterRegistrationValues()
 	 */
 	const REGISTRATION_PROPERTIES = ['username', 'displayName', 'email', 'password', 'recoveryEmail', 'language', 'timezone'];
+
+	/**
+	 * Properties only admins and users with the "mayChangeUsers" right may change. Users may not change them on their own
+	 * account.
+	 */
+	const MANAGER_PROPERTIES = ['enabled', 'forcePasswordChange', 'disk_quota', 'disk_usage', 'homeDir', 'loginCount', 'lastLogin'];
 
 	/**
 	 * Strip everything that a user who registers themselves may not choose, like "groups" and "enabled".
@@ -441,7 +448,19 @@ public function historyLog(): bool|array
 	/**
 	 * @throws Exception
 	 */
+	/**
+	 * Only admins may change the personal group. Users with the "mayChangeUsers" right may only change who can see the
+	 * user (the ACL). Members of the personal group get access to everything that is shared with the user.
+	 *
+	 * @throws Forbidden
+	 */
 	public function setPersonalGroup($values) {
+		$state = go()->getAuthState();
+		if($state && !$state->isAdmin()) {
+			if(!go()->getModel()->getUserRights()->mayChangeUsers || !empty(array_diff(array_keys($values), ['acl']))) {
+				throw new Forbidden();
+			}
+		}
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
@@ -461,11 +480,65 @@ public function historyLog(): bool|array
 			throw new Forbidden();
 		}
 		$this->archive = $v;
+		if($v) {
+			$this->enabled = false;
+		}
 	}
 
 	protected function canCreate(): bool
 	{
-		return go()->getModel()->getUserRights()->mayChangeUsers;
+		return go()->getModel()->getUserRights()->mayChangeUsers && $this->currentUserMayAssignGroups();
+	}
+
+	/**
+	 * Check if the logged-in user may add this user to the groups that were added to it.
+	 *
+	 * Only administrators may add users to any group. Others, like users with the "mayChangeUsers" right, may only use the
+	 * default groups for new users and group "Everyone". Otherwise they could create an administrator or give users
+	 * permissions they don't have themselves.
+	 *
+	 * Saves without a logged-in user, like the installer, LDAP sync or auto registration on login, are not restricted.
+	 *
+	 * @return bool
+	 */
+	public function currentUserMayAssignGroups(): bool
+	{
+		if(!$this->isModified('groups')) {
+			return true;
+		}
+
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin()) {
+			return true;
+		}
+
+		$oldGroups = $this->isNew() ? [] : ($this->getOldValue('groups') ?? []);
+		$added = array_diff(array_map('intval', $this->groups), array_map('intval', $oldGroups));
+		$allowed = array_map('intval', array_merge(Settings::get()->getDefaultGroups(), [Group::ID_EVERYONE]));
+
+		return empty(array_diff($added, $allowed));
+	}
+
+	/**
+	 * Check if the logged-in user may change this user, like its e-mail address or display name.
+	 *
+	 * Administrators may change all users, users may change themselves and users with the "mayChangeUsers" right may
+	 * change users that are not administrators. Saves without a logged-in user, like the installer, are not restricted.
+	 *
+	 * @return bool
+	 */
+	public function currentUserMayChange(): bool
+	{
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin()) {
+			return true;
+		}
+
+		if($this->id == $state->getUserId()) {
+			return true;
+		}
+
+		return go()->getModel()->getUserRights()->mayChangeUsers && !$this->isAdmin() && $this->hasPermissionLevel(Acl::LEVEL_READ);
 	}
 
 	/** @noinspection PhpCastIsUnnecessaryInspection */
@@ -615,7 +688,51 @@ public function historyLog(): bool|array
 		return false;
 	}
 
+	/**
+	 * Check if the user changes their own e-mail or recovery e-mail address without the current password.
+	 *
+	 * The password reset mail is sent to these addresses, so someone who took over a logged-in session could take over
+	 * the account by changing them. Administrators and user managers who change another user don't need it.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function changesRecoveryAddressWithoutPassword(): bool
+	{
+		if($this->isNew() || $this->passwordVerified) {
+			return false;
+		}
+
+		$changed = false;
+		foreach(['email', 'recoveryEmail'] as $propName) {
+			if(!$this->isModified($propName) || empty($this->$propName)) {
+				continue;
+			}
+			// Setting the recovery e-mail to the unchanged e-mail address is harmless
+			if($propName == 'recoveryEmail' && !$this->isModified('email') && $this->recoveryEmail == $this->email) {
+				continue;
+			}
+			$changed = true;
+		}
+
+		if(!$changed || App::get()->getInstaller()->isInProgress()) {
+			return false;
+		}
+
+		$state = go()->getAuthState();
+		if(!$state || !$state->isAuthenticated() || $state->isAdmin() || $state->getUserId() != $this->id) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected function internalValidate() {
+
+		// Must be checked before the recovery e-mail is set to the e-mail address below
+		if($this->changesRecoveryAddressWithoutPassword()) {
+			$this->setValidationError('currentPassword', $this->passwordVerified === null ? ErrorCode::REQUIRED : ErrorCode::INVALID_INPUT);
+		}
 
 		if(!isset($this->homeDir) && in_array("homeDir", $this->selectedProperties)) {
 			$this->homeDir = "users/" . $this->username;
@@ -647,6 +764,14 @@ public function historyLog(): bool|array
 			if($this->id == 1 && !in_array(Group::ID_ADMINS, $this->groups)) {
 				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group Admins from the primary admin user"));
 			}
+
+			if(!$this->currentUserMayAssignGroups()) {
+				$this->setValidationError('groups', ErrorCode::FORBIDDEN, go()->t("Only administrators may add users to groups other than the default groups"));
+			}
+		}
+
+		if($this->profileForbidden) {
+			$this->setValidationError('profile', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
 		}
 
 		if(!$this->validatePasswordChange()) {
@@ -879,6 +1004,17 @@ public function historyLog(): bool|array
 		return $this->authenticators;
 	}
 
+	/**
+	 * Check a password recovery hash from the client against the one of this user
+	 *
+	 * @param mixed $hash The hash from the request. Anything other than a string never matches.
+	 * @return bool
+	 */
+	public function checkRecoveryHash(mixed $hash): bool
+	{
+		return is_string($hash) && !empty($this->recoveryHash) && hash_equals($this->recoveryHash, $hash);
+	}
+
   /**
    * Send a password recovery link
    *
@@ -1005,6 +1141,11 @@ public function historyLog(): bool|array
 			return true;
 		}
 
+		// A pending archive must be saved, also when no other property changed
+		if($forIsModified && $this->archive && ($allProps || in_array('archive', $properties))) {
+			return true;
+		}
+
 		// Add contact profile
 		if (($allProps || in_array('profile', $properties)) && isset($this->contact) && $this->contact->isModified()) {
 			if($forIsModified) {
@@ -1053,7 +1194,7 @@ public function historyLog(): bool|array
 	
 	/**
 	 * Hash a password for users
-	 * 
+	 *
 	 * @param string $password
 	 * @return string
 	 */
@@ -1064,7 +1205,7 @@ public function historyLog(): bool|array
 		if($passwordLen > go()->getSettings()->passwordMaxLength) {
 			throw new \InvalidArgumentException("Maximum password length is ".go()->getSettings()->passwordMaxLength." chars");
 		}
-		return password_hash($password, PASSWORD_DEFAULT);
+		return Password::hash($password);
 	}
 
 	/**
@@ -1364,9 +1505,14 @@ public function historyLog(): bool|array
 		
 		$this->contact = !$this->isNew() ? Contact::findForUser($this->id) : null;
 		if(!$this->contact) {
+
+			if(!$this->isFetched('email', 'displayName')) {
+				return null;
+			}
+
 			$this->contact = new Contact();
 			$this->contact->addressBookId = go()->getSettings()->userAddressBook()->id;
-			if(isset($this->email)) {
+			if(!empty($this->email)) {
 				$this->contact->emailAddresses[0] = (new EmailAddress($this->contact))->setValues(['email' => $this->email]);
 			}
 			$nameParts = explode(" ", $this->displayName);
@@ -1379,6 +1525,11 @@ public function historyLog(): bool|array
 	}
 
 	/**
+	 * Set when the client tried to use a contact as profile that it may not use
+	 */
+	private bool $profileForbidden = false;
+
+	/**
 	 * @throws Exception
 	 */
 	public function setProfile($values) {
@@ -1386,10 +1537,17 @@ public function historyLog(): bool|array
 			throw new Exception("Can't set profile without address book module.");
 		}
 		if(isset($values['id'])) {
+			// Only the user's own profile or a contact that isn't the profile of another user and that the logged-in user
+			// may change can become the profile. Otherwise it would be taken from its user and that user's e-mail address
+			// could be changed through it.
 			$contact = \go\modules\community\addressbook\model\Contact::findById($values['id']);
-			if(!empty($contact)){
-				$this->contact = $contact;
+			$isOwnProfile = !empty($contact) && !$this->isNew() && $contact->goUserId == $this->id;
+			if(empty($contact) ||
+				(!$isOwnProfile && (isset($contact->goUserId) || !$contact->hasPermissionLevel(Acl::LEVEL_WRITE)))) {
+				$this->profileForbidden = true;
+				return;
 			}
+			$this->contact = $contact;
 		} else {
 			$this->contact = $this->getProfile();
 			$this->contact->setValues($values);

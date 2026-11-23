@@ -61,7 +61,7 @@ class Sync extends Controller
 			return $d->name;
 		}, $server->domains);
 
-		$records = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $username, 100);
+		$records = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . ldap_escape($username, "", LDAP_ESCAPE_FILTER), 100);
 
 		foreach ($records as $record) {
 
@@ -90,7 +90,7 @@ class Sync extends Controller
 		$connection = $server->connect();
 
 		if (!empty($xserver->username)) {
-			if (!$connection->bind($server->username, $server->getPassword())) {
+			if (!$connection->bind($server->username, $server->decryptPassword())) {
 				throw new Exception("Invalid password given for '" . $server->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $server->username . '"');
@@ -156,7 +156,7 @@ class Sync extends Controller
 		$connection = $server->connect();
 
 		if (!empty($xserver->username)) {
-			if (!$connection->bind($server->username, $server->getPassword())) {
+			if (!$connection->bind($server->username, $server->decryptPassword())) {
 				throw new Exception("Invalid password given for '" . $server->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $server->username . '"');
@@ -425,7 +425,7 @@ class Sync extends Controller
 		}, $server->domains);
 
 		if (!empty($server->username)) {
-			if (!$connection->bind($server->username, $server->getPassword())) {
+			if (!$connection->bind($server->username, $server->decryptPassword())) {
 				throw new Exception("Invalid password given for '" . $server->username . "'");
 			} else {
 				go()->debug("Authenticated with user '" . $server->username . '"');
@@ -560,7 +560,7 @@ class Sync extends Controller
 		if (isset($record->memberuid)) {
 			//for openldap
 			foreach ($record->memberuid as $uid) {
-				$accountResult = Record::find($ldapConn, $server->peopleDN, 'uid=' . $uid);
+				$accountResult = Record::find($ldapConn, $server->peopleDN, 'uid=' . ldap_escape($uid, "", LDAP_ESCAPE_FILTER));
 				if ($r = $accountResult->fetch()) {
 					$members[] = ['username' => $this->getGOUserName($r, $server), 'email' => $r->mail[0] ?? null];
 				}

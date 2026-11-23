@@ -207,10 +207,22 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * Check if a file is locked by another user.
 	 *
+	 * A lock without an expiry time was set by the user and stays until it is unlocked.
+	 *
 	 * @return boolean
 	 */
 	public function isLocked($forYouToo = false){
-		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && time() < $this->lock_expires_at;
+		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && (empty($this->lock_expires_at) || time() < $this->lock_expires_at);
+	}
+
+	/**
+	 * Check if the file has a lock that a user set with "Lock" in the menu. It has no expiry time, unlike the locks of
+	 * WOPI, DAV and OnlyOffice, and stays until it is unlocked.
+	 *
+	 * @return bool
+	 */
+	public function hasUserLock(): bool {
+		return !empty($this->locked_user_id) && empty($this->lock_expires_at);
 	}
 
 	public function unlockAllowed(){
@@ -271,6 +283,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 	protected function beforeDelete() {
 
+		// Never delete a file elsewhere on the server through a link
+		if(!File::$deleteInDatabaseOnly) {
+			$this->fsFile->checkFileStoragePath();
+		}
+
 		//blocked database check. We check this in the controller now.
 		if($this->isLocked() && !\GO::user()->isAdmin())
 			throw new \Exception(\GO::t("File is locked", "files").': '.$this->path);
@@ -315,7 +332,21 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		}
 	}
 
+	public function validate() {
+		// The name is appended to the folder path on disk, so it must not contain a path separator or be "..".
+		if(($this->getIsNew() || $this->isModified('name')) && !\go\core\fs\FileSystemObject::isValidName((string) $this->name)) {
+			$this->setValidationError('name', \GO::t("Invalid file or folder name", "files"));
+		}
+		return parent::validate();
+	}
+
 	protected function beforeSave() {
+
+		// Never write, rename or move through a link to a file elsewhere on the server
+		$this->fsFile->checkFileStoragePath();
+		if(!$this->isNew && ($this->isModified('name') || $this->isModified('folder_id'))) {
+			$this->_getOldFsFile()->checkFileStoragePath();
+		}
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
 		$this->checkNormalization();
@@ -354,6 +385,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 			if(!$this->locked_user_id) {
 				$this->lock_id = "";
+				$this->lock_expires_at = null;
 			}
 		}
 
@@ -399,7 +431,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		if(!$this->ignoreLockChange && $this->isModified('locked_user_id')){
 			$old_locked_user_id = $this->getOldAttributeValue('locked_user_id');
-			if(!empty($old_locked_user_id) && $old_locked_user_id != \GO::user()->id && !\GO::user()->isAdmin())
+			// An expired lock doesn't protect the file anymore, so another user may lock it
+			$oldExpiresAt = $this->isModified('lock_expires_at') ? $this->getOldAttributeValue('lock_expires_at') : $this->lock_expires_at;
+			$oldLockActive = empty($oldExpiresAt) || $oldExpiresAt > time();
+			if(!empty($old_locked_user_id) && $oldLockActive && $old_locked_user_id != \GO::user()->id && !\GO::user()->isAdmin())
 				throw new \GO\Files\Exception\FileLocked();
 		}
 		
@@ -559,9 +594,17 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * The link that can be send in an e-mail as download link.
 	 *
+	 * Anyone who may read the file may create or extend the link. Deleting the file when the link expires requires
+	 * delete permission.
+	 *
 	 * @return string
+	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	public function getEmailDownloadURL($html=true, $newExpireTime=false, $deleteWhenExpired=false) {
+
+		if(!$this->checkPermissionLevel($deleteWhenExpired ? \GO\Base\Model\Acl::DELETE_PERMISSION : \GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		if($newExpireTime && $this->expire_time < $newExpireTime){
 			if($this->expire_time <= time() || empty($this->random_code)) {
@@ -569,7 +612,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			}
 			$this->expire_time = $newExpireTime;
 			$this->delete_when_expired = $deleteWhenExpired;
-			$this->save();
+			// The link fields may be changed with read permission, which is checked above
+			$this->save(true);
 		}
 
 		if (!empty($this->expire_time) && !empty($this->random_code)) {
@@ -651,6 +695,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		if($appendNumberToNameIfExists)
 			$copy->appendNumberToNameIfExists();
 
+		$this->fsFile->checkFileStoragePath();
+		$copy->fsFile->checkFileStoragePath();
 		$this->fsFile->copy($copy->fsFile->parent(), $copy->name);
 
 		$copy->save(true);
@@ -684,9 +730,15 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		if($this->isLocked())
 			throw new \GO\Files\Exception\FileLocked();
+
+		if(!$this->hasPermissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			throw new AccessDenied();
+		}
 //		for safety allow replace action
 		if(!$this->isNew)
 			$this->log("update");
+
+		$this->fsFile->checkFileStoragePath();
 
 		$oldPath = $this->saveVersion();
 
@@ -709,9 +761,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		}
 		$fsFile->setDefaultPermissions();
 
-		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
-		$this->save();
+
+		// permissions already checked above
+		$this->save(true);
 		
 		$this->fireEvent('replace', array($this, $isUploadedFile));
 		
@@ -728,6 +781,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			throw new AccessDenied();
 		}
 
+		$this->fsFile->checkFileStoragePath();
 		$this->fsFile->putContents($data);
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
@@ -773,6 +827,27 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 			return false;
 		}
 		return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath));
+	}
+
+	/**
+	 * Find a file by a path that comes from the client and check that the current user may read it.
+	 *
+	 * A file that doesn't exist and a file the user may not read give the same exception, so it can't be used to find out
+	 * which files exist.
+	 *
+	 * @param mixed $relpath Relative path from \GO::config()->file_storage_path
+	 * @return File
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	public function findReadableByPath($relpath): File
+	{
+		$file = is_string($relpath) && $relpath !== '' ? $this->findByPath($relpath) : false;
+
+		if (!$file || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
+
+		return $file;
 	}
 
 	/**
@@ -959,13 +1034,37 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	 */
 	public function moveToTrash(): void
 	{
-		TrashedItem::model()->saveForFile($this);
+		// Moving to the trash is deleting, so it requires delete permission
+		if(!$this->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 
 		$trashFolder = Folder::model()->findByPath('trash');
 		if ($this->folder_id == $trashFolder->id) {
 			throw new Exception("File is already in trash");
 		}
-		$this->move($trashFolder, true);
+		$originalFolder = $this->folder;
+		$originalPath = $this->fsFile->path();
+
+		// Only create the trash record when the file was moved
+		go()->getDbConnection()->beginTransaction();
+		try {
+			if (!$this->move($trashFolder, true)) {
+				throw new Exception("Unable to move file to trash");
+			}
+
+			TrashedItem::model()->saveForFile($this, $originalFolder);
+
+			go()->getDbConnection()->commit();
+		} catch (\Throwable $e) {
+			go()->getDbConnection()->rollBack();
+			// The file may already have been moved, or renamed when its name exists in the trash
+			TrashedItem::moveBackOnDisk($originalPath, [
+				$trashFolder->fsFolder->path() . '/' . $this->name,
+				dirname($originalPath) . '/' . $this->name
+			]);
+			throw $e;
+		}
 	}
 
 	/**

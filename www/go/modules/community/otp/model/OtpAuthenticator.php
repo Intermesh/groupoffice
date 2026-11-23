@@ -12,6 +12,7 @@ use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\fs\File;
 use go\core\orm\Property;
+use go\core\orm\Query;
 use go\core\util\QRcode;
 use go\core\validate\ErrorCode;
 
@@ -31,7 +32,11 @@ class OtpAuthenticator extends Property
 
 	private ?string $verify = null;
 	public static bool $requestSecret = false;
-	public ?DateTimeInterface $expiresAt = null;
+	/**
+	 * Set for temporary secrets only, by the server (see expireAt()). Not writable through the API, because an expiry date
+	 * disables the authenticator.
+	 */
+	protected ?DateTimeInterface $expiresAt = null;
 
 	protected int $codeLength = 6;
 
@@ -92,13 +97,14 @@ class OtpAuthenticator extends Property
 			}
 		}
 
-		// Temporary secrets need not be validated against currently verified password
-		if (!empty($this->expiresAt)) {
+		// New temporary secrets (e.g. from LDAP) need not be validated against currently verified password
+		if ($this->isNew() && !empty($this->expiresAt)) {
 			parent::internalValidate();
 			return;
 		}
 
-		if ($this->isModified("secret")) {
+		// An expiry date disables the authenticator, so changing it needs the password just like changing the secret
+		if ($this->isModified("secret") || (!$this->isNew() && $this->isModified("expiresAt"))) {
 			if ((!go()->getAuthState() || !go()->getAuthState()->isAdmin()) && !$this->owner->isPasswordVerified()) {
 				$this->owner->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
 				throw new Forbidden();
@@ -163,6 +169,27 @@ class OtpAuthenticator extends Property
 	public function getIsEnabled(): bool
 	{
 		return $this->verified;
+	}
+
+	/**
+	 * Get the expiry date of a temporary secret
+	 *
+	 * @return DateTimeInterface|null null when the secret doesn't expire
+	 */
+	public function getExpiresAt(): ?DateTimeInterface
+	{
+		return $this->expiresAt;
+	}
+
+	/**
+	 * Make this a temporary secret that expires at the given date. For server side use only, e.g. LDAP.
+	 *
+	 * @param DateTimeInterface $expiresAt
+	 * @return void
+	 */
+	public function expireAt(DateTimeInterface $expiresAt): void
+	{
+		$this->expiresAt = $expiresAt;
 	}
 
 	/**
@@ -257,6 +284,16 @@ class OtpAuthenticator extends Property
 	 */
 	public function verifyCode(string $code, ?string $secret = null, int $discrepancy = 1, ?int $currentTimeSlice = null): bool
 	{
+		return $this->findTimeSlice($code, $secret, $discrepancy, $currentTimeSlice) !== null;
+	}
+
+	/**
+	 * Find the time slice of a code
+	 *
+	 * @return int|null null when the code is not correct
+	 */
+	private function findTimeSlice(string $code, ?string $secret = null, int $discrepancy = 1, ?int $currentTimeSlice = null): ?int
+	{
 
 		//replace spaces
 		$code = preg_replace('/\s+/', '', $code);
@@ -264,21 +301,51 @@ class OtpAuthenticator extends Property
 		$secret = empty($secret) ? $this->secret : $secret;
 
 		if ($currentTimeSlice === null) {
-			$currentTimeSlice = floor(time() / 30);
+			$currentTimeSlice = (int) floor(time() / 30);
 		}
 
 		if (strlen($code) != 6) {
-			return false;
+			return null;
 		}
 
 		for ($i = -$discrepancy; $i <= $discrepancy; ++$i) {
 			$calculatedCode = $this->internalGetCode($secret, $currentTimeSlice + $i);
 			if ($this->timingSafeEquals($calculatedCode, $code)) {
-				return true;
+				return $currentTimeSlice + $i;
 			}
 		}
 
-		return false;
+		return null;
+	}
+
+	/**
+	 * Check a code to log in
+	 *
+	 * A code can only be used once. Codes of the same or an earlier time slice than the last accepted code are
+	 * refused, so a code that somebody saw can't be used again while it's still valid.
+	 *
+	 * @param string $code
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function verifyLoginCode(string $code): bool
+	{
+		$timeSlice = $this->findTimeSlice($code);
+		if ($timeSlice === null) {
+			return false;
+		}
+
+		// One update, so two requests with the same code can't both succeed
+		$stmt = go()->getDbConnection()->update(
+			'otp_secret',
+			['lastTimeSlice' => $timeSlice],
+			(new Query())
+				->where('userId = :userId AND (lastTimeSlice IS NULL OR lastTimeSlice < :timeSlice)')
+				->bind([':userId' => $this->userId, ':timeSlice' => $timeSlice])
+		);
+		$stmt->execute();
+
+		return $stmt->rowCount() > 0;
 	}
 
 	/**

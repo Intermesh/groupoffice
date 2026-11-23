@@ -127,13 +127,13 @@ GO.summary.formatCalendarQtip = function(data)
 	{
 		str += '<br />'+t("Status", "calendar")+': ';
 
-		if(t("statuses", "calendar")[data.status]){
-			// str+=Ext.util.Format.htmlEncode(t("statuses", "calendar")[data.status]);
-			str+=t("statuses", "calendar")[data.status];
-		}else
-		{
-			str+=data.status;
-		}
+		// The JSCalendar status of the event
+		var statusNames = {
+			confirmed: t("Confirmed"),
+			tentative: t("Tentative"),
+			cancelled: t("Cancelled")
+		};
+		str+=Ext.util.Format.htmlEncode(statusNames[data.status] || data.status);
 	}
 
 	if(!GO.util.empty(data.calendar))

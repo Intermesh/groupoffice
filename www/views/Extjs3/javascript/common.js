@@ -186,7 +186,10 @@ GO.openHelp = function(page){
 
 
 GO.util.callToLink = function(phone){
-		return '<a onclick="GO.util.callToHandler(\''+phone+'\');">'+phone+'</a>';	
+		// The phone number comes HTML encoded from the server. Escape it for the JavaScript string of the handler and
+		// encode it again for the HTML.
+		phone = GO.util.html_entity_decode(phone || '', 'ENT_QUOTES');
+		return '<a onclick="GO.util.callToHandler(\'' + Ext.util.Format.htmlEncode(GO.util.add_slashes(phone)) + '\');">' + Ext.util.Format.htmlEncode(phone) + '</a>';
 }
 
 GO.util.callToHandler = function(phone) {	

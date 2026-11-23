@@ -164,6 +164,59 @@ class Column {
 	const DATE_FORMAT = "Y-m-d";
 
 	/**
+	 * Get the JSON type of the values of this column in the API.
+	 *
+	 * @return string|null "integer", "boolean", "number" or "string", or null for JSON columns that can hold any value
+	 */
+	public function getJsonType(): ?string
+	{
+		return match ($this->dbType) {
+			'int', 'tinyint', 'smallint', 'mediumint', 'bigint' => $this->length === 1 ? 'boolean' : 'integer',
+			'decimal', 'float', 'double' => 'number',
+			'json' => null,
+			default => 'string'
+		};
+	}
+
+	/**
+	 * Get the JSON schema (draft 2020-12) of the values of this column in the API.
+	 *
+	 * Dates are strings: "datetime" columns are in ISO 8601 with time zone (UTC), "localdatetime" columns have no time
+	 * zone and "date" columns have no time.
+	 *
+	 * @return array
+	 */
+	public function toJsonSchema(): array
+	{
+		$type = $this->getJsonType();
+		if (!isset($type)) {
+			return [];
+		}
+
+		$schema = ['type' => $this->nullAllowed ? [$type, 'null'] : $type];
+
+		switch ($this->dbType) {
+			case 'datetime':
+				$schema['format'] = 'date-time';
+				break;
+			case 'localdatetime':
+				$schema['format'] = 'local-date-time';
+				break;
+			case 'date':
+				$schema['format'] = 'date';
+				break;
+			case 'varchar':
+			case 'char':
+				if (!empty($this->length)) {
+					$schema['maxLength'] = (int) $this->length;
+				}
+				break;
+		}
+
+		return $schema;
+	}
+
+	/**
 	 * Get the SQL string to add / alter this field.
 	 * 
 	 * eg. "tinyint(1) NOT NULL DEFAULT '0'"
@@ -286,15 +339,32 @@ class Column {
 		}
 	}
 	
+	/**
+	 * Convert a value to the format the database stores
+	 *
+	 * A date time object for a "datetime" column is converted to UTC, whatever its time zone, so that it is read back
+	 * as the same moment. A "localdatetime" column keeps the time as given.
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public function castToDb($value) {
 		if (!isset($value)) {
 			return null;
 		}
-		
+
 		switch ($this->dbType) {
 			case 'localdatetime':
-			case 'datetime':
 				return is_scalar($value ) ? $value : $value->format(self::DATETIME_FORMAT);
+
+			case 'datetime':
+				if(is_scalar($value)) {
+					return $value;
+				}
+				// a copy, so the time zone of the caller's object doesn't change
+				return DateTimeImmutable::createFromInterface($value)
+					->setTimezone(new DateTimeZone("UTC"))
+					->format(self::DATETIME_FORMAT);
 
 			case 'date':
 				return is_scalar($value ) ? $value : $value->format(self::DATE_FORMAT);

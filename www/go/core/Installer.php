@@ -68,6 +68,25 @@ class Installer {
 	}
 
 	/**
+	 * Check if the web upgrade may run for the current request.
+	 *
+	 * When the database version differs from the code version, Group-Office can't be used until it's upgraded and
+	 * login may not work with the old schema, so anyone may start it. When the database is up to date, only an
+	 * administrator may run it again. Also used to protect install/license.php.
+	 *
+	 * @return bool
+	 */
+	public function isUpgradeAllowed(): bool
+	{
+		if (go()->getSettings()->databaseVersion != go()->getVersion()) {
+			return true;
+		}
+
+		$state = go()->getAuthState();
+		return $state !== null && $state->isAuthenticated() && $state->isAdmin();
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function enableGarbageCollection() {
@@ -170,6 +189,13 @@ class Installer {
 		// Fix chicken / egg problem for acl->entityTypeId
 		Group::check();
 		GoCoreModule::check();
+
+		// The principal of the admin could not be saved before the core entities were registered. Alerts and other
+		// records that reference the creator need it.
+		$admin->savePrincipal = true;
+		if(!$admin->savePrincipal()) {
+			throw new Exception("Failed to create the principal of the admin user");
+		}
 
 		$tempAuthState = new TemporaryState();
 		$tempAuthState->setUserId(1);
@@ -501,10 +527,10 @@ class Installer {
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		GO::session()->runAsRoot();
+		$oldIgnoreAcl = GO::$ignoreAclPermissions;
 		GO::$ignoreAclPermissions = true;
 
 		go()->disableEvents();
-
 
 		$this->isValidDb();
 		go()->getCache()->flush(true, false);
@@ -537,6 +563,9 @@ class Installer {
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
+		// for moving wopi module. remove later.
+		go()->getDbConnection()->exec("update core_module set package='community' where name='wopi'");
 
 		$database = go()->getDatabase();
 		$database->setUtf8();
@@ -591,6 +620,7 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		$this->enableDiskUsage();
+		GO::$ignoreAclPermissions = $oldIgnoreAcl;
 
 		// old framework messes it up somewhere
 		date_default_timezone_set("UTC");

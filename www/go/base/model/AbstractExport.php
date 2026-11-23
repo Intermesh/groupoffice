@@ -3,7 +3,9 @@ namespace GO\Base\Model;
 
 use \GO;
 use GO\Base\Data\Store;
+use GO\Base\Data\Column;
 use GO\Base\Data\ColumnModel;
+use GO\Base\Util\StringHelper;
 
 abstract class AbstractExport {
 	
@@ -142,16 +144,20 @@ abstract class AbstractExport {
 		if(!$columns)
 			$columns = $this->_columns;
 		
-		foreach($columns as $col){
-			
-//			$format = '$model->'.str_replace('.','->', $col);
-			
-			
-			$format = '$model->resolveAttribute("'.$col.'","formatted");';
+		// The columns come from the request, so they may only be used as data and never as code
+		$columns = array_values(array_diff($columns, $this->notExportableColumns));
 
-			if($col !== 'customFields.') // CF of type Notes must be skipped
-				$colModel->formatColumn($col, $format, array(), '', $this->getLabel($col));
-			
+		foreach($columns as $col){
+
+			if($col === 'customFields.') // CF of type Notes must be skipped
+				continue;
+
+			$column = new Column($col, $this->getLabel($col));
+			$column->setFormat(function($model) use ($col, $column) {
+				$value = $model->resolveAttribute($col, 'formatted');
+				return $column->getModelFormatType() == 'html' ? StringHelper::encodeHtml($value) : $value;
+			});
+			$colModel->addColumn($column);
 		}
 
 		$colModel->sort($columns);

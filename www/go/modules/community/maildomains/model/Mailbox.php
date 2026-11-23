@@ -78,6 +78,7 @@ final class Mailbox extends AclItemEntity
 
 	private ?string $plainPassword = null;
 	private ?Domain $domain;
+	private bool $domainDefaultsApplied = false;
 
 	/**
 	 * @inheritDoc
@@ -132,6 +133,47 @@ final class Mailbox extends AclItemEntity
 	public function title(): string
 	{
 		return $this->username;
+	}
+
+	/**
+	 * Applies the mailbox defaults of the domain to a new mailbox before the given values are set,
+	 * so values the client sends explicitly always win.
+	 *
+	 * @inheritDoc
+	 */
+	public function setValues(array $values, bool $checkAPIRights = true): static
+	{
+		if ($this->isNew() && !$this->domainDefaultsApplied) {
+			$domain = $this->findDomainForValues($values);
+			if ($domain) {
+				$this->autoExpunge = $domain->defaultAutoExpunge;
+				$this->fts = $domain->defaultFts;
+				$this->domainDefaultsApplied = true;
+			}
+		}
+
+		return parent::setValues($values, $checkAPIRights);
+	}
+
+	/**
+	 * Find the domain by the domainId or username in the given values
+	 *
+	 * @param array $values
+	 * @return Domain|null
+	 * @throws \Exception
+	 */
+	private function findDomainForValues(array $values): ?Domain
+	{
+		if (!empty($values['domainId'])) {
+			return Domain::findById($values['domainId']);
+		}
+
+		if (!empty($values['username']) && str_contains($values['username'], '@')) {
+			$domainName = explode("@", $values['username'])[1];
+			return Domain::find()->where(['domain' => $domainName])->single();
+		}
+
+		return isset($this->domainId) ? $this->getDomain() : null;
 	}
 
 	/**

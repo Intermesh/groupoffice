@@ -9,6 +9,7 @@ use go\core\exception\Forbidden;
 use go\core\mail\AddressList;
 use go\core\orm\Filters;
 use go\core\orm\Mapping;
+use go\core\validate\ErrorCode;
 
 final class Alias extends AclItemEntity
 {
@@ -88,7 +89,7 @@ final class Alias extends AclItemEntity
 		$domainParts = explode('@', $this->address);
 
 		if (isset($domainParts[1]) && ($domainParts[1] !== $d->domain)) {
-			$this->setValidationError('address', "The domain part of the address must match with the main domain");
+			$this->setValidationError('address', ErrorCode::INVALID_INPUT,"The domain part of the address must match with the main domain");
 		}
 
 		if (!empty($d->maxAliases) && $this->isNew() && $d->countAliases() + 1 > $d->maxAliases) {

@@ -167,4 +167,6 @@ return array (
   'Automatic linking' => 'Automatische Verknüpfung',
   'Addrees' => 'Adresse',
   'Please select at least two items to merge.' => 'Bitte wählen Sie mindestens zwei Einträge zum Zusammenführen aus.',
+  'Please select a company' => 'Bitte wählen Sie eine Firma',
+  'vCard importer' => 'vCard-Import',
 );

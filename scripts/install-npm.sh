@@ -1,10 +1,18 @@
 #!/bin/bash
-# This script builds SASS, installs composer packages and build's the GOUI modules
+# This script installs the NPM packages, builds SASS and builds the GOUI modules
+#
+# Usage: install-npm.sh [nodev] [www dir]
+#
+#   nodev    Don't build the type definitions
+#   www dir  Directory to build in. Defaults to www of this checkout.
 
 set -e
 
 IS_DEV=true
-[ "$1" == "nodev" ] && IS_DEV=false
+if [ "$1" == "nodev" ]; then
+  IS_DEV=false
+  shift
+fi
 
 if [ "$IS_DEV" == "true" ]; then
   echo "DEV mode: Also building type definitions";
@@ -17,9 +25,15 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
 DIR="$(pwd)";
 
-cd "$DIR/www"
+WWW="$( cd "${1:-$DIR/www}" && pwd )"
+cd "$WWW"
 #npm up
-npm ci --prefer-offline --audit=false --progress=false --fund=false
+if [ "$IS_DEV" == "true" ]; then
+  # Dev checkouts may have modules on other branches that aren't in the lock file yet
+  npm install --prefer-offline --audit=false --progress=false --fund=false
+else
+  npm ci --prefer-offline --audit=false --progress=false --fund=false
+fi
 
 echo "Building SASS"
 
@@ -34,8 +48,8 @@ done
 
 function buildGOUI() {
   echo BUILDING node modules inside "$1"...
-  cd $DIR;
-  for line in $(find $1 -path */goui/package.json -not -path '*/node_modules/*');
+  cd "$WWW";
+  for line in $(find $1 -path '*/goui/package.json' -not -path '*/node_modules/*');
   do
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
@@ -45,7 +59,7 @@ function buildGOUI() {
     if [ "$IS_DEV" == "true" ]; then
       npm run build:dts
     fi
-    cd $DIR;
+    cd "$WWW";
 
   done
 
@@ -54,10 +68,10 @@ function buildGOUI() {
 
 function buildAndInstallGOUIExceptCommunityAndBusiness() {
   echo BUILDING AND INSTALL node modules inside "$1"...
-  cd $DIR;
+  cd "$WWW";
   find "$1" \
       \( -path '*/community/*' -o -path '*/business/*' -o -path '*/node_modules/*' \) -prune -o \
-      -path */goui/package.json -print |
+      -path '*/goui/package.json' -print |
     while IFS= read -r line; do
     local NODE_DIR="$(dirname "${line}")";
     echo "BUILD:" $NODE_DIR;
@@ -68,7 +82,7 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
     if [ "$IS_DEV" == "true" ]; then
       npm run build:dts
     fi
-    cd $DIR;
+    cd "$WWW";
 
   done
 
@@ -77,22 +91,22 @@ function buildAndInstallGOUIExceptCommunityAndBusiness() {
 
 
 echo "Building GOUI shared libs"
-cd $DIR;
-cd ./www/views/goui
+cd "$WWW";
+cd ./views/goui
 npm run build
 if [ "$IS_DEV" == "true" ]; then
   npm run build:dts
 fi
 
-cd $DIR;
+cd "$WWW";
 echo "DONE";
 
 if [ "$IS_DEV" == "true" ]; then
-  find ./www -name tsconfig.tsbuildinfo -delete
+  find . -name tsconfig.tsbuildinfo -delete
 fi
 
-buildGOUI "./www/go/modules/community"
-buildGOUI "./www/go/modules/business"
-buildGOUI "./www/promodules"
+buildGOUI "./go/modules/community"
+buildGOUI "./go/modules/business"
+buildGOUI "./promodules"
 
-buildAndInstallGOUIExceptCommunityAndBusiness "./www/go/modules"
+buildAndInstallGOUIExceptCommunityAndBusiness "./go/modules"

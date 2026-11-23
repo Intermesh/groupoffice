@@ -368,4 +368,8 @@ Nastavení -> Účty -> Váš účet -> Složky.',
   'Are you sure you want to move all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)' => 'Jste si jisti, že chcete přesunout všechny nalezené e-maily? ("+ GO.email.messail.messagesGrid.store.reader.jsonData.allUids.length +" emaily)',
   'Delete all' => 'Smazat vše',
   'Are you sure you want to delete all the emails from the search result? (" + GO.email.messagesGrid.store.reader.jsonData.allUids.length + " emails)' => 'Jste si jisti, že chcete smazat všechny nalezené e-maily? ("+ GO.email.messail.messagesGrid.store.reader.jsonData.allUids.length +" emaily)',
+  'Fax' => 'Fax',
+  'Unsubscribe link' => 'Odkaz pro odhlášení',
+  'Unsubscribe href' => 'Adresa odkazu pro odhlášení',
+  'Message could not be saved because the \'Drafts\' folder is disabled.\\n\\nGo to E-mail -> Administration -> Accounts -> Double click account -> Folders to configure it.' => 'Zprávu nelze uložit, protože složka \'Koncepty\' je vypnutá.\\n\\nNastavíte ji v E-mail -> Správa -> Účty -> dvojklik na účet -> Složky.',
 );

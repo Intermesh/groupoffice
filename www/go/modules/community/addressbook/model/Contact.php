@@ -61,6 +61,7 @@ class Contact extends AclItemEntity {
 	 */							
 	public ?string $id;
 
+	/** ID of the AddressBook the contact is in. The permissions of the address book apply to the contact. */
 	public string $addressBookId;
 	
 	/**
@@ -77,8 +78,11 @@ class Contact extends AclItemEntity {
 	 */							
 	public ?string $prefixes = '';
 	public ?string $initials = '';
+	/** First name of a person */
 	public ?string $firstName = '';
+	/** Middle name of a person, like "van der" */
 	public ?string $middleName = '';
+	/** Last name of a person */
 	public ?string $lastName = '';
 
 	/**
@@ -96,7 +100,9 @@ class Contact extends AclItemEntity {
 	 * ['P', t("Won't say")]
 	 */							
 	public ?string $gender;
+	/** Free text notes about the contact */
 	public ?string $notes;
+	/** True for an organization, false for a person */
 	public bool $isOrganization = false;
 
 	public function genderAsText(): string {
@@ -851,25 +857,74 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 
-		$this->updateUser();
+		if(!$this->updateUser()) {
+			return false;
+		}
 
 		return $this->saveOriganizationIds();
 
 	}
 
-	private function updateUser() {
+	/**
+	 * Copy the name and e-mail address of a user's profile contact to the user
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function updateUser(): bool
+	{
 		if(isset($this->goUserId) && $this->isModified([
 				'name',
 				'emailAddresses',
 			])) {
 
 			$user = User::findById($this->goUserId,['email', 'displayName']);
+			if(!$user) {
+				return true;
+			}
 			$user->displayName = $this->name;
 			if(isset($this->emailAddresses[0])) {
 				$user->email = $this->emailAddresses[0]->email;
 			}
-			if($user->isModified()) {
-				$user->save();
+			if(!$user->isModified()) {
+				return true;
+			}
+
+			// The e-mail address of a user is used for password recovery. So only those who may change the user may change it.
+			if(!$user->currentUserMayChange()) {
+				$this->setValidationError('goUserId', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
+				return false;
+			}
+
+			if(!$user->save()) {
+				$this->setValidationError('goUserId', ErrorCode::RELATIONAL, $user->getValidationErrorsAsString());
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Only those who may change a user may make a contact the profile of that user or unlink it.
+	 *
+	 * @throws Exception
+	 */
+	private function validateGoUserId(): void
+	{
+		if(!$this->isModified(['goUserId'])) {
+			return;
+		}
+
+		foreach([$this->getOldValue('goUserId'), $this->goUserId] as $userId) {
+			if(empty($userId)) {
+				continue;
+			}
+
+			$user = User::findById($userId, ['id']);
+			if(!$user || !$user->currentUserMayChange()) {
+				$this->setValidationError('goUserId', ErrorCode::FORBIDDEN, go()->t("Permission denied"));
+				return;
 			}
 		}
 	}
@@ -916,6 +971,8 @@ class Contact extends AclItemEntity {
 				}
 			}
 		}
+
+		$this->validateGoUserId();
 		
 		parent::internalValidate();
 	}
@@ -954,6 +1011,9 @@ class Contact extends AclItemEntity {
 	private $organizationIds;
 	protected $setOrganizationIds;
 	
+	/**
+	 * IDs of the organizations (contacts with isOrganization) a person belongs to
+	 */
 	public function getOrganizationIds() {
 
 		if(!isset($this->organizationIds)) {			

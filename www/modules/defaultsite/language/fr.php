@@ -62,4 +62,13 @@ return array (
   'Ticket no.' => 'Ticket no.',
   'Discussion' => 'Discussion',
   'Ticket' => 'Ticket',
+  'Default site' => 'Site par défaut',
+  'Please fill in all fields' => 'Veuillez remplir tous les champs',
+  'The given username is incorrect' => 'Le nom d\'utilisateur indiqué est incorrect',
+  'The new password could not be saved. Please contact the administrator of the system' => 'Le nouveau mot de passe n\'a pas pu être enregistré. Veuillez contacter l\'administrateur du système',
+  'The new password may not be the same as the old password' => 'Le nouveau mot de passe ne peut pas être identique à l\'ancien',
+  'The password and the password confirmation do not match' => 'Le mot de passe et sa confirmation ne correspondent pas',
+  'The password you have given is incorrect' => 'Le mot de passe indiqué est incorrect',
+  'You are required to change your password.' => 'Vous devez changer votre mot de passe.',
+  'Your password is expired' => 'Votre mot de passe a expiré',
 );

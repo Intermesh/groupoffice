@@ -39,6 +39,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			groupField: 'internal_udate'
 		});
 
+		// Without a selected account the server can't list messages
+		this.messagesStore.on('beforeload', function(store){
+			return !!store.baseParams.account_id;
+		}, this);
+
 		this.messagesStore.on('load', function(){
 
 			this.isManager = this.messagesGrid.store.reader.jsonData.permission_level == GO.permissionLevels.manage;
@@ -240,14 +245,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				accountNode = this.treePanel.getNodeById(accountNodeId);
 			}
 			if(!accountNode) {
-				// fallback on first
-				for(var i=0;i<rootNode.childNodes.length;i++){
-					let child = rootNode.childNodes[i];
-					if(child.expanded) {
-						accountNode = child;
-						break;
-					}
-				}
+				// fallback on first expanded account, or the first account when all are collapsed
+				accountNode = rootNode.childNodes.find(child => child.expanded) || rootNode.childNodes[0];
 			}
 
 			if(!accountNode) {
@@ -282,6 +281,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				}
 
 			}, this, {single: true});
+
+			// A collapsed account doesn't load its folders, so expand it to select the inbox
+			if(!accountNode.expanded) {
+				accountNode.expand();
+			}
 
 		}, this);
 
@@ -518,7 +522,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 				var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
-				if(record && !record.data.seen && data.notification) {
+				// sending the notification requires "Use account"
+				if(record && !record.data.seen && data.notification && this.permissionLevel >= GO.permissionLevels.create) {
 					if(GO.email.alwaysRespondToNotifications || confirm(t("The sender of this messages likes a read notification by you at: %s. Do you want to send a read notification now?", "email").replace('%s', data.notification))) {
 						GO.request({
 							url: "email/message/notification",
@@ -1417,6 +1422,12 @@ go.Modules.register("legacy", 'email', {
 			queryString = href.substr(indexOf+1);
 		} else {
 			email = href.substr(7);
+		}
+
+		try {
+			email = decodeURIComponent(email);
+		} catch (err) {
+			// not URL encoded
 		}
 
 		e.preventDefault();

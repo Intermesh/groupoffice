@@ -29,6 +29,13 @@ class Preferences extends Property
 	public bool $birthdaysAreVisible = false;
 
 	public bool $multiLine = false;
+
+	/** @var bool Show an event in the color of its category when one calendar is visible and the event has one category */
+	public bool $showCategoryColor = false;
+
+	/** @var bool Print the week and workweek in a grid with hours (print/week, print/days) instead of a list per day (printRange) */
+	public bool $printWeekInGrid = false;
+
 	/** @var bool Show birthdays on the calendar */
 	public bool $tasksAreVisible = false;
 	/** @var bool Show birthdays on the calendar */

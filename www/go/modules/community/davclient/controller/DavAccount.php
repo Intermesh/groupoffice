@@ -2,6 +2,7 @@
 
 namespace go\modules\community\davclient\controller;
 
+use go\core\exception\NotFound;
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\davclient\model;
@@ -34,20 +35,35 @@ class DavAccount extends EntityController {
 		return $this->defaultChanges($params);
 	}
 
+	/**
+	 * Synchronize a CalDAV / CardDAV account, or one collection of it
+	 *
+	 * @apiParam string accountId Required. ID of the account. Requires read permission.
+	 * @apiParam string collectionId ID of the collection to synchronize. Without it, the whole account is synchronized,
+	 * including the home set.
+	 * @apiResponse {accountId: string, collection: ?object, success: bool, error: ?string} "collection" is null when
+	 * the whole account is synchronized or the collection was not found
+	 * @apiPermission Read permission on the account.
+	 * @param array $params
+	 * @return array
+	 * @throws NotFound
+	 */
 	public function sync($params) {
-		set_time_limit(600);
+		// getEntity() returns false when the user may not read the account
 		$account = $this->getEntity($params['accountId']);
+		if(empty($account)) {
+			throw new NotFound();
+		}
+		set_time_limit(600);
 		$success = false;
 		$collection = null;
-		if(!empty($account)) {
-			if(isset($params['collectionId'])) {
-				if(isset($account->collections[$params['collectionId']])) {
-					$collection = $account->collections[$params['collectionId']];
-					$success = $account->syncCollection($collection);
-				}
-			} else {
-				$success = $account->sync(true); // full sync, incl homeset
+		if(isset($params['collectionId'])) {
+			if(isset($account->collections[$params['collectionId']])) {
+				$collection = $account->collections[$params['collectionId']];
+				$success = $account->syncCollection($collection);
 			}
+		} else {
+			$success = $account->sync(true); // full sync, incl homeset
 		}
 		return ['accountId'=>$params['accountId'], 'collection'=>$collection, 'success' => $success, 'error' => $account->lastError];
 	}
@@ -55,5 +71,18 @@ class DavAccount extends EntityController {
 	protected function canCreate(Entity $entity): bool
 	{
 		return $this->rights->mayChangeAccount;
+	}
+
+	/**
+	 * Changing the host or credentials of an account requires the "Change account" permission, also for the owner
+	 */
+	protected function canUpdate(Entity $entity): bool
+	{
+		return $this->rights->mayChangeAccount && parent::canUpdate($entity);
+	}
+
+	protected function canDestroy(Entity $entity): bool
+	{
+		return $this->rights->mayChangeAccount && parent::canDestroy($entity);
 	}
 }

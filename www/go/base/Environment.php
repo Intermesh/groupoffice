@@ -4,14 +4,14 @@ namespace GO\Base;
 
 class Environment {
 	
+	/**
+	 * Check if we run on the command line
+	 *
+	 * Web requests never count as command line, also not when they come from the server itself: CLI skips admin checks.
+	 */
 	public function isCli(){
 		
-		$cli = PHP_SAPI=='cli';
-		if(!$cli && PHP_SAPI=='cgi-fcgi' && isset($_SERVER['REMOTE_ADDR']) && isset($_SERVER['SERVER_ADDR']))
-			return $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'];
-		else
-			return $cli;
-		return false;
+		return go()->getEnvironment()->isCli();
 		
 	}
 	

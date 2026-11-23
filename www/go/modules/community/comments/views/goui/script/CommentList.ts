@@ -12,8 +12,7 @@ import {
 	QuoteStripper,
 	StoreComponent,
 	StoreEventMap,
-	t,
-	win,
+	t, tbar,
 	Window
 } from "@intermesh/goui";
 import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
@@ -190,41 +189,7 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 						imgPromises.push(Image.replaceImages(target.el));
 
 						// Enlarge images when clicked in window
-						target.el.addEventListener("click", (e) => {
-							if (e.target && (e.target as HTMLElement).tagName == "IMG") {
-								const img = e.target as HTMLImageElement
-
-								const imageWin = win({
-										width: window.innerWidth - 50,
-										height: window.innerHeight - 50,
-										maximized: false,
-										maximizable: true,
-										modal: true,
-										title: img.alt ?? "Image",
-									},
-									comp({
-										flex: 1,
-										itemId: "img-cont",
-
-										style: {
-											alignItems: "center",
-											justifyContent: "center"
-										},
-										listeners: {
-											beforerender: ({target}) => {
-												const i = img.cloneNode() as HTMLImageElement;
-												i.style.height = "100%";
-												i.style.width = "100%";
-												i.style.objectFit = "contain";
-												target.el.appendChild(i);
-											}
-										}
-									})
-								);
-
-								imageWin.show();
-							}
-						});
+						Image.enableZoom(target.el);
 					},
 					render: ({target}) => {
 
@@ -266,10 +231,52 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 				}
 			});
 
+			if (comment.section === "draft") {
+				const mayChange = client.user.isAdmin || writtenByUser;
+				commentComp.items.add(
+					tbar({cls: "comment-actions"},
+						// Posting the draft sends it, like a reply to the customer of a support ticket
+
+						btn({
+							icon: "edit",
+							text: t("Edit"),
+							disabled: !mayChange,
+							handler: () => {
+								const commentDlg = new CommentDialog();
+								void commentDlg.load(comment.id);
+								commentDlg.show();
+							}
+						}),
+						btn({
+							icon: "delete",
+							text: t("Delete"),
+							disabled: !mayChange,
+							handler: () => {
+								commentDS.confirmDestroy([comment.id]);
+							}
+						}),
+						'->',
+						btn({
+							cls: "filled primary",
+							icon: "send",
+							text: t("Send"),
+							disabled: !mayChange,
+							handler: async () => {
+								if (await Window.confirm(t("Send this draft?"))) {
+									commentDS.update(comment.id, {section: null}).catch((err) => {
+										void Window.error(err);
+									});
+								}
+							}
+						})
+					)
+				);
+			}
+
 			if (quote) {
 				commentComp.items.add(
 					btn({
-						cls: "raised",
+						cls: "outlined",
 						text: t("More"),
 						handler: (btn) => {
 							commentComp.html = comment.text;

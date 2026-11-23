@@ -15,4 +15,10 @@ return array (
   'Client ID' => 'Client-ID',
   'Project ID' => 'Projekt-ID',
   'Project Id' => 'Project ID',
+  'Click here' => 'Klicken Sie hier',
+  'Hello' => 'Hallo',
+  'OAuth2 authentication was successful.' => 'OAuth2-Authentifizierung war erfolgreich.',
+  'OAuth2 connection' => 'OAuth2-Verbindung',
+  'Request or update a refresh token in a separate window.' => 'Ein Refresh-Token in einem separaten Fenster anfordern oder aktualisieren.',
+  'to close this window.' => 'um dieses Fenster zu schließen.',
 );

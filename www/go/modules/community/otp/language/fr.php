@@ -15,4 +15,12 @@ return array (
   'When disabling OTP Authenticator this step will be removed from the login process.' => 'Lorsque l\'authentification Google est désactivée, cette étape sera supprimée du processus d\'authentification.',
   'Provide your current password to disable OTP Authenticator.' => 'Saisissez votre mot de passe actuel pour désactiver l\'authentification Google.',
   'Provide your current password before you can enable OTP Authenticator.' => 'Saisissez votre mot de passe actuel pour activer l\'authentification Google.',
+  'Block Group-Office usage until setup is done' => 'Bloquer l\'utilisation de GroupOffice jusqu\'à la fin de la configuration',
+  'Count down' => 'Compte à rebours',
+  'Count down this number of seconds until the user can cancel the setup' => 'Nombre de secondes du compte à rebours avant que l\'utilisateur puisse annuler la configuration',
+  'Enforce two factor authentication for users in a specific group' => 'Imposer l\'authentification à deux facteurs aux utilisateurs d\'un groupe spécifique',
+  'Setup later' => 'Configurer plus tard',
+  'Setup one-time password authentication using an OTP application which generates a unique PIN for each login.' => 'Configurez l\'authentification par mot de passe à usage unique à l\'aide d\'une application OTP qui génère un code PIN unique pour chaque connexion.',
+  'Two Factor Authentication' => 'Authentification à deux facteurs',
+  'Your system administrator requires you to setup two factor authentication' => 'Votre administrateur système exige que vous configuriez l\'authentification à deux facteurs',
 );

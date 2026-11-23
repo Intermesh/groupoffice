@@ -8,4 +8,5 @@ return array (
   'Use alternative WOPI client URI (Only for Microsoft Office Online' => 'Použít alternativního URI klienta WOPI (Pouze pro Microsoft Office Online',
   'WOPI client URI' => 'URI klienta WOPI',
   'Only for use with Microsoft Office Online. WOPI traffic must be tunneled through a wopi subdomain.' => 'Pouze pro použití s Online Microsoft Office. WOPI provoz musí být tunelován přes wopi subdomény.',
+  'Libre Office Online' => 'Libre Office Online',
 );

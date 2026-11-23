@@ -378,7 +378,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 					$text .= '<div class="em-folder-status" id="status_' . $nodeId . '"></div>';
 				}
 			}
-			$text .= '<div class="ellipsis">'.$mailbox->getDisplayName().'</div>';
+			$text .= '<div class="ellipsis">'.htmlspecialchars($mailbox->getDisplayName(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'</div>';
 
 			$cls = $mailbox->noselect==1 ? 'em-tree-node-noselect' : "";
 			
@@ -573,6 +573,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
 				throw new \GO\Base\Exception\AccessDenied();
       }
 
+      // Moving removes the message from the source account
+      if($move) {
+        $srcAccountModel->requirePermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION);
+      }
+
       if($move && $targetAccountModel->id == $srcAccountModel->id) {
 
         $srcImapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($srcAccountModel, $srcMessageInfo->mailboxPath, $srcMessageInfo->mailUid);
@@ -617,38 +622,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController
     }
 
 		return array('success'=>true);
-	}
-
-	protected function actionLoadAddress(array $params)
-	{
-		$accountModel = GO\Email\Model\Account::model()->find(
-			GO\Base\Db\FindParams::newInstance()
-				->single()
-				->select('t.*,al.name,al.email')
-				->ignoreAcl()
-				->joinModel(array(
-					'model'=>'GO\Email\Model\Alias',
-					'localTableAlias'=>'t',
-					'localField'=>'id',
-					'foreignField'=>'account_id',
-					'tableAlias'=>'al'
-				))
-				->criteria(GO\Base\Db\FindCriteria::newInstance()
-					->addCondition('id',$params['id'])
-					->addCondition('default','1','=','al')
-				)
-		);
-
-		$response = array(
-			'success' => true,
-			'data' => array(
-				'name' => $accountModel->name,
-				'email' => $accountModel->email
-			)
-		);
-
-		echo json_encode($response);
-
 	}
 
 }

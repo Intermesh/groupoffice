@@ -373,10 +373,10 @@ class Sieve {
 	include :global \"default\";
 	}
 
-	# rule:[".GO::t("Standard vacation rule", "sieve")."]
+	# rule:[".go_sieve_script::single_line(GO::t("Standard vacation rule", "sieve"))."]
 	if false # anyof (true)
 	{
-	\tvacation :days 3 :addresses [\"".implode('","',$aliasEmails)."\"] \"".GO::t("I am on vacation", "sieve")."\";
+	\tvacation :days 3 :addresses [".(empty($aliasEmails) ? '""' : implode(',', array_map([go_sieve_script::class, 'escape_test_string'], $aliasEmails)))."] ".go_sieve_script::escape_test_string(GO::t("I am on vacation", "sieve")).";
 	\tstop;
 	}
 
@@ -384,7 +384,7 @@ class Sieve {
 	if anyof (header :contains \"X-Spam-Flag\" \"YES\")
 	{
 		setflag \"\\\Seen\";
-		fileinto ".$createFlag." \"".$spamFolder."\";
+		fileinto ".$createFlag." ".go_sieve_script::escape_test_string($spamFolder).";
 		stop;
 	}";
 				} else {
@@ -402,7 +402,7 @@ class Sieve {
 	if anyof (header :contains \"X-Spam-Flag\" \"YES\")
 	{
 		setflag \"\\\Seen\";
-		fileinto ".$createFlag." \"".$spamFolder."\";
+		fileinto ".$createFlag." ".go_sieve_script::escape_test_string($spamFolder).";
 		stop;
 	}";
 				}
@@ -795,7 +795,7 @@ class go_sieve_script
                 else {
                     $output .= 'set ';
                     foreach (array_diff(array_keys($var), array('name', 'value')) as $opt) {
-                        $output .= ":$opt ";
+                        $output .= ':' . self::tag($opt) . ' ';
                     }
                     $output .= self::escape_string($var['name']) . ' ' . self::escape_string($var['value']) . ";\n";
                 }
@@ -817,7 +817,8 @@ class go_sieve_script
 
             // header
             if (!empty($rule['name']) && strlen($rule['name'])) {
-                $script .= '# rule:[' . $rule['name'] . "]\n";
+                // the name is in a comment, a line break would end it
+                $script .= '# rule:[' . self::single_line($rule['name']) . "]\n";
             }
 
             // constraints expressions
@@ -827,6 +828,9 @@ class go_sieve_script
                     switch ($test['test']) {
                     case 'size':
                         $tests[$i] .= ($test['not'] ? 'not ' : '');
+                        if (!preg_match('/^[0-9]+[KMG]?$/i', (string) $test['arg'])) {
+                            throw new \Exception(go()->t("The filter contains an invalid value", "legacy", "sieve"));
+                        }
                         $tests[$i] .= 'size :' . ($test['type']=='under' ? 'under ' : 'over ') . $test['arg'];
                         break;
 
@@ -836,7 +840,7 @@ class go_sieve_script
 
                     case 'exists':
                         $tests[$i] .= ($test['not'] ? 'not ' : '');
-                        $tests[$i] .= 'exists ' . self::escape_string($test['arg']);
+                        $tests[$i] .= 'exists ' . self::escape_test_string($test['arg']);
                         break;
 
                     case 'header':
@@ -846,8 +850,8 @@ class go_sieve_script
                         $this->add_index($test, $tests[$i], $exts);
                         $this->add_operator($test, $tests[$i], $exts);
 
-                        $tests[$i] .= ' ' . self::escape_string($test['arg1']);
-                        $tests[$i] .= ' ' . self::escape_string($test['arg2']);
+                        $tests[$i] .= ' ' . self::escape_test_string($test['arg1']);
+                        $tests[$i] .= ' ' . self::escape_test_string($test['arg2']);
                         break;
 
                     case 'address':
@@ -865,7 +869,7 @@ class go_sieve_script
 
                         // :all address-part is optional, skip it
                         if (!empty($test['part']) && $test['part'] != 'all') {
-                            $tests[$i] .= ' :' . $test['part'];
+                            $tests[$i] .= ' :' . self::tag($test['part']);
                             if ($test['part'] == 'user' || $test['part'] == 'detail') {
                                 array_push($exts, 'subaddress');
                             }
@@ -873,8 +877,8 @@ class go_sieve_script
 
                         $this->add_operator($test, $tests[$i], $exts);
 
-                        $tests[$i] .= ' ' . self::escape_string($test['arg1']);
-                        $tests[$i] .= ' ' . self::escape_string($test['arg2']);
+                        $tests[$i] .= ' ' . self::escape_test_string($test['arg1']);
+                        $tests[$i] .= ' ' . self::escape_test_string($test['arg2']);
                         break;
 
                     case 'body':
@@ -886,16 +890,16 @@ class go_sieve_script
 							  }
 
                         if (!empty($test['part'])) {
-                            $tests[$i] .= ' :' . $test['part'];
+                            $tests[$i] .= ' :' . self::tag($test['part']);
 
                             if (!empty($test['content']) && $test['part'] == 'content') {
-                                $tests[$i] .= ' ' . self::escape_string($test['content']);
+                                $tests[$i] .= ' ' . self::escape_test_string($test['content']);
                             }
                         }
 
                         $this->add_operator($test, $tests[$i], $exts);
 
-                        $tests[$i] .= ' ' . self::escape_string($test['arg']);
+                        $tests[$i] .= ' ' . self::escape_test_string($test['arg']);
                         break;
 
                     case 'date':
@@ -910,17 +914,17 @@ class go_sieve_script
                             $tests[$i] .= ' :originalzone';
                         }
                         else if (!empty($test['zone'])) {
-                            $tests[$i] .= ' :zone ' . self::escape_string($test['zone']);
+                            $tests[$i] .= ' :zone ' . self::escape_test_string($test['zone']);
                         }
 
                         $this->add_operator($test, $tests[$i], $exts);
 
                         if ($test['test'] == 'date') {
-                            $tests[$i] .= ' ' . self::escape_string($test['header']);
+                            $tests[$i] .= ' ' . self::escape_test_string($test['header']);
                         }
 
-                        $tests[$i] .= ' ' . self::escape_string($test['part']);
-                        $tests[$i] .= ' ' . self::escape_string($test['arg']);
+                        $tests[$i] .= ' ' . self::escape_test_string($test['part']);
+                        $tests[$i] .= ' ' . self::escape_test_string($test['arg']);
 
                         break;
                     }
@@ -1005,7 +1009,7 @@ class go_sieve_script
                         array_push($exts, 'include');
                         $action_script .= 'include ';
                         foreach (array_diff(array_keys($action), array('target', 'type')) as $opt) {
-                            $action_script .= ":$opt ";
+                            $action_script .= ':' . self::tag($opt) . ' ';
                         }
                         $action_script .= self::escape_string($action['target']);
                         break;
@@ -1014,7 +1018,7 @@ class go_sieve_script
                         array_push($exts, 'variables');
                         $action_script .= 'set ';
                         foreach (array_diff(array_keys($action), array('name', 'value', 'type')) as $opt) {
-                            $action_script .= ":$opt ";
+                            $action_script .= ':' . self::tag($opt) . ' ';
                         }
                         $action_script .= self::escape_string($action['name']) . ' ' . self::escape_string($action['value']);
                         break;
@@ -1514,7 +1518,7 @@ class go_sieve_script
 
         // skip default comparator
         if ($test['comparator'] != 'i;ascii-casemap') {
-            $out .= ' :comparator ' . self::escape_string($test['comparator']);
+            $out .= ' :comparator ' . self::escape_test_string($test['comparator']);
         }
     }
 
@@ -1549,7 +1553,7 @@ class go_sieve_script
                 array_push($exts, 'regex');
             }
 
-            $out .= ' :' . $test['type'];
+            $out .= ' :' . self::tag($test['type']);
         }
 
         $this->add_comparator($test, $out, $exts);
@@ -1650,6 +1654,61 @@ class go_sieve_script
         else {
             return '"' . addcslashes($str, '\\"') . '"';
         }
+    }
+
+    /**
+     * Escape a value of a test as quoted string or list of quoted strings.
+     *
+     * Tests of a disabled rule are written after "if false #". A multi-line string would end this comment and the rest
+     * of the value would become part of the script, so line breaks are refused.
+     *
+     * @param string|array $str
+     * @return string
+     * @throws \Exception when the value contains a line break
+     */
+    static function escape_test_string($str)
+    {
+        if (is_array($str) && count($str) > 1) {
+            foreach($str as $idx => $val)
+                $str[$idx] = self::escape_test_string($val);
+
+            return '[' . implode(',', $str) . ']';
+        }
+        else if (is_array($str)) {
+            $str = array_pop($str);
+        }
+
+        return '"' . addcslashes(self::single_line((string) $str), '\\"') . '"';
+    }
+
+    /**
+     * Refuse line breaks in a value that must be on one line
+     *
+     * @param string $str
+     * @return string
+     * @throws \Exception when the value contains a line break
+     */
+    static function single_line($str)
+    {
+        if (preg_match('/[\r\n\0]/', (string) $str)) {
+            throw new \Exception(go()->t("The filter contains an invalid value", "legacy", "sieve"));
+        }
+        return (string) $str;
+    }
+
+    /**
+     * Validate a tag (":name") or comparison type, such as "contains", "under" or "localpart"
+     *
+     * @param string $str
+     * @return string
+     * @throws \Exception when it isn't a word
+     */
+    static function tag($str)
+    {
+        if (!is_string($str) || !preg_match('/^[a-z][a-z0-9_-]*$/i', $str)) {
+            throw new \Exception(go()->t("The filter contains an invalid value", "legacy", "sieve"));
+        }
+        return $str;
     }
 
     /**
@@ -1794,7 +1853,7 @@ class go_sieve_script
                         if (preg_match('/^(.*)\r?\n\.\r?\n/sU', $str, $m)) {
                             $text = $m[1];
                             // remove dot-stuffing
-                            $text = str_replace("\n..", "\n.", $text);
+                            $text = preg_replace('/^\.\./m', '.', $text);
                             $str = substr($str, strlen($m[0]));
                         }
                         else {

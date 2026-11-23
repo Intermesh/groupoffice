@@ -11,6 +11,7 @@ use go\core\data\convert\Json;
 use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
+use go\core\jmap\exception\InvalidArguments;
 use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\App;
@@ -451,26 +452,13 @@ abstract class Entity extends Property {
 	 */
 	protected function internalSave(): bool
 	{
-		if (property_exists($this, 'filesFolderId') && count($this->attachments)) {
-			$folder = Folder::model()->findForEntity($this, false);
-			if (!isset($this->filesFolderId)) {
-				$this->filesFolderId = $folder->id;
-			}
-			foreach ($this->attachments as $attachment) {
-				$b = Blob::findById($attachment['blobId']);
-				if (!$b) {
-					throw new Exception("No blob found");
-				}
-				$dest = go()->getDataFolder()->getFile($folder->path . '/' . $b->name);
-				$dest->appendNumberToNameIfExists();
-				$f = $b->getFile();
-				$f->copy($dest);
-			}
-		}
-
-
 		if(!parent::internalSave()) {
 			App::get()->debug(static::class."::internalSave() returned false");
+			return false;
+		}
+
+		// After the save, because the path of the files folder of a new entity contains its ID
+		if (count($this->attachments) && !$this->saveAttachments()) {
 			return false;
 		}
 
@@ -704,7 +692,11 @@ abstract class Entity extends Property {
 	 */
 	protected function internalGetPermissionLevel(): int
 	{
-		if(go()->getAuthState() && go()->getAuthState()->isAdmin()) {
+		if(!go()->getAuthState() || !go()->getAuthState()->isAuthenticated()) {
+			return 0;
+		}
+
+		if(go()->getAuthState()->isAdmin()) {
 			return Acl::LEVEL_MANAGE;
 		}
 		if($this->isNew()) {
@@ -866,9 +858,11 @@ abstract class Entity extends Property {
 			->add("permissionLevelUserId", function() {
 				//dummy used in permissionLevel filter.
 			})
+			->describe("Admins only. Use with permissionLevel to check the permissions of this user instead of the current user.", ['type' => 'integer'])
 			->add("permissionLevelGroups", function() {
 				//dummy used in permissionLevel filter.
 			})
+			->describe("Admins only. Use with permissionLevel to check the permissions of these group IDs instead of the current user.", ['type' => 'array', 'items' => ['type' => 'integer']])
 			->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filterCondition, $filters) {
 
 				// security check. Only admins may query on behalf of others permissions
@@ -889,6 +883,7 @@ abstract class Entity extends Property {
 				//Permission level is always added to the main query so that it's always applied with AND
 				static::applyAclToQuery($query, $value, $filterCondition['permissionLevelUserId'] ?? null, $filterCondition['permissionLevelGroups'] ?? null);
 			})
+			->describe("Only entities the current user has at least this permission level for: 10 = read, 20 = create, 30 = write, 40 = delete, 50 = manage.", ['type' => 'integer', 'enum' => [10, 20, 30, 40, 50]])
 
 			->add('text', function (Criteria $criteria, $value, Query $query) {
 				if (!is_array($value)) {
@@ -901,45 +896,34 @@ abstract class Entity extends Property {
 					}
 				}
 			})
+			->describe("Free text search in the main text fields of the entity. Words match anywhere in the text and a number also matches the ID. An array of search terms must all match.", ['anyOf' => [['type' => 'string'], ['type' => 'array', 'items' => ['type' => 'string']]]])
 			->add('exclude', function (Criteria $criteria, $value) {
 				if (!empty($value)) {
 					$criteria->andWhere('id', 'NOT IN', $value);
 				}
-			});
+			})
+			->describe("Entity IDs to leave out of the result.", ['type' => 'array', 'items' => ['type' => 'integer']]);
 
 		if (static::getMapping()->getColumn('modifiedAt')) {
 			$filters->addDateTime("modifiedAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('modifiedAt', $comparator, $value);
-			});
+			})
+				->describe("Last modification date.");
 		}
 
 
 		if (static::getMapping()->getColumn('modifiedBy')) {
 			$filters->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-
-				foreach($value as &$v) {
-					if ($v == "{{me}}") {
-						$v = go()->getUserId();
-					}
-				}
-
-				if(is_numeric($value[0])) {
-					$criteria->andWhere('modifiedBy', '=', $value);
-				} else {
-
-					if (!$query->isJoined('core_user', 'modifier')) {
-						$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
-					}
-
-					$criteria->where('modifier.displayName', $comparator, $value);
-				}
-			});
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'modifiedBy', 'modifier');
+			})
+				->describe("Users who last modified the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
 		}
 
 		if (static::getMapping()->getColumn('createdAt')) {
 			$filters->addDateTime("createdAt", function (Criteria $criteria, $comparator, $value) {
 				$criteria->where('createdAt', $comparator, $value);
-			});
+			})
+				->describe("Creation date.");
 		}
 
 
@@ -947,25 +931,12 @@ abstract class Entity extends Property {
 			$filters->add("createdByMe", function (Criteria $criteria, $value, Query $query) {
 				//operator must always be = as this filter is also used in conjunction with permission queries
 				$criteria->where('createdBy', '=', go()->getAuthState()->getUserId());
-			});
+			})
+				->describe("Only entities created by the current user. The value is ignored.", ['type' => 'boolean']);
 			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-
-				foreach($value as &$v) {
-					if ($v == "{{me}}") {
-						$v = go()->getUserId();
-					}
-				}
-
-				if(is_numeric($value[0])) {
-					$criteria->andWhere('createdBy', '=', $value);
-				} else {
-					if (!$query->isJoined('core_user', 'creator')) {
-						$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
-					}
-
-					$criteria->where('creator.displayName', $comparator, $value);
-				}
-			});
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'createdBy', 'creator');
+			})
+				->describe("Users who created the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
 		}
 
 		self::defineLegacyFilters($filters);
@@ -974,62 +945,116 @@ abstract class Entity extends Property {
 			static::defineCustomFieldFilters($filters);
 		}
 
-		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+		// Filters on related rows use sub queries instead of joins so that they can be combined with OR and NOT
 
-			if (!$query->isJoined('comments_comment', 'comment')) {
-				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
+		$filters->addDateTime('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+			// Compares the date of the last comment. Entities without comments get NULL, so they only match inside NOT.
+			$lastComment = (new DbQuery())
+				->select('MAX(commentFilter.date)')
+				->from('comments_comment', 'commentFilter')
+				->where(self::commentsCorrelation($query));
+			self::onlyVisibleComments($lastComment);
+			$lastCommentDate = '(' . $lastComment . ')';
+
+			if ($value === null) {
+				// A null filter value finds entities without comments
+				$criteria->where($lastCommentDate . ($comparator == '=' ? ' IS NULL' : ' IS NOT NULL'));
+				return;
 			}
 
-			$tag = ":commentedAt" . uniqid();
-
-			$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
-				->bind($tag, $value->format(Column::DATETIME_FORMAT))
-				->groupBy(['id']);
-
-		});
+			$tag = ':' . $criteria->bindTag();
+			$criteria->where($lastCommentDate . ' ' . $comparator . ' ' . $tag)
+				->bind($tag, $value->format(Column::DATETIME_FORMAT));
+		})
+			->describe("Date of the last comment. Null finds entities without comments.");
 
 		$filters->addText('comment', function (Criteria $criteria, $comparator, $value, Query $query) {
-			if (!$query->isJoined('comments_comment', 'comment')) {
-				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
-			}
+			$sub = (new DbQuery())
+				->select('commentFilter.id')
+				->from('comments_comment', 'commentFilter')
+				->where(self::commentsCorrelation($query))
+				->andWhere('commentFilter.text', $comparator, $value);
+			self::onlyVisibleComments($sub);
 
-			$query->groupBy(['id']);
-			$criteria->where('comment.text ', $comparator, $value);
-		});
+			$criteria->whereExists($sub);
+		})
+			->describe("Entities with a comment that contains this text.");
 
 		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
 
-			if(!isset($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
-				throw new \LogicException("link filter must have 'entity' and an optional 'id' parameter");
+			if(!is_array($value) || !isset($value['entity']) || !is_string($value['entity']) || (count($value) > 1 && !isset($value['id']))) {
+				throw new InvalidArguments("link filter must have 'entity' and an optional 'id' parameter");
+			}
+
+			if(!EntityType::existsByName($value['entity'])) {
+				throw new InvalidArguments("link filter has an unknown entity '" . $value['entity'] . "'");
 			}
 
 
-			$linkAlias = 'link_' . uniqid();
-			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
-
-			$query->join('core_link', $linkAlias, $on, "LEFT");
-			$criteria->where('toId', '!=');
+			$sub = (new DbQuery())
+				->select('linkFilter.toId')
+				->from('core_link', 'linkFilter')
+				->where('linkFilter.toId = ' . $query->getTableAlias() . '.id')
+				->andWhere('linkFilter.toEntityTypeId', '=', static::entityType()->getId())
+				->andWhere('linkFilter.fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());
 
 			if (!empty($value['id'])) {
-				$criteria->andWhere('fromId', '=', $value['id']);
+				$sub->andWhere('linkFilter.fromId', '=', $value['id']);
 			}
 
-			$query->groupBy([$query->getTableAlias() . '.id']);
-		});
-
-		$filters->add("customrelations", function(Criteria $criteria, $value, Query $query) {
-			$cfRelationAlias = 'relation_' . uniqid();
-			$on =  $cfRelationAlias .'entityTypeId=' . static::entityType()->getId();
-			$query->join('core_customfields_relation', $cfRelationAlias,$on, 'LEFT');
-			if (!empty($value['id'])) {
-				$criteria->andWhere('entityId', '=', $value['id']);
-			}
-			$query->groupBy([$query->getTableAlias() . '.id']);
-		});
+			$criteria->whereExists($sub);
+		})
+			->describe("Entities linked to an entity of the given type, for example {\"entity\": \"Contact\", \"id\": 1}. Without \"id\" any entity of that type matches.", [
+				'type' => 'object',
+				'properties' => [
+					'entity' => ['type' => 'string', 'description' => 'Entity name'],
+					'id' => ['type' => 'integer', 'description' => 'Entity ID']
+				],
+				'required' => ['entity'],
+				'additionalProperties' => false
+			]);
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
 
 		return $filters;
+	}
+
+	/**
+	 * SQL condition that correlates the "commentFilter" alias of comments_comment with the entity in the main query.
+	 *
+	 * @param Query $query The main query
+	 * @return string
+	 */
+	private static function commentsCorrelation(Query $query): string
+	{
+		return 'commentFilter.entityId = ' . $query->getTableAlias() . '.id AND commentFilter.entityTypeId = ' . static::entityType()->getId();
+	}
+
+	/**
+	 * Limit a sub query on comments to the comments the current user may read
+	 *
+	 * Comments in a section, like private notes, are only for users who may change the entity. See
+	 * {@see \go\modules\community\comments\model\Comment::internalGetPermissionLevel()}. Without this, a user who may
+	 * only read an entity could find out the text of its private notes with the "comment" filter.
+	 *
+	 * @param DbQuery $commentQuery A query on comments_comment with alias "commentFilter"
+	 */
+	private static function onlyVisibleComments(DbQuery $commentQuery): void
+	{
+		if (go()->getAuthState()->isAdmin()) {
+			return;
+		}
+
+		$writable = static::find(static::getPrimaryKey(false), true);
+		$writable->select($writable->getTableAlias() . '.id')
+			->andWhere($writable->getTableAlias() . '.id = commentFilter.entityId');
+		static::applyAclToQuery($writable, Acl::LEVEL_WRITE);
+
+		$commentQuery->andWhere(
+			(new Criteria())
+				->where('commentFilter.section IS NULL')
+				->orWhereExists($writable)
+		);
 	}
 
 	/**
@@ -1038,31 +1063,88 @@ abstract class Entity extends Property {
 	 * @param Filters $filters
 	 * @throws Exception
 	 */
+	/**
+	 * JSON schema for the createdBy and modifiedBy filter values
+	 */
+	private const USER_FILTER_SCHEMA = [
+		'anyOf' => [
+			['type' => ['string', 'integer']],
+			['type' => 'array', 'items' => ['type' => ['string', 'integer']]]
+		]
+	];
+
 	private static function defineLegacyFilters(Filters $filters) {
 		if (static::getMapping()->getColumn('ctime')) {
-			$filters->addDateTime('createdAt', function (Criteria $criteria, $comparator, DateTime $value) {
-				$criteria->andWhere('ctime', $comparator, $value->format("U"));
-			});
+			$filters->addDateTime('createdAt', function (Criteria $criteria, $comparator, ?DateTime $value) {
+				$criteria->andWhere('ctime', $comparator, $value?->format("U"));
+			})
+				->describe("Creation date.");
 		}
 
 		if (static::getMapping()->getColumn('mtime')) {
-			$filters->addDateTime('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value) {
-				$criteria->andWhere('mtime', $comparator, $value->format("U"));
-			});
+			$filters->addDateTime('modifiedAt', function (Criteria $criteria, $comparator, ?DateTime $value) {
+				$criteria->andWhere('mtime', $comparator, $value?->format("U"));
+			})
+				->describe("Last modification date.");
 		}
 
 		if (static::getMapping()->getColumn('user_id')) {
 			$filters->addText('createdBy', function (Criteria $criteria, $comparator, $value, Query $query) {
-				$query->join('core_user', 'creator', 'creator.id = p.user_id');
-				$query->andWhere('creator.displayName', $comparator, $value);
-			});
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'user_id', 'creator');
+			})
+				->describe("Users who created the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
 		}
 
 		if (static::getMapping()->getColumn('muser_id')) {
 			$filters->addText('modifiedBy', function (Criteria $criteria, $comparator, $value, Query $query) {
-				$query->join('core_user', 'modifier', 'creator.id = p.muser_id');
-				$query->andWhere('modifier.displayName', $comparator, $value);
-			});
+				self::applyUserFilter($criteria, $comparator, $value, $query, 'muser_id', 'modifier');
+			})
+				->describe("Users who last modified the entity: user IDs, \"{{me}}\" for the current user or display names.", self::USER_FILTER_SCHEMA);
+		}
+	}
+
+	/**
+	 * Applies a createdBy / modifiedBy style filter on a user id column.
+	 *
+	 * Each value can be a user ID, "{{me}}" for the current user or a display name to match. IDs and names may be mixed
+	 * and match with OR.
+	 *
+	 * @param Criteria $criteria
+	 * @param string $comparator Comparator for the display name match
+	 * @param array $value User ID's, "{{me}}" or display names
+	 * @param Query $query
+	 * @param string $column The column holding the user ID
+	 * @param string $joinAlias Alias for the core_user join used for display name matching
+	 */
+	private static function applyUserFilter(Criteria $criteria, string $comparator, array $value, Query $query, string $column, string $joinAlias): void
+	{
+		$ids = [];
+		$names = [];
+		foreach($value as $v) {
+			if ($v === "{{me}}") {
+				$ids[] = go()->getUserId();
+			} else if (is_numeric($v)) {
+				$ids[] = (int) $v;
+			} else if (is_string($v) && $v !== '') {
+				$names[] = $v;
+			}
+		}
+
+		$userCriteria = new Criteria();
+
+		if (!empty($ids)) {
+			$userCriteria->where($query->getTableAlias() . '.' . $column, 'IN', $ids);
+		}
+
+		if (!empty($names)) {
+			if (!$query->isJoined('core_user', $joinAlias)) {
+				$query->join('core_user', $joinAlias, $joinAlias . '.id = ' . $query->getTableAlias() . '.' . $column, 'LEFT');
+			}
+			$userCriteria->orWhere($joinAlias . '.displayName', $comparator, $names);
+		}
+
+		if ($userCriteria->hasConditions()) {
+			$criteria->andWhere($userCriteria);
 		}
 	}
 
@@ -1255,10 +1337,21 @@ abstract class Entity extends Property {
 		}
 		
 		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
+		$cfJoined = false;
 		foreach($sort as $field => $dir) {
+			if(substr($field, 0, 13) == "customFields/") {
+				$sort->renameKey($field, str_replace("/", ".", $field));
+				if(!$cfJoined) {
+					$query->joinCustomFields();
+					$cfJoined = true;
+				}
+			}
+
 			if(substr($field, 0, 13) == "customFields.") {
-				$query->joinCustomFields();				
-				break;
+				if(!$cfJoined) {
+					$query->joinCustomFields();
+					$cfJoined = true;
+				}
 			}
 		}
 
@@ -1616,6 +1709,86 @@ abstract class Entity extends Property {
 	public function setAttachments(array $attachments)
 	{
 		$this->attachments = $attachments;
+	}
+
+	/**
+	 * Add the blobs set with {@see setAttachments()} to the files folder of this entity
+	 *
+	 * The files module adds them, so they get a database record. All attachments are checked for a valid name, write
+	 * permission on the folder and the quota before any file is added: a file on disk isn't removed when the
+	 * transaction of the save is rolled back. A failure is set as a validation error on "attachments".
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function saveAttachments(): bool
+	{
+		if (!property_exists($this, 'filesFolderId')) {
+			return true;
+		}
+
+		$blobs = [];
+		$size = 0;
+		foreach ($this->attachments as $attachment) {
+			$blob = isset($attachment['blobId']) ? Blob::findById($attachment['blobId']) : null;
+			if (!$blob) {
+				$this->setValidationError('attachments', ErrorCode::NOT_FOUND, "Blob not found");
+				return false;
+			}
+			if (!\go\core\fs\FileSystemObject::isValidName((string) $blob->name)) {
+				$this->setValidationError('attachments', ErrorCode::INVALID_INPUT, "Invalid file name");
+				return false;
+			}
+			$blobs[] = $blob;
+			$size += $blob->size;
+		}
+
+		// findForEntity() sets the folder ID on the entity, but doesn't save it
+		$oldFolderId = $this->filesFolderId ?? null;
+		$folder = Folder::model()->findForEntity($this, false);
+		if ($oldFolderId != $folder->id) {
+			// The entity is already saved, so the folder ID is written to its row
+			$this->filesFolderId = $folder->id;
+			$column = $this->getMapping()->getColumn('filesFolderId');
+			go()->getDbConnection()
+				->update($column->table->getName(), ['filesFolderId' => $folder->id], $this->primaryKeyValues())
+				->execute();
+		}
+
+		if (!$folder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
+			$this->setValidationError('attachments', ErrorCode::FORBIDDEN, "No write permission on the files folder");
+			return false;
+		}
+
+		if (!\GO\Files\Model\File::checkQuota($size)) {
+			$this->setValidationError('attachments', ErrorCode::INVALID_INPUT, "Not enough disk space");
+			return false;
+		}
+
+		foreach ($blobs as $blob) {
+			// A copy, because the files module moves the file into the folder. The move changes the path of $tmp, so
+			// the temporary path is kept to clean up when the move failed.
+			$tmp = \GO\Base\Fs\File::tempFile();
+			$tmpPath = $tmp->path();
+			try {
+				$blob->getFile()->copy(new \go\core\fs\File($tmp->path()));
+				$folder->addFilesystemFile($tmp, true, $blob->name);
+			} catch (\GO\Base\Exception\AccessDenied $e) {
+				$this->setValidationError('attachments', ErrorCode::FORBIDDEN, $e->getMessage());
+				return false;
+			} catch (\GO\Base\Exception\InsufficientDiskspace|InvalidArgumentException $e) {
+				$this->setValidationError('attachments', ErrorCode::INVALID_INPUT, $e->getMessage());
+				return false;
+			} finally {
+				if (is_file($tmpPath)) {
+					unlink($tmpPath);
+				}
+			}
+		}
+
+		$this->attachments = [];
+
+		return true;
 	}
 	
 }
