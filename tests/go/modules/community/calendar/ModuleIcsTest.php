@@ -43,21 +43,20 @@ class ModuleIcsTest extends TestCase
 		return $this->outputIcs(Calendar::findById($this->calendar->id));
 	}
 
+	/**
+	 * Module::outputIcs() closes all output buffers to stream the file, so the test reads the parts it writes
+	 */
 	private function outputIcs(Calendar $calendar): string
 	{
-		// outputIcs ends one output buffer. Ignore the "headers already sent" warnings of header() on the command line.
-		ob_start();
-		ob_start();
-		set_error_handler(fn() => true, E_WARNING);
+		$ics = '';
 		try {
-			(new \ReflectionMethod(Module::class, 'outputIcs'))->invoke(Module::get(), $calendar);
+			foreach ((new \ReflectionMethod(Module::class, 'ics'))->invoke(null, $calendar) as $part) {
+				$ics .= $part;
+			}
 		} catch (\Exception $e) {
 			// an invalid time zone stops the export
-			ob_end_flush();
-		} finally {
-			restore_error_handler();
 		}
-		return ob_get_clean();
+		return $ics;
 	}
 
 	public function testDescriptionIsEscaped(): void
