@@ -401,7 +401,6 @@ class Extjs3 {
 				'title' => GO::config()->title,
 				'full_url' => GO::config()->full_url,
 				'allow_password_change' => GO::config()->allow_password_change,
-				'allow_themes' => GO::config()->allow_themes,
 				'allow_profile_edit' => GO::config()->allow_profile_edit,
 				'max_users' => GO::config()->max_users,
 				'debug' => go()->getDebugger()->enabled,

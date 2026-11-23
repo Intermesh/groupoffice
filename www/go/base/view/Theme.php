@@ -14,7 +14,7 @@ class Theme{
 	 */
 	public function getName(){
 		if(!isset($this->name)) {
-			$this->name = \GO::config()->allow_themes && \GO::user() ? \GO::user()->theme : \GO::config()->theme;
+			$this->name = \GO::user() ? \GO::user()->theme : \GO::config()->theme;
 			
 			if(!file_exists(\GO::view()->getPath().'themes/'.$this->name.'/Layout.php')){
 				$this->name = 'Paper';

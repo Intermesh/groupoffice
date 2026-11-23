@@ -345,14 +345,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	var $defaultView = 'Extjs3';
 
 	/**
-	 * Enable theme switching by users
-	 *
-	 * @var     bool
-	 * @access  public
-	 */
-	var $allow_themes = true;
-
-	/**
 	 * Enable password changing by users
 	 *
 	 * @var     bool

@@ -474,7 +474,6 @@ namespace go\core {
 				"searchMaxExecutionTime" => 10, // Seconds after which the database aborts a global search or links query. 0 for no limit.
 				"passwordHashCost" => null, // bcrypt cost of user passwords, OAuth client secrets and remember me tokens. Null uses the PHP default. Only lower it for tests.
 				"theme" => "Paper",
-				"allow_themes" => true,
 				"file_storage_path" => '/var/lib/groupoffice',
 				"tmpdir" => sys_get_temp_dir() . '/groupoffice',
 				"debug" => false,

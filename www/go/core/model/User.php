@@ -1677,15 +1677,8 @@ public function historyLog(): bool|array
 		$this->theme = $v;
 	}
 
-	/**
-	 * @throws ConfigurationException
-	 */
 	public function getTheme() {
-		if(!go()->getConfig()['allow_themes']) {
-			return go()->getConfig()['theme'];
-		} else {
-			return $this->theme;
-		}
+		return $this->theme;
 	}
 
 	public function findAclId(): ?int
