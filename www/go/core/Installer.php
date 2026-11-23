@@ -131,6 +131,8 @@ class Installer {
 		if(!$cron->save()) {
 			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
 		}
+
+		\go\core\cron\EmailReminders::install("*/5 * * * *");
 	}
 
 	/**

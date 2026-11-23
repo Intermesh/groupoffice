@@ -1931,3 +1931,8 @@ $updates['202611131500'][] = "UPDATE `go_cron` SET `active`=0 WHERE 1;";
 
 $updates['202611131500'][] = "alter table core_alert
     add isSent boolean default false not null;";
+
+// The old cron jobs don't run anymore. Schedule the e-mail reminders when they were scheduled in the old system.
+$updates['202611231300'][] = function() {
+	\go\core\cron\EmailReminders::migrateLegacySchedule();
+};
