@@ -1,4 +1,4 @@
-import {client, jmapds} from "@intermesh/groupoffice-core";
+import {client, jmapds, main} from "@intermesh/groupoffice-core";
 
 function base64encode(v: ArrayBuffer) {
 	return btoa(String.fromCharCode(...new Uint8Array(v)))
@@ -50,7 +50,8 @@ export async function subscribe(registration: ServiceWorkerRegistration) {
 	}
 
 	if (!subscription) {
-		const allowed = await requestPermission();
+		// The same question as for the desktop notifications, so the user is asked once
+		const allowed = await main.notifier.initNotifications();
 		if (!allowed) {
 			return false;
 		}
@@ -86,19 +87,6 @@ export async function subscribe(registration: ServiceWorkerRegistration) {
 		})
 	}
 
-}
-
-async function requestPermission(): Promise<boolean> {
-	if (Notification.permission === 'granted') {
-		return true;
-	}
-	if (Notification.permission === 'denied') {
-		console.warn('Push notifications blocked by user.');
-		return false;
-	}
-
-	const permission = await Notification.requestPermission();
-	return permission === 'granted';
 }
 
 export async function unsubscribe(subscription: PushSubscription): Promise<void> {
