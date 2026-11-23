@@ -83,7 +83,12 @@ class Alert extends SingleOwnerEntity
 	}
 
 
-	public function getSearch() : Search {
+	/**
+	 * The search record of the entity of the alert
+	 *
+	 * @return Search|null null when the entity has none, like an entity that was deleted
+	 */
+	public function getSearch() : ?Search {
 		return Search::find()->where(['entityTypeId'=>$this->entityTypeId, 'entityId'=>$this->entityId])->single();
 	}
 
@@ -163,7 +168,10 @@ class Alert extends SingleOwnerEntity
 		if($this->isSent) return;
 		$this->isSent = true;
 
-		$searchRecord = Search::find()->where(['entityTypeId'=>$this->entityTypeId, 'entityId'=>$this->entityId])->single();
+		$searchRecord = $this->getSearch();
+		if(!$searchRecord) {
+			return;
+		}
 		//$entity = $entityType->getClassName()::findById($this->entityId);
 		$user = User::find(['displayName', 'email', 'mail_reminders'])->where(['id'=> $this->userId])->single();
 		if($user->mail_reminders) {

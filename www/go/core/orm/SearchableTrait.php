@@ -8,6 +8,7 @@ use go\core\db\Criteria;
 use go\core\db\Query as OrmQuery;
 use go\core\db\Statement;
 use go\core\ErrorHandler;
+use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\Module;
 use go\core\model\Search;
@@ -199,6 +200,15 @@ trait SearchableTrait {
 		}
 
 		if(!Search::delete(
+			(new Query)
+				->where(['entityTypeId' => static::entityType()->getId()])
+				->andWhere('entityId', 'IN', $query)
+		)) {
+			return false;
+		}
+
+		// Otherwise the alerts stay without an entity to show
+		if(!Alert::delete(
 			(new Query)
 				->where(['entityTypeId' => static::entityType()->getId()])
 				->andWhere('entityId', 'IN', $query)
