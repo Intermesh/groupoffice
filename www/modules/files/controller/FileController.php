@@ -312,7 +312,24 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		if(isset($params['lock'])){
 			//GOTA sends lock parameter It does not know the user ID.
-			$model->locked_user_id=empty($params['lock']) ? 0 : \GO::user()->id;
+			$params['locked_user_id'] = $params['lock'];
+		}
+
+		// The expiry of a lock is set by the server only
+		unset($params['lock_expires_at'], $params['lock_id']);
+
+		if(isset($params['locked_user_id'])) {
+			// A lock that the user sets with "Lock" in the menu or GOTA doesn't expire, unlike the locks of WOPI, DAV and
+			// OnlyOffice. A user can only lock a file in their own name.
+			if(empty($params['locked_user_id'])) {
+				$model->locked_user_id = 0;
+				$model->lock_id = "";
+			} else {
+				$model->locked_user_id = \GO::user()->id;
+				$model->lock_id = uniqid(\GO::user()->id . "-");
+			}
+			$model->lock_expires_at = null;
+			unset($params['locked_user_id']);
 		}
 		
 		

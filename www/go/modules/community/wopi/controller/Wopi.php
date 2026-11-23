@@ -147,11 +147,14 @@ class Wopi extends Controller
 //      throw new Exception(409);
 //    }
 //
-    if($file->isLocked(true) && $file->lock_id != $lockID) {
-      Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
-      throw new Exception(409);
-    } else {
-			// for co-editing set to current user
+    if($file->isLocked(true)) {
+      if($file->lock_id != $lockID) {
+        Response::get()->setHeader("X-WOPI-Lock", $file->lock_id);
+        throw new Exception(409);
+      }
+
+			// for co-editing set to current user. Only when the file is locked, otherwise this would create a lock without
+			// an expiry time, which doesn't expire.
 			$file->locked_user_id = go()->getUserId();
 			$file->ignoreLockChange = true;
 		}

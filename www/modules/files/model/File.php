@@ -207,10 +207,12 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * Check if a file is locked by another user.
 	 *
+	 * A lock without an expiry time was set by the user and stays until it is unlocked.
+	 *
 	 * @return boolean
 	 */
 	public function isLocked($forYouToo = false){
-		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && time() < $this->lock_expires_at;
+		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && (empty($this->lock_expires_at) || time() < $this->lock_expires_at);
 	}
 
 	public function unlockAllowed(){
@@ -373,6 +375,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 			if(!$this->locked_user_id) {
 				$this->lock_id = "";
+				$this->lock_expires_at = null;
 			}
 		}
 

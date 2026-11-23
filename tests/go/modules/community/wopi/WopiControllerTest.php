@@ -171,6 +171,51 @@ class WopiControllerTest extends TestCase
 		$this->assertEquals('first-session', File::model()->findByPk($this->file1->id, false, true)->lock_id);
 	}
 
+	/**
+	 * A lock that the user set in the files module has no expiry time and must keep blocking other editors
+	 */
+	public function testManualLockDoesNotExpire(): void
+	{
+		$this->file1->locked_user_id = $this->other->id;
+		$this->file1->lock_expires_at = null;
+		$this->file1->ignoreLockChange = true;
+		$this->assertTrue($this->file1->save());
+
+		$file = File::model()->findByPk($this->file1->id, false, true);
+		$this->assertNotEmpty($file->lock_id);
+		$this->assertTrue($file->isLocked());
+
+		try {
+			$this->lockAs($this->controller($this->writeServiceId, $file), 'wopi-session');
+			$this->fail('A manually locked file was locked by WOPI');
+		} catch (Exception $e) {
+			$this->assertEquals(409, $e->code);
+		}
+
+		// Unlocking clears the lock completely
+		$file->locked_user_id = 0;
+		$file->ignoreLockChange = true;
+		$this->assertTrue($file->save());
+		$file = File::model()->findByPk($this->file1->id, false, true);
+		$this->assertEmpty($file->lock_id);
+		$this->assertEmpty($file->lock_expires_at);
+		$this->assertFalse($file->isLocked(true));
+	}
+
+	/**
+	 * Saving an unlocked file through WOPI must not lock it, that lock would have no expiry time
+	 */
+	public function testCheckLockDoesNotLockUnlockedFile(): void
+	{
+		$controller = $this->controller($this->writeServiceId, $this->file1);
+		$this->setRequestHeaders(['x-wopi-lock' => 'wopi-session']);
+
+		$this->call($controller, 'checkLock', $this->file1, false);
+		$this->assertTrue($this->file1->save());
+
+		$this->assertFalse(File::model()->findByPk($this->file1->id, false, true)->isLocked(true));
+	}
+
 	public function testOtherFileIsRefused(): void
 	{
 		$controller = $this->controller($this->writeServiceId, $this->file1);
