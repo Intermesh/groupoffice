@@ -404,3 +404,11 @@ $updates['202609071447'][] = "update fs_files set lock_expires_at = unix_timesta
 
 // Locks without an expiry time don't expire anymore. Before, WOPI could create these when saving a file that wasn't locked.
 $updates['202611231100'][] = "update fs_files set lock_expires_at = unix_timestamp() + 1800 where locked_user_id > 0 and lock_expires_at is null;";
+
+// The old cron jobs don't run anymore. Schedule the jobs that were scheduled in the old system.
+$updates['202611231300'][] = function() {
+	\GO\Files\Cron\RecalculateDiskUsageJob::migrateLegacySchedule();
+	\GO\Files\Cron\CorrectQuotaUserJob::migrateLegacySchedule();
+	\GO\Files\Cron\DeleteExpiredLinksJob::migrateLegacySchedule();
+	\GO\Files\Cron\NotifyFolderChangesJob::migrateLegacySchedule();
+};

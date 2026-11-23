@@ -210,6 +210,9 @@ class FilesModule extends \GO\Base\Module{
 	
 	public function install() {
 		parent::install();
+
+		\GO\Files\Cron\RecalculateDiskUsageJob::install("24 2 * * *");
+		\GO\Files\Cron\CorrectQuotaUserJob::install("0 2 * * *");
 		
 		$template = new \GO\files\Model\Template();
 		$template->name=\GO::t("Microsoft Word document", "files");
