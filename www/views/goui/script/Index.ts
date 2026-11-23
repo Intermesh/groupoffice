@@ -10,4 +10,7 @@ await main.boot();
 root.items.add(main);
 
 // fire off the router
-void router.start();
+void router.start().finally(() => {
+	// TEMPORARY: "?f=" links of GO::createExternalUrl()
+	main.runExternalFunction();
+});
