@@ -122,25 +122,13 @@ go.AuthenticationManager = (function () {
 			});
 		},
 		
-		logout: function (first) {
-			if (Ext.Ajax.isLoading() || window.groupofficeCore.client.isBusy())
-			{
-				if (first) {
-					Ext.getBody().mask(t("Loading..."));
-				}
-				this.logout.defer(300, this, [true]);
-			} else
-			{
-				window.GOUI.browserStoreConnection.deleteDatabase().then(function() {
-					Ext.Ajax.request({
-						url: go.AuthenticationManager.getAuthUrl(),
-						method: "DELETE",
-						callback: function() {
-							go.reload();
-						}
-					});
-				});
-			}
+		/**
+		 * Waits for running requests, deletes the browser database, ends the session and reloads
+		 *
+		 * @see authManager.logout() of groupoffice-core
+		 */
+		logout: function () {
+			return window.groupofficeCore.authManager.logout();
 		},
 
 		doAuthentication: function (authenticators, cb, scope) {
