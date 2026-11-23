@@ -265,7 +265,7 @@ class TextExtractorTest extends TestCase
 			$this->expectExceptionMessage('poppler-utils');
 		}
 		$text = (new TextExtractor())->extract($path);
-		$this->assertStringContainsString("--- Page 1 ---\nHello PDF", $text);
-		$this->assertStringContainsString("--- Page 2 ---\nSecond page", $text);
+		// TCPDF adds a "Powered by TCPDF" line to a page
+		$this->assertMatchesRegularExpression('#^--- Page 1 ---\n.*Hello PDF.*\n\n--- Page 2 ---\n.*Second page$#s', $text);
 	}
 }

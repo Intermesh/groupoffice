@@ -231,7 +231,8 @@ class GetBlobTest extends TestCase
 		} else {
 			$this->assertFalse($result['isError'], json_encode($result));
 			$this->assertEquals('pdf', $result['structuredContent']['extracted']);
-			$this->assertStringStartsWith("--- Page 1 ---\nInvoice ", $result['structuredContent']['text']);
+			// TCPDF adds a "Powered by TCPDF" line to a page
+			$this->assertMatchesRegularExpression('#^--- Page 1 ---\n.*Invoice #s', $result['structuredContent']['text']);
 		}
 	}
 
