@@ -235,6 +235,60 @@ class GetBlobTest extends TestCase
 		}
 	}
 
+	public function testEntry(): void
+	{
+		// Word writes the XML on one line. The template has curly quotes, so the condition never matches.
+		$padding = str_repeat('<w:p><w:r><w:t>Lorem ipsum dolor sit amet</w:t></w:r></w:p>', 50);
+		$id = $this->createBlob(self::docx($padding . '&lt;gotpl if=„contact:mentor“&gt;Mentor&lt;/gotpl&gt;' . $padding), 'template.docx');
+
+		$result = $this->callTool(['blobId' => $id, 'entry' => 'word/document.xml', 'length' => 20]);
+		$this->assertFalse($result['isError'], json_encode($result));
+		$this->assertEquals('word/document.xml', $result['structuredContent']['entry']);
+		$this->assertEquals('<w:document xmlns:w=', $result['structuredContent']['text']);
+
+		$search = $this->callTool(['blobId' => $id, 'entry' => 'word/document.xml', 'search' => 'GOTPL']);
+		$this->assertFalse($search['isError'], json_encode($search));
+		$this->assertEquals(2, $search['structuredContent']['matchCount']);
+		$match = $search['structuredContent']['matches'][0];
+		$this->assertEquals(1, $match['line']);
+		$this->assertStringContainsString('sit amet</w:t></w:r></w:p>&lt;gotpl if=„contact:mentor“&gt;Mentor&lt;/gotpl&gt;<w:p><w:r><w:t>Lorem', $match['text']);
+		$this->assertLessThan(GetBlob::MAX_LINE_LENGTH, strlen($match['text']));
+
+		// The offset of a match reads on from there
+		$part = $this->callTool(['blobId' => $id, 'entry' => 'word/document.xml', 'offset' => $match['offset'], 'length' => 5]);
+		$this->assertEquals('gotpl', $part['structuredContent']['text']);
+	}
+
+	public function testEntryNotFound(): void
+	{
+		$id = $this->createBlob(self::docx('text'), 'letter.docx');
+		$result = $this->callTool(['blobId' => $id, 'entry' => 'content.xml']);
+		$this->assertTrue($result['isError']);
+		$this->assertStringContainsString('[Content_Types].xml, word/document.xml', $result['structuredContent']['error']);
+	}
+
+	public function testEntryOfOtherFile(): void
+	{
+		$id = $this->createBlob('plain text ' . uniqid(), 'a.txt');
+		$result = $this->callTool(['blobId' => $id, 'entry' => 'content.xml']);
+		$this->assertTrue($result['isError']);
+		$this->assertStringContainsString('not a zip file', $result['structuredContent']['error']);
+	}
+
+	public function testBinaryEntryIsRefused(): void
+	{
+		$id = $this->createBlob(self::zip(['image.bin' => "\0\1\2" . uniqid()]), 'archive.zip');
+
+		$result = $this->callTool(['blobId' => $id, 'entry' => 'image.bin']);
+		$this->assertTrue($result['isError']);
+		$this->assertStringContainsString('binary', $result['structuredContent']['error']);
+
+		// Without entry the error says which files are in the zip
+		$result = $this->callTool(['blobId' => $id]);
+		$this->assertTrue($result['isError']);
+		$this->assertStringContainsString('use entry to read a file in it. The files in it are: image.bin', $result['structuredContent']['error']);
+	}
+
 	public function testBinaryIsRefused(): void
 	{
 		$id = $this->createBlob("\0\1\2\3binary" . uniqid(), 'file.bin');
