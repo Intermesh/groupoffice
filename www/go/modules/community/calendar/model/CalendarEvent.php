@@ -1085,11 +1085,7 @@ class CalendarEvent extends AclItemEntity {
 			// loop all calendar subscribers
 			$subscribers = go()->getDbConnection()->query('select userId from calendar_calendar_user where id = '.$this->calendarId.' AND isSubscribed = 1')->fetchAll(\PDO::FETCH_COLUMN);
 			foreach($subscribers as $subscriber) {
-				CoreAlert::deleteByEntity($this, '1', $subscriber); // this will reschedule if recurring and existing
-
-				foreach ($this->alertsFor((int) $subscriber) as $alert) {
-					$alert->schedule($this, $subscriber);
-				}
+				$this->rescheduleAlertsFor((int) $subscriber);
 			}
 
 		}

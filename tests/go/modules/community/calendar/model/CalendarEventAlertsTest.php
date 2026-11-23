@@ -180,6 +180,21 @@ class CalendarEventAlertsTest extends TestCase
 		}
 	}
 
+	public function testRemovedAlertIsNotScheduled(): void
+	{
+		$event = $this->createEvent('creator', self::start('+2 days'), '-PT1H');
+		$event->setValues(['alerts' => [
+			'1' => ['trigger' => ['offset' => '-PT1H', 'relativeTo' => 'start']],
+			'2' => ['trigger' => ['offset' => '-PT2H', 'relativeTo' => 'start']]
+		]]);
+		$this->assertTrue($event->save(), json_encode($event->getValidationErrors()));
+		$this->assertEquals([self::utc($event->start, '-2 hours'), self::utc($event->start, '-1 hour')], $this->triggers($event, 'creator'));
+
+		$event->setValues(['alerts' => ['1' => ['trigger' => ['offset' => '-PT1H', 'relativeTo' => 'start']]]]);
+		$this->assertTrue($event->save(), json_encode($event->getValidationErrors()));
+		$this->assertEquals([self::utc($event->start, '-1 hour')], $this->triggers($event, 'creator'));
+	}
+
 	public function testOtherSubscriberMovingEventKeepsCreatorsAlert(): void
 	{
 		$event = $this->createEvent('creator', self::start('+2 days'), '-PT1H');
