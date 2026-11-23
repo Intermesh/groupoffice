@@ -283,6 +283,13 @@ export class UserProfileSettingsPanel extends AppSettingsPanel {
 		this.items.add(this.form);
 	}
 
+	/**
+	 * The profile is always shown, also for users without access to the address book, like the old ExtJS panel did.
+	 */
+	public isAllowed(user: User): boolean {
+		return true;
+	}
+
 	async save() {
 		return this.form.submit();
 	}
