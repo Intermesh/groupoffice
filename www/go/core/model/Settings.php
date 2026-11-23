@@ -644,7 +644,7 @@ class Settings extends core\Settings
 	/**
 	 * @var int
 	 */
-	public int|null $archivedUsersAddressBook;
+	public int|null $archivedUsersAddressBook = null;
 	/**
 	 * When archiving a user, move profile user
 	 *
