@@ -4,6 +4,7 @@ namespace go\modules\legacy\announcements;
 use GO\Announcements\Controller\AnnouncementController;
 use GO\Announcements\Model\Announcement;
 use GO\Announcements\Model\Target;
+use GO\Base\Db\Columns;
 use GO\Base\Exception\AccessDenied;
 use go\core\auth\TemporaryState;
 use go\core\model\User;
@@ -17,6 +18,7 @@ class AnnouncementControllerTest extends TestCase
 {
 	private $authState;
 	private bool $ignoreAcl;
+	private bool $forceLoadColumns;
 	private bool $installed = false;
 	private array $tables = [];
 	private User $user;
@@ -26,6 +28,13 @@ class AnnouncementControllerTest extends TestCase
 	{
 		$this->authState = go()->getAuthState();
 		$this->ignoreAcl = \GO::$ignoreAclPermissions;
+
+		// The legacy models select their columns by name from a cached column list. That cache can still hold
+		// columns that an upgrade has dropped, like core_user.last_password_change, so read the columns from the
+		// database instead.
+		$this->forceLoadColumns = Columns::$forceLoad;
+		Columns::$forceLoad = true;
+
 		$this->actAs(User::ID_SUPER_ADMIN);
 
 		if (!\GO::modules()->isInstalled('announcements')) {
@@ -86,6 +95,7 @@ class AnnouncementControllerTest extends TestCase
 			\GO::$ignoreAclPermissions = $this->ignoreAcl;
 		}
 		go()->setAuthState($this->authState);
+		Columns::$forceLoad = $this->forceLoadColumns;
 	}
 
 	private function findTables(): array

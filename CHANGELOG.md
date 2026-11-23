@@ -1,3 +1,4 @@
+23-11-2026: 6.8.185
 - Core: the global search and the links panel could hang for many minutes on large installations, filling up the database server with slow queries.
 - Core: the global search, the link search and the search fields of the modules start searching automatically from 3 characters. Press enter to search for shorter text.
 

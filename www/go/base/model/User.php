@@ -62,7 +62,6 @@ use go\modules\business\business\model\EmployeeAgreement;
  * @property string $email
  * @property string $recoveryEmail
  * @property string $digest
- * @property int $last_password_change
  * @property boolean $forcePasswordChange
  * @property string $homeDir
  *
@@ -501,7 +500,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 			$this->digest = md5($this->username.":".GO::config()->product_name.":".$this->_unencryptedPassword);
 			
 			// set the last_password_change time
-			$this->last_password_change = time();
+//			$this->last_password_change = time();
 			
 			// Only reset this when it's not modified in the same request.
 			// Otherwise checking this checkbox will not work in the Admin Users module 
@@ -744,7 +743,8 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @return boolean
 	 */
 	public function checkPasswordChangeRequired(){
-		
+		return $this->forcePasswordChange;
+		/*
 		if($this->forcePasswordChange){
 			return true;
 		}
@@ -762,6 +762,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		// Check if the last password change+seconds is greater than the current time, 
 		// if it is then the password does not need to change, otherwise it does
 		return (($this->last_password_change+$seconds) > time())?false:true;
+		*/
 	}
 	
 	public function defaultAttributes() {
