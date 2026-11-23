@@ -27,6 +27,10 @@ $baseUrl = \go\core\webclient\Extjs3::get()->getBaseUrl();
 
 // Before any output, because ?SET_LANGUAGE= sets the language cookie
 $isoCode = go()->getLanguage()->getIsoCode();
+// The language chosen on the login screen
+if(isset($_GET['lang']) && go()->getLanguage()->setLanguage($_GET['lang']) !== false) {
+	$isoCode = go()->getLanguage()->getIsoCode();
+}
 $textDirection = go()->getLanguage()->getTextDirection();
 
 ?>
@@ -84,7 +88,8 @@ $textDirection = go()->getLanguage()->getTextDirection();
 
     <script src="views/Extjs3/javascript/ext-base-debug.js"></script>
     <script src="views/Extjs3/javascript/ext-all-debug.js"></script>
-    <script src="views/Extjs3/lang.php?lang=<?= $_GET['lang'] ?? ''?>"></script>
+    <!-- The language and its version are in the URL, because the browser caches the translations for a year -->
+    <script src="views/Extjs3/lang.php?lang=<?= urlencode($isoCode) ?>&amp;v=<?= \go\core\webclient\Extjs3::get()->getLanguageJS()->getModifiedAt()->format("U") ?>"></script>
 <!--    <script src="views/goui/legacyscripts.php"></script>-->
 
     <script type="module" src="views/goui/dist/Index.js"></script>
