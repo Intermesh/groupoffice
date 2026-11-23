@@ -25,10 +25,14 @@ try {
 // Without the path and query of the request, eg. "?oauthConsent=1" or "index.php?lang=nl"
 $baseUrl = \go\core\webclient\Extjs3::get()->getBaseUrl();
 
+// Before any output, because ?SET_LANGUAGE= sets the language cookie
+$isoCode = go()->getLanguage()->getIsoCode();
+$textDirection = go()->getLanguage()->getTextDirection();
+
 ?>
 
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars(go()->getLanguage()->getIsoCode()) ?>" dir="<?= go()->getLanguage()->getTextDirection() ?>" style="height:100%">
+<html lang="<?= htmlspecialchars($isoCode) ?>" dir="<?= htmlspecialchars($textDirection) ?>" style="height:100%">
 <head>
     <title>Group-Office</title>
     <script>
