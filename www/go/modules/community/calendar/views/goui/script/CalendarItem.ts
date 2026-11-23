@@ -1021,7 +1021,8 @@ export class CalendarItem {
 			const update : Partial<CalendarEvent> = {recurrenceRule: rule};
 
 			// remove patches that occur after the until
-			const patchRecurrenceOverrides = this.removeFutureOverrides(until);
+			// keep the overrides before this occurrence, also the one of the day before
+			const patchRecurrenceOverrides = this.removeFutureOverrides(new DateTime(this.recurrenceId));
 			if(Object.keys(patchRecurrenceOverrides).length != Object.keys(this.data.recurrenceOverrides ?? {}).length) {
 				update.recurrenceOverrides = patchRecurrenceOverrides;
 			}
