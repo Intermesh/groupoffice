@@ -959,7 +959,7 @@ LUA;
 	private function decodeValue(string $payload, string $logicalKey)
 	{
 		try {
-			$value = @unserialize($payload);
+			$value = @unserialize($payload, ['allowed_classes' => true]); // classes must be allowed because we use this in our ORM;
 
 			if ($value === false && $payload !== serialize(false)) {
 				throw new RuntimeException("unserialize() returned false for non-false payload");
