@@ -315,7 +315,8 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 
 		}
 
-		if(client.user.calendarPreferences?.showTooltips)
+		// Without details the tooltip has nothing to add
+		if(client.user.calendarPreferences?.showTooltips && !item.detailsHidden)
 			tooltip({
 				style:{maxWidth:'60rem' ,wordBreak: 'break-word'},
 				listeners: { 'render': ({target}) => {target.html = item.quickText}},

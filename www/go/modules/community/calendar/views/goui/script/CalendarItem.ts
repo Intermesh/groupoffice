@@ -543,6 +543,13 @@ export class CalendarItem {
 		return this.cal.myRights?.mayReadItems === false;
 	}
 
+	/**
+	 * The server left out the details: a busy only event, or a private event of someone else
+	 */
+	get detailsHidden() {
+		return this.isBusyOnly || (this.data.privacy !== 'public' && !this.title);
+	}
+
 	get mayChange() {
 		return (this.isNew() || (this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}
