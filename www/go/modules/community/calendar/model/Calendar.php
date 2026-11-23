@@ -45,7 +45,7 @@ class Calendar extends AclOwnerEntity {
 	const Attending = 'attending';
 	const None = 'none';
 
-	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'includeInAvailability'];
+	const UserProperties = ['color', 'sortOrder', 'isVisible', 'isSubscribed', 'syncToDevice', 'includeInAvailability', 'useCreatorAlerts'];
 
 	public ?string $id;
 	/** @var string The user-visible name of the calendar */
@@ -74,6 +74,11 @@ class Calendar extends AclOwnerEntity {
 
 	/** Whether the calendar is synchronized to the user's devices, like phones with CalDAV or ActiveSync */
 	public ?bool $syncToDevice = null;
+
+	/**
+	 * Per user, null when the user didn't choose. {@see getUseCreatorAlerts()}
+	 */
+	protected ?bool $useCreatorAlerts = null;
 
 	protected ?string $defaultColor = null;
 
@@ -255,6 +260,23 @@ class Calendar extends AclOwnerEntity {
 		return !empty($this->ownerId);
 	}
 
+	/**
+	 * Use the alerts that the creator of an event set on it instead of the default alerts. In a calendar with an owner
+	 * these are the alerts of the owner, because the alerts that someone sets when creating an event go to the owner.
+	 *
+	 * Per user. When the user didn't choose, it's on for a calendar without an owner, like a team calendar, and off for
+	 * a personal calendar and a resource.
+	 *
+	 * @return bool
+	 */
+	public function getUseCreatorAlerts(): bool {
+		return $this->useCreatorAlerts ?? (!$this->isOwned() && empty($this->groupId));
+	}
+
+	public function setUseCreatorAlerts(?bool $value): void {
+		$this->useCreatorAlerts = $value;
+	}
+
 	protected function internalValidate()
 	{
 		if($this->isNew()) {
@@ -304,6 +326,7 @@ class Calendar extends AclOwnerEntity {
 			0 => $this->isModified('defaultAlertsWithTime'),
 			1 => $this->isModified('defaultAlertsWithoutTime')
 		];
+		$useCreatorAlertsModified = !$this->isNew() && $this->isModified('useCreatorAlerts');
 		if(!$this->isNew() && $this->id === go()->getAuthState()->getUser(['calendarPreferences'])->calendarPreferences->personalCalendarId) {
 			$this->isSubscribed = true; // do not let users unsubscribe there personal calendar
 		}
@@ -316,9 +339,13 @@ class Calendar extends AclOwnerEntity {
 		$success = parent::internalSave();
 
 		if($success) {
-			foreach($defaultAlertsModified as $showWithoutTime => $modified) {
-				if($modified) {
-					$this->updateEventAlerts((bool) $showWithoutTime);
+			if($useCreatorAlertsModified) {
+				$this->updateEventAlerts();
+			} else {
+				foreach ($defaultAlertsModified as $showWithoutTime => $modified) {
+					if ($modified) {
+						$this->updateEventAlerts((bool)$showWithoutTime);
+					}
 				}
 			}
 		}
@@ -341,19 +368,23 @@ class Calendar extends AclOwnerEntity {
 	/**
 	 * Schedule the alerts of the current user again for the future events in this calendar that use the default alerts.
 	 *
-	 * @param bool $showWithoutTime true for the full-day events, false for the events with a time
+	 * @param bool|null $showWithoutTime true for the full-day events, false for the events with a time, null for both
 	 * @throws \Exception
 	 */
-	private function updateEventAlerts(bool $showWithoutTime): void {
+	private function updateEventAlerts(?bool $showWithoutTime = null): void {
 		if(!\go\core\model\Alert::$enabled) {
 			return;
 		}
 		// Users without per-user data for an event use the default alerts.
 		$events = CalendarEvent::find()->filter(['inCalendars' => $this->id, 'after' => date('Y-m-d\TH:i:s')])
-			->andWhere('showWithoutTime', '=', $showWithoutTime ? 1 : 0)
 			->andWhere((new Criteria())->where('useDefaultAlerts', '=', 1)->orWhere('useDefaultAlerts', 'IS', null));
+		if(isset($showWithoutTime)) {
+			$events->andWhere('showWithoutTime', '=', $showWithoutTime ? 1 : 0);
+		}
 		foreach($events as $event) {
 			$event->rescheduleAlertsFor(go()->getUserId());
+			// The VALARMs for CalDAV are generated again on the next request
+			$event->resetICalBlobOf(go()->getUserId());
 		}
 	}
 

@@ -275,4 +275,6 @@ return array (
   'Import calendar from ICS file.' => 'Agenda importeren uit ICS-bestand.',
   'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Maak een exacte kopie van de agenda uit een extern ICS-bestand in de geselecteerde GroupOffice-agenda\'s. Selecteer de agenda\'s waarin geïmporteerd moet worden in de beheerinstellingen van de agenda.',
   'This event already exists. Open it in your calendar to respond to it.' => 'Deze afspraak bestaat al. Open hem in uw agenda om te reageren.',
+  'Use the notifications of the creator' => 'Meldingen van de maker gebruiken',
+  'Get the notifications that the creator set on an event instead of your default notifications' => 'U krijgt de meldingen die de maker bij een afspraak heeft ingesteld in plaats van uw standaard meldingen',
 );

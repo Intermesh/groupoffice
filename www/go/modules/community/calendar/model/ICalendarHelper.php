@@ -607,7 +607,7 @@ class ICalendarHelper {
 		if(!isset($vevent->VALARM)) {
 			return;
 		}
-		$event->alerts = [];
+		$alerts = [];
 		foreach ($vevent->VALARM as $valarm) {
 			$a = (new Alert($event))->setValues([
 				'action' => (string)$valarm->ACTION,
@@ -617,8 +617,54 @@ class ICalendarHelper {
 			]);
 			if(isset($valarm->ACKNOWLEDGED))
 				$a->acknowledged = $valarm->ACKNOWLEDGED->getDateTime();
-			$event->alerts[] = $a;
+			$alerts[] = $a;
 		}
+
+		// Clients send the alerts back that they got, also when these are the default alerts of the calendar or the
+		// alerts of the creator. Keep using those, so the alerts follow when the defaults or the creator's alerts change.
+		// Both are checked, because the client may still have the alerts from before the user turned
+		// Calendar::getUseCreatorAlerts() on or off. That doesn't change the event, so the client didn't fetch it again.
+		if(!$event->isNew() && $event->useDefaultAlerts !== false) {
+			foreach($event->inheritedAlertsFor($event->forUserId()) as $inherited) {
+				if(self::sameAlerts($alerts, $inherited)) {
+					return;
+				}
+			}
+		}
+		$event->alerts = $alerts;
+	}
+
+	/**
+	 * Whether two lists of alerts trigger at the same times with the same actions
+	 *
+	 * @param Alert[] $a
+	 * @param Alert[] $b
+	 * @return bool
+	 */
+	private static function sameAlerts(array $a, array $b): bool
+	{
+		$keys = function(array $alerts): array {
+			$keys = array_map(function(Alert $alert) {
+				$trigger = $alert->getTrigger();
+				if(isset($trigger['offset'])) {
+					try {
+						$offset = $trigger['offset'];
+						$sign = $offset[0] === '-' ? -1 : 1;
+						$interval = new \DateInterval(ltrim($offset, '+-'));
+						$time = 'offset:' . $sign * ((($interval->d * 24 + $interval->h) * 60 + $interval->i) * 60 + $interval->s);
+					} catch(\Exception $e) {
+						$time = 'offset:' . $trigger['offset'];
+					}
+				} else {
+					$when = $trigger['when'] ?? null;
+					$time = 'when:' . ($when instanceof \DateTimeInterface ? $when->getTimestamp() : strtotime((string) $when));
+				}
+				return strtolower($alert->action) . '|' . $time;
+			}, $alerts);
+			sort($keys);
+			return $keys;
+		};
+		return $keys($a) === $keys($b);
 	}
 
 	/**

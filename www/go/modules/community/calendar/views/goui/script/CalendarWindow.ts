@@ -28,6 +28,10 @@ export class CalendarWindow extends FormWindow {
 		const alertField = alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
 			fdAlertField = alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')});
 
+		// The owner of a calendar gets the notifications that others set when creating an event already
+		const useCreatorAlertsCb = checkbox({name: 'useCreatorAlerts', label: t('Use the notifications of the creator'),
+			hint: t('Get the notifications that the creator set on an event instead of your default notifications')});
+
 		const ownerIdField = combobox({
 				dataSource: principalDS, placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
@@ -66,6 +70,7 @@ export class CalendarWindow extends FormWindow {
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
 				alertField,
 				fdAlertField,
+				useCreatorAlertsCb,
 				publishField,
 				textfield({hidden:true, readOnly:true,buttons:[
 					btn({icon:'copy_all', title:t('Copy')})
@@ -106,6 +111,7 @@ export class CalendarWindow extends FormWindow {
 			if(unsubscribed)
 				this.sharePanel!.show();
 			ownerIdField.hidden = !editable;
+			useCreatorAlertsCb.hidden = !!data.ownerId && data.ownerId == client.user.id;
 			descriptionFld.hidden = !editable;
 			publishField.hidden = !editable || !data.id; // no publish button for new calendars
 			nameFld.readOnly = !editable || !!data.davaccountId;

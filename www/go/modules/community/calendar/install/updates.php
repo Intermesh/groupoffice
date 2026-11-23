@@ -539,3 +539,6 @@ $updates['202611091200'][] = "delete from calendar_schedule_object;";
 $updates['202611121200'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN showCategoryColor TINYINT(1) DEFAULT 0 NOT NULL AFTER `multiLine`;";
 
 $updates['202611181200'][] = "ALTER TABLE `calendar_preferences` ADD COLUMN printWeekInGrid TINYINT(1) DEFAULT 0 NOT NULL AFTER `showCategoryColor`;";
+
+// Subscribers of a calendar can choose to get the notifications that the creator of an event set #37829
+$updates['202611231200'][] = "ALTER TABLE `calendar_calendar_user` ADD COLUMN `useCreatorAlerts` TINYINT(1) NULL DEFAULT NULL AFTER `includeInAvailability`;";
