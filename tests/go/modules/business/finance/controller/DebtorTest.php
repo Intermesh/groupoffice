@@ -6,18 +6,21 @@ use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\model\User;
 use go\modules\business\business\model\Business;
+use go\modules\business\ModuleRightsTrait;
 use go\modules\business\ModuleTablesTrait;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../fixtures/ModuleTablesTrait.php';
+require_once __DIR__ . '/../../fixtures/ModuleRightsTrait.php';
 
 /**
- * Debtor/runActions sends reminders to customers, so it needs write permission on the business. Running the actions of
- * all businesses is only for administrators.
+ * Debtor/runActions sends reminders to customers, so it needs the "maySendReminders" right and write permission on the
+ * business. Running the actions of all businesses is only for administrators.
  */
 class DebtorTest extends TestCase
 {
 	use ModuleTablesTrait;
+	use ModuleRightsTrait;
 
 	private $authState;
 	private User $user;
@@ -64,6 +67,7 @@ class DebtorTest extends TestCase
 	protected function tearDown(): void
 	{
 		$this->actAs(User::ID_SUPER_ADMIN);
+		self::revokeModuleRights('business', 'finance', $this->user);
 		if (isset($this->business->id)) {
 			Business::delete(['id' => $this->business->id]);
 		}
@@ -111,6 +115,17 @@ class DebtorTest extends TestCase
 	public function testRunActionsWithReadPermissionOnTheBusiness(): void
 	{
 		$this->grant(Acl::LEVEL_READ);
+		self::grantModuleRights('business', 'finance', $this->user, ['maySendReminders']);
+
+		$this->actAs($this->user->id);
+		$this->expectException(Forbidden::class);
+		$this->controller()->runActions(['dryRun' => true, 'businessId' => $this->business->id]);
+	}
+
+	public function testRunActionsWithoutTheRightToSendReminders(): void
+	{
+		$this->grant(Acl::LEVEL_WRITE);
+		self::grantModuleRights('business', 'finance', $this->user, ['mayChangePayments']);
 
 		$this->actAs($this->user->id);
 		$this->expectException(Forbidden::class);
@@ -120,6 +135,7 @@ class DebtorTest extends TestCase
 	public function testRunActionsWithWritePermissionOnTheBusiness(): void
 	{
 		$this->grant(Acl::LEVEL_WRITE);
+		self::grantModuleRights('business', 'finance', $this->user, ['maySendReminders']);
 
 		$this->actAs($this->user->id);
 		$this->assertEquals(['count' => 0, 'errors' => []], $this->controller()->runActions(['dryRun' => true, 'businessId' => $this->business->id]));
