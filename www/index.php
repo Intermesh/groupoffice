@@ -28,7 +28,7 @@ $baseUrl = \go\core\webclient\Extjs3::get()->getBaseUrl();
 ?>
 
 <!DOCTYPE html>
-<html lang="en" style="height:100%">
+<html lang="<?= htmlspecialchars(go()->getLanguage()->getIsoCode()) ?>" dir="<?= go()->getLanguage()->getTextDirection() ?>" style="height:100%">
 <head>
     <title>Group-Office</title>
     <script>
@@ -113,6 +113,9 @@ $baseUrl = \go\core\webclient\Extjs3::get()->getBaseUrl();
     <link rel="stylesheet" media="print,screen" href="views/Extjs3/themes/Paper/style.css">
     <link rel="stylesheet" href="node_modules/@intermesh/groupoffice-core/dist/groupoffice.css">
     <link rel="stylesheet" href="views/Extjs3/css.php">
+<?php if(!empty(go()->getConfig()['custom_css_url'])): ?>
+    <link rel="stylesheet" href="<?= htmlspecialchars(go()->getConfig()['custom_css_url']) ?>">
+<?php endif; ?>
 <?php
     // Custom logos of the system settings. The blob ID is added for caching only.
     $logoId = go()->getSettings()->logoId;
