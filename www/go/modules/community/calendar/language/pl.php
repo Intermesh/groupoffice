@@ -224,4 +224,6 @@ return array (
   'Import calendar from ICS file.' => 'Importuj kalendarz z pliku ICS.',
   'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Twórz dokładną kopię zewnętrznego kalendarza z pliku ICS w wybranych kalendarzach GroupOffice. Kalendarze docelowe wybierz w ustawieniach administracyjnych kalendarza.',
   'Print week and workweek in a grid with hours' => 'Drukuj tydzień i tydzień roboczy w siatce z godzinami',
+  'Only events from the first day of last month onward are published' => 'Publikowane są tylko wydarzenia od pierwszego dnia poprzedniego miesiąca',
+  'Public URL' => 'Publiczny adres URL',
 );

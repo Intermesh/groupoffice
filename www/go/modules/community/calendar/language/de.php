@@ -278,4 +278,8 @@ return array (
   'Import calendar from ICS file.' => 'Kalender aus ICS-Datei importieren.',
   'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Exakte Kopie eines externen ICS-Kalenders in die ausgewählten GroupOffice-Kalender erstellen. Wählen Sie die Zielkalender in den Verwaltungseinstellungen des Kalenders aus.',
   'Print week and workweek in a grid with hours' => 'Woche und Arbeitswoche in einem Raster mit Stunden drucken',
+  'Use the notifications of the creator' => 'Benachrichtigungen des Erstellers verwenden',
+  'Get the notifications that the creator set on an event instead of your default notifications' => 'Sie erhalten die Benachrichtigungen, die der Ersteller für einen Termin eingestellt hat, statt Ihrer Standardbenachrichtigungen',
+  'Only events from the first day of last month onward are published' => 'Es werden nur Termine ab dem ersten Tag des letzten Monats veröffentlicht',
+  'Public URL' => 'Öffentliche URL',
 );

@@ -152,7 +152,9 @@ export class ParticipantField extends Component<ParticipantFieldEventMap> {
 						dataSource: jmapds('Principal'),
 						filters: {
 							default: {
-								preferUser: true
+								preferUser: true,
+								// Also resources of which the user may only see the free / busy information, to book them
+								permissionLevel: 5
 							}
 						}
 						//properties: ['id', 'displayName', 'email']

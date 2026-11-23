@@ -74,7 +74,99 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * Details of a private event that only its owner may see. Also hidden in the recurrence overrides.
 	 */
-	const PrivateDetails = ['title', 'description', 'location', 'categoryIds'];
+	const PrivateDetails = ['title', 'description', 'location', 'categoryIds', 'participants', 'replyTo'];
+
+	/**
+	 * Check if a property, or a property of a recurrence override patch like "participants/1", is a detail of a private
+	 * event that only its owner may see. See {@see PrivateDetails}.
+	 *
+	 * @param string $property
+	 * @return bool
+	 */
+	public static function isPrivateDetail(string $property): bool
+	{
+		return in_array($property, self::PrivateDetails) || str_starts_with($property, 'participants/');
+	}
+
+	/**
+	 * Check if a property, or a property of a recurrence override patch, tells who takes part in the event
+	 *
+	 * @param string $property
+	 * @return bool
+	 */
+	public static function isParticipantDetail(string $property): bool
+	{
+		return $property === 'participants' || $property === 'replyTo' || str_starts_with($property, 'participants/');
+	}
+
+	private ?bool $managesResource = null;
+
+	/**
+	 * The user manages the resource of this calendar, like the admin of a room, who has write permission on all its
+	 * events. They see who takes part in a private booking and may answer it for the resource
+	 * ({@see onlyResourceAnswerModified()}), but the other details stay hidden.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function managesResource(): bool
+	{
+		if(!isset($this->managesResource)) {
+			$this->managesResource = isset($this->calendarId) &&
+				$this->getPermissionLevel() >= 35 /* write all, see Calendar::getMyRights() */ &&
+				!empty(Calendar::find(['id', 'groupId'])->selectSingleValue('groupId')->where('id', '=', $this->calendarId)->single());
+		}
+		return $this->managesResource;
+	}
+
+	/**
+	 * Check if the only change to the participants is the answer of the resource of this calendar: its participation
+	 * status and comment. That's what the admins of a resource may change in a private booking.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function onlyResourceAnswerModified(): bool
+	{
+		if(!$this->isModified('participants')) {
+			return true;
+		}
+		$old = $this->getOldValue('participants') ?? [];
+		$new = $this->participants ?? [];
+		$oldIds = array_map('strval', array_keys($old));
+		$newIds = array_map('strval', array_keys($new));
+		sort($oldIds);
+		sort($newIds);
+		if($oldIds !== $newIds) {
+			return false;
+		}
+		$resourceId = 'Calendar:' . $this->calendarId;
+		foreach($new as $id => $participant) {
+			$before = $old[$id]->toArray();
+			$after = $participant->toArray();
+			if((string) $id === $resourceId) {
+				unset($before['participationStatus'], $before['participationComment'],
+					$after['participationStatus'], $after['participationComment']);
+			}
+			if($before != $after) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * The only properties of an event that others see when they may only read the free / busy information of the
+	 * calendar. Anything else, like the participants, would tell what the event is about or who made it.
+	 */
+	const BusyOnlyProperties = ['id', 'calendarId', 'uid', 'start', 'duration', 'timeZone', 'showWithoutTime',
+		'recurrenceRule', 'recurrenceOverrides', 'recurrenceId', 'status', 'privacy', 'firstOccurrence', 'lastOccurrence',
+		'permissionLevel'];
+
+	/**
+	 * The properties of a recurrence override that others see when they may only read the free / busy information
+	 */
+	const BusyOnlyOverrideProperties = ['start', 'duration', 'timeZone', 'showWithoutTime', 'status', 'excluded'];
 
 //	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 //	const IgnoredPropertiesInException = [
@@ -860,7 +952,11 @@ class CalendarEvent extends AclItemEntity {
 		if($success) {
 			$this->addToKnownCalendars();
 			$this->removeFromKnownCalendars($removedParticipants);
-			$this->updateAlerts($this->forUserId());
+			if(!$this->isNew() && $this->isModified(['alerts', 'useDefaultAlerts'])) {
+				// Other users may get these alerts, see Calendar::getUseCreatorAlerts()
+				$this->resetICalBlobsOfAllUsers();
+			}
+			$this->updateAlerts();
 			$this->changeEventsWithSameUID();
 			$this->incrementCalendarModSeq();
 		}
@@ -955,13 +1051,133 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
-	 * Private events of others only show the time
+	 * Private events of others only show the time. So do all events in a calendar on which the user may only read the
+	 * free / busy information.
 	 *
 	 * @return bool
 	 */
 	public function showAsPrivate(): bool
 	{
-		return $this->isPrivate() && !$this->currentUserIsOwner();
+		if($this->currentUserIsOwner()) {
+			return false;
+		}
+		return $this->isPrivate() || $this->mayOnlyReadFreeBusy();
+	}
+
+	/**
+	 * The user may only read the free / busy information of the calendar of this event, so the event shows only when
+	 * it's busy. See {@see BusyOnlyProperties}.
+	 *
+	 * @return bool
+	 */
+	public function showAsBusyOnly(): bool
+	{
+		return !$this->currentUserIsOwner() && $this->mayOnlyReadFreeBusy();
+	}
+
+	/**
+	 * The logged-in user has less than read permission on the calendar. Without a logged-in user, the event is shown
+	 * through a secret instead of the permissions, like in a published calendar or the page of an invitation, so it
+	 * shows as before.
+	 */
+	private function mayOnlyReadFreeBusy(): bool
+	{
+		$state = go()->getAuthState();
+		return $state && $state->isAuthenticated() && $this->getPermissionLevel() < Acl::LEVEL_READ;
+	}
+
+	/**
+	 * Remove everything but the busy time from an event array of {@see toArray()}, when {@see showAsBusyOnly()}
+	 *
+	 * @param array $arr
+	 * @return array
+	 */
+	public function hideBusyOnlyDetails(array $arr): array
+	{
+		if(!$this->showAsBusyOnly()) {
+			return $arr;
+		}
+		$arr = array_intersect_key($arr, array_flip(self::BusyOnlyProperties));
+		if(!empty($arr['recurrenceOverrides'])) {
+			foreach($arr['recurrenceOverrides'] as $recurrenceId => $patch) {
+				if(is_array($patch)) {
+					$arr['recurrenceOverrides'][$recurrenceId] = array_intersect_key($patch, array_flip(self::BusyOnlyOverrideProperties));
+				}
+			}
+		}
+		return $arr;
+	}
+
+	/**
+	 * The events that users who may only read the free / busy information of a calendar see in it. The same events
+	 * as {@see BusyPeriod::fetch()} uses for the availability: not secret, not cancelled and not "free" for the owner
+	 * of the calendar. A resource calendar has no owner, so its events are always busy.
+	 *
+	 * For a query of {@see find()}.
+	 *
+	 * @return Criteria
+	 */
+	public static function busyCriteria(): Criteria
+	{
+		return (new Criteria())
+			->where('eventdata.privacy', '!=', self::Secret)
+			->andWhere('eventdata.status', '!=', self::Cancelled)
+			->andWhereExists(go()->getDbConnection()
+				->select('fb.eventId')
+				->from('calendar_event_user', 'fb')
+				->where('fb.eventId = cce.eventId AND fb.userId = cal.ownerId AND cal.groupId IS NULL')
+				->andWhere('fb.freeBusyStatus', '=', self::FREEBUSY_FREE), true);
+	}
+
+	/**
+	 * Limit a query of {@see find()} to the events the current user may see: all events in calendars with read
+	 * permission and, with $withBusyOnly, the busy events in calendars with only free / busy permission
+	 * ({@see busyCriteria()}).
+	 *
+	 * @param Query $query
+	 * @param bool $withBusyOnly
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function applyVisibleToQuery(Query $query, bool $withBusyOnly): void
+	{
+		if(User::isAdminById(go()->getUserId())) {
+			return;
+		}
+
+		$visible = (new Criteria())->where('cce.calendarId', 'IN', self::calendarIdsWithLevel(Acl::LEVEL_READ));
+		if($withBusyOnly) {
+			$visible->orWhere((new Criteria())
+				->where('cce.calendarId', 'IN', self::calendarIdsWithLevel(Calendar::LEVEL_FREEBUSY))
+				->andWhere(self::busyCriteria()));
+		}
+		$query->andWhere($visible);
+	}
+
+	/**
+	 * Subquery with the IDs of the calendars on which the current user has at least this permission level
+	 */
+	private static function calendarIdsWithLevel(int $level): Query
+	{
+		$calendars = Calendar::find(['id'])->selectSingleValue('calendar_calendar.id');
+		Calendar::applyAclToQuery($calendars, $level);
+		return $calendars;
+	}
+
+	/**
+	 * Check if the current user may see this event while having only free / busy permission on its calendar. With the
+	 * same query as {@see applyVisibleToQuery()}, so getting an event by ID shows the same events as a query.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isVisibleAsBusy(): bool
+	{
+		return self::find(['id'])
+			->selectSingleValue('cce.id')
+			->where('cce.id', '=', $this->id)
+			->andWhere(self::busyCriteria())
+			->single() !== null;
 	}
 
 	/**
@@ -995,18 +1211,27 @@ class CalendarEvent extends AclItemEntity {
 			$arr['description'] = '';
 			$arr['location'] = '';
 			$arr['categoryIds'] = [];
+			// Who takes part tells what the event is about. Left out, so the client doesn't send them back. Except for
+			// the admins of a resource, who answer the booking.
+			$hideParticipants = !$this->managesResource();
+			if($hideParticipants) {
+				unset($arr['participants'], $arr['replyTo']);
+			}
 			// An exception of the series may have its own details. Leave them out instead of clearing them, so the
 			// client doesn't send empty values back. RecurrenceOverride::setValues() keeps them when it does.
 			if(!empty($arr['recurrenceOverrides'])) {
 				foreach($arr['recurrenceOverrides'] as $recurrenceId => $patch) {
 					if(is_array($patch)) {
-						$arr['recurrenceOverrides'][$recurrenceId] = array_diff_key($patch, array_flip(self::PrivateDetails));
+						$arr['recurrenceOverrides'][$recurrenceId] = array_filter($patch,
+							fn($property) => !self::isPrivateDetail((string) $property) ||
+								(!$hideParticipants && self::isParticipantDetail((string) $property)),
+							ARRAY_FILTER_USE_KEY);
 					}
 				}
 			}
 		}
 		unset($arr['recurrenceId'], $arr['excluded']);
-		return $arr;
+		return $this->hideBusyOnlyDetails($arr);
 	}
 
 	private function addToKnownCalendars() {
@@ -1071,9 +1296,9 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
-	 * @param int|null $userId null when nobody is logged in. For example when a participant replies on the public invite page.
+	 * Schedule the alerts of every subscriber of the calendar again when the event or its alerts changed.
 	 */
-	private function updateAlerts(?int $userId) : void {
+	private function updateAlerts() : void {
 		if(!CoreAlert::$enabled) {
 			return;
 		}
@@ -1085,20 +1310,7 @@ class CalendarEvent extends AclItemEntity {
 			// loop all calendar subscribers
 			$subscribers = go()->getDbConnection()->query('select userId from calendar_calendar_user where id = '.$this->calendarId.' AND isSubscribed = 1')->fetchAll(\PDO::FETCH_COLUMN);
 			foreach($subscribers as $subscriber) {
-				CoreAlert::deleteByEntity($this, '1', $subscriber); // this will reschedule if recurring and existing
-
-				// string = int comparison
-				if($subscriber != $userId) { // find only default calendar alerts (if any)
-					$calendar = Calendar::findFor($subscriber, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime'])
-						->where('id', '=', $this->calendarId)->single();
-					$alerts =  ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
-				} else {
-					$alerts = $this->alerts();
-				}
-
-				foreach ($alerts as $alert) {
-					$alert->schedule($this, $subscriber);
-				}
+				$this->rescheduleAlertsFor((int) $subscriber);
 			}
 
 		}
@@ -1106,15 +1318,123 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
+	 * Replace the scheduled alerts of a user for this event with the alerts that apply to the user now.
+	 *
+	 * @param int $userId
+	 * @throws Exception
+	 */
+	public function rescheduleAlertsFor(int $userId): void {
+		CoreAlert::delete(
+			(new Query())
+				->where(['entityTypeId' => self::entityType()->getId(), 'entityId' => $this->id, 'userId' => $userId])
+				->setData(['preventDismiss' => true]) // dismissing would schedule the next occurrence
+		);
+		$alerts = $this->alertsFor($userId);
+		// An alert shows the title, so not to subscribers that may only read the free / busy information
+		if(empty($alerts) || !$this->mayReadDetails($userId)) {
+			return;
+		}
+		foreach ($alerts as $alert) {
+			$alert->schedule($this, $userId);
+		}
+	}
+
+	/**
+	 * Check if a user may read the details of this event, and not only its free / busy information
+	 *
+	 * @param int $userId
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function mayReadDetails(int $userId): bool {
+		if(isset($this->ownerId) && $this->ownerId == $userId) {
+			return true;
+		}
+		$calendar = Calendar::findById($this->calendarId);
+		return $calendar && Acl::getUserPermissionLevel($calendar->findAclId(), $userId) >= Acl::LEVEL_READ;
+	}
+
+	/**
+	 * The alerts of the event for the user it was loaded for.
+	 *
+	 * @see alertsFor()
 	 * @return Alert[]
 	 */
-	public function alerts() {
-		if($this->useDefaultAlerts) {
-			$calendar = Calendar::findById($this->calendarId, ['id', 'ownerId', $this->showWithoutTime?'defaultAlertsWithoutTime':'defaultAlertsWithTime']);
-			return ($this->showWithoutTime ? $calendar->defaultAlertsWithoutTime : $calendar->defaultAlertsWithTime) ?? [];
-		} else {
-			return $this->alerts ?? [];
+	public function alerts(): array {
+		return $this->alertsFor($this->forUserId());
+	}
+
+	/**
+	 * The alerts of the event for a user:
+	 *
+	 * 1. The alerts the user set on the event.
+	 * 2. Or the alerts the creator set on the event, when {@see Calendar::getUseCreatorAlerts()} is on for the user. In a
+	 *    calendar with an owner these are the alerts of the owner, because {@see checkScheduleFor()} gives the alerts
+	 *    that someone sets when creating an event to the owner.
+	 * 3. Or the default alerts of the user's calendar.
+	 *
+	 * @param int|null $userId null when nobody is logged in
+	 * @return Alert[]
+	 */
+	public function alertsFor(?int $userId): array {
+		[$useDefaultAlerts, $alerts] = $this->ownAlertsOf($userId);
+		if(!$useDefaultAlerts) {
+			return $alerts;
 		}
+		$inherited = $this->inheritedAlertsFor($userId);
+		return $inherited['creator'] ?? $inherited['default'];
+	}
+
+	/**
+	 * The alerts a user gets when the user didn't set alerts on the event: "default" has the default alerts of the
+	 * user's calendar and "creator" the alerts of the creator, when {@see Calendar::getUseCreatorAlerts()} is on for the
+	 * user and the creator set alerts.
+	 *
+	 * @param int|null $userId null when nobody is logged in
+	 * @return array{default: Alert[], creator?: Alert[]}
+	 */
+	public function inheritedAlertsFor(?int $userId): array {
+		$defaultsProp = $this->showWithoutTime ? 'defaultAlertsWithoutTime' : 'defaultAlertsWithTime';
+		$props = ['id', 'ownerId', 'groupId', 'useCreatorAlerts', $defaultsProp];
+		$query = isset($userId) ? Calendar::findFor($userId, $props) : Calendar::find($props);
+		$calendar = $query->where('id', '=', $this->calendarId)->single();
+		if(!$calendar) {
+			return ['default' => []];
+		}
+
+		$inherited = ['default' => $calendar->$defaultsProp ?? []];
+		if(isset($userId) && $calendar->getUseCreatorAlerts()) {
+			$creatorId = $calendar->getOwnerId() ?? $this->createdBy;
+			if(!empty($creatorId) && $creatorId != $userId) {
+				[$creatorUsesDefaultAlerts, $creatorAlerts] = $this->ownAlertsOf((int) $creatorId);
+				if(!$creatorUsesDefaultAlerts && !empty($creatorAlerts)) {
+					$inherited['creator'] = $creatorAlerts;
+				}
+			}
+		}
+		return $inherited;
+	}
+
+	/**
+	 * Whether a user uses the default alerts on this event and the alerts the user set on it. A user without per-user
+	 * data for the event uses the default alerts.
+	 *
+	 * @param int|null $userId
+	 * @return array{0: bool, 1: Alert[]}
+	 */
+	private function ownAlertsOf(?int $userId): array {
+		if($userId === null || $userId === $this->forUserId()) {
+			return [$this->useDefaultAlerts !== false, $this->alerts ?? []];
+		}
+		if(empty($this->id)) {
+			// not saved yet, so other users have no data for it
+			return [true, []];
+		}
+		$event = self::findFor($userId, ['id', 'useDefaultAlerts', 'alerts'])->where('cce.id', '=', $this->id)->single();
+		if(!$event) {
+			return [true, []];
+		}
+		return [$event->useDefaultAlerts !== false, $event->alerts ?? []];
 	}
 
 	/**
@@ -1167,6 +1487,10 @@ class CalendarEvent extends AclItemEntity {
 		if(!$this->isOrigin || !$this->hasPermissionLevel(Acl::LEVEL_WRITE)) {
 			return false;
 		}
+		// Others get a private event without its details, so the data they send back would remove them
+		if($this->showAsPrivate()) {
+			return false;
+		}
 		$participant = $this->calendarParticipant();
 		return !$participant || $participant->isOwner() || $this->ownerId === null;
 	}
@@ -1178,6 +1502,17 @@ class CalendarEvent extends AclItemEntity {
 	public function resetICalBlobsOfAllUsers(): void
 	{
 		go()->getDbConnection()->update('calendar_event_user', ['veventBlobId' => null], ['eventId' => $this->eventId])->execute();
+	}
+
+	/**
+	 * Remove the stored iCalendar data of a user for this event, so it's generated again on the next request. Use this
+	 * when data of the user changed that is not saved with the event, like the alerts the user inherits.
+	 *
+	 * @param int $userId
+	 */
+	public function resetICalBlobOf(int $userId): void
+	{
+		go()->getDbConnection()->update('calendar_event_user', ['veventBlobId' => null], ['eventId' => $this->eventId, 'userId' => $userId])->execute();
 	}
 
 	/**

@@ -51,4 +51,31 @@ class ModuleTest extends TestCase
 	{
 		$this->assertNull(Module::findClassForRequest($package, $name));
 	}
+
+	/**
+	 * Uninstalling switches off JMAP change tracking and history while it runs. They must be switched on again after
+	 * a successful uninstall, or later changes in the same process aren't synced to clients.
+	 */
+	public function testUninstallRestoresChangeTracking(): void
+	{
+		if (ModuleModel::isInstalled('community', 'apikeys')) {
+			$this->markTestSkipped('The apikeys module is installed');
+		}
+		$authState = go()->getAuthState();
+		go()->setAuthState(new \go\core\auth\TemporaryState(model\User::ID_SUPER_ADMIN));
+		try {
+			$this->assertNotFalse(\go\modules\community\apikeys\Module::get()->install());
+			$this->assertTrue(\go\modules\community\apikeys\Module::get()->uninstall());
+
+			$this->assertTrue(jmap\Entity::$trackChanges);
+			$this->assertTrue(\go\modules\community\history\Module::$enabled);
+		} finally {
+			jmap\Entity::$trackChanges = true;
+			\go\modules\community\history\Module::$enabled = true;
+			if (ModuleModel::isInstalled('community', 'apikeys')) {
+				\go\modules\community\apikeys\Module::get()->uninstall();
+			}
+			go()->setAuthState($authState);
+		}
+	}
 }

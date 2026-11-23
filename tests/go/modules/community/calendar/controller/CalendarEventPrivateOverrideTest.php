@@ -9,7 +9,9 @@ use go\core\util\DateTime;
 use go\core\util\JSON;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\CalendarEvent as EventModel;
+use go\modules\community\calendar\model\CalDAVBackend;
 use go\modules\community\calendar\model\ICalendarHelper;
+use Sabre\DAV;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -35,11 +37,11 @@ class CalendarEventPrivateOverrideTest extends TestCase
 			self::$viewer->setValues(['username' => $name, 'displayName' => $name, 'email' => $name . '@example.com', 'password' => 'Pa55word!!xyz']);
 			self::assertTrue(self::$viewer->save(), self::$viewer->getValidationErrorsAsString());
 
-			// The admin owns the calendar, the viewer may change its events
+			// The admin owns the calendar, the viewer may change and delete its events
 			self::$calendar = new Calendar();
 			self::$calendar->name = uniqid('privoverride');
 			self::$calendar->setOwnerId(User::ID_SUPER_ADMIN);
-			self::$calendar->setAcl([self::$viewer->getPersonalGroup()->id => Acl::LEVEL_WRITE]);
+			self::$calendar->setAcl([self::$viewer->getPersonalGroup()->id => Acl::LEVEL_DELETE]);
 			self::assertTrue(self::$calendar->save(), self::$calendar->getValidationErrorsAsString());
 		} catch (\Throwable $e) {
 			self::tearDownAfterClass();
@@ -173,5 +175,127 @@ class CalendarEventPrivateOverrideTest extends TestCase
 		$this->assertEquals('Override secret', $override['description']);
 		$this->assertEquals('Override room', $override['location']);
 		return $override;
+	}
+
+	/**
+	 * Add participants to the event and to the override, as the admin
+	 */
+	private function addParticipants(): void
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		$admin = User::findById(User::ID_SUPER_ADMIN, ['email']);
+		$event = EventModel::findById($this->event->id);
+		$event->setValues(['participants' => [
+			User::ID_SUPER_ADMIN => ['email' => $admin->email, 'name' => 'Admin', 'roles' => ['owner' => true, 'attendee' => true], 'kind' => 'individual', 'participationStatus' => 'accepted'],
+			'guest@example.com' => ['email' => 'guest@example.com', 'name' => 'Guest', 'roles' => ['attendee' => true], 'kind' => 'individual'],
+		]]);
+		$this->assertTrue($event->save(), $event->getValidationErrorsAsString());
+		$event = EventModel::findById($this->event->id);
+		$event->setValues(['recurrenceOverrides' => [self::OVERRIDE => [
+			'start' => '2030-03-05T16:00:00', 'title' => 'Override title',
+			'participants/guest@example.com' => ['email' => 'guest@example.com', 'name' => 'Guest', 'roles' => ['attendee' => true], 'kind' => 'individual', 'participationStatus' => 'declined']
+		]]]);
+		$this->assertTrue($event->save(), $event->getValidationErrorsAsString());
+		$this->event = $event;
+	}
+
+	private function controller(int $userId): CalendarEvent
+	{
+		go()->setAuthState(new TemporaryState($userId));
+		return (new \ReflectionClass(CalendarEvent::class))->newInstanceWithoutConstructor();
+	}
+
+	public function testParticipantsAreHiddenFromOthers(): void
+	{
+		$this->addParticipants();
+		$this->assertArrayHasKey('participants', $this->get(User::ID_SUPER_ADMIN));
+
+		$event = $this->get(self::$viewer->id);
+		$this->assertArrayNotHasKey('participants', $event);
+		$this->assertArrayNotHasKey('replyTo', $event);
+		$this->assertStringNotContainsString('guest@example.com', json_encode($event));
+
+		$occurrence = $this->controller(self::$viewer->id)->get(['ids' => [$this->event->id . '/' . self::OVERRIDE]])['list'][0];
+		$this->assertStringNotContainsString('guest@example.com', json_encode($occurrence));
+	}
+
+	public function testParticipantsAreHiddenInICalendarExportButNotInInvitations(): void
+	{
+		$this->addParticipants();
+
+		go()->setAuthState(new TemporaryState(self::$viewer->id));
+		$ics = ICalendarHelper::toVObject(EventModel::findById($this->event->id))->serialize();
+		$this->assertStringNotContainsString('ATTENDEE', $ics);
+		$this->assertStringNotContainsString('ORGANIZER', $ics);
+
+		// Invitations go to the participants, also when sent by someone who may not see them
+		$event = EventModel::findById($this->event->id);
+		$this->assertStringContainsString('ATTENDEE;CN=Guest', ICalendarHelper::toInvite('CANCEL', $event)->serialize());
+	}
+
+	/**
+	 * Others don't see the details, so they can't change the event, only their own properties
+	 */
+	public function testPrivateEventOfOthersIsReadOnly(): void
+	{
+		$id = $this->event->id;
+		$result = $this->controller(self::$viewer->id)->set(['update' => [$id => ['start' => '2030-03-04T15:00:00']]]);
+		$this->assertArrayHasKey($id, (array) $result['notUpdated']);
+
+		// Making it public in the same update doesn't help
+		$result = $this->controller(self::$viewer->id)->set(['update' => [$id => ['privacy' => 'public', 'start' => '2030-03-04T15:00:00']]]);
+		$this->assertArrayHasKey($id, (array) $result['notUpdated']);
+
+		$result = $this->controller(self::$viewer->id)->set(['update' => [$id => ['color' => '00FF00']]]);
+		$this->assertArrayHasKey($id, (array) $result['updated']);
+
+		$result = $this->controller(self::$viewer->id)->set(['destroy' => [$id]]);
+		$this->assertArrayHasKey($id, (array) $result['notDestroyed']);
+
+		$this->assertEquals('2030-03-04T14:00:00', $this->get(User::ID_SUPER_ADMIN)['start']);
+	}
+
+	public function testOwnerCanChangePrivateEvent(): void
+	{
+		$id = $this->event->id;
+		$result = $this->controller(User::ID_SUPER_ADMIN)->set(['update' => [$id => ['start' => '2030-03-04T15:00:00']]]);
+
+		$this->assertArrayHasKey($id, (array) $result['updated']);
+	}
+
+	/**
+	 * A CalDAV client of someone else gets the event without the participants and title. When it sends the event back,
+	 * only the user's own data may change.
+	 */
+	public function testPrivateEventOfOthersIsReadOnlyInCalDAV(): void
+	{
+		go()->setAuthState(new TemporaryState(self::$viewer->id));
+		$event = EventModel::findById($this->event->id);
+		$this->assertFalse($event->mayChangeEventData());
+
+		$uri = go()->getDbConnection()->selectSingleValue('uri')->from('calendar_calendar_event')
+			->where(['id' => $this->event->id])->single();
+		try {
+			(new CalDAVBackend())->deleteCalendarObject('c-' . self::$calendar->id, $uri);
+			$this->fail('The private event of someone else was deleted');
+		} catch (DAV\Exception\Forbidden $e) {
+			$this->assertNotNull(EventModel::findById($this->event->id));
+		}
+	}
+
+	/**
+	 * The invitation goes to the participants, who may see the details, also when someone else sends it
+	 */
+	public function testInvitationHasDetailsWhenSentByOthers(): void
+	{
+		$this->addParticipants();
+
+		go()->setAuthState(new TemporaryState(self::$viewer->id));
+		$event = EventModel::findById($this->event->id);
+		$ics = ICalendarHelper::toInvite('CANCEL', $event)->serialize();
+
+		$this->assertStringContainsString('SUMMARY:Private plan', $ics);
+		$this->assertStringContainsString('DESCRIPTION:Series secret', $ics);
+		$this->assertStringNotContainsString('(Private)', $ics);
 	}
 }

@@ -99,13 +99,15 @@ export class ListView extends CalendarView {
 
 		const time = E('span', e.data.showWithoutTime ? t('Full day') :
 			Format.time(e.start, true) + ' - ' + Format.time(e.end, true)),
-			title = E('span', e.title);
+			title = E('span', e.title || (e.isBusyOnly ? '(' + t('Busy') + ')' : ''));
 		e.divs[0] = super.eventHtml(e,E('div',
 			...this.calendarStripes(e, true),
 			time,
 			title
 		).css({color: '#'+e.color})).on('click', () => {
-			this.detail.loadEvent(e);
+			if(!e.isBusyOnly) {
+				this.detail.loadEvent(e);
+			}
 		});
 		container.append(e.divs[0]);
 

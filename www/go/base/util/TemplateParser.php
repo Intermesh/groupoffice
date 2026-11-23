@@ -189,6 +189,7 @@ class TemplateParser
 	
 	
 	private function _fixTags($content) {
+		$content = $this->_fixConditionTags($content);
 		return preg_replace_callback('/{[^}]*}/U', function($matches) {
 											//Sometimes people change styles within a {autodata} tag.
 											//Then there are XML tags inside the GO template tag.
@@ -206,6 +207,42 @@ class TemplateParser
 
 											return $replacement;
 										}, $content);
+	}
+
+	/**
+	 * Word splits text into runs, also inside a tag like <gotpl if="contact:name"> or </gotpl>. Then there are XML
+	 * tags inside the template tag and the condition can't be read, so the content is always removed. The XML tags
+	 * are placed in front of the template tag, like _fixTags() does for {autodata} tags.
+	 */
+	private function _fixConditionTags(string $content): string
+	{
+		// XML tags that may be anywhere in the template tag, also inside its name
+		$xml = '(?:<[^>]*>)*';
+		$open = preg_quote($this->openTagSymbol, '/');
+		$close = preg_quote($this->closeTagSymbol, '/');
+
+		foreach ($this->_tags as $tag) {
+			$name = implode($xml, array_map(fn($char) => preg_quote($char, '/'), str_split($tag)));
+			$patterns = [
+				'/' . $open . $xml . $name . '(?=[\s<]).*?' . $close . '/s',
+				'/' . $open . $xml . '\/' . $xml . $name . $xml . $close . '/',
+			];
+			foreach ($patterns as $pattern) {
+				$result = preg_replace_callback($pattern, function($matches) {
+					if (!str_contains($matches[0], '<')) {
+						return $matches[0];
+					}
+					preg_match_all('/<[^>]*>/', $matches[0], $xmlTags);
+					$replacement = implode('', $xmlTags[0]) . strip_tags($matches[0]);
+					//Fix for word not showing the spaces
+					return str_replace('<w:t>', '<w:t xml:space="preserve">', $replacement);
+				}, $content);
+				if ($result !== null) {
+					$content = $result;
+				}
+			}
+		}
+		return $content;
 	}
 
 	private function _parseTags($content) {

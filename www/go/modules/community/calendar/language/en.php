@@ -6,6 +6,8 @@ return [
 	'Show event in category color' => 'Show event in category color',
 	'Only when one calendar is selected and the event has one category' => 'Only when one calendar is selected and the event has one category',
 	'Print week and workweek in a grid with hours' => 'Print week and workweek in a grid with hours',
+	'Use the notifications of the creator' => 'Use the notifications of the creator',
+	'Get the notifications that the creator set on an event instead of your default notifications' => 'Get the notifications that the creator set on an event instead of your default notifications',
 
 
 	'mayChangeCalendars'=> 'Create/Delete Calendars',
@@ -41,4 +43,6 @@ return [
 		'tentative' => 'You are tentative about the event',
 	],
 	'This event already exists. Open it in your calendar to respond to it.' => 'This event already exists. Open it in your calendar to respond to it.',
+	'Only events from the first day of last month onward are published' => 'Only events from the first day of last month onward are published',
+	'Public URL' => 'Public URL',
 ];

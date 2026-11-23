@@ -47,6 +47,26 @@ if(!go()->getConfig()['sseEnabled']) {
 	exit();
 }
 
+// The client may specify the entity 'types' to watch. The web client POSTs them as a JSON array:
+// in the query string they grew with every installed entity until the URL hit the web server's
+// request line limit (414). GET with ?types= is still accepted.
+//
+// CSRF is enforced by go\core\jmap\State for any non GET request that authenticates with the
+// access token cookie, so the POST needs no check of its own.
+if(Request::get()->getMethod() == "POST") {
+	// Decoded without $associative, so a JSON object stays an object and is refused
+	$types = json_decode((string) file_get_contents('php://input'));
+
+	if(!is_array($types) || count(array_filter($types, 'is_string')) !== count($types)) {
+		Response::get()
+			->setStatus(400, "Expected a JSON array of entity names")
+			->output();
+		exit();
+	}
+} else {
+	$types = !empty($_GET['types']) ? explode(',', $_GET['types']) : [];
+}
+
 //for servers with session.autostart
 @session_write_close();
 
@@ -66,8 +86,7 @@ Response::get()
 
 
 try {
-// Client may specify 'types' and a 'ping' interval
-	(new PushDispatcher(!empty($_GET['types']) ? explode(',', $_GET['types']) : []))
+	(new PushDispatcher($types))
 		->start();
 } catch(Throwable $e) {
 	echo "event: exception\n";

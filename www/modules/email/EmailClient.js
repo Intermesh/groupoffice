@@ -39,6 +39,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			groupField: 'internal_udate'
 		});
 
+		// Without a selected account the server can't list messages
+		this.messagesStore.on('beforeload', function(store){
+			return !!store.baseParams.account_id;
+		}, this);
+
 		this.messagesStore.on('load', function(){
 
 			this.isManager = this.messagesGrid.store.reader.jsonData.permission_level == GO.permissionLevels.manage;
@@ -240,14 +245,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				accountNode = this.treePanel.getNodeById(accountNodeId);
 			}
 			if(!accountNode) {
-				// fallback on first
-				for(var i=0;i<rootNode.childNodes.length;i++){
-					let child = rootNode.childNodes[i];
-					if(child.expanded) {
-						accountNode = child;
-						break;
-					}
-				}
+				// fallback on first expanded account, or the first account when all are collapsed
+				accountNode = rootNode.childNodes.find(child => child.expanded) || rootNode.childNodes[0];
 			}
 
 			if(!accountNode) {
@@ -282,6 +281,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				}
 
 			}, this, {single: true});
+
+			// A collapsed account doesn't load its folders, so expand it to select the inbox
+			if(!accountNode.expanded) {
+				accountNode.expand();
+			}
 
 		}, this);
 

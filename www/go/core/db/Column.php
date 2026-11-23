@@ -339,15 +339,32 @@ class Column {
 		}
 	}
 	
+	/**
+	 * Convert a value to the format the database stores
+	 *
+	 * A date time object for a "datetime" column is converted to UTC, whatever its time zone, so that it is read back
+	 * as the same moment. A "localdatetime" column keeps the time as given.
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public function castToDb($value) {
 		if (!isset($value)) {
 			return null;
 		}
-		
+
 		switch ($this->dbType) {
 			case 'localdatetime':
-			case 'datetime':
 				return is_scalar($value ) ? $value : $value->format(self::DATETIME_FORMAT);
+
+			case 'datetime':
+				if(is_scalar($value)) {
+					return $value;
+				}
+				// a copy, so the time zone of the caller's object doesn't change
+				return DateTimeImmutable::createFromInterface($value)
+					->setTimezone(new DateTimeZone("UTC"))
+					->format(self::DATETIME_FORMAT);
 
 			case 'date':
 				return is_scalar($value ) ? $value : $value->format(self::DATE_FORMAT);

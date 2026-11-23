@@ -1,16 +1,16 @@
 import {
-	btn,
 	checkbox,
 	colorfield,
 	combobox,
 	comp,
 	hiddenfield,
-	textarea, TextField,
+	textarea,
 	textfield,
 } from "@intermesh/goui";
 import {client, FormWindow, modules, principalDS} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {t} from "./Index.js";
+import {publishFields} from "./PublishField.js";
 
 export class CalendarWindow extends FormWindow {
 
@@ -28,6 +28,10 @@ export class CalendarWindow extends FormWindow {
 		const alertField = alertfield({name: 'defaultAlertsWithTime',isForDefault:true, label:t('Events with time')}),
 			fdAlertField = alertfield({name: 'defaultAlertsWithoutTime',isForDefault:true, fullDay:true, label:t('Events without time (Full-day)')});
 
+		// The owner of a calendar gets the notifications that others set when creating an event already
+		const useCreatorAlertsCb = checkbox({name: 'useCreatorAlerts', label: t('Use the notifications of the creator'),
+			hint: t('Get the notifications that the creator set on an event instead of your default notifications')});
+
 		const ownerIdField = combobox({
 				dataSource: principalDS, placeholder: t('Shared'),displayProperty: 'name', filter: {entity: 'User'},
 				label: t("Owner"), name: "ownerId", filterName: "text", flex:'1 0', clearable:true
@@ -43,11 +47,8 @@ export class CalendarWindow extends FormWindow {
 			}),
 			descriptionFld = textarea({name:'description', label: t('Description'), autoHeight:true}),
 				nameFld = textfield({name: 'name', label: t('Name'), flex:1}),
-			publishField = checkbox({type:'switch', name: 'publish',label: t('Publish calendar as ICS file')}).on('change', (e) => {
+			{publishField, items: publishItems} = publishFields(this.form, () => {
 				this.closeOnSave = false;
-				this.form.submit().then(_ => {
-					this.form.load(this.form.currentId!);
-				});
 			});
 
 		this.generalTab.items.add(
@@ -63,21 +64,11 @@ export class CalendarWindow extends FormWindow {
 				availabilityAffectCb,
 				includeInAvailability,
 				checkbox({name: 'syncToDevice', label: t('Sync to device'), hint: t('Make calendar available in CalDAV and ActiveSync')}),
+				...publishItems,
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
 				alertField,
 				fdAlertField,
-				publishField,
-				textfield({hidden:true, readOnly:true,buttons:[
-					btn({icon:'copy_all', title:t('Copy')})
-						.on('click',e=>{ navigator.clipboard.writeText((e.target.parent!.parent! as TextField).value);})
-				]}),
-				hiddenfield({name: 'publishKey'}).on('setvalue', (e) => {
-					const f = e.target.previousSibling()! as TextField;
-					f.hidden = !e.newValue;
-					publishField.value = !! e.newValue;
-					f.value = client.pageUrl('community/calendar/ics/'+e.newValue);
-				})
-				//unsubscribeBtn
+				useCreatorAlertsCb
 			),
 		);
 
@@ -106,6 +97,7 @@ export class CalendarWindow extends FormWindow {
 			if(unsubscribed)
 				this.sharePanel!.show();
 			ownerIdField.hidden = !editable;
+			useCreatorAlertsCb.hidden = !!data.ownerId && data.ownerId == client.user.id;
 			descriptionFld.hidden = !editable;
 			publishField.hidden = !editable || !data.id; // no publish button for new calendars
 			nameFld.readOnly = !editable || !!data.davaccountId;

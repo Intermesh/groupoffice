@@ -193,4 +193,6 @@ return array (
     'tentative' => '{name} è incerto per l\'evento "{title}" {date}',
   ),
   'Print week and workweek in a grid with hours' => 'Stampa la settimana e la settimana lavorativa in una griglia con le ore',
+  'Only events from the first day of last month onward are published' => 'Vengono pubblicati solo gli eventi a partire dal primo giorno del mese scorso',
+  'Public URL' => 'URL pubblico',
 );

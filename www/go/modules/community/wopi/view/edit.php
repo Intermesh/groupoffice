@@ -49,7 +49,8 @@
 <form id="office_form" name="office_form" target="office_frame"
       action="<?= $action; ?>" enctype="multipart/form-data" method="post">
     <input name="access_token" value="<?= $token->getToken(); ?>" type="hidden"/>
-<!--    <input name="access_token_ttl" value="--><?php //= $token->getExpiresAt()->format('U') * 1000; ?><!--" type="hidden"/>-->
+    <!-- WOPI wants the time the token expires in milliseconds since the epoch, not a duration. 0 would mean it never expires. -->
+    <input name="access_token_ttl" value="<?= $token->getExpiresAt()->getTimestamp() * 1000; ?>" type="hidden"/>
 <!--    <input name="ui_defaults" value="UIMode=compact" type="hidden" />-->
 <!--    <input name="css_variables" value="--co-primary-element=#1652a1;" type="hidden"/>-->
 </form>

@@ -101,6 +101,23 @@ class TokenTest extends TestCase
 		$this->assertNull(go()->getDbConnection()->selectSingleValue('id')->from('wopi_token')->where('id', '=', $token->id())->single());
 	}
 
+	/**
+	 * The edit view sends the expiry to the WOPI client as access_token_ttl, also for a token reused from the database
+	 */
+	public function testTokenExpiryIsSentAsTtl(): void
+	{
+		$created = $this->token($this->file1);
+		$reused = $this->token($this->file1);
+
+		$this->assertEquals($created->getToken(), $reused->getToken());
+
+		$minExpiry = (new \DateTime())->add(new \DateInterval(Token::REUSE_MIN_REMAINING))->getTimestamp();
+		foreach ([$created, $reused] as $token) {
+			$this->assertGreaterThan($minExpiry, $token->getExpiresAt()->getTimestamp());
+		}
+		$this->assertEquals($created->getExpiresAt()->getTimestamp(), $reused->getExpiresAt()->getTimestamp());
+	}
+
 	public function testDisabledUserIsRejected(): void
 	{
 		$token = $this->token($this->file1);

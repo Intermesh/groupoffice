@@ -207,10 +207,22 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 	/**
 	 * Check if a file is locked by another user.
 	 *
+	 * A lock without an expiry time was set by the user and stays until it is unlocked.
+	 *
 	 * @return boolean
 	 */
 	public function isLocked($forYouToo = false){
-		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && time() < $this->lock_expires_at;
+		return !empty($this->locked_user_id) && ($forYouToo || !\GO::user() || $this->locked_user_id!=\GO::user()->id) && (empty($this->lock_expires_at) || time() < $this->lock_expires_at);
+	}
+
+	/**
+	 * Check if the file has a lock that a user set with "Lock" in the menu. It has no expiry time, unlike the locks of
+	 * WOPI, DAV and OnlyOffice, and stays until it is unlocked.
+	 *
+	 * @return bool
+	 */
+	public function hasUserLock(): bool {
+		return !empty($this->locked_user_id) && empty($this->lock_expires_at);
 	}
 
 	public function unlockAllowed(){
@@ -373,6 +385,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 			if(!$this->locked_user_id) {
 				$this->lock_id = "";
+				$this->lock_expires_at = null;
 			}
 		}
 
@@ -418,7 +431,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 
 		if(!$this->ignoreLockChange && $this->isModified('locked_user_id')){
 			$old_locked_user_id = $this->getOldAttributeValue('locked_user_id');
-			if(!empty($old_locked_user_id) && $old_locked_user_id != \GO::user()->id && !\GO::user()->isAdmin())
+			// An expired lock doesn't protect the file anymore, so another user may lock it
+			$oldExpiresAt = $this->isModified('lock_expires_at') ? $this->getOldAttributeValue('lock_expires_at') : $this->lock_expires_at;
+			$oldLockActive = empty($oldExpiresAt) || $oldExpiresAt > time();
+			if(!empty($old_locked_user_id) && $oldLockActive && $old_locked_user_id != \GO::user()->id && !\GO::user()->isAdmin())
 				throw new \GO\Files\Exception\FileLocked();
 		}
 		

@@ -177,4 +177,52 @@ class DocumentPermissionTest extends TestCase
 		$response = $this->create($this->sharedContact->id, [Contact::class . ':' . $this->sharedContact->id]);
 		$this->assertTrue($response['success']);
 	}
+
+	private function getLinks(int $modelId): array
+	{
+		$this->actAs($this->user->id);
+		return (new \ReflectionMethod(DocumentController::class, 'actionGetLinks'))->invoke(new DocumentController(), [
+			'template_id' => $this->template->id,
+			'model_name' => 'Contact',
+			'model_id' => $modelId
+		]);
+	}
+
+	private function setTemplateFilename(string $filename): void
+	{
+		$this->template->filename = $filename;
+		$this->assertTrue($this->template->save(true));
+	}
+
+	/**
+	 * The file name of the template is filled in on the server with the tags of the document (#38372)
+	 */
+	public function testFilename(): void
+	{
+		$this->sharedContact->lastName = 'Müller & <Co>';
+		$this->assertTrue($this->sharedContact->save());
+		$this->setTemplateFilename('Vertrag_{contact:first_name}_{contact:last_name}_{date}');
+
+		$filename = $this->getLinks($this->sharedContact->id)['filename'];
+		$this->assertStringStartsWith('Vertrag_Shared_Müller & ', $filename);
+		$this->assertStringNotContainsString('{', $filename);
+		$this->assertStringNotContainsString('&amp;', $filename);
+		$this->assertMatchesRegularExpression('#_\d{1,4}\D\d{1,2}\D\d{1,4}$#', $filename, 'The date is missing');
+	}
+
+	public function testNoFilename(): void
+	{
+		$this->assertSame('', $this->getLinks($this->sharedContact->id)['filename']);
+	}
+
+	public function testFilenameOfUnreadableItem(): void
+	{
+		$this->setTemplateFilename('{contact:first_name}');
+		$this->actAs($this->user->id);
+
+		// actionGetLinks() also refuses the item when it reads the search cache. This tests the check of the file name
+		// itself, so it doesn't depend on that.
+		$this->expectException(AccessDenied::class);
+		(new \ReflectionMethod(DocumentController::class, '_parseFilename'))->invoke(new DocumentController(), $this->template, 'Contact', $this->privateContact->id);
+	}
 }

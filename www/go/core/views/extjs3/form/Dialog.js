@@ -129,7 +129,14 @@ go.form.Dialog = Ext.extend(go.Window, {
 					text: t("Save"),
 					handler: function() {
 						this.submit().catch(function(error) {
-							GO.errorDialog.show(error );
+							debugger;
+							if(Ext.isString(error)) {
+								GO.errorDialog.show(error);
+							} else if( !!error.notCreated || !! error.notUpdated) {
+								GO.errorDialog.show(t("An error occurred. More details can be found in the console."));
+							} else {
+								GO.errorDialog.show(t("An unexpected error occurred. Please contact your administrator."));
+							}
 						});
 					},
 					scope: this

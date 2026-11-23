@@ -113,7 +113,12 @@ class Occurrences
 			$arr['description'] = '';
 			$arr['location'] = '';
 			$arr['categoryIds'] = [];
+			if (!$event->managesResource()) {
+				unset($arr['participants'], $arr['replyTo']);
+			}
 		}
+		// The override may also have added participants or other details
+		$arr = $event->hideBusyOnlyDetails($arr);
 
 		if (!isset($override) || !isset($override->start)) {
 			$arr['start'] = $recurrenceId;

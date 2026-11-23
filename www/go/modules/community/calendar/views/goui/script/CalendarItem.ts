@@ -58,6 +58,7 @@ export interface CalendarEvent extends BaseEntity {
 	modifier: any
 	creator: any
 	createdAt: string
+	createdBy?: string
 	modifiedAt: string
 	location?:string
 	description?:string
@@ -536,12 +537,39 @@ export class CalendarItem {
 		return !hasOwner || this.calendarPrincipal?.roles?.owner || false;
 	}
 
+	/**
+	 * The user may only read the free / busy information of the calendar. The server sends the time only.
+	 */
+	get isBusyOnly() {
+		return this.cal.myRights?.mayReadItems === false;
+	}
+
+	/**
+	 * The server left out the details: a busy only event, or a private event of someone else
+	 */
+	get detailsHidden() {
+		return this.isBusyOnly || this.showsAsPrivate;
+	}
+
+	/**
+	 * A private event of someone else. The server leaves out its details. Like CalendarEvent::showAsPrivate() on the
+	 * server: the owner of the calendar, or the creator when the calendar has no owner, sees everything.
+	 */
+	get showsAsPrivate() {
+		if(!this.data.id || !this.data.privacy || this.data.privacy === 'public') {
+			return false;
+		}
+		const ownerId = this.cal.ownerId;
+		return ownerId ? ownerId != client.user.id : this.data.createdBy != client.user.id;
+	}
+
 	get mayChange() {
-		return (this.isNew() || (this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
+		// A private event of someone else is read only, as its details aren't shown
+		return (this.isNew() || (this.cal.myRights.mayWriteOwn && this.isOwner && !this.showsAsPrivate)) && !this.readOnly;
 	}
 
 	get mayMove() { // or remove
-		return this.cal.myRights.mayWriteAll && !this.readOnly; // change calendar or delete single instance/full series
+		return this.cal.myRights.mayWriteAll && !this.readOnly && !this.showsAsPrivate; // change calendar or delete single instance/full series
 	}
 
 	private _calendarPrincipal:Participant|undefined;

@@ -1,6 +1,13 @@
+includes:
+    # Errors that existed before PHPStan ran in CI. See phpstan-baselines.php.
+    - phpstan-baselines.php
+
 parameters:
 
     level: 3
+
+    # The minimum supported PHP version, so the result doesn't depend on the PHP version that runs PHPStan.
+    phpVersion: 80200
 
     parallel:
         processTimeout: 100.00
@@ -11,7 +18,63 @@ parameters:
         - ../www/api
         - ../www/go
 
+    # Classes that are used by the analysed code but are not autoloaded.
+    scanFiles:
+        - ../www/go/vendor/odtphp/library/odf.php
+
+    # Legacy modules of this repository, which www/go uses. Not www/modules as a whole: it can contain legacy modules of
+    # other repositories, whose classes are not available in CI.
+    scanDirectories:
+        - ../www/modules/bookmarks
+        - ../www/modules/caldav
+        - ../www/modules/calendar
+        - ../www/modules/carddav
+        - ../www/modules/customcss
+        - ../www/modules/dav
+        - ../www/modules/defaultsite
+        - ../www/modules/email
+        - ../www/modules/files
+        - ../www/modules/manualsite
+        - ../www/modules/modules
+        - ../www/modules/postfixadmin
+        - ../www/modules/reminders
+        - ../www/modules/sieve
+        - ../www/modules/site
+        - ../www/modules/smime
+        - ../www/modules/summary
+        - ../www/modules/sync
+        - ../www/modules/tasks
+
     excludePaths:
-        - */vendor/*
-        - ../www/go/modules/community/activesync
+        # Vendor code isn't analysed, but its classes can be found.
+        analyse:
+            - */vendor/*
+        analyseAndScan:
+            - ../www/go/modules/community/activesync (?)
+            # DokuWiki plugins extend classes of DokuWiki, which isn't part of GroupOffice.
+            - ../www/go/modules/community/dokuwiki/lib
+            # Extends PfPdfPlugin, which doesn't exist.
+            - ../www/go/base/util/PdfGantt.php
+
+    # Errors that depend on the environment, so they occur in CI but not in the development container or the other way
+    # around.
+    ignoreErrors:
+        # Business modules are in their own repository and are not available in CI.
+        -
+            message: '#go\\modules\\business\\#'
+            identifier: class.notFound
+            reportUnmatched: false
+        -
+            message: '#go\\modules\\business\\#'
+            identifier: throws.notThrowable
+            reportUnmatched: false
+        # The Date exceptions of PHP 8.3 don't exist in PHP 8.2, unless a module has symfony/polyfill-php83 (swissqr).
+        -
+            message: '#^PHPDoc tag @throws with type .*Date\w+Exception.* is not subtype of Throwable$#'
+            identifier: throws.notThrowable
+            reportUnmatched: false
+        # Only exists on servers that have a global config.
+        -
+            message: '#/etc/groupoffice/globalconfig\.inc\.php#'
+            reportUnmatched: false
 

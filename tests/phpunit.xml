@@ -18,6 +18,9 @@
       <directory>./go/api</directory>
     </testsuite>
   </testsuites>
+  <extensions>
+    <bootstrap class="go\ResetTimeZoneExtension"/>
+  </extensions>
   <!--	<filter>
 		<whitelist>
 			<directory>./</directory>

@@ -169,24 +169,48 @@ class Module extends core\Module
 	private function outputIcs(Calendar $calendar, $after = null) {
 		set_time_limit(0);
 
+		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
+		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
+
+		$ics = self::ics($calendar, $after);
+		// the header throws an exception for an invalid time zone, before the output buffers are closed
+		echo $ics->current();
+		while(ob_get_level() > 0) {
+			ob_end_flush();
+		}
+
+		for($ics->next(); $ics->valid(); $ics->next()) {
+			echo $ics->current();
+			flush();
+		}
+	}
+
+	/**
+	 * The iCalendar export of a calendar in parts: the header, each event and the end
+	 *
+	 * The events are read one by one, so a large calendar can be streamed.
+	 *
+	 * @param Calendar $calendar
+	 * @param string|null $after Only events after this date (Y-m-d)
+	 * @return \Generator<string>
+	 */
+	private static function ics(Calendar $calendar, ?string $after = null): \Generator
+	{
+		yield self::icsHeader($calendar);
+
 		$events = CalendarEvent::find()->filter(['inCalendars' => $calendar->id]);
 		if($after !== null) {
 			$events->filter(['after' => $after]);
 		}
-		header('Content-Type: text/calendar; charset=UTF-8; component=vcalendar');
-		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
-
-		echo self::icsHeader($calendar);
-		ob_end_flush();
-
 		foreach($events as $ev) {
 			$vcal = ICalendarHelper::toVObject($ev);
+			$part = '';
 			foreach($vcal->VEVENT as $vevent) {
-				echo $vevent->serialize();
+				$part .= $vevent->serialize();
 			}
-			flush();
+			yield $part;
 		}
-		echo "END:VCALENDAR\r\n";
+		yield "END:VCALENDAR\r\n";
 	}
 
 	/**
@@ -221,7 +245,7 @@ class Module extends core\Module
 	}
 
 	// https://uri/path/api/page.php/community/calendar/ics/key
-	public function pageIcs($key) {
+	public function pageIcs(string $key) {
 		// No auth needed but publishKey most be known to read
 		$calendar = Calendar::find()->where(['publishKey' => $key])->single();
 		if($calendar) {
@@ -233,7 +257,7 @@ class Module extends core\Module
 
 	public function downloadIcs($key) {
 		$ev = CalendarEvent::findById($key);
-		if (!$ev || !$ev->getPermissionLevel()) {
+		if (!$ev || !$ev->hasPermissionLevel(Acl::LEVEL_READ)) {
 			throw new Forbidden();
 		}
 
@@ -255,9 +279,13 @@ class Module extends core\Module
 			throw new Forbidden();
 		}
 
-		return Calendar::find()->selectSingleValue('calendar_calendar.id')
+		$calendars = Calendar::find()->selectSingleValue('calendar_calendar.id')
 			//->join('calendar_calendar_user', 'cu','cu.userId = '.go()->getUserId().' AND cu.calendarId = t.id')
-			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
+			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true);
+		// Users may subscribe to calendars with free / busy permission only. Those aren't printed, because the reports
+		// print the details of the events.
+		Calendar::applyAclToQuery($calendars, Acl::LEVEL_READ);
+		return $calendars->all();
 	}
 
 	public function pagePrint($type,$date) {
@@ -451,15 +479,6 @@ class Module extends core\Module
 
 		return parent::afterInstall($model);
 	}
-
-//	protected function rights(): array
-//	{
-//		return [
-//			'mayChangeCalendars', // allows AddressBook/set (hide ui elements that use this)
-//			'mayExportItems', // Allows users to export contacts
-//		];
-//	}
-
 
 	public function demo(Generator $faker)
 	{

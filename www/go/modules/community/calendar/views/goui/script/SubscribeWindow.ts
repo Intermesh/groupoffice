@@ -31,7 +31,9 @@ export class SubscribeWindow extends Window {
 				limit: 20,
 			},
 			filters: {
-				subscribed: {isSubscribed: false}
+				subscribed: {isSubscribed: false},
+				// Also calendars of which the user may only see the free / busy information
+				permission: {permissionLevel: 5}
 			},
 			sort:[{property:'name',isAscending:true}],
 			dataSource:jmapds('Calendar')
