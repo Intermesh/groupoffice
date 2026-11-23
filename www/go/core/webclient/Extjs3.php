@@ -9,7 +9,6 @@ use go\core\fs\File;
 use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\SingletonTrait;
-use http\Exception\InvalidArgumentException;
 
 class Extjs3 {
 
@@ -368,25 +367,7 @@ class Extjs3 {
 		}
 		echo '<script>';
 
-		//these parameter are passed by dialog.php. These are used to directly link to
-//a dialog.
-		if (isset($_REQUEST['f'])) {
-			if (substr($_REQUEST['f'], 0, 9) == '{GOCRYPT}')
-				$fp = Crypt::decrypt($_REQUEST['f']);
-			else
-				$fp = json_decode(base64_decode($_REQUEST['f']), true);
-
-			GO::debug("External function parameters:");
-			GO::debug($fp);
-
-			if(preg_match("/[^a-z_]/", $fp['m']) || preg_match("/[^a-z]/i", $fp['f'])) {
-				throw new InvalidArgumentException("Invalid function given");
-			}
-
-			// nosemgrep
-			echo 'if (GO.' . $fp['m'] .'){GO.mainLayout.on("render", function () {GO. '. $fp['m'] . '.' . $fp['f'] . '.call(this,  '. json_encode($fp['p']) .');});}';
-		}
-
+		// The ?f= external functions are run by the GOUI client, see main.runExternalFunction() in groupoffice-core
 
 		echo 'Ext.onReady(GO.mainLayout.boot, GO.mainLayout);</script>';
 	}
