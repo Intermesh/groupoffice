@@ -280,4 +280,5 @@ return array (
   'Print week and workweek in a grid with hours' => 'Woche und Arbeitswoche in einem Raster mit Stunden drucken',
   'Use the notifications of the creator' => 'Benachrichtigungen des Erstellers verwenden',
   'Get the notifications that the creator set on an event instead of your default notifications' => 'Sie erhalten die Benachrichtigungen, die der Ersteller für einen Termin eingestellt hat, statt Ihrer Standardbenachrichtigungen',
+  'Only events from the first day of last month onward are published' => 'Es werden nur Termine ab dem ersten Tag des letzten Monats veröffentlicht',
 );

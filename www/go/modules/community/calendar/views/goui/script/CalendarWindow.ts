@@ -1,16 +1,16 @@
 import {
-	btn,
 	checkbox,
 	colorfield,
 	combobox,
 	comp,
 	hiddenfield,
-	textarea, TextField,
+	textarea,
 	textfield,
 } from "@intermesh/goui";
 import {client, FormWindow, modules, principalDS} from "@intermesh/groupoffice-core";
 import {alertfield} from "./AlertField.js";
 import {t} from "./Index.js";
+import {publishFields} from "./PublishField.js";
 
 export class CalendarWindow extends FormWindow {
 
@@ -47,11 +47,8 @@ export class CalendarWindow extends FormWindow {
 			}),
 			descriptionFld = textarea({name:'description', label: t('Description'), autoHeight:true}),
 				nameFld = textfield({name: 'name', label: t('Name'), flex:1}),
-			publishField = checkbox({type:'switch', name: 'publish',label: t('Publish calendar as ICS file')}).on('change', (e) => {
+			{publishField, items: publishItems} = publishFields(this.form, () => {
 				this.closeOnSave = false;
-				this.form.submit().then(_ => {
-					this.form.load(this.form.currentId!);
-				});
 			});
 
 		this.generalTab.items.add(
@@ -71,17 +68,7 @@ export class CalendarWindow extends FormWindow {
 				alertField,
 				fdAlertField,
 				useCreatorAlertsCb,
-				publishField,
-				textfield({hidden:true, readOnly:true,buttons:[
-					btn({icon:'copy_all', title:t('Copy')})
-						.on('click',e=>{ navigator.clipboard.writeText((e.target.parent!.parent! as TextField).value);})
-				]}),
-				hiddenfield({name: 'publishKey'}).on('setvalue', (e) => {
-					const f = e.target.previousSibling()! as TextField;
-					f.hidden = !e.newValue;
-					publishField.value = !! e.newValue;
-					f.value = client.pageUrl('community/calendar/ics/'+e.newValue);
-				})
+				...publishItems
 				//unsubscribeBtn
 			),
 		);

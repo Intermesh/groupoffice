@@ -277,4 +277,5 @@ return array (
   'This event already exists. Open it in your calendar to respond to it.' => 'Deze afspraak bestaat al. Open hem in uw agenda om te reageren.',
   'Use the notifications of the creator' => 'Meldingen van de maker gebruiken',
   'Get the notifications that the creator set on an event instead of your default notifications' => 'U krijgt de meldingen die de maker bij een afspraak heeft ingesteld in plaats van uw standaard meldingen',
+  'Only events from the first day of last month onward are published' => 'Alleen afspraken vanaf de eerste dag van de vorige maand worden gepubliceerd',
 );
