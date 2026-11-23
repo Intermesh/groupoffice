@@ -99,12 +99,24 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	},
 
+	/**
+	 * Get the panel of a module
+	 *
+	 * @param {string} moduleName
+	 * @param {boolean} unhide Create the panel and its tab when it doesn't exist yet. When false, the panel is only
+	 *  returned when it was created already.
+	 * @returns {Ext.Component|go.Component|false} The ExtJS panel, the GOUI panel, or false when the module has no panel.
+	 */
 	getModulePanel: function (moduleName, unhide = true) {
-		const wrapper = groupofficeCore.main.getPanelById(moduleName);
+		const main = groupofficeCore.main;
+		if(!main.hasPanel(moduleName)) {
+			return false;
+		}
+		const wrapper = unhide ? main.getPanelById(moduleName) : main.findPanel(moduleName);
 		if(!wrapper) {
 			return false;
 		}
-		return wrapper.extJSComp;
+		return wrapper.extJSComp || wrapper;
 	},
 
 
@@ -174,14 +186,31 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	},
 
+	/**
+	 * Check if the panel of a module has been created, so it can be refreshed.
+	 *
+	 * When true, getModulePanel(panelId, false) returns the panel.
+	 *
+	 * @param {string} panelId
+	 * @returns {boolean}
+	 */
 	panelIsVisible : function(panelId) {
-		const activeItemComponent = window.groupofficeCore.main.container.activeItemComponent;
-		return activeItemComponent && activeItemComponent.itemId === panelId;
+		return !!window.groupofficeCore.main.findPanel(panelId);
 	},
 
+	/**
+	 * Open the panel of a module
+	 *
+	 * @param {string} moduleName
+	 * @returns {Ext.Component|go.Component|false} The ExtJS panel, the GOUI panel, or false when the module has no panel.
+	 */
 	openModule: function (moduleName) {
-		const pnl = groupofficeCore.main.openPanel(moduleName);
-		return pnl?.extJSComp;
+		const main = groupofficeCore.main;
+		if(!main.hasPanel(moduleName)) {
+			return false;
+		}
+		const pnl = main.openPanel(moduleName);
+		return pnl.extJSComp || pnl;
 	},
 
 

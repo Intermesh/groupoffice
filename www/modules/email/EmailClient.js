@@ -565,9 +565,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					}
 				});
 
-				if(GO.mainLayout.tabPanel) {
-					GO.mainLayout.tabPanel.setActiveTab(this.id);
-				}
+				GO.mainLayout.openModule("email");
 			} else {
 				alert(t("To use this function you must load your e-mail first by pressing the e-mail tab", "email"));
 			}
