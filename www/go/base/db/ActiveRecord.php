@@ -2271,7 +2271,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					if(preg_match('/[a-z]+/i', $value)){
 						return $value;
 					}else{
-						return trim(preg_replace('/[\s-_\(\)]+/','', $value));
+						return trim(preg_replace('/[\s_()-]+/','', $value));
 					}
 					break;
 				case 'boolean':

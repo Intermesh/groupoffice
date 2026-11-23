@@ -2065,12 +2065,6 @@ parameters:
 			path: ../www/go/base/db/ActiveRecord.php
 
 		-
-			message: '#^Regex pattern is invalid\: Compilation failed\: invalid range in character class at offset 3 in pattern\: /\[\\s\-_\\\(\\\)\]\+/$#'
-			identifier: regexp.pattern
-			count: 1
-			path: ../www/go/base/db/ActiveRecord.php
-
-		-
 			message: '#^Static property GO\\Base\\Db\\ActiveRecord\:\:\$attributeOutputMode \(GO\\Base\\Db\\StringHelper\) does not accept default value of type string\.$#'
 			identifier: property.defaultValue
 			count: 1
