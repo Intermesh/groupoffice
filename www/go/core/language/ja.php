@@ -1238,7 +1238,7 @@ return array (
   'No items found' => 'アイテムが見つかりません',
   'Please use one of these formats (eg. hour, no spaces):' => '次の書式のいずれかを使用してください: (例. 時間、空白無し):',
   'Your browser is blocking a popup from {product_name}. Please disable the popup blocker for this site' => 'あなたのブラウザは {product_name} からのポップアップをブロックしました。許可するようにして下さい。',
-  'Define which groups are allowed to login from which IP addresses. You can use \'*\' to match any charachters and \'?\' to match any single character. eg. \'192.168.1?.*\'. Be careful, You can lock yourself out!' => 'どのグループがどのIPアドレスからログインできるかを定義します。「*」は任意の文字に一致し、「?」は任意の1文字に一致します。例：「192.168.1?.*」。注意してください。誤ってログインできなくなる可能性があります。',
+  'Define which groups are allowed to login from which IP addresses. You can use \'*\' to match any characters and \'?\' to match any single character. eg. \'192.168.1?.*\'. Be careful, You can lock yourself out!' => 'どのグループがどのIPアドレスからログインできるかを定義します。「*」は任意の文字に一致し、「?」は任意の1文字に一致します。例：「192.168.1?.*」。注意してください。誤ってログインできなくなる可能性があります。',
   'Synchronization' => '同期',
   'Enable 2-Factor authentication for ActiveSync devices' => 'ActiveSyncデバイスに対して二要素認証を有効にします',
   'ActiveSync devices can connect by default.' => '既定でActiveSyncデバイスが接続可能です。',

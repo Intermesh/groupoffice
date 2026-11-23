@@ -13,7 +13,7 @@ export class SystemSettings extends Fieldset {
 					name: "settings"
 				},
 				textfield({label: t('Server URL', "community", "jitsimeet"), name: 'videoUri'}),
-				checkbox({label: t("Enable JWT authentification", "community", "jitsimeet"), name: "videoJwtEnabled"}),
+				checkbox({label: t("Enable JWT authentication", "community", "jitsimeet"), name: "videoJwtEnabled"}),
 				textfield({type: "password", label: t('App Secret', "community", "jitsimeet"), name: 'videoJwtSecret'}),
 				textfield({label: t('App ID', "community", "jitsimeet"), name: 'videoJwtAppId'})
 			)

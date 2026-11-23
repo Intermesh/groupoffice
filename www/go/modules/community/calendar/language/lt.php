@@ -31,7 +31,7 @@ return array (
   'after' => 'po',
   'Video meeting' => 'Video susitikimas',
   'Server URL' => 'Serverio URL',
-  'Enable JWT authentification' => 'Įgalinti JWT autentifikavimą',
+  'Enable JWT authentication' => 'Įgalinti JWT autentifikavimą',
   'App Secret' => 'Programėlės slaptasis raktas',
   'App ID' => 'Programos ID',
   'Events with time' => 'Įvykiai su nurodytu laiku',

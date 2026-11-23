@@ -126,7 +126,7 @@ return array (
   'Approve / Disapprove' => 'Genehmigen / Ablehnen',
   'Manage resources' => 'Ressourcen verwalten',
   'Server URL' => 'Server URL',
-  'Enable JWT authentification' => 'JWT Authentifizierung aktivieren',
+  'Enable JWT authentication' => 'JWT Authentifizierung aktivieren',
   'App Secret' => 'App Secret',
   'App ID' => 'App ID',
   'Wk' => 'Wo',

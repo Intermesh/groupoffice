@@ -1,7 +1,7 @@
 <?php
 return array (
   'Video meeting' => 'Wideokonferencja',
-  'Enable JWT authentification' => 'Włącz uwierzytelnianie JWT',
+  'Enable JWT authentication' => 'Włącz uwierzytelnianie JWT',
   'App Secret' => 'App Secret',
   'App ID' => 'App ID',
 );

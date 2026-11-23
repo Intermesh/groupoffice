@@ -126,7 +126,7 @@ return array (
   'Default duration' => 'Standaard duur',
   'Duration for a new event when no range is selected' => 'Duur voor een nieuwe afspraak wanneer geen tijd is geselecteerd',
   'Video meeting' => 'Video afspraak',
-  'Enable JWT authentification' => 'Schakel JWT-authenticatie in',
+  'Enable JWT authentication' => 'Schakel JWT-authenticatie in',
   'App secret' => 'App geheim',
   'App ID' => 'App ID',
   'Event page' => 'Afspraak pagina',

@@ -2141,7 +2141,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Test message' => 'Testnachricht',
   'The export has started in the background' => 'Der Export wurde im Hintergrund gestartet',
   'The given URL is not a valid WOPI client' => 'Die angegebene URL ist kein gültiger WOPI-Client',
-  'The hostname contains invalid charachters' => 'Der Hostname enthält ungültige Zeichen',
+  'The hostname contains invalid characters' => 'Der Hostname enthält ungültige Zeichen',
   'The import has started in the background' => 'Der Import wurde im Hintergrund gestartet',
   'The installed version {installed} is higher than the maximum licensed version {licensed}.' => 'Die installierte Version {installed} ist höher als die maximal lizenzierte Version {licensed}.',
   'The owner and item entities cannot have the same entity name' => 'Die Eigentümer- und die Element-Entität dürfen nicht denselben Entitätsnamen haben',

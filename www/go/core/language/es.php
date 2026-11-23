@@ -2071,7 +2071,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Test message' => 'Mensaje de prueba',
   'The export has started in the background' => 'La exportación se ha iniciado en segundo plano',
   'The given URL is not a valid WOPI client' => 'La URL indicada no es un cliente WOPI válido',
-  'The hostname contains invalid charachters' => 'El nombre de host contiene caracteres no válidos',
+  'The hostname contains invalid characters' => 'El nombre de host contiene caracteres no válidos',
   'The import has started in the background' => 'La importación se ha iniciado en segundo plano',
   'The installed version {installed} is higher than the maximum licensed version {licensed}.' => 'La versión instalada {installed} es superior a la versión máxima con licencia {licensed}.',
   'The owner and item entities cannot have the same entity name' => 'Las entidades propietaria y de elemento no pueden tener el mismo nombre de entidad',

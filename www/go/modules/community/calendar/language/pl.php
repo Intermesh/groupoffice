@@ -121,7 +121,7 @@ return array (
   'Approve / Disapprove' => 'Zatwierdź / Odrzuć',
   'Manage resources' => 'Zarządzaj zasobami',
   'Server URL' => 'URL serwera',
-  'Enable JWT authentification' => 'Włącz uwierzytelnianie JWT',
+  'Enable JWT authentication' => 'Włącz uwierzytelnianie JWT',
   'App Secret' => 'Sekret aplikacji',
   'App ID' => 'ID aplikacji',
   'Wk' => 'Tydz.',

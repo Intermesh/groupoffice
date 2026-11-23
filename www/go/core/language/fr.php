@@ -1657,7 +1657,7 @@ return array (
   'The entity has been modified by someone else. Do you want to discard your changes and load the changes in this form?' => 'L\'élément a été modifié par quelqu\'un d\'autre. Voulez-vous annuler vos modifications et charger les modifications dans ce formulaire ?',
   'The export has started in the background' => 'L\'exportation a démarré en arrière-plan',
   'The given URL is not a valid WOPI client' => 'L\'URL indiquée n\'est pas un client WOPI valide',
-  'The hostname contains invalid charachters' => 'Le nom d\'hôte contient des caractères non valides',
+  'The hostname contains invalid characters' => 'Le nom d\'hôte contient des caractères non valides',
   'The import has started in the background' => 'L\'importation a démarré en arrière-plan',
   'The installed version {installed} is higher than the maximum licensed version {licensed}.' => 'La version installée {installed} est supérieure à la version maximale autorisée par la licence {licensed}.',
   'The item was successfully deleted' => 'L\'élément a été supprimé avec succès',
