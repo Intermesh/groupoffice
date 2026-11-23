@@ -153,6 +153,24 @@ class WopiControllerTest extends TestCase
 		$this->assertGreaterThan(time(), $file->lock_expires_at);
 	}
 
+	/**
+	 * Also when the expired lock was of another user
+	 */
+	public function testExpiredLockOfOtherUserIsReplaced(): void
+	{
+		$this->file1->lock('crashed-session', $this->other->id);
+		$this->file1->lock_expires_at = time() - 1;
+		$this->file1->ignoreLockChange = true;
+		$this->assertTrue($this->file1->save());
+
+		$file = File::model()->findByPk($this->file1->id, false, true);
+		$this->lockAs($this->controller($this->writeServiceId, $file), 'new-session');
+
+		$file = File::model()->findByPk($this->file1->id, false, true);
+		$this->assertEquals('new-session', $file->lock_id);
+		$this->assertEquals($this->user->id, $file->locked_user_id);
+	}
+
 	public function testActiveLockIsRefused(): void
 	{
 		$controller = $this->controller($this->writeServiceId, $this->file1);
