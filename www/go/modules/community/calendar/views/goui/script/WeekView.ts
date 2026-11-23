@@ -33,6 +33,7 @@ export class WeekView extends CalendarView {
 		this.el.on('keydown', (e: KeyboardEvent) => {
 			if(e.key == 'Delete') {
 				this.selected.forEach(item => {
+					if(item.isBusyOnly) return;
 					const i = this.dayItems.indexOf(item as CalendarDayItem);
 					if(i > -1) {
 						item.remove();

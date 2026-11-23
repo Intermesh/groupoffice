@@ -95,6 +95,16 @@ class Calendar extends EntityController {
 		return $this->rights->mayChangeCalendars;
 	}
 
+	/**
+	 * Users with free / busy permission may get the calendar, to subscribe to it and see its busy events. The query
+	 * still returns readable calendars only, unless the client asks for the free / busy level with the
+	 * "permissionLevel" filter. {@see model\Calendar::toArray()} leaves out what they may not see.
+	 */
+	protected function canRead(Entity $entity): bool
+	{
+		return $entity->hasPermissionLevel(model\Calendar::LEVEL_FREEBUSY);
+	}
+
 	protected function canDestroy(Entity $entity): bool
 	{
 		return $this->rights->mayChangeCalendars && $entity->hasPermissionLevel(Acl::LEVEL_DELETE);

@@ -40,6 +40,15 @@ class Principal extends EntityController {
 	}
 
 	/**
+	 * A resource calendar shares its permissions with its principal. Users that may only read its free / busy
+	 * information may get the principal too, so they can find the resource and book it.
+	 */
+	protected function canRead(\go\core\jmap\Entity $entity): bool
+	{
+		return $entity->hasPermissionLevel(\go\modules\community\calendar\model\Calendar::LEVEL_FREEBUSY);
+	}
+
+	/**
 	 * Get the busy periods of a principal. Returns an empty list when the calendar module is not installed.
 	 *
 	 * @apiParam string id Required. ID of the principal: a user ID or "Calendar:<id>" for a resource calendar

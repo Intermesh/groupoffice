@@ -301,7 +301,7 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				timeAndIcons.append(time);
 			}
 			div = E('div',
-				E('em', item.title || '('+t(item.data.privacy!='public' ? 'Private' :'Nameless')+')',
+				E('em', item.title || '('+t(item.isBusyOnly ? 'Busy' : item.data.privacy!='public' ? 'Private' :'Nameless')+')',
 					...this.fmLocation(item.data.location)
 				),
 
@@ -337,12 +337,13 @@ export abstract class CalendarView<EventMap extends ComponentEventMap = Componen
 				this.selectItem(item);
 
 				// todo: set id first
-				if(!item.key || item.readOnly) return;
+				if(!item.key || item.readOnly || item.isBusyOnly) return;
 				this.current = item;
 				this.contextMenu.showAt(ev);
 				ev.preventDefault();
 			}).on('dblclick', _ev => {
-				if(!item.key) return;
+				// Nothing to show but the time
+				if(!item.key || item.isBusyOnly) return;
 				item.open();
 			});
 	}

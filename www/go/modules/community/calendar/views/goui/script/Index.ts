@@ -78,7 +78,8 @@ export const calendarStore = datasourcestore({
 	filters: {
 		default: {
 			isSubscribed: true,
-			davaccountId : null
+			davaccountId : null,
+			permissionLevel: 5 // also calendars of which the user may only see the free / busy information
 		}
 	},
 	sort: [{property:'groupId'},{property:'sortOrder'},{property:'name'}],

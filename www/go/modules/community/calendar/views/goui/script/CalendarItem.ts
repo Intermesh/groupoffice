@@ -536,6 +536,13 @@ export class CalendarItem {
 		return !hasOwner || this.calendarPrincipal?.roles?.owner || false;
 	}
 
+	/**
+	 * The user may only read the free / busy information of the calendar. The server sends the time only.
+	 */
+	get isBusyOnly() {
+		return this.cal.myRights?.mayReadItems === false;
+	}
+
 	get mayChange() {
 		return (this.isNew() || (this.cal.myRights.mayWriteOwn && this.isOwner)) && !this.readOnly;
 	}

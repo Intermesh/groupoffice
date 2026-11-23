@@ -247,9 +247,13 @@ class Module extends core\Module
 			throw new Forbidden();
 		}
 
-		return Calendar::find()->selectSingleValue('calendar_calendar.id')
+		$calendars = Calendar::find()->selectSingleValue('calendar_calendar.id')
 			//->join('calendar_calendar_user', 'cu','cu.userId = '.go()->getUserId().' AND cu.calendarId = t.id')
-			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true)->all();
+			->where('caluser.isVisible', '=',1)->andWhere('caluser.isSubscribed','=', true);
+		// Users may subscribe to calendars with free / busy permission only. Those aren't printed, because the reports
+		// print the details of the events.
+		Calendar::applyAclToQuery($calendars, Acl::LEVEL_READ);
+		return $calendars->all();
 	}
 
 	public function pagePrint($type,$date) {

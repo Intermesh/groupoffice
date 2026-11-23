@@ -28,6 +28,7 @@ export class MonthView extends CalendarView<MonthViewEventMap> {
 		this.el.on('keydown', (e: KeyboardEvent) => {
 			if(e.key == 'Delete') {
 				this.selected.forEach(item => {
+					if(item.isBusyOnly) return;
 					const i = this.viewModel.indexOf(item);
 					if(i > -1) {
 						item.remove();

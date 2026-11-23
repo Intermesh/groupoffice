@@ -388,6 +388,23 @@ class Calendar extends AclOwnerEntity {
 		}
 	}
 
+	/**
+	 * Users that may only read the free / busy information don't get the public URL or the webcal URL, which give the
+	 * details of the events, nor who the calendar is shared with
+	 */
+	public function toArray(array|null $properties = null): array
+	{
+		$arr = parent::toArray($properties);
+		if($this->getPermissionLevel() < Acl::LEVEL_READ) {
+			foreach(['publishKey', 'webcalUri', 'acl'] as $prop) {
+				if(array_key_exists($prop, $arr)) {
+					$arr[$prop] = null;
+				}
+			}
+		}
+		return $arr;
+	}
+
 	public function getMyRights() {
 		$lvl = $this->getPermissionLevel();
 		return [

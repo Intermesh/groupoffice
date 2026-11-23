@@ -40,8 +40,11 @@ class ModuleIcsTest extends TestCase
 		$this->assertTrue($this->calendar->save(), $this->calendar->getValidationErrorsAsString());
 		// set without validation, like a value that was stored earlier
 		go()->getDbConnection()->update('calendar_calendar', $values, ['id' => $this->calendar->id])->execute();
-		$calendar = Calendar::findById($this->calendar->id);
+		return $this->outputIcs(Calendar::findById($this->calendar->id));
+	}
 
+	private function outputIcs(Calendar $calendar): string
+	{
 		// outputIcs ends one output buffer. Ignore the "headers already sent" warnings of header() on the command line.
 		ob_start();
 		ob_start();
@@ -78,6 +81,38 @@ class ModuleIcsTest extends TestCase
 	{
 		$ics = $this->export(['timeZone' => "Europe/Amsterdam"]);
 		$this->assertStringContainsString("X-WR-TIMEZONE:Europe/Amsterdam\r\nBEGIN:VTIMEZONE", $ics);
+	}
+
+	/**
+	 * A published calendar is read with its secret URL, without a logged-in user. It shows the details of the events
+	 * that aren't private, also now that users with free / busy permission only see the time.
+	 */
+	public function testPublishedCalendarShowsDetailsWithoutLogin(): void
+	{
+		$this->calendar = new Calendar();
+		$this->calendar->name = 'ICS test ' . uniqid();
+		$this->calendar->setOwnerId(1);
+		$this->calendar->setPublish(true);
+		$this->assertTrue($this->calendar->save(), $this->calendar->getValidationErrorsAsString());
+
+		$event = new CalendarEvent();
+		$event->calendarId = $this->calendar->id;
+		$event->title = 'Open day';
+		$event->location = 'Main hall';
+		$event->start = new DateTime('+1 week');
+		$event->duration = 'PT1H';
+		$this->assertTrue($event->save(), $event->getValidationErrorsAsString());
+
+		try {
+			go()->setAuthState(new TemporaryState());
+			$ics = $this->outputIcs(Calendar::findById($this->calendar->id));
+		} finally {
+			go()->setAuthState(new TemporaryState(1));
+			CalendarEvent::delete(['calendarId' => $this->calendar->id]);
+		}
+
+		$this->assertStringContainsString('SUMMARY:Open day', $ics);
+		$this->assertStringContainsString('LOCATION:Main hall', $ics);
 	}
 
 	/**

@@ -76,6 +76,19 @@ class CalendarEvent extends AclItemEntity {
 	 */
 	const PrivateDetails = ['title', 'description', 'location', 'categoryIds'];
 
+	/**
+	 * The only properties of an event that others see when they may only read the free / busy information of the
+	 * calendar. Anything else, like the participants, would tell what the event is about or who made it.
+	 */
+	const BusyOnlyProperties = ['id', 'calendarId', 'uid', 'start', 'duration', 'timeZone', 'showWithoutTime',
+		'recurrenceRule', 'recurrenceOverrides', 'recurrenceId', 'status', 'privacy', 'firstOccurrence', 'lastOccurrence',
+		'permissionLevel'];
+
+	/**
+	 * The properties of a recurrence override that others see when they may only read the free / busy information
+	 */
+	const BusyOnlyOverrideProperties = ['start', 'duration', 'timeZone', 'showWithoutTime', 'status', 'excluded'];
+
 //	// If any of this properties is in the recurrenceOverrides the Object most be ignored
 //	const IgnoredPropertiesInException = [
 //		'uid', 'links', 'method', 'privacy', 'prodId',
@@ -959,13 +972,133 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
-	 * Private events of others only show the time
+	 * Private events of others only show the time. So do all events in a calendar on which the user may only read the
+	 * free / busy information.
 	 *
 	 * @return bool
 	 */
 	public function showAsPrivate(): bool
 	{
-		return $this->isPrivate() && !$this->currentUserIsOwner();
+		if($this->currentUserIsOwner()) {
+			return false;
+		}
+		return $this->isPrivate() || $this->mayOnlyReadFreeBusy();
+	}
+
+	/**
+	 * The user may only read the free / busy information of the calendar of this event, so the event shows only when
+	 * it's busy. See {@see BusyOnlyProperties}.
+	 *
+	 * @return bool
+	 */
+	public function showAsBusyOnly(): bool
+	{
+		return !$this->currentUserIsOwner() && $this->mayOnlyReadFreeBusy();
+	}
+
+	/**
+	 * The logged-in user has less than read permission on the calendar. Without a logged-in user, the event is shown
+	 * through a secret instead of the permissions, like in a published calendar or the page of an invitation, so it
+	 * shows as before.
+	 */
+	private function mayOnlyReadFreeBusy(): bool
+	{
+		$state = go()->getAuthState();
+		return $state && $state->isAuthenticated() && $this->getPermissionLevel() < Acl::LEVEL_READ;
+	}
+
+	/**
+	 * Remove everything but the busy time from an event array of {@see toArray()}, when {@see showAsBusyOnly()}
+	 *
+	 * @param array $arr
+	 * @return array
+	 */
+	public function hideBusyOnlyDetails(array $arr): array
+	{
+		if(!$this->showAsBusyOnly()) {
+			return $arr;
+		}
+		$arr = array_intersect_key($arr, array_flip(self::BusyOnlyProperties));
+		if(!empty($arr['recurrenceOverrides'])) {
+			foreach($arr['recurrenceOverrides'] as $recurrenceId => $patch) {
+				if(is_array($patch)) {
+					$arr['recurrenceOverrides'][$recurrenceId] = array_intersect_key($patch, array_flip(self::BusyOnlyOverrideProperties));
+				}
+			}
+		}
+		return $arr;
+	}
+
+	/**
+	 * The events that users who may only read the free / busy information of a calendar see in it. The same events
+	 * as {@see BusyPeriod::fetch()} uses for the availability: not secret, not cancelled and not "free" for the owner
+	 * of the calendar. A resource calendar has no owner, so its events are always busy.
+	 *
+	 * For a query of {@see find()}.
+	 *
+	 * @return Criteria
+	 */
+	public static function busyCriteria(): Criteria
+	{
+		return (new Criteria())
+			->where('eventdata.privacy', '!=', self::Secret)
+			->andWhere('eventdata.status', '!=', self::Cancelled)
+			->andWhereExists(go()->getDbConnection()
+				->select('fb.eventId')
+				->from('calendar_event_user', 'fb')
+				->where('fb.eventId = cce.eventId AND fb.userId = cal.ownerId AND cal.groupId IS NULL')
+				->andWhere('fb.freeBusyStatus', '=', self::FREEBUSY_FREE), true);
+	}
+
+	/**
+	 * Limit a query of {@see find()} to the events the current user may see: all events in calendars with read
+	 * permission and, with $withBusyOnly, the busy events in calendars with only free / busy permission
+	 * ({@see busyCriteria()}).
+	 *
+	 * @param Query $query
+	 * @param bool $withBusyOnly
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function applyVisibleToQuery(Query $query, bool $withBusyOnly): void
+	{
+		if(User::isAdminById(go()->getUserId())) {
+			return;
+		}
+
+		$visible = (new Criteria())->where('cce.calendarId', 'IN', self::calendarIdsWithLevel(Acl::LEVEL_READ));
+		if($withBusyOnly) {
+			$visible->orWhere((new Criteria())
+				->where('cce.calendarId', 'IN', self::calendarIdsWithLevel(Calendar::LEVEL_FREEBUSY))
+				->andWhere(self::busyCriteria()));
+		}
+		$query->andWhere($visible);
+	}
+
+	/**
+	 * Subquery with the IDs of the calendars on which the current user has at least this permission level
+	 */
+	private static function calendarIdsWithLevel(int $level): Query
+	{
+		$calendars = Calendar::find(['id'])->selectSingleValue('calendar_calendar.id');
+		Calendar::applyAclToQuery($calendars, $level);
+		return $calendars;
+	}
+
+	/**
+	 * Check if the current user may see this event while having only free / busy permission on its calendar. With the
+	 * same query as {@see applyVisibleToQuery()}, so getting an event by ID shows the same events as a query.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isVisibleAsBusy(): bool
+	{
+		return self::find(['id'])
+			->selectSingleValue('cce.id')
+			->where('cce.id', '=', $this->id)
+			->andWhere(self::busyCriteria())
+			->single() !== null;
 	}
 
 	/**
@@ -1010,7 +1143,7 @@ class CalendarEvent extends AclItemEntity {
 			}
 		}
 		unset($arr['recurrenceId'], $arr['excluded']);
-		return $arr;
+		return $this->hideBusyOnlyDetails($arr);
 	}
 
 	private function addToKnownCalendars() {
@@ -1108,9 +1241,29 @@ class CalendarEvent extends AclItemEntity {
 				->where(['entityTypeId' => self::entityType()->getId(), 'entityId' => $this->id, 'userId' => $userId])
 				->setData(['preventDismiss' => true]) // dismissing would schedule the next occurrence
 		);
-		foreach ($this->alertsFor($userId) as $alert) {
+		$alerts = $this->alertsFor($userId);
+		// An alert shows the title, so not to subscribers that may only read the free / busy information
+		if(empty($alerts) || !$this->mayReadDetails($userId)) {
+			return;
+		}
+		foreach ($alerts as $alert) {
 			$alert->schedule($this, $userId);
 		}
+	}
+
+	/**
+	 * Check if a user may read the details of this event, and not only its free / busy information
+	 *
+	 * @param int $userId
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function mayReadDetails(int $userId): bool {
+		if(isset($this->ownerId) && $this->ownerId == $userId) {
+			return true;
+		}
+		$calendar = Calendar::findById($this->calendarId);
+		return $calendar && Acl::getUserPermissionLevel($calendar->findAclId(), $userId) >= Acl::LEVEL_READ;
 	}
 
 	/**
