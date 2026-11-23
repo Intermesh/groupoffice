@@ -172,6 +172,28 @@ class WopiControllerTest extends TestCase
 	}
 
 	/**
+	 * UnlockAndRelock: a Lock request with X-WOPI-OldLock replaces the current lock
+	 */
+	public function testUnlockAndRelock(): void
+	{
+		$controller = $this->controller($this->writeServiceId, $this->file1);
+		$this->lockAs($controller, 'old-lock');
+
+		$this->setRequestHeaders(['x-wopi-lock' => 'new-lock', 'x-wopi-oldlock' => 'old-lock']);
+		$this->call($controller, 'lock', $this->file1->id);
+		$this->assertEquals('new-lock', File::model()->findByPk($this->file1->id, false, true)->lock_id);
+
+		// The old lock doesn't match anymore
+		$this->setRequestHeaders(['x-wopi-lock' => 'other-lock', 'x-wopi-oldlock' => 'old-lock']);
+		try {
+			$this->call($controller, 'lock', $this->file1->id);
+			$this->fail('Relocked with an old lock that doesn\'t match');
+		} catch (Exception $e) {
+			$this->assertEquals(409, $e->code);
+		}
+	}
+
+	/**
 	 * A lock that the user set in the files module has no expiry time and must keep blocking other editors
 	 */
 	public function testManualLockDoesNotExpire(): void

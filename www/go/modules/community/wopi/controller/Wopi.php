@@ -314,7 +314,7 @@ class Wopi extends Controller
 
 			$file->locked_user_id = 0;
 			$file->lock_id ="";
-
+			$isLocked = false;
     }
 
     $id = Request::get()->getHeader("X-WOPI-Lock");
