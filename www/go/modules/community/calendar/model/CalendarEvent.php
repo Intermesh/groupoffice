@@ -89,6 +89,73 @@ class CalendarEvent extends AclItemEntity {
 	}
 
 	/**
+	 * Check if a property, or a property of a recurrence override patch, tells who takes part in the event
+	 *
+	 * @param string $property
+	 * @return bool
+	 */
+	public static function isParticipantDetail(string $property): bool
+	{
+		return $property === 'participants' || $property === 'replyTo' || str_starts_with($property, 'participants/');
+	}
+
+	private ?bool $managesResource = null;
+
+	/**
+	 * The user manages the resource of this calendar, like the admin of a room, who has write permission on all its
+	 * events. They see who takes part in a private booking and may answer it for the resource
+	 * ({@see onlyResourceAnswerModified()}), but the other details stay hidden.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function managesResource(): bool
+	{
+		if(!isset($this->managesResource)) {
+			$this->managesResource = isset($this->calendarId) &&
+				$this->getPermissionLevel() >= 35 /* write all, see Calendar::getMyRights() */ &&
+				!empty(Calendar::find(['id', 'groupId'])->selectSingleValue('groupId')->where('id', '=', $this->calendarId)->single());
+		}
+		return $this->managesResource;
+	}
+
+	/**
+	 * Check if the only change to the participants is the answer of the resource of this calendar: its participation
+	 * status and comment. That's what the admins of a resource may change in a private booking.
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function onlyResourceAnswerModified(): bool
+	{
+		if(!$this->isModified('participants')) {
+			return true;
+		}
+		$old = $this->getOldValue('participants') ?? [];
+		$new = $this->participants ?? [];
+		$oldIds = array_map('strval', array_keys($old));
+		$newIds = array_map('strval', array_keys($new));
+		sort($oldIds);
+		sort($newIds);
+		if($oldIds !== $newIds) {
+			return false;
+		}
+		$resourceId = 'Calendar:' . $this->calendarId;
+		foreach($new as $id => $participant) {
+			$before = $old[$id]->toArray();
+			$after = $participant->toArray();
+			if((string) $id === $resourceId) {
+				unset($before['participationStatus'], $before['participationComment'],
+					$after['participationStatus'], $after['participationComment']);
+			}
+			if($before != $after) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * The only properties of an event that others see when they may only read the free / busy information of the
 	 * calendar. Anything else, like the participants, would tell what the event is about or who made it.
 	 */
@@ -1144,15 +1211,21 @@ class CalendarEvent extends AclItemEntity {
 			$arr['description'] = '';
 			$arr['location'] = '';
 			$arr['categoryIds'] = [];
-			// Who takes part tells what the event is about. Left out, so the client doesn't send them back.
-			unset($arr['participants'], $arr['replyTo']);
+			// Who takes part tells what the event is about. Left out, so the client doesn't send them back. Except for
+			// the admins of a resource, who answer the booking.
+			$hideParticipants = !$this->managesResource();
+			if($hideParticipants) {
+				unset($arr['participants'], $arr['replyTo']);
+			}
 			// An exception of the series may have its own details. Leave them out instead of clearing them, so the
 			// client doesn't send empty values back. RecurrenceOverride::setValues() keeps them when it does.
 			if(!empty($arr['recurrenceOverrides'])) {
 				foreach($arr['recurrenceOverrides'] as $recurrenceId => $patch) {
 					if(is_array($patch)) {
 						$arr['recurrenceOverrides'][$recurrenceId] = array_filter($patch,
-							fn($property) => !self::isPrivateDetail((string) $property), ARRAY_FILTER_USE_KEY);
+							fn($property) => !self::isPrivateDetail((string) $property) ||
+								(!$hideParticipants && self::isParticipantDetail((string) $property)),
+							ARRAY_FILTER_USE_KEY);
 					}
 				}
 			}

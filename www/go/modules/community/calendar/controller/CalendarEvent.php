@@ -124,7 +124,12 @@ class CalendarEvent extends EntityController {
 	 */
 	protected function canUpdate(Entity $entity): bool
 	{
-		return $entity->hasPermissionLevel(Acl::LEVEL_READ) && parent::canUpdate($entity);
+		/** @var model\CalendarEvent $entity */
+		if(!$entity->hasPermissionLevel(Acl::LEVEL_READ) || !parent::canUpdate($entity)) {
+			return false;
+		}
+		// The admin of a resource may only answer a private booking, see canUpdateBeforePatch()
+		return !$entity->showAsPrivate() || $entity->onlyResourceAnswerModified();
 	}
 
 	/**
@@ -136,6 +141,9 @@ class CalendarEvent extends EntityController {
 	 * A private event of someone else is read only, because the user doesn't get its details, like the participants.
 	 * Only the user's own properties, like the color and alerts, may change. Checked on the event as it is stored, so
 	 * making it public in the same update doesn't help.
+	 *
+	 * The admins of a resource may also answer a private booking for the resource. canUpdate() checks that the
+	 * participation status of the resource is the only change to the participants.
 	 */
 	protected function canUpdateBeforePatch(Entity $entity, array $properties): bool
 	{
@@ -143,8 +151,9 @@ class CalendarEvent extends EntityController {
 		if(!$entity->showAsPrivate()) {
 			return true;
 		}
+		$allowed = $entity->managesResource() ? [...self::OWN_PROPERTIES, 'participants'] : self::OWN_PROPERTIES;
 		foreach(array_keys($properties) as $path) {
-			if(!in_array(explode('/', (string) $path)[0], self::OWN_PROPERTIES)) {
+			if(!in_array(explode('/', (string) $path)[0], $allowed)) {
 				return false;
 			}
 		}

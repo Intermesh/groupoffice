@@ -145,7 +145,9 @@ class ICalendarHelper {
 				if(isset($vevent->SUMMARY)) {
 					$vevent->SUMMARY = '(' . go()->t('Private', 'community', 'calendar') . ')';
 				}
-				foreach(['DESCRIPTION', 'LOCATION', 'CATEGORIES', 'ATTENDEE', 'ORGANIZER'] as $property) {
+				$hidden = $event->managesResource() ? ['DESCRIPTION', 'LOCATION', 'CATEGORIES'] :
+					['DESCRIPTION', 'LOCATION', 'CATEGORIES', 'ATTENDEE', 'ORGANIZER'];
+				foreach($hidden as $property) {
 					$vevent->remove($property);
 				}
 			}
