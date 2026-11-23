@@ -192,4 +192,6 @@ return array (
     'tentative' => '{name} si není jistý/á účastí na události „{title}“ {date}',
   ),
   'Print week and workweek in a grid with hours' => 'Tisknout týden a pracovní týden v mřížce s hodinami',
+  'Only events from the first day of last month onward are published' => 'Publikují se pouze události od prvního dne minulého měsíce',
+  'Public URL' => 'Veřejná URL adresa',
 );

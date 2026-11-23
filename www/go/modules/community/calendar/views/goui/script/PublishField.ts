@@ -1,4 +1,13 @@
-import {btn, checkbox, CheckboxField, Component, DataSourceForm, hiddenfield, textfield} from "@intermesh/goui";
+import {
+	browser,
+	btn,
+	checkbox,
+	CheckboxField,
+	Component,
+	DataSourceForm,
+	hiddenfield,
+	textfield
+} from "@intermesh/goui";
 import {client} from "@intermesh/groupoffice-core";
 import {t} from "./Index.js";
 
@@ -22,10 +31,11 @@ export function publishFields(form: DataSourceForm<any>, beforeSave: () => void)
 			});
 		}),
 		urlField = textfield({
+			label: t("Public URL"),
 			hidden: true, readOnly: true, buttons: [
 				btn({icon: 'copy_all', title: t('Copy')})
 					.on('click', () => {
-						void navigator.clipboard.writeText(urlField.value);
+						browser.copyTextToClipboard(urlField.value);
 					})
 			]
 		}),

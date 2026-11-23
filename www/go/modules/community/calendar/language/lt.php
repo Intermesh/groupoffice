@@ -136,4 +136,6 @@ return array (
   'You' => 'Tu',
   'This' => 'Šis',
   'Print week and workweek in a grid with hours' => 'Spausdinti savaitę ir darbo savaitę tinklelyje su valandomis',
+  'Only events from the first day of last month onward are published' => 'Skelbiami tik įvykiai nuo praėjusio mėnesio pirmos dienos',
+  'Public URL' => 'Viešas URL',
 );

@@ -162,4 +162,6 @@ return array (
     'tentative' => '{name} ha respondido provisionalmente al evento "{title}" {date}',
   ),
   'Print week and workweek in a grid with hours' => 'Imprimir la semana y la semana laboral en una cuadrícula con horas',
+  'Only events from the first day of last month onward are published' => 'Solo se publican los eventos a partir del primer día del mes pasado',
+  'Public URL' => 'URL pública',
 );

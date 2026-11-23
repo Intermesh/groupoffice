@@ -64,12 +64,11 @@ export class CalendarWindow extends FormWindow {
 				availabilityAffectCb,
 				includeInAvailability,
 				checkbox({name: 'syncToDevice', label: t('Sync to device'), hint: t('Make calendar available in CalDAV and ActiveSync')}),
+				...publishItems,
 				comp({tagName:'h3',flex:'1 0 100%',text:t('Default notifications') }),
 				alertField,
 				fdAlertField,
-				useCreatorAlertsCb,
-				...publishItems
-				//unsubscribeBtn
+				useCreatorAlertsCb
 			),
 		);
 

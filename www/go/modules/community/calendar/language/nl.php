@@ -278,4 +278,5 @@ return array (
   'Use the notifications of the creator' => 'Meldingen van de maker gebruiken',
   'Get the notifications that the creator set on an event instead of your default notifications' => 'U krijgt de meldingen die de maker bij een afspraak heeft ingesteld in plaats van uw standaard meldingen',
   'Only events from the first day of last month onward are published' => 'Alleen afspraken vanaf de eerste dag van de vorige maand worden gepubliceerd',
+  'Public URL' => 'Openbare URL',
 );

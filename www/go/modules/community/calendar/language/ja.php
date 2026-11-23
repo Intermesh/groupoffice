@@ -152,4 +152,6 @@ return array (
   'Appointment' => '予定',
   '{name}\'s birthday' => '{name} の誕生日',
   'Print week and workweek in a grid with hours' => '週と勤務週を時間付きのグリッドで印刷',
+  'Only events from the first day of last month onward are published' => '先月の1日以降のイベントのみが公開されます',
+  'Public URL' => '公開URL',
 );

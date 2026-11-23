@@ -275,4 +275,6 @@ return [
 	'Import calendar from ICS file.' => 'Importer un agenda depuis un fichier ICS.',
 	'Make exact copy of external ICS file calendar to the selected Group-Office calendars. Select the calendars to import to, in the calendar\'s administration settings.' => 'Faire une copie exacte de l\'agenda d\'un fichier ICS externe dans les agendas GroupOffice sélectionnés. Sélectionnez les agendas de destination dans les paramètres d\'administration de l\'agenda.',
 	'Print week and workweek in a grid with hours' => 'Imprimer la semaine et la semaine de travail dans une grille avec les heures',
+	'Only events from the first day of last month onward are published' => 'Seuls les événements à partir du premier jour du mois dernier sont publiés',
+	'Public URL' => 'URL publique',
 ];

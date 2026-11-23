@@ -44,4 +44,5 @@ return [
 	],
 	'This event already exists. Open it in your calendar to respond to it.' => 'This event already exists. Open it in your calendar to respond to it.',
 	'Only events from the first day of last month onward are published' => 'Only events from the first day of last month onward are published',
+	'Public URL' => 'Public URL',
 ];
