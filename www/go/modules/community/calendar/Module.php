@@ -169,7 +169,9 @@ class Module extends core\Module
 		header('Content-Disposition: ' . \go\core\http\Response::contentDisposition('attachment', $calendar->name.' ('.$calendar->id.') '.date('Y-m-d').'.ics'));
 
 		echo self::icsHeader($calendar);
-		ob_end_flush();
+		while(ob_get_level() > 0) {
+			ob_end_flush();
+		}
 
 		foreach($events as $ev) {
 			$vcal = ICalendarHelper::toVObject($ev);
@@ -213,7 +215,7 @@ class Module extends core\Module
 	}
 
 	// https://uri/path/api/page.php/community/calendar/ics/key
-	public function pageIcs($key) {
+	public function pageIcs(string $key) {
 		// No auth needed but publishKey most be known to read
 		$calendar = Calendar::find()->where(['publishKey' => $key])->single();
 		if($calendar) {
@@ -447,15 +449,6 @@ class Module extends core\Module
 
 		return parent::afterInstall($model);
 	}
-
-//	protected function rights(): array
-//	{
-//		return [
-//			'mayChangeCalendars', // allows AddressBook/set (hide ui elements that use this)
-//			'mayExportItems', // Allows users to export contacts
-//		];
-//	}
-
 
 	public function demo(Generator $faker)
 	{
