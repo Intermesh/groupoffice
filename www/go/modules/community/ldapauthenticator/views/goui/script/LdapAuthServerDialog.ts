@@ -187,7 +187,7 @@ export class LdapAuthServerDialog extends FormWindow {
 		const ldapServerFs = fieldset({
 				legend: t("LDAP Server", "community", "ldapauthenticator"),
 			},
-			comp({html: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.", "communty", "imapauthenticator")}),
+			comp({html: t("Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.", "community", "ldapauthenticator")}),
 			this.arrayFld = arrayfield({
 				required: true,
 				name: "domains",

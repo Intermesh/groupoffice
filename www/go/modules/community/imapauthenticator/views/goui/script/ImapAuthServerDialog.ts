@@ -30,8 +30,8 @@ export class ImapAuthServerDialog extends FormWindow {
 		const imapServerFs = fieldset({
 				legend: t("IMAP Server")
 			},
-			comp({html: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.", "communty", "imapauthenticator")}),
-			comp({html: t("Use a '*' to match all domains.", "communty", "imapauthenticator")}),
+			comp({html: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.", "community", "imapauthenticator")}),
+			comp({html: t("Use a '*' to match all domains.", "community", "imapauthenticator")}),
 			this.arrayFld = arrayfield({
 				required: true,
 				name: "domains",
