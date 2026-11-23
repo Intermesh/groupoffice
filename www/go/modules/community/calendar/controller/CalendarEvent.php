@@ -126,6 +126,39 @@ class CalendarEvent extends EntityController {
 	{
 		return $entity->hasPermissionLevel(Acl::LEVEL_READ) && parent::canUpdate($entity);
 	}
+
+	/**
+	 * The properties of an event that belong to the user, which may change on a private event of someone else
+	 */
+	const OWN_PROPERTIES = ['color', 'keywords', 'freeBusyStatus', 'useDefaultAlerts', 'alerts'];
+
+	/**
+	 * A private event of someone else is read only, because the user doesn't get its details, like the participants.
+	 * Only the user's own properties, like the color and alerts, may change. Checked on the event as it is stored, so
+	 * making it public in the same update doesn't help.
+	 */
+	protected function canUpdateBeforePatch(Entity $entity, array $properties): bool
+	{
+		/** @var model\CalendarEvent $entity */
+		if(!$entity->showAsPrivate()) {
+			return true;
+		}
+		foreach(array_keys($properties) as $path) {
+			if(!in_array(explode('/', (string) $path)[0], self::OWN_PROPERTIES)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * A private event of someone else is read only, see {@see canUpdateBeforePatch()}
+	 */
+	protected function canDestroy(Entity $entity): bool
+	{
+		/** @var model\CalendarEvent $entity */
+		return !$entity->showAsPrivate() && parent::canDestroy($entity);
+	}
 	
 	/**
 	 * @param array $params

@@ -144,9 +144,9 @@ class RecurrenceOverride extends Property
 		// Others don't get the details of a private event (see CalendarEvent::toArray()), so they don't send them
 		// back when they change the occurrence. Keep them unless they're given.
 		if(!$this->isNew() && isset($old) && empty($values['excluded']) && $this->owner->showAsPrivate()) {
-			foreach(CalendarEvent::PrivateDetails as $prop) {
-				if(isset($old->$prop) && !array_key_exists($prop, $values)) {
-					$this->props->$prop = $old->$prop;
+			foreach((array) $old as $prop => $value) {
+				if(CalendarEvent::isPrivateDetail((string) $prop) && !array_key_exists($prop, $values)) {
+					$this->props->$prop = $value;
 				}
 			}
 			$this->patch = json_encode($this->props);

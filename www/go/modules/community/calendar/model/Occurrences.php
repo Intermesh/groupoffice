@@ -113,6 +113,7 @@ class Occurrences
 			$arr['description'] = '';
 			$arr['location'] = '';
 			$arr['categoryIds'] = [];
+			unset($arr['participants'], $arr['replyTo']);
 		}
 		// The override may also have added participants or other details
 		$arr = $event->hideBusyOnlyDetails($arr);

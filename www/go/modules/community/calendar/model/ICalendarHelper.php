@@ -138,6 +138,15 @@ class ICalendarHelper {
 				}
 			}
 		}
+		// Others may not see who takes part in a private event. Not in toVEvent(), because the invitations to the
+		// participants use it too.
+		if($event->showAsPrivate()) {
+			foreach($vcalendar->select('VEVENT') as $vevent) {
+				$vevent->remove('ATTENDEE');
+				$vevent->remove('ORGANIZER');
+			}
+		}
+
 		// this will remove the invalid UTF-8 characters for XML response in caldav.
 		$vcalendar->validate(VObject\Node::REPAIR);
 

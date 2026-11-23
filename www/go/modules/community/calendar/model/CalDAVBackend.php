@@ -674,6 +674,11 @@ class CalDAVBackend extends AbstractBackend implements
 				$query->from('calendar_calendar_event','cce')
 					->where(['calendarId' => $id, 'cce.uri'=> $objectUri]);
 				self::checkCollectionPermission($type, $id, Acl::LEVEL_DELETE);
+				// A private event of someone else is read only
+				$event = CalendarEvent::find()->where(['cce.calendarId' => $id, 'cce.uri' => $objectUri])->single();
+				if($event && $event->showAsPrivate()) {
+					throw new DAV\Exception\Forbidden("A private event can only be deleted by its owner");
+				}
 				CalendarEvent::delete($query);
 				break;
 			case 't':

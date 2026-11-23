@@ -74,7 +74,19 @@ class CalendarEvent extends AclItemEntity {
 	/**
 	 * Details of a private event that only its owner may see. Also hidden in the recurrence overrides.
 	 */
-	const PrivateDetails = ['title', 'description', 'location', 'categoryIds'];
+	const PrivateDetails = ['title', 'description', 'location', 'categoryIds', 'participants', 'replyTo'];
+
+	/**
+	 * Check if a property, or a property of a recurrence override patch like "participants/1", is a detail of a private
+	 * event that only its owner may see. See {@see PrivateDetails}.
+	 *
+	 * @param string $property
+	 * @return bool
+	 */
+	public static function isPrivateDetail(string $property): bool
+	{
+		return in_array($property, self::PrivateDetails) || str_starts_with($property, 'participants/');
+	}
 
 	/**
 	 * The only properties of an event that others see when they may only read the free / busy information of the
@@ -1132,12 +1144,15 @@ class CalendarEvent extends AclItemEntity {
 			$arr['description'] = '';
 			$arr['location'] = '';
 			$arr['categoryIds'] = [];
+			// Who takes part tells what the event is about. Left out, so the client doesn't send them back.
+			unset($arr['participants'], $arr['replyTo']);
 			// An exception of the series may have its own details. Leave them out instead of clearing them, so the
 			// client doesn't send empty values back. RecurrenceOverride::setValues() keeps them when it does.
 			if(!empty($arr['recurrenceOverrides'])) {
 				foreach($arr['recurrenceOverrides'] as $recurrenceId => $patch) {
 					if(is_array($patch)) {
-						$arr['recurrenceOverrides'][$recurrenceId] = array_diff_key($patch, array_flip(self::PrivateDetails));
+						$arr['recurrenceOverrides'][$recurrenceId] = array_filter($patch,
+							fn($property) => !self::isPrivateDetail((string) $property), ARRAY_FILTER_USE_KEY);
 					}
 				}
 			}
@@ -1397,6 +1412,10 @@ class CalendarEvent extends AclItemEntity {
 	public function mayChangeEventData(): bool
 	{
 		if(!$this->isOrigin || !$this->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			return false;
+		}
+		// Others get a private event without its details, so the data they send back would remove them
+		if($this->showAsPrivate()) {
 			return false;
 		}
 		$participant = $this->calendarParticipant();
