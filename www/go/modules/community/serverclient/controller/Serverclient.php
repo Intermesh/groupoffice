@@ -11,6 +11,18 @@ use go\modules\community\serverclient\Module;
 class Serverclient extends \go\core\Controller
 {
 	/**
+	 * The mail domains of the "serverclient_domains" config option, to offer mailboxes when creating a user
+	 *
+	 * @apiPermission Module access: the domain names are no secret, and creating a mailbox is checked in setMailbox().
+	 * @apiReadOnly
+	 * @return array{domains: string[]}
+	 */
+	public function domains(): array
+	{
+		return ['domains' => array_values(array_filter(Module::getDomains()))];
+	}
+
+	/**
 	 * save mailbox on server when the user is saved
 	 *
 	 * password is synchronized in user save event
