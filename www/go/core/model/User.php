@@ -597,10 +597,8 @@ public function historyLog(): bool|array
 		$auth = new Authenticate();
 		$success = $auth->passwordLogin($this->username, $password);
 
-		if($success) {
-			$this->passwordVerified = true;
-		}
-		return $success !== false;
+		$this->passwordVerified = $success !== false;
+		return $this->passwordVerified;
 	}
 	
 	/**

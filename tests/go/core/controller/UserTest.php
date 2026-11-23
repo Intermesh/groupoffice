@@ -3,6 +3,7 @@ namespace go\core\controller;
 
 use go\core\auth\TemporaryState;
 use go\core\exception\Forbidden;
+use go\core\validate\ErrorCode;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Module;
@@ -404,6 +405,7 @@ class UserTest extends TestCase
 		$result = $this->update($this->user->id, $this->user->id, [$property => uniqid('attacker') . '@example.com', 'currentPassword' => 'wrong']);
 
 		$this->assertArrayHasKey($this->user->id, $result['notUpdated'] ?? []);
+		$this->assertSame(ErrorCode::INVALID_INPUT, $result['notUpdated'][$this->user->id]->validationErrors['currentPassword']['code'] ?? null);
 		$this->assertSame($before, UserModel::findById($this->user->id)->$property);
 	}
 
