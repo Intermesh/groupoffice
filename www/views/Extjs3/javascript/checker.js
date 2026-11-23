@@ -73,113 +73,44 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 
 		this.reminderStore.on('load',function(store, records) {
-			//this.reminders.removeAll();
 
-			records.forEach(function(record) {
+			// The store is loaded on every check, so only notify the reminders that aren't shown yet
+			const newRecords = records.filter(record => !this.notifiedReminders[record.data.id]);
 
-				//const id = 'go-reminder-pnl-' + record.data.id;
+			newRecords.forEach(function(record) {
 
-				// if(go.Notifier.getById(id)) {
-				// 	return;
-				// }
-				//
-				// var snoozeMenuItems = [];
-				// for(var i = 0; i < checkerSnoozeTimes.length; i++){
-				// 	snoozeMenuItems.push(	{
-				// 		text: checkerSnoozeTimes[i][1],
-				// 		value: checkerSnoozeTimes[i][0],
-				// 		scope: this
-				// 	});
-				// }
-				// var snoozeMenu = new Ext.menu.Menu({
-				// 	items:snoozeMenuItems
-				// });
-				//
-				// let body = record.data.local_time + ": " + record.data.name;
-				//
-				// if(record.data.text) {
-				// 	body += "\n" + record.data.text;
-				// }
-				//
-				//
-				// const iconCls = go.Entities.getLinkIcon(record.data.entity);
-				//
-				// var reminderPanel = {
-				// 	statusIcon: "reminder",
-				// 	itemId: id,
-				// 	record: record,
-				// 	title: record.data.type,
-				// 	iconCls: iconCls,
-				// 	html: Ext.util.Format.nl2br(body),
-				// 	notificationBody:  body,
-				//
-				// 	listeners: {
-				// 		destroy: (panel) => {
-				// 			if(!panel.skipTask) {
-				// 				this.doTask("dismiss_reminders", 0, [record.data.id], panel);
-				// 			}
-				// 		}
-				// 	},
-				// 	handler: () => {
-				//
-				// 		if(!record.data.model_name || !record.data.model_id) {
-				// 			return;
-				// 		}
-				// 		const parts = record.data.model_name.split("\\");
-				//
-				// 		//go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
-				//
-				// 		var win = new go.links.LinkDetailWindow({
-				// 			entity: parts[3].toLowerCase()
-				// 		});
-				//
-				// 		win.load(record.data.model_id);
-				//
-				// 		go.Notifier.hideNotifications();
-				// 	},
-				// 	buttonAlign: 'right',
-				// 	buttons: [{
-				// 		iconCls : 'ic-timer',
-				// 		text: t("Snooze"),
-				// 		menu: snoozeMenu,
-				// 		scope: this
-				// 	},{
-				// 		iconCls : 'ic-delete',
-				// 		text: t("Dismiss"),
-				// 		handler: (btn, e) => {
-				// 			//needed to prevent notification area closing
-				// 			e.stopEvent();
-				// 			pnl.destroy();
-				// 		},
-				// 		scope: this
-				// 	}]
-				// };
+				const id = record.data.id, notifier = window.groupofficeCore.main.notifier;
+				this.notifiedReminders[id] = true;
 
-				//const pnl = go.Notifier.msg(reminderPanel);
-
-				window.GOUI.Notifier.notify({
-					tag:'reminder_'+record.data.id,
+				const notification = {
+					tag:'reminder_'+id,
 					title:record.data.type,text:  record.data.local_time + ": " + record.data.name,
 					icon: {name:'reminder',color:'orange',link:'views/Extjs3/themes/Paper/img/notify/reminder.png'},
 					category:'alarm',variant:'info',
 					actions:{
-						//'snooze': {text:t('Snooze'), icon: 'timer', run(){snoozeMenu.show()}},
-						'dismiss': {text:t('Dismiss'), icon: 'delete', run(){this.close()}}
+						primary: {text:t("Snooze"), icon: 'snooze', run: (button) => {
+							// a menu is removed when it closes, so create a new one each time
+							window.GOUI.menu({isDropdown: true}, ...checkerSnoozeTimes.map(([seconds, text]) => window.GOUI.btn({
+								text,
+								handler: () => {
+									this.doTask("snooze_reminders", seconds, [id]);
+									// silent, because closing dismisses the reminder
+									notifier.close(notification, true);
+								}
+							}))).showFor(button.el);
+						}},
+						secondary: {text:t("Dismiss"), icon: 'delete', run: () => notifier.close(notification)}
 					},
-					onClose: () => { this.doTask("dismiss_reminders", 0, [record.data.id]); }
-				});
+					onClose: () => { this.doTask("dismiss_reminders", 0, [id]); }
+				};
 
-				// snoozeMenu.items.each(function(i) {
-				// 	i.setHandler(function(item){
-				// 		this.doTask("snooze_reminders", item.value, [record.data.id], pnl);
-				//
-				// 		//to prevent dismiss in destroy event handler above
-				// 		pnl.skipTask = true;
-				// 		pnl.destroy();
-				// 		}, this);
-				// }, this);
+				window.GOUI.Notifier.notify(notification);
 
 			}, this);
+
+			if(newRecords.length) {
+				window.groupofficeCore.main.notifier.playSound('reminder');
+			}
 
 		},this);
 
@@ -197,6 +128,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			callback: function(){
 				for (var i = 0; i < reminderIds.length;  i++) {
 					this.reminderStore.remove(this.reminderStore.getById(reminderIds[i]));
+					// notify again when a snoozed reminder returns
+					delete this.notifiedReminders[reminderIds[i]];
 				}
 
 				GO.checker.lastCount = this.reminderStore.getCount();
@@ -260,15 +193,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 		if(!hasReminders) return;
 
+		// notifies new reminders, see initReminders()
 		this.reminderStore.loadData(storeData);
-
-		if(this.lastCount == this.reminderStore.getCount()) {
-			return;
-		}
-
-		this.lastCount = this.reminderStore.getCount();
-
-		window.groupofficeCore.main.notifier.playSound('reminder');
 
 	},
 	
