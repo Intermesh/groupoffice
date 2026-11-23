@@ -117,14 +117,14 @@ $baseUrl = \go\core\webclient\Extjs3::get()->getBaseUrl();
     // Custom logos of the system settings. The blob ID is added for caching only.
     $logoId = go()->getSettings()->logoId;
     $logoIdDark = go()->getSettings()->logoIdDark;
-    if(isset($logoId) || isset($logoIdDark)): ?>
+    if(!empty($logoId) || !empty($logoIdDark)): ?>
     <style>
-<?php if(isset($logoId)): ?>
+<?php if(!empty($logoId)): ?>
         .groupoffice-logo, .login-overlay:after {
             background-image: url("api/page.php/core/logo?v=<?= urlencode($logoId) ?>");
         }
 <?php endif; ?>
-<?php if(isset($logoIdDark)): ?>
+<?php if(!empty($logoIdDark)): ?>
         .dark .groupoffice-logo, .dark .login-overlay:after {
             background-image: url("api/page.php/core/logo/dark?v=<?= urlencode($logoIdDark) ?>");
         }
