@@ -59,7 +59,7 @@ class Module extends core\Module
 
 	public function getDocumentationURL(): ?string
 	{
-		return "https://groupoffice.readthedocs.io/en/latest/using/calendar.html";
+		return "https://www.group-office.com/docs/latest/using/calendar.html";
 	}
 
 	protected function rights(): array
