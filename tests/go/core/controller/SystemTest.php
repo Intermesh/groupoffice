@@ -2,11 +2,13 @@
 namespace go\core\controller;
 
 use go\core\auth\TemporaryState;
+use go\core\exception\Forbidden;
 use go\core\model\User as UserModel;
 use PHPUnit\Framework\TestCase;
 
 /**
- * System/about returns the version to every user, but the usage of the instance only to administrators
+ * System/about returns the version to every user, but the usage of the instance only to administrators. Only
+ * administrators may generate demo data.
  */
 class SystemTest extends TestCase
 {
@@ -85,5 +87,13 @@ class SystemTest extends TestCase
 		// Not newer than the installed version
 		go()->getCache()->set("latestVersion", "1.0.0", true, 60);
 		$this->assertNull($this->about(self::$user->id)['latestVersion']);
+	}
+
+	public function testUserMayNotGenerateDemoData()
+	{
+		go()->setAuthState(new TemporaryState(self::$user->id));
+
+		$this->expectException(Forbidden::class);
+		(new System())->demo();
 	}
 }
