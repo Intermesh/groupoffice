@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="336" height="336" viewBox="0 0 336 336" xmlns="http://www.w3.org/2000/svg">
+	<title>API keys</title>
+	<!-- Code window -->
+	<rect x="10" y="34" width="290" height="230" rx="26" fill="#37474F"/>
+	<g fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+		<polyline points="88,104 52,138 88,172" stroke="#4DD0E1"/>
+		<line x1="146" y1="94" x2="120" y2="182" stroke="#FFFFFF"/>
+		<polyline points="178,104 214,138 178,172" stroke="#4DD0E1"/>
+	</g>
+	<rect x="48" y="210" width="92" height="14" rx="7" fill="#607D8B"/>
+	<rect x="48" y="236" width="60" height="14" rx="7" fill="#607D8B"/>
+	<!-- Key badge -->
+	<circle cx="254" cy="254" r="78" fill="#FFFFFF"/>
+	<circle cx="254" cy="254" r="72" fill="#FFB300"/>
+	<g transform="rotate(-40 254 254)" fill="#FFFFFF">
+		<circle cx="224" cy="254" r="26"/>
+		<rect x="240" y="246" width="66" height="16" rx="5"/>
+		<rect x="278" y="254" width="12" height="22" rx="3"/>
+		<rect x="294" y="254" width="12" height="16" rx="3"/>
+		<circle cx="218" cy="254" r="9" fill="#FFB300"/>
+	</g>
+</svg>
