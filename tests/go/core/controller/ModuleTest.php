@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Module/set may only change module settings and default ACL's for module managers. A refused update must not leave
- * changes behind in the database or in the settings object.
+ * changes behind in the database or in the settings object. Module/get returns the documentation URL to every user.
  */
 class ModuleTest extends TestCase
 {
@@ -189,5 +189,21 @@ class ModuleTest extends TestCase
 			$this->update(UserModel::ID_SUPER_ADMIN, ['permissions' => $original]);
 		}
 		$this->assertNull($this->storedCoreRights($groupId));
+	}
+
+	public function testUserGetsDocumentationUrl()
+	{
+		$notes = ModuleModel::findByName('community', 'notes');
+		if(!$notes || !$notes->isAvailable()) {
+			$this->markTestSkipped("The notes module isn't installed");
+		}
+
+		go()->setAuthState(new TemporaryState($this->user->id));
+		$list = (new Module())->get(['ids' => [$notes->id, $this->coreId], 'properties' => ['id', 'package', 'name', 'documentationUrl']])->getArray()['list'];
+		$urls = array_column($list, 'documentationUrl', 'id');
+
+		$this->assertStringStartsWith('https://', $urls[$notes->id]);
+		// Core has no page of its own
+		$this->assertNull($urls[$this->coreId]);
 	}
 }

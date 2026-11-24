@@ -256,6 +256,17 @@ class Module extends Entity {
 		return static::module()->getLocalizedPackage();
 	}
 
+	/**
+	 * URL of the page about this module in the user documentation, or null when it has none. The web client opens it
+	 * with "Documentation" in the account menu while the module is open.
+	 *
+	 * @return string|null
+	 */
+	public function getDocumentationUrl() : ?string {
+		$module = static::module();
+		return method_exists($module, 'getDocumentationURL') ? $module->getDocumentationURL() : null;
+	}
+
 	public function getCapabilities() : array {
 		$p = $this->getUserRights();
 
