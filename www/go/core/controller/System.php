@@ -13,6 +13,7 @@ use go\core\http\Client;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
 use go\core\model;
+use go\core\util\Changelog;
 use go\core\util\DateTime;
 use go\core\util\JSON;
 
@@ -57,6 +58,35 @@ class System extends Controller {
 
 		$blob->getFile()->output();
 		exit();
+	}
+
+	/**
+	 * The changes of the releases after a version, for the "What's new" window that administrators get after an upgrade
+	 *
+	 * @apiPermission Only administrators.
+	 * @apiReadOnly
+	 * @param array{since?: string} $params "since" is the version the administrator saw last
+	 * @return array{version: string, releases: array{version: string, date: string, changes: string[]}[]}
+	 * @throws Forbidden
+	 * @throws InvalidArguments
+	 */
+	public function changelog(array $params = []): array
+	{
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden();
+		}
+
+		if(!isset($params['since']) || !is_string($params['since']) || !preg_match('/^\d+(\.\d+)+$/', $params['since'])) {
+			throw new InvalidArguments("Parameter 'since' must be a version like 26.0.1");
+		}
+
+		$version = go()->getVersion();
+		$changelog = Changelog::load();
+
+		return [
+			'version' => $version,
+			'releases' => $changelog ? $changelog->between($params['since'], $version) : []
+		];
 	}
 
 	/**

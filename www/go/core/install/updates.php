@@ -1941,3 +1941,6 @@ $updates['202611231300'][] = function() {
 $updates['202611231500'][] = function() {
 	\go\core\cron\EmailReminders::installDisabled("*/5 * * * *");
 };
+
+// The version of which an administrator saw the changes in the "What's new" window
+$updates['202611241700'][] = "alter table core_user add whatsNewVersion varchar(20) null;";

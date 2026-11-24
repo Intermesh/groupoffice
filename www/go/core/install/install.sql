@@ -256,6 +256,7 @@ CREATE TABLE `core_user` (
   `passwordModifiedAt` datetime null,
   `forcePasswordChange` boolean default false not null,
   enableSendShortcut boolean default true not null,
+  `whatsNewVersion` varchar(20) null,
     PRIMARY KEY (`id`)
 )
   ENGINE=InnoDB;

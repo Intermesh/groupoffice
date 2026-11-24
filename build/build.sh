@@ -331,6 +331,9 @@ build_package() {
 	log "Building $PACKAGE_NAME"
 
 	cp -r "$REPO_DIR/www/" "$PACKAGE_DIR"
+	# The "What's new" window for administrators reads it (go\core\util\Changelog). As a PHP file that returns the text,
+	# because the web server serves this folder and the changelog shows the exact version.
+	php -r 'echo "<?php\nreturn " . var_export(file_get_contents($argv[1]), true) . ";\n";' "$REPO_DIR/CHANGELOG.md" > "$PACKAGE_DIR/changelog.php"
 
 	encode_pro_and_business
 

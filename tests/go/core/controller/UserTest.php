@@ -184,6 +184,22 @@ class UserTest extends TestCase
 		$this->assertSame('Changed name', UserModel::findById($this->user->id)->displayName);
 	}
 
+	public function testAdminMaySaveSeenWhatsNewVersion()
+	{
+		self::actAs(UserModel::ID_SUPER_ADMIN);
+		$admin = self::newUser([Group::ID_ADMINS]);
+
+		try {
+			$result = $this->update($admin->id, $admin->id, ['whatsNewVersion' => '26.1.2']);
+
+			$this->assertUpdated($result, $admin->id);
+			$this->assertSame('26.1.2', UserModel::findById($admin->id)->whatsNewVersion);
+		} finally {
+			self::actAs(UserModel::ID_SUPER_ADMIN);
+			UserModel::delete(['id' => $admin->id]);
+		}
+	}
+
 	public function testUserMayNotChangeAnotherUser()
 	{
 		$result = $this->update($this->user->id, self::$otherUser->id, ['displayName' => 'Changed name']);

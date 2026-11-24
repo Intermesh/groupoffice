@@ -480,6 +480,12 @@ class Settings extends core\Settings
 	 */
 	public string|null $databaseVersion = null;
 
+	/**
+	 * The version before the last upgrade. The web client shows administrators the changes since this version when it
+	 * doesn't know which version they saw last.
+	 */
+	public string|null $upgradedFrom = null;
+
 
 	/** @var int Time the db cache was cleared. The client will invalidate it's indexeddb cache when this changes.
 	 */

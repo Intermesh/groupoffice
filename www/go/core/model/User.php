@@ -215,6 +215,12 @@ class User extends AclItemEntity {
 	 */
 	public ?\DateTimeInterface $lastLogin = null;
 
+	/**
+	 * The version of which the user saw the changes in the "What's new" window that administrators get after an
+	 * upgrade. Stored on the user, so they don't see the same changes again on another device.
+	 */
+	public ?string $whatsNewVersion = null;
+
 	public ?\DateTimeInterface $modifiedAt;
 
 	public ?\DateTimeInterface $createdAt;

@@ -590,6 +590,9 @@ class Installer {
 		go()->setCache(new $cls);
 
 
+		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
+			go()->getSettings()->upgradedFrom = go()->getSettings()->databaseVersion;
+		}
 		go()->getSettings()->databaseVersion = go()->getVersion();
 		go()->getSettings()->save();
 
