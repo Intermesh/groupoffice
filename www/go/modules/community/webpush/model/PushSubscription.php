@@ -68,12 +68,24 @@ class PushSubscription extends Entity
 		return $this->verificationCode === null;
 	}
 
+	/**
+	 * True when the browser confirmed the subscription, so push messages reach it. Read-only for the client.
+	 */
+	public function getVerified(): bool
+	{
+		return $this->isVerified();
+	}
+
 	protected static function defineFilters(): Filters
 	{
 		// Expired subscriptions are replaced by the client
 		return parent::defineFilters()->add('default', function (Criteria $criteria, $value, Query $query) {
 			$query->andWhere('expires', '>', new DateTime());
-		}, 'alwaysUsed');
+		}, 'alwaysUsed')
+			// The subscriptions of one browser
+			->add('deviceClientId', function (Criteria $criteria, $value) {
+				$criteria->where('deviceClientId', '=', $value);
+			});
 	}
 
 	/**

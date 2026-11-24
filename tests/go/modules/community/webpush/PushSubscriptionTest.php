@@ -129,6 +129,7 @@ class PushSubscriptionTest extends TestCase
 	{
 		$id = $this->create(self::$owner->id)['created']['new']['id'];
 		$this->assertNotContains($id, array_map(fn($s) => $s->id, PushSubscription::findActiveForUser(self::$owner->id)));
+		$this->assertFalse($this->get($id)['verified']);
 
 		$code = go()->getDbConnection()->selectSingleValue('verificationCode')->from('core_push_subscription')->where('id', '=', $id)->single();
 		go()->setAuthState(new TemporaryState(self::$owner->id));
@@ -136,5 +137,31 @@ class PushSubscriptionTest extends TestCase
 		$this->assertArrayHasKey($id, $result['updated'] ?? [], var_export($result['notUpdated'] ?? null, true));
 
 		$this->assertContains($id, array_map(fn($s) => $s->id, PushSubscription::findActiveForUser(self::$owner->id)));
+		$this->assertTrue($this->get($id)['verified']);
+
+		// The client can't mark a subscription verified itself
+		$result = (new PushSubscriptionController())->set(['update' => [$id => ['verified' => false]]])->getArray();
+		$this->assertTrue($this->get($id)['verified'], var_export($result, true));
+	}
+
+	private function get(string $id): array
+	{
+		go()->setAuthState(new TemporaryState(self::$owner->id));
+		return (new PushSubscriptionController())->get(['ids' => [$id]])->getArray()['list'][0];
+	}
+
+	/**
+	 * The settings find the subscription of this browser by its device ID, and only among the user's own
+	 */
+	public function testFilterOnDevice(): void
+	{
+		$id = $this->create(self::$owner->id, ['deviceClientId' => 'pushtestdevice'])['created']['new']['id'];
+		$this->create(self::$owner->id);
+		$otherId = $this->create(self::$other->id, ['deviceClientId' => 'pushtestdevice'])['created']['new']['id'];
+
+		go()->setAuthState(new TemporaryState(self::$owner->id));
+		$ids = (new PushSubscriptionController())->query(['filter' => ['deviceClientId' => 'pushtestdevice']])->getArray()['ids'];
+		$this->assertSame([$id], $ids);
+		$this->assertNotContains($otherId, $ids);
 	}
 }
