@@ -10,4 +10,6 @@ return array (
   'API keys' => 'API-sleutels',
   'Access token' => 'Toegangstoken',
   'Copy the access token now. It\'s not possible to view it again.' => 'Kopieer het toegangstoken nu. Het is daarna niet meer mogelijk om het te bekijken.',
+  'name' => 'API-sleutels',
+  'description' => 'Maak toegangssleutels aan, zodat andere applicaties en websites verbinding kunnen maken met de GroupOffice-API.',
 );
