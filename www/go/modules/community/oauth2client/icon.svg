@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="336" height="336" viewBox="0 0 336 336" xmlns="http://www.w3.org/2000/svg">
+	<title>OAuth2 client</title>
+	<!-- Shield with user -->
+	<path d="M150 18 L264 58 v86 c0 76 -50 132 -114 158 c-64 -26 -114 -82 -114 -158 v-86 z" fill="#3949AB" opacity="0.25" transform="translate(0 6)"/>
+	<path d="M150 18 L264 58 v86 c0 76 -50 132 -114 158 c-64 -26 -114 -82 -114 -158 v-86 z" fill="#5C6BC0"/>
+	<circle cx="150" cy="118" r="32" fill="#FFFFFF"/>
+	<path d="M96 214 a54 50 0 0 1 108 0 z" fill="#FFFFFF"/>
+	<!-- Sign in badge -->
+	<circle cx="254" cy="254" r="78" fill="#FFFFFF"/>
+	<circle cx="254" cy="254" r="72" fill="#43A047"/>
+	<g fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M264 216 h18 a10 10 0 0 1 10 10 v56 a10 10 0 0 1 -10 10 h-18"/>
+		<line x1="210" y1="254" x2="262" y2="254"/>
+		<polyline points="242,234 262,254 242,274"/>
+	</g>
+</svg>
