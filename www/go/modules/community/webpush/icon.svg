@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="336" height="336" viewBox="0 0 336 336" xmlns="http://www.w3.org/2000/svg">
+	<title>Web push</title>
+	<!-- Browser window -->
+	<rect x="8" y="24" width="292" height="238" rx="26" fill="#ECEFF1"/>
+	<path d="M34 24 h240 a26 26 0 0 1 26 26 v26 h-292 v-26 a26 26 0 0 1 26 -26 z" fill="#1E88E5"/>
+	<circle cx="40" cy="50" r="9" fill="#FFFFFF" opacity="0.6"/>
+	<circle cx="68" cy="50" r="9" fill="#FFFFFF" opacity="0.6"/>
+	<circle cx="96" cy="50" r="9" fill="#FFFFFF" opacity="0.6"/>
+	<!-- Page content -->
+	<rect x="32" y="102" width="52" height="14" rx="7" fill="#CFD8DC"/>
+	<rect x="32" y="130" width="40" height="14" rx="7" fill="#CFD8DC"/>
+	<rect x="32" y="158" width="48" height="14" rx="7" fill="#CFD8DC"/>
+	<rect x="32" y="196" width="120" height="14" rx="7" fill="#CFD8DC"/>
+	<rect x="32" y="224" width="90" height="14" rx="7" fill="#CFD8DC"/>
+	<!-- Notification sliding in -->
+	<rect x="109" y="89" width="184" height="84" rx="16" fill="#000000" opacity="0.14"/>
+	<rect x="104" y="82" width="184" height="84" rx="16" fill="#FFFFFF"/>
+	<circle cx="142" cy="124" r="24" fill="#26A69A"/>
+	<path d="M131 131 v-10 a11 11 0 0 1 22 0 v10 l4 5 h-30 z" fill="#FFFFFF"/>
+	<circle cx="142" cy="106" r="2.5" fill="#FFFFFF"/>
+	<rect x="178" y="106" width="88" height="14" rx="7" fill="#455A64"/>
+	<rect x="178" y="130" width="62" height="12" rx="6" fill="#B0BEC5"/>
+	<!-- Bell badge: a new notification -->
+	<circle cx="252" cy="252" r="78" fill="#FFFFFF"/>
+	<circle cx="252" cy="252" r="72" fill="#FFA000"/>
+	<circle cx="252" cy="209" r="7" fill="#FFFFFF"/>
+	<path d="M222 272 v-28 a30 30 0 0 1 60 0 v28 l12 14 h-84 z" fill="#FFFFFF"/>
+	<path d="M238 292 h28 a14 14 0 0 1 -28 0 z" fill="#FFFFFF"/>
+	<circle cx="286" cy="214" r="17" fill="#F44336" stroke="#FFA000" stroke-width="7"/>
+</svg>
