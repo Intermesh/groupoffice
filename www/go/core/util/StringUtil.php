@@ -675,6 +675,13 @@ END;
 			}
 		}
 
+		// The patterns can't see everything. For example, they can't see an event handler after a ">" in a quoted
+		// attribute value, like <img alt=">" onerror=...>. Parse the HTML like a browser to find those.
+		if (self::containsActiveContent($orig, (bool) $withStyle)) {
+			go()->debug("XSS detected by parsing the HTML");
+			return true;
+		}
+
 		return false;
 	}
 
@@ -1116,6 +1123,52 @@ END;
 			return $html;
 		}
 
+		$root = self::parseHtmlFragment($html);
+		if (!$root) {
+			// Can't be parsed. Don't return something that wasn't checked.
+			return htmlspecialchars($html, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+		}
+
+		self::walkActiveContent($root, true);
+
+		$result = '';
+		foreach ($root->childNodes as $child) {
+			$result .= $root->ownerDocument->saveHTML($child);
+		}
+		return $result;
+	}
+
+	/**
+	 * Check if HTML contains something that can run scripts: script elements, event handler attributes like onerror,
+	 * javascript: URLs and CSS expressions. It finds what removeActiveContent() removes.
+	 *
+	 * The HTML is parsed with DOMDocument, so it isn't fooled by a ">" in a quoted attribute value like regular
+	 * expressions are.
+	 *
+	 * @param string $html
+	 * @param bool $withStyle Also count <style> elements as active content
+	 * @return bool
+	 */
+	public static function containsActiveContent(string $html, bool $withStyle = false): bool
+	{
+		if (trim($html) === '') {
+			return false;
+		}
+
+		$root = self::parseHtmlFragment($html);
+		if (!$root) {
+			// Can't be parsed, so it can't be checked
+			return true;
+		}
+
+		return self::walkActiveContent($root, false, $withStyle);
+	}
+
+	/**
+	 * Parse an HTML fragment and return the element that holds it
+	 */
+	private static function parseHtmlFragment(string $html): ?\DOMElement
+	{
 		$doc = new \DOMDocument();
 		$useErrors = libxml_use_internal_errors(true);
 		// The XML declaration makes libxml read the HTML as UTF-8. The wrapper element gives one root to read back.
@@ -1124,17 +1177,27 @@ END;
 		libxml_clear_errors();
 		libxml_use_internal_errors($useErrors);
 
-		$root = $loaded ? $doc->getElementById('go-active-content-root') : null;
-		if (!$root) {
-			// Can't be parsed. Don't return something that wasn't checked.
-			return htmlspecialchars($html, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-		}
+		return $loaded ? $doc->getElementById('go-active-content-root') : null;
+	}
 
-		$xpath = new \DOMXPath($doc);
+	/**
+	 * Find active content in the parsed HTML
+	 *
+	 * @param \DOMElement $root
+	 * @param bool $remove Remove the active content. When false it stops at the first that is found.
+	 * @param bool $withStyle Count <style> elements as active content
+	 * @return bool True if active content was found
+	 */
+	private static function walkActiveContent(\DOMElement $root, bool $remove, bool $withStyle = false): bool
+	{
+		$xpath = new \DOMXPath($root->ownerDocument);
+		$found = false;
 
-		// Comments can contain conditional comments for old browsers
-		foreach (iterator_to_array($xpath->query('//comment()', $root)) as $comment) {
-			$comment->parentNode->removeChild($comment);
+		if ($remove) {
+			// Comments can contain conditional comments for old browsers
+			foreach (iterator_to_array($xpath->query('//comment()', $root)) as $comment) {
+				$comment->parentNode->removeChild($comment);
+			}
 		}
 
 		foreach (iterator_to_array($xpath->query('.//*', $root)) as $element) {
@@ -1143,12 +1206,17 @@ END;
 				continue; // inside an element that was removed
 			}
 
-			if (in_array(strtolower($element->localName ?? $element->nodeName), self::ACTIVE_CONTENT_ELEMENTS)) {
+			$elementName = strtolower($element->localName ?? $element->nodeName);
+			if (in_array($elementName, self::ACTIVE_CONTENT_ELEMENTS) || ($withStyle && $elementName === 'style')) {
+				if (!$remove) {
+					return true;
+				}
+				$found = true;
 				$element->parentNode->removeChild($element);
 				continue;
 			}
 
-			if (strtolower($element->localName ?? $element->nodeName) === 'style') {
+			if ($remove && $elementName === 'style') {
 				$element->textContent = self::escapeStyleContent($element->textContent);
 			}
 
@@ -1156,16 +1224,16 @@ END;
 				/** @var \DOMAttr $attribute */
 				$name = strtolower($attribute->nodeName);
 				if (self::isActiveAttribute($name, $attribute->value)) {
+					if (!$remove) {
+						return true;
+					}
+					$found = true;
 					$element->removeAttributeNode($attribute);
 				}
 			}
 		}
 
-		$result = '';
-		foreach ($root->childNodes as $child) {
-			$result .= $doc->saveHTML($child);
-		}
-		return $result;
+		return $found;
 	}
 
 	/**
