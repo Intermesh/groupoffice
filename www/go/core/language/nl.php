@@ -2278,4 +2278,6 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'That\'s it!' => 'Dat was het!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Volg de rondleiding opnieuw via het accountmenu, door rechtsboven op uw foto of initialen te klikken.',
   'Read the documentation' => 'Lees de documentatie',
+  'What\'s new' => 'Wat is er nieuw',
+  'Full changelog' => 'Volledige wijzigingslog',
 );

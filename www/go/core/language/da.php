@@ -637,4 +637,6 @@ Kodeord: %s',
   'That\'s it!' => 'Det var det!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Tag rundvisningen igen fra kontomenuen ved at klikke på dit billede eller dine initialer øverst til højre.',
   'Read the documentation' => 'Læs dokumentationen',
+  'What\'s new' => 'Nyheder',
+  'Full changelog' => 'Fuld ændringslog',
 );

@@ -2353,4 +2353,6 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'That\'s it!' => 'Das war\'s!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Starten Sie den Rundgang erneut über das Kontomenü, indem Sie oben rechts auf Ihr Bild oder Ihre Initialen klicken.',
   'Read the documentation' => 'Dokumentation lesen',
+  'What\'s new' => 'Was ist neu',
+  'Full changelog' => 'Vollständiges Änderungsprotokoll',
 );

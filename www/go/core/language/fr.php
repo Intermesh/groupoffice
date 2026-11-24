@@ -2190,4 +2190,6 @@ Si vous n\'avez pas demandé de nouveau mot de passe, veuillez supprimer cet e-m
   'That\'s it!' => 'C\'est tout !',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Refaites la visite depuis le menu du compte, en cliquant sur votre photo ou vos initiales en haut à droite.',
   'Read the documentation' => 'Lire la documentation',
+  'What\'s new' => 'Nouveautés',
+  'Full changelog' => 'Journal des modifications complet',
 );

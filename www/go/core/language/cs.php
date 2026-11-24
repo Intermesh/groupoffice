@@ -2320,4 +2320,6 @@ Pokud jste o nové heslo nežádali, tento e-mail prosím smažte.',
   'That\'s it!' => 'To je vše!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Prohlídku můžete projít znovu z nabídky účtu kliknutím na svůj obrázek nebo iniciály vpravo nahoře.',
   'Read the documentation' => 'Přečíst dokumentaci',
+  'What\'s new' => 'Co je nového',
+  'Full changelog' => 'Úplný seznam změn',
 );

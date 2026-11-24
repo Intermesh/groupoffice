@@ -1063,4 +1063,6 @@ Radera det här meddelandet om du inte begärt ett nytt lösenord.',
   'That\'s it!' => 'Det var allt!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Ta rundturen igen från kontomenyn genom att klicka på din bild eller dina initialer uppe till höger.',
   'Read the documentation' => 'Läs dokumentationen',
+  'What\'s new' => 'Nyheter',
+  'Full changelog' => 'Fullständig ändringslogg',
 );

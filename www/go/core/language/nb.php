@@ -1163,4 +1163,6 @@ Hvis du ikke har bedt om et nytt passord kan du bare slette denne e-posten.',
   'That\'s it!' => 'Det var det!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Ta omvisningen på nytt fra kontomenyen ved å klikke på bildet eller initialene dine øverst til høyre.',
   'Read the documentation' => 'Les dokumentasjonen',
+  'What\'s new' => 'Hva er nytt',
+  'Full changelog' => 'Fullstendig endringslogg',
 );

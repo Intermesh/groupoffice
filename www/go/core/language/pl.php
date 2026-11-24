@@ -2206,4 +2206,6 @@ Jeśli nie prosiłeś(-aś) o nowe hasło, usuń tę wiadomość.',
   'That\'s it!' => 'To wszystko!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Przewodnik możesz uruchomić ponownie z menu konta, klikając swoje zdjęcie lub inicjały w prawym górnym rogu.',
   'Read the documentation' => 'Przeczytaj dokumentację',
+  'What\'s new' => 'Co nowego',
+  'Full changelog' => 'Pełna lista zmian',
 );

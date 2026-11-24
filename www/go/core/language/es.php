@@ -2299,4 +2299,6 @@ Si no ha solicitado una nueva contraseña, elimine este correo.',
   'That\'s it!' => '¡Eso es todo!',
   'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Vuelva a hacer el recorrido desde el menú de la cuenta, haciendo clic en su foto o sus iniciales arriba a la derecha.',
   'Read the documentation' => 'Leer la documentación',
+  'What\'s new' => 'Novedades',
+  'Full changelog' => 'Registro de cambios completo',
 );
