@@ -1,7 +1,7 @@
 <?php
 return array (
-  'name' => 'OAuth2 Client',
-  'description' => 'Met deze module configureert u eenvoudig een OAuth2 connectie.',
+  'name' => 'OAuth2-client',
+  'description' => 'Maakt verbinding met Google en Microsoft 365 voor e-mailaccounts en om met die accounts in te loggen.',
   'Click here' => 'Klik hier',
   'Hello' => 'Hallo',
   'to close this window.' => 'om dit scherm af te sluiten.',
