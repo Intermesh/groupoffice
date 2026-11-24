@@ -27,11 +27,14 @@ class Html extends Base {
 	 * Remove scripts, event handlers and other active content before the value is stored. The value is shown as HTML
 	 * in the detail view.
 	 *
+	 * Only a value with active content is changed. Parsing and writing the HTML again would also change valid HTML,
+	 * like Word markup.
+	 *
 	 * @inheritDoc
 	 */
 	public function apiToDb($value, CustomFieldsModel $values, $entity)
 	{
-		if (!is_string($value) || $value === '') {
+		if (!is_string($value) || !StringUtil::containsActiveContent($value)) {
 			return $value;
 		}
 		return StringUtil::removeActiveContent($value);

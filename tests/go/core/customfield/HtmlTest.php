@@ -79,6 +79,9 @@ class HtmlTest extends TestCase
 			'paragraph with link' => ['<p>Hello <b>world</b> <a href="https://www.group-office.com">link</a></p>'],
 			// The old regular expression check refused this text
 			'text about javascript' => ['<p>Links starting with javascript: are removed</p>'],
+			// Parsing and writing these again would change them
+			'word markup' => ["<p class=MsoNormal><span lang=NL style='font-size:11.0pt'>Word<o:p></o:p></span></p>"],
+			'unclosed tags and entities' => ['<p>one<p>two &nbsp;&euro; a < b'],
 		];
 	}
 
