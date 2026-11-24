@@ -22,4 +22,7 @@ return array (
   'Bookmarks' => 'Favorieten',
   'Logo' => 'Logo',
   'Upload Logo' => 'Upload Logo',
+  'No bookmarks yet' => 'Nog geen favorieten',
+  'Keep links to the websites you use often in one place, grouped in categories. A bookmark can also open inside GroupOffice as a module.' => 'Bewaar links naar websites die u vaak gebruikt op één plek, gegroepeerd in categorieën. Een favoriet kan ook binnen GroupOffice openen als een module.',
+  'Add bookmark' => 'Favoriet toevoegen',
 );

@@ -1,6 +1,6 @@
 import {btn, combobox, comp, Component, datasourcestore, DataSourceStore, searchbtn, t, tbar} from "@intermesh/goui";
 import {BookmarksGridView} from "./BookmarksGridView.js";
-import {AclLevel, principalDS} from "@intermesh/groupoffice-core";
+import {AclLevel, emptystate, principalDS} from "@intermesh/groupoffice-core";
 import {BookmarksDialog} from "./BookmarksDialog.js";
 import {ManageCategoriesWindow} from "./ManageCategoriesWindow.js";
 import {BookmarksColumnView} from "./BookmarksColumnView.js";
@@ -38,6 +38,20 @@ export class Main extends Component {
 		const columnView = new BookmarksColumnView(this.store);
 		columnView.hidden = true;
 
+		const emptyState = emptystate({
+			store: this.store,
+			hidden: true,
+			icon: "bookmarks",
+			heading: t("No bookmarks yet"),
+			description: t("Keep links to the websites you use often in one place, grouped in categories. A bookmark can also open inside GroupOffice as a module."),
+			addText: t("Add bookmark"),
+			onAdd: () => this.addBookmark()
+		});
+
+		this.store.on("load", () => {
+			emptyState.hidden = this.store.count() > 0;
+		});
+
 		void this.store.load();
 
 		const toolbar = tbar({
@@ -46,11 +60,7 @@ export class Main extends Component {
 			btn({
 				icon: "add",
 				text: t("Add"),
-				handler: () => {
-					const dlg = new BookmarksDialog();
-
-					dlg.show();
-				}
+				handler: () => this.addBookmark()
 			}),
 			btn({
 				icon: "view_module",
@@ -109,5 +119,11 @@ export class Main extends Component {
 		this.items.add(toolbar);
 		this.items.add(gridView);
 		this.items.add(columnView);
+		this.items.add(emptyState);
+	}
+
+	private addBookmark() {
+		const dlg = new BookmarksDialog();
+		dlg.show();
 	}
 }
