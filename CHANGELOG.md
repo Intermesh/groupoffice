@@ -1,3 +1,6 @@
+- Core: Security: HTML custom fields could store a script that ran in the browser of everyone who opened the item, for example an administrator who opened a contact in a shared address book. A ">" in a quoted attribute value hid the script from the check. Scripts are now removed when an HTML custom field is saved, instead of refusing values that look like a script, and the detail view removes them from values that were stored before. The same check also protects notes and comments.
+- Core: Security: lists that show an HTML custom field as a column could run a script stored in that field, also from values stored before this update.
+
 23-11-2026: 26.0.62
 - Core: more helpful error message when a JMAP object is not created or updated in ExtJS3
 - Calendar: users with "Read free/busy" permission on a calendar can now subscribe to it and see its events as "Busy", without the title, description, location or participants. This works for every calendar, like a meeting room or a colleague's calendar: they see when it's booked but not why. Secret, cancelled and "free" events stay hidden, like in the availability window. These users can also find a resource in the participant field and book it. Calendars that are already shared with "Read free/busy" now show up in "Subscribe to calendar" for those users. #38255
