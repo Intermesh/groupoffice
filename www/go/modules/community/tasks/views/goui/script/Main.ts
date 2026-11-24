@@ -374,7 +374,7 @@ export class Main extends MainThreeColumnPanel {
 				searchbtn({
 					listeners: {
 						input: ({text}) => {
-							(this.taskGrid.store.queryParams.filter as Filter).text = text;
+							this.taskGrid.store.setFilter("text", {text});
 							void this.taskGrid.store.load();
 						}
 					}
