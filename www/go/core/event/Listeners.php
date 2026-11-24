@@ -95,7 +95,17 @@ class Listeners extends Singleton {
 				continue;
 			}
 
-			$module->module()->defineListeners();
+			// Availability isn't checked, so the listeners stay when only the license check fails. But a module that the
+			// config doesn't allow is not used, and the other classes of an encoded module can't be loaded without a loader.
+			$moduleCls = $module->module();
+			if($moduleCls instanceof \go\core\Module && (
+				!\go\core\Module::isAllowed($module->name, $module->package) ||
+				($moduleCls->requiredLicense() !== null && !go()->getEnvironment()->hasIoncube())
+			)) {
+				continue;
+			}
+
+			$moduleCls->defineListeners();
 		}
 
 		//disable events to prevent recursion

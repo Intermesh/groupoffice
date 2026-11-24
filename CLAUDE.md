@@ -23,7 +23,12 @@ We are migrating away from legacy code. When writing new code or changing existi
 
 ## Running tests
 
+#### PHP
 Run phpunit as `www-data`, never as root. Use `tools/phpunit <path>` from the docker-groupoffice-development checkout (it runs as `www-data`; `-c <service>` picks another container than `groupoffice`, `-m install|upgrade|existing` the mode, default `install`, and `existing` runs against the existing database with Xdebug) or `docker compose exec -u www-data groupoffice ...`. Running as root creates root-owned files in `/tmp/phpunit`, `/tmp/groupoffice` and `/var/lib/groupoffice` and breaks the tooling. Tests live in `tests/` (`/usr/local/share/src/tests` in the container).
+
+#### Typescript (GOUI)
+
+Run mocha on the host from `www/views/goui/goui` with `npm test`, or `../../../node_modules/.bin/mocha` (mocha, tsx, chai and jsdom are installed in `www/node_modules`). `.mocharc.json` there sets up jsdom and always loads every file in `tests/`, so a path argument doesn't limit the run. Pick tests with `--grep <describe or it text>`. Running one file first fails with `Collection is not a constructor` because of the import order, also for existing tests.
 
 ## Environment
 
@@ -72,6 +77,7 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 
 ## Writing tests
 
+### PHP
 - Tests are PHPUnit (config `tests/phpunit.xml`, suites `core`, `modules`, `api`). They run against a real installed database, not mocks, via `tests/bootstrap-install.php`.
 - Mirror the source namespace: `go\core\util\IpAddress` is tested in `tests/go/core/util/IpAddressTest.php`. Module tests go in `tests/go/modules/<package>/<module>/`.
 - Classes extend `PHPUnit\Framework\TestCase`, are named `<Class>Test`, and use `testSomething` methods. Use data providers for many inputs (see `IpAddressTest`). A leading underscore (`_testFoo`) disables a test, so don't use it for new ones.
@@ -86,6 +92,13 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
   - Don't call external services. The test bootstrap disables the pwned module for that reason.
   - Find slow tests with `--log-junit <file>`, which records the time of every test.
 - Run a single test: `tools/phpunit <path>` (see "Running tests").
+
+### Typescript (GOUI)
+- Tests are mocha with chai's `expect`, in `www/views/goui/goui/tests/lib/`, mirroring `script/`: `script/util/Format.ts` is tested in `tests/lib/util/Format.ts`. Group tests with `describe()` per class and method and write `it()` texts as behaviour ("Decodes entities").
+- Import the source with a `.js` extension (`../../../script/util/Format.js`), like the existing tests.
+- Tests run in jsdom, not a browser. jsdom-global doesn't expose every browser global (`DOMParser` is missing), and jsdom doesn't load images or run `onerror`, so a test can't prove that an XSS payload doesn't run. Check that in a real browser, e.g. headless Chrome with `--dump-dom`, and test the output (text, elements, attributes) in mocha.
+- Run `npx tsc --noEmit` in the `goui` folder as well; mocha (through tsx) doesn't check types.
+- `goui` and `groupoffice-core` are git submodules: commit the change and its test in the submodule, then the submodule pointer in this repository.
 
 ## Converting ExtJS 3.4 to GOUI
 

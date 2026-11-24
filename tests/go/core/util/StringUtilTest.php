@@ -91,6 +91,8 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 			'css expression' => ['<div style="width: expression(alert(1))">x</div>'],
 			'formaction' => ['<button formaction="javascript:alert(1)">x</button>'],
 			'nested in table' => ['<table><tr><td><img src=x onerror=alert(1)></td></tr></table>'],
+			'greater than in value after other attributes' => ['<p>x</p><img src="x" title="a>b" onerror="alert(1)">'],
+			'comment ended with --!>' => ['<!-- --!><img alt=">" onerror=alert(1) src=x> -->'],
 		];
 	}
 
@@ -130,6 +132,37 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 	public function testFilterXSSRemovesActiveContent(string $html)
 	{
 		$this->assertNoActiveContent(\GO\Base\Util\StringHelper::filterXSS($html));
+	}
+
+	/**
+	 * detectXSS() guards HTML custom fields, notes and comments, where nothing is sanitized after it. The regular
+	 * expressions can't see an event handler after a ">" in a quoted attribute value.
+	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('activeHtmlProvider')]
+	public function testDetectXSSFindsActiveContent(string $html)
+	{
+		$this->assertTrue(StringUtil::detectXSS($html), $html);
+	}
+
+	public static function safeHtmlProvider(): array
+	{
+		return [
+			'paragraph' => ['<p>Hello <b>world</b></p>'],
+			'link' => ['<a href="https://www.group-office.com" target="_blank">GroupOffice</a>'],
+			'mailto' => ['<a href="mailto:info@example.com">Mail</a>'],
+			'inline image' => ['<img src="data:image/png;base64,iVBORw0KGgo=" alt="x">'],
+			'greater than in value' => ['<span title="a > b">compare</span>'],
+			'table' => ['<table style="width:100%"><tr><td>1</td><td>2</td></tr></table>'],
+			'list' => ['<ul><li>one</li><li>two</li></ul>'],
+			'comment' => ['<!-- from Word --><p>text</p>'],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('safeHtmlProvider')]
+	public function testDetectXSSAllowsSafeHtml(string $html)
+	{
+		$this->assertFalse(StringUtil::detectXSS($html), $html);
+		$this->assertFalse(StringUtil::containsActiveContent($html), $html);
 	}
 
 	/**
