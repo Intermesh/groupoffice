@@ -64,6 +64,7 @@ class AlertDispatcher extends CronJob
 			}
 
 			foreach (PushSubscription::findActiveForUser($alert->userId) as $subscription) {
+				go()->debug("Dispatching: " . $alert->id . ' '.$search->name);
 				$this->webPush->queue($subscription, json_encode([
 					'id' => $alert->id,
 					'tag' => 'alert-' . $alert->id,
