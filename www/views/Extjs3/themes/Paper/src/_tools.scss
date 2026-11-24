@@ -57,17 +57,16 @@
 }
 
 .empty-state, .x-grid-empty {
-	i
+
+	> i
 	{
 		@extend %icon;
 		display:block;
 		margin: utils.dp(8) auto;
-		display: block;
 		font-size: utils.dp(48);
 		max-height: utils.dp(48);
 		color: var(--fg-hint-text);
 	}
-
 }
 .empty-state {
 	p {
