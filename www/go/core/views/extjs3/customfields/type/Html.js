@@ -26,7 +26,8 @@ go.customfields.type.Html = Ext.extend(go.customfields.type.Text, {
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
-		return value;
+		// Values stored before they were sanitized on save may contain scripts
+		return value ? DOMPurify.sanitize(value) : value;
 	},
 
 	/**

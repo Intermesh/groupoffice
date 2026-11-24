@@ -6,6 +6,7 @@ use go\core\orm\Entity;
 use go\core\model\Field;
 use go\core\customfield\Base;
 use go\core\validate\ErrorCode;
+use go\core\orm\CustomFieldsModel;
 use go\core\util\StringUtil;
 
 class Html extends Base {
@@ -19,6 +20,20 @@ class Html extends Base {
 	protected function getFieldSQL(): string
 	{
 		return "TEXT NULL";
+	}
+
+	/**
+	 * Remove scripts, event handlers and other active content before the value is stored. The value is shown as HTML
+	 * in the detail view.
+	 *
+	 * @inheritDoc
+	 */
+	public function apiToDb($value, CustomFieldsModel $values, $entity)
+	{
+		if (!is_string($value) || $value === '') {
+			return $value;
+		}
+		return StringUtil::removeActiveContent($value);
 	}
 
 	/**
