@@ -1,5 +1,5 @@
 <?php
 return [
 		'name' => 'CardDAV server',
-		'description' => ' Module for synchronizing contacts via the CardDAV protocol.'
+		'description' => 'Synchronizes address books with phones and other apps through CardDAV.'
 ];
