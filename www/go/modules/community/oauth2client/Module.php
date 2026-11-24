@@ -176,4 +176,9 @@ class Module extends core\Module
 			$client->maybeRefreshAccessToken($account, $tokenParams);
 		}
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/oauth2.html";
+	}
 }

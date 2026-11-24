@@ -63,4 +63,9 @@ class Module extends core\Module
 		}
 		return Settings::get()->createMeetingUri();
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/jitsimeet.html";
+	}
 }

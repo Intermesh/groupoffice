@@ -363,4 +363,8 @@ class Module extends core\Module implements DomainProvider
 		return $user;
 	}
 
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/system-settings/authentication/ldap.html";
+	}
 }

@@ -44,4 +44,8 @@ class Module extends core\Module implements DomainProvider {
 						->all();
 	}
 
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/system-settings/authentication/imap.html";
+	}
 }

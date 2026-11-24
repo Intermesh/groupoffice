@@ -132,4 +132,9 @@ class EmailModule extends \GO\Base\Module{
 		if(!empty($params['unseenEmails']))
 			$html .= '<p>'.str_replace('{new}', $params['unseenEmails'], GO::t("You have {new} new e-mail(s)", "email")).'</p>';
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/email.html";
+	}
 }

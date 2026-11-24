@@ -64,4 +64,9 @@ final class Module extends core\Module
 	{
 		return Settings::get();
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/maildomains.html";
+	}
 }

@@ -331,4 +331,8 @@ class SieveModule extends Module{
 //			$response['sieve_after'] = $rule;
 		}
 
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/email.html#filtering-and-out-of-office";
+	}
 }

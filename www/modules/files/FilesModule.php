@@ -304,4 +304,8 @@ class FilesModule extends \GO\Base\Module{
 		$demoHome->syncFilesystem();
 	}
 
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/files.html";
+	}
 }

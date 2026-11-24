@@ -205,5 +205,8 @@ class Module extends core\Module {
 		}
 	}
 
-
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/tasks.html";
+	}
 }

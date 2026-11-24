@@ -38,4 +38,9 @@ class Module extends \go\core\Module
   {
       return Settings::get();
   }
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/dokuwiki.html";
+	}
 }

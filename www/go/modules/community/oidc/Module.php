@@ -84,4 +84,8 @@ class Module extends \go\core\Module
 		return ['clients' => array_map(fn(Client $c) => ['id' => $c->id, 'name' => $c->name], $clients)];
 	}
 
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/system-settings/openid-connect.html";
+	}
 }

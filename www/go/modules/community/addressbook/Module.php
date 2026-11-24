@@ -374,4 +374,9 @@ class Module extends core\Module
 		$a->state = $faker->state;
 		$a->country = $faker->country;
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/address-book.html";
+	}
 }

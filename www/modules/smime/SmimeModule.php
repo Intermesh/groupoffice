@@ -60,4 +60,9 @@ class SmimeModule extends \GO\Base\Module{
 
 		return $certs;
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/email.html#s-mime";
+	}
 }

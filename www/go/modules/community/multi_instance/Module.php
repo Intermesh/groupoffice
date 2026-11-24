@@ -231,4 +231,9 @@ class Module extends \go\core\Module {
 
 		return trim($str, " \n\\");
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/install/extras/multi_instance.html";
+	}
 }

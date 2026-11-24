@@ -13,4 +13,9 @@ class DavModule extends \GO\Base\Module{
 	{
 		return go()->t("Files", $this->getPackage(), $this->getName());
 	}
+
+	public function getDocumentationURL(): ?string
+	{
+		return "https://www.group-office.com/docs/latest/using/webdav/webdav.html";
+	}
 }
