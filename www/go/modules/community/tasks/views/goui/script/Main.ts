@@ -1,4 +1,4 @@
-import {client, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
+import {client, emptystate, filterpanel, jmapds, MainThreeColumnPanel} from "@intermesh/groupoffice-core";
 import {
 	btn,
 	checkbox,
@@ -345,6 +345,15 @@ export class Main extends MainThreeColumnPanel {
 		this.taskGrid = new TaskGrid();
 		this.taskGrid.draggableRows = true;
 		this.taskGrid.sortableGroup = "TaskToList";
+		this.taskGrid.emptyState = emptystate({
+			store: this.taskGrid.store,
+			icon: "task_alt",
+			heading: t("No tasks yet"),
+			description: t("Keep track of what needs to be done, with a due date, a priority and reminders. Assign tasks to colleagues and share task lists."),
+			addText: t("Add task"),
+			filterNames: ["text", "status", "completed", "assignedToMe", "user", "customfilters"],
+			onAdd: () => this.addTask()
+		});
 		void this.taskGrid.store.load();
 
 		this.taskGrid.rowSelectionConfig = {
@@ -382,10 +391,7 @@ export class Main extends MainThreeColumnPanel {
 				btn({
 					cls: "primary filled",
 					icon: "add",
-					handler: () => {
-						const dlg = new TaskDialog();
-						dlg.show();
-					}
+					handler: () => this.addTask()
 				}),
 				btn({
 					icon: "more_vert",
@@ -502,6 +508,11 @@ export class Main extends MainThreeColumnPanel {
 				this.taskGrid
 			)
 		);
+	}
+
+	private addTask() {
+		const dlg = new TaskDialog();
+		dlg.show();
 	}
 
 	protected createEast() {

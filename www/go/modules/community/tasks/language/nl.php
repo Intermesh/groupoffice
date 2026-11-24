@@ -110,4 +110,6 @@ return array (
   'Task list' => 'Takenlijst',
   'Tasklists' => 'Takenlijsten',
   'Tasks in this list will be shown in the calendar' => 'Taken in deze lijst worden in de agenda getoond',
+  'No tasks yet' => 'Nog geen taken',
+  'Keep track of what needs to be done, with a due date, a priority and reminders. Assign tasks to colleagues and share task lists.' => 'Houd bij wat er moet gebeuren, met een einddatum, een prioriteit en herinneringen. Wijs taken toe aan collega\'s en deel takenlijsten.',
 );
