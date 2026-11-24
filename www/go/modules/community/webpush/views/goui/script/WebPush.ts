@@ -24,14 +24,120 @@ function listenForVerification() {
 			return;
 		}
 		void jmapds('PushSubscription').update(ev.data.pushSubscriptionId, {verificationCode: ev.data.verificationCode})
+			.then(() => stateListeners.forEach(fn => fn()))
 			.catch(e => console.error("Couldn't verify the push subscription", e));
 	});
 }
 
-export async function subscribe(registration: ServiceWorkerRegistration) {
+const stateListeners = new Set<() => void>();
+
+/**
+ * Call a function when this device confirmed its subscription
+ *
+ * @return a function that stops the calls
+ */
+export function onDeviceStateChange(fn: () => void): () => void {
+	stateListeners.add(fn);
+	return () => stateListeners.delete(fn);
+}
+
+/**
+ * Whether this browser can receive push messages from GroupOffice
+ *
+ * - unsupported: the browser has no push, or the page isn't served over HTTPS
+ * - unavailable: the user has no access to the web push module
+ * - blocked: the user blocked notifications for this site in the browser
+ * - off: not subscribed, or turned off for this device
+ * - pending: subscribed, but the browser didn't confirm it yet
+ * - on: push messages reach this browser
+ */
+export type DeviceState = "unsupported" | "unavailable" | "blocked" | "off" | "pending" | "on";
+
+/**
+ * Remembers in this browser that the user turned push off, so logging in doesn't subscribe again
+ */
+const TURNED_OFF_KEY = 'webpushTurnedOff';
+
+export function isTurnedOffOnDevice(): boolean {
+	try {
+		return localStorage.getItem(TURNED_OFF_KEY) === "1";
+	} catch (e) {
+		return false;
+	}
+}
+
+function getApplicationServerKey(): string | undefined {
+	return client.session?.capabilities['urn:ietf:params:jmap:webpush-vapid']?.applicationServerKey;
+}
+
+function getDeviceClientId(): string {
+	let deviceClientId = localStorage.getItem('deviceClientId');
+	if (!deviceClientId) {
+		deviceClientId = crypto.randomUUID();
+		localStorage.setItem('deviceClientId', deviceClientId);
+	}
+	return deviceClientId;
+}
+
+async function getBrowserSubscription(): Promise<PushSubscription | null> {
+	const registration = await navigator.serviceWorker.getRegistration();
+	return registration ? registration.pushManager.getSubscription() : null;
+}
+
+export async function getDeviceState(): Promise<DeviceState> {
+	if (!window.isSecureContext || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+		return "unsupported";
+	}
+	if (!getApplicationServerKey()) {
+		return "unavailable";
+	}
+	if (Notification.permission === 'denied') {
+		return "blocked";
+	}
+	const subscription = await getBrowserSubscription();
+	if (!subscription || isTurnedOffOnDevice()) {
+		return "off";
+	}
+	// From the server, because the data source doesn't know when the server confirmed it
+	const deviceClientId = getDeviceClientId(),
+		response = await client.jmap("PushSubscription/get", {}),
+		mine = (response.list as any[]).find(s => s.deviceClientId === deviceClientId && s.url === subscription.endpoint);
+	if (!mine) {
+		return "off";
+	}
+	return mine.verified ? "on" : "pending";
+}
+
+/**
+ * Turn push on for this device. Call it from a click, because browsers only ask for permission after a user action.
+ *
+ * @return false when the user didn't allow notifications
+ */
+export async function turnOn(): Promise<boolean> {
+	if (Notification.permission !== 'granted' && await Notification.requestPermission() !== 'granted') {
+		return false;
+	}
+	localStorage.removeItem(TURNED_OFF_KEY);
+	return subscribe(await navigator.serviceWorker.ready);
+}
+
+/**
+ * Turn push off for this device, also for later logins
+ */
+export async function turnOff(): Promise<void> {
+	localStorage.setItem(TURNED_OFF_KEY, "1");
+	await unsubscribe(await getBrowserSubscription());
+}
+
+/**
+ * Subscribe this browser and save the subscription on the server
+ *
+ * @return false when there is no subscription, because the user didn't allow notifications
+ */
+export async function subscribe(registration: ServiceWorkerRegistration): Promise<boolean> {
 	listenForVerification();
 
-	const applicationServerKey = client.session?.capabilities['urn:ietf:params:jmap:webpush-vapid'].applicationServerKey;
+	const applicationServerKey = getApplicationServerKey();
 	if (!applicationServerKey)
 		return false;
 
@@ -63,16 +169,13 @@ export async function subscribe(registration: ServiceWorkerRegistration) {
 		subscriptionChanged = true;
 	}
 
-	let deviceClientId = localStorage.getItem('deviceClientId');
-	if (!deviceClientId) {
-		deviceClientId = crypto.randomUUID();
-		localStorage.setItem('deviceClientId', deviceClientId);
-	}
+	const deviceClientId = getDeviceClientId();
 
 	const result = await jmapds('PushSubscription').get();
 	const existing = result.list.find(s => s.deviceClientId === deviceClientId);
 
-	if (subscriptionChanged || !existing) { // then update server entity
+	// Also when the browser got a new address from its push service
+	if (subscriptionChanged || !existing || existing.url !== subscription.endpoint) { // then update server entity
 
 		if (existing) {
 			await jmapds('PushSubscription').destroy(existing.id);
@@ -86,10 +189,13 @@ export async function subscribe(registration: ServiceWorkerRegistration) {
 			}
 		})
 	}
-
+	return true;
 }
 
-export async function unsubscribe(subscription: PushSubscription): Promise<void> {
+/**
+ * Delete the subscriptions of this device on the server and in the browser
+ */
+export async function unsubscribe(subscription: PushSubscription | null): Promise<void> {
 
 	await jmapds('PushSubscription').query({
 		filter: {deviceClientId: localStorage.getItem('deviceClientId')}
@@ -100,5 +206,5 @@ export async function unsubscribe(subscription: PushSubscription): Promise<void>
 		}
 	});
 
-	await subscription.unsubscribe();
+	await subscription?.unsubscribe();
 }
