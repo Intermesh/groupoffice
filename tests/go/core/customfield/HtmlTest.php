@@ -73,10 +73,18 @@ class HtmlTest extends TestCase
 		}
 	}
 
-	public function testSafeHtmlIsKept(): void
+	public static function safeHtmlProvider(): array
 	{
-		$html = '<p>Hello <b>world</b> <a href="https://www.group-office.com">link</a></p>';
+		return [
+			'paragraph with link' => ['<p>Hello <b>world</b> <a href="https://www.group-office.com">link</a></p>'],
+			// The old regular expression check refused this text
+			'text about javascript' => ['<p>Links starting with javascript: are removed</p>'],
+		];
+	}
 
+	#[\PHPUnit\Framework\Attributes\DataProvider('safeHtmlProvider')]
+	public function testSafeHtmlIsKept(string $html): void
+	{
 		$a = new A();
 		$a->propA = 'html-' . uniqid();
 		$a->setCustomFields([self::$field->databaseName => $html]);

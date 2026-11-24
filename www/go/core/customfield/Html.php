@@ -3,14 +3,15 @@
 namespace go\core\customfield;
 
 use go\core\orm\Entity;
-use go\core\model\Field;
 use go\core\customfield\Base;
-use go\core\validate\ErrorCode;
 use go\core\orm\CustomFieldsModel;
 use go\core\util\StringUtil;
 
 class Html extends Base {
 
+	/**
+	 * @deprecated Values are no longer validated. Active content is removed on save, see apiToDb().
+	 */
 	public static bool $validationEnabled = true;
 	/**
 	 * Get column definition for SQL
@@ -35,21 +36,4 @@ class Html extends Base {
 		}
 		return StringUtil::removeActiveContent($value);
 	}
-
-	/**
-	 * @param $value
-	 * @param Field $field
-	 * @param $model
-	 * @return bool
-	 * @throws \Exception
-	 */
-	public function validate($value, Field $field, $model): bool
-	{
-		if(self::$validationEnabled && !empty($value) && StringUtil::detectXSS($value)) {
-			$model->setValidationError("customFields." . $field->databaseName, ErrorCode::INVALID_INPUT, "You're not allowed to put scripts in customFields." . $field->databaseName);				
-			return false;
-		}
-		return true;
-	}
-	
 }
