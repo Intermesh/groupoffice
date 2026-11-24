@@ -484,7 +484,7 @@ namespace go\core {
 				"max_users" => 0,
 				'quota' => 0,
 				"allowed_modules" => "",
-				"product_name" => "Group-Office",
+				"product_name" => "GroupOffice",
 				"lockWithFlock" => false,
 				"checkForUpdates" => true,
 
