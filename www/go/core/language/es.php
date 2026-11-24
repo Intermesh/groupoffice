@@ -2281,4 +2281,22 @@ Haga clic en el enlace siguiente (o péguelo en un navegador) para cambiar su co
 %s
 
 Si no ha solicitado una nueva contraseña, elimine este correo.',
+  'Skip' => 'Omitir',
+  '{current} of {total}' => '{current} de {total}',
+  'Take the tour' => 'Hacer el recorrido',
+  'This short tour shows you around. Use the buttons or the arrow keys to continue.' => 'Este breve recorrido le muestra lo más importante. Use los botones o las teclas de flecha para continuar.',
+  'The modules you open show as tabs here. Right-click a tab to pin it, so it is here every time you log in. Drag the tabs to change their order.' => 'Los módulos que abre aparecen aquí como pestañas. Haga clic derecho en una pestaña para fijarla, así estará aquí cada vez que inicie sesión. Arrastre las pestañas para cambiar su orden.',
+  'All modules' => 'Todos los módulos',
+  'Open any module from here, also the ones that aren\'t pinned.' => 'Abra aquí cualquier módulo, también los que no están fijados.',
+  'Shortcut' => 'Atajo de teclado',
+  'Search all modules at once.' => 'Busque en todos los módulos a la vez.',
+  'Reminders and other alerts show up here.' => 'Aquí aparecen los recordatorios y otros avisos.',
+  'Your account' => 'Su cuenta',
+  'Change your settings, like your language and password, and log out here.' => 'Cambie aquí su configuración, como su idioma y su contraseña, y cierre la sesión.',
+  'Link items to each other, like an e-mail or a note to a contact. The links show in the detail of both items, so related information is always one click away.' => 'Enlace elementos entre sí, como un correo electrónico o una nota con un contacto. Los enlaces aparecen en el detalle de ambos elementos, así la información relacionada siempre está a un clic.',
+  'Sharing' => 'Compartir',
+  'Address books, calendars, notebooks and other lists can be shared with colleagues. You choose who may read them and who may change them.' => 'Las libretas de direcciones, los calendarios, los cuadernos de notas y otras listas se pueden compartir con compañeros. Usted elige quién puede leerlos y quién puede modificarlos.',
+  'That\'s it!' => '¡Eso es todo!',
+  'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Vuelva a hacer el recorrido desde el menú de la cuenta, haciendo clic en su foto o sus iniciales arriba a la derecha.',
+  'Read the documentation' => 'Leer la documentación',
 );

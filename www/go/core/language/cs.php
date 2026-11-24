@@ -2302,4 +2302,22 @@ Klikněte na níže uvedený odkaz (nebo jej vložte do prohlížeče) a změňt
 %s
 
 Pokud jste o nové heslo nežádali, tento e-mail prosím smažte.',
+  'Skip' => 'Přeskočit',
+  '{current} of {total}' => '{current} z {total}',
+  'Take the tour' => 'Projít prohlídku',
+  'This short tour shows you around. Use the buttons or the arrow keys to continue.' => 'Tato krátká prohlídka vás provede prostředím. Pokračujte pomocí tlačítek nebo šipek na klávesnici.',
+  'The modules you open show as tabs here. Right-click a tab to pin it, so it is here every time you log in. Drag the tabs to change their order.' => 'Moduly, které otevřete, se zde zobrazují jako karty. Klikněte pravým tlačítkem na kartu a připněte ji, aby tu byla při každém přihlášení. Přetažením karet změníte jejich pořadí.',
+  'All modules' => 'Všechny moduly',
+  'Open any module from here, also the ones that aren\'t pinned.' => 'Odtud otevřete jakýkoli modul, i ty, které nejsou připnuté.',
+  'Shortcut' => 'Klávesová zkratka',
+  'Search all modules at once.' => 'Hledejte ve všech modulech najednou.',
+  'Reminders and other alerts show up here.' => 'Zde se zobrazují upomínky a další oznámení.',
+  'Your account' => 'Váš účet',
+  'Change your settings, like your language and password, and log out here.' => 'Zde změníte svá nastavení, například jazyk a heslo, a odhlásíte se.',
+  'Link items to each other, like an e-mail or a note to a contact. The links show in the detail of both items, so related information is always one click away.' => 'Propojte položky navzájem, například e-mail nebo poznámku s kontaktem. Odkazy se zobrazí v detailu obou položek, takže související informace máte vždy na jedno kliknutí.',
+  'Sharing' => 'Sdílení',
+  'Address books, calendars, notebooks and other lists can be shared with colleagues. You choose who may read them and who may change them.' => 'Adresáře, kalendáře, poznámkové bloky a další seznamy můžete sdílet s kolegy. Vy rozhodujete, kdo je smí číst a kdo je smí měnit.',
+  'That\'s it!' => 'To je vše!',
+  'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Prohlídku můžete projít znovu z nabídky účtu kliknutím na svůj obrázek nebo iniciály vpravo nahoře.',
+  'Read the documentation' => 'Přečíst dokumentaci',
 );

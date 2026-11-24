@@ -2188,4 +2188,22 @@ Kliknij poniższy link (lub wklej go do przeglądarki), aby zmienić hasło:
 %s
 
 Jeśli nie prosiłeś(-aś) o nowe hasło, usuń tę wiadomość.',
+  'Skip' => 'Pomiń',
+  '{current} of {total}' => '{current} z {total}',
+  'Take the tour' => 'Pokaż przewodnik',
+  'This short tour shows you around. Use the buttons or the arrow keys to continue.' => 'Ten krótki przewodnik pokaże Ci najważniejsze elementy. Użyj przycisków lub klawiszy strzałek, aby przejść dalej.',
+  'The modules you open show as tabs here. Right-click a tab to pin it, so it is here every time you log in. Drag the tabs to change their order.' => 'Otwierane moduły są tu wyświetlane jako karty. Kliknij kartę prawym przyciskiem myszy, aby ją przypiąć, dzięki czemu będzie tu przy każdym logowaniu. Przeciągaj karty, aby zmienić ich kolejność.',
+  'All modules' => 'Wszystkie moduły',
+  'Open any module from here, also the ones that aren\'t pinned.' => 'Stąd otworzysz dowolny moduł, również te nieprzypięte.',
+  'Shortcut' => 'Skrót klawiszowy',
+  'Search all modules at once.' => 'Przeszukuj wszystkie moduły naraz.',
+  'Reminders and other alerts show up here.' => 'Tutaj pojawiają się przypomnienia i inne powiadomienia.',
+  'Your account' => 'Twoje konto',
+  'Change your settings, like your language and password, and log out here.' => 'Tutaj zmienisz swoje ustawienia, takie jak język i hasło, oraz się wylogujesz.',
+  'Link items to each other, like an e-mail or a note to a contact. The links show in the detail of both items, so related information is always one click away.' => 'Łącz elementy ze sobą, na przykład e-mail lub notatkę z kontaktem. Odnośniki są widoczne w szczegółach obu elementów, więc powiązane informacje są zawsze o jedno kliknięcie dalej.',
+  'Sharing' => 'Udostępnianie',
+  'Address books, calendars, notebooks and other lists can be shared with colleagues. You choose who may read them and who may change them.' => 'Książki adresowe, kalendarze, notatniki i inne listy możesz udostępniać współpracownikom. Ty decydujesz, kto może je czytać, a kto zmieniać.',
+  'That\'s it!' => 'To wszystko!',
+  'Take the tour again from the account menu, by clicking your picture or initials at the top right.' => 'Przewodnik możesz uruchomić ponownie z menu konta, klikając swoje zdjęcie lub inicjały w prawym górnym rogu.',
+  'Read the documentation' => 'Przeczytaj dokumentację',
 );
