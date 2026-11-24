@@ -22,4 +22,6 @@ return array (
   'Request ID' => 'ID aanvragen',
   'Entity ID' => 'Identiteit van de entiteit',
   'Datum' => 'Datum',
+  'Nothing logged in this period' => 'Niets vastgelegd in deze periode',
+  'The history shows who created, changed or deleted items, when users logged in and out, failed login attempts, file downloads and sent e-mails. Choose another date range to see other entries.' => 'De geschiedenis toont wie items heeft gemaakt, gewijzigd of verwijderd, wanneer gebruikers in- en uitlogden, mislukte inlogpogingen, gedownloade bestanden en verzonden e-mails. Kies een andere periode om andere records te zien.',
 );

@@ -15,7 +15,7 @@ import {
 	tbar,
 	DateRangeField, btn
 } from "@intermesh/goui";
-import {principalcombo} from "@intermesh/groupoffice-core";
+import {emptystate, principalcombo} from "@intermesh/groupoffice-core";
 import {LogEntryGrid} from "./LogEntryGrid.js";
 import {TypeGrid} from "./TypeGrid.js";
 
@@ -36,6 +36,13 @@ export class Main extends Component {
 
 		this.logEntryGrid = new LogEntryGrid();
 		this.logEntryGrid.stateId = "history-logentry-grid";
+		this.logEntryGrid.emptyState = emptystate({
+			store: this.logEntryGrid.store,
+			icon: "history",
+			heading: t("Nothing logged in this period"),
+			description: t("The history shows who created, changed or deleted items, when users logged in and out, failed login attempts, file downloads and sent e-mails. Choose another date range to see other entries."),
+			filterNames: ["search", "user", "actions", "entities"]
+		});
 
 		this.items.add(
 			this.west = this.createWest(),
