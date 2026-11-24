@@ -2259,4 +2259,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Put users in groups to share items and give permissions to many users at once.' => 'Plaats gebruikers in groepen om items te delen en veel gebruikers tegelijk rechten te geven.',
   'Getting started' => 'Aan de slag',
   'Read the guide that explains the basics of GroupOffice.' => 'Lees de handleiding die de basis van GroupOffice uitlegt.',
+  'Try other search words or filters.' => 'Probeer andere zoekwoorden of filters.',
 );
