@@ -1,5 +1,5 @@
 import {btn, checkbox, comp, Component, EntityID, Notifier, router, searchbtn, t, tbar, Window} from "@intermesh/goui";
-import {authManager, client, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
+import {authManager, client, emptystate, MainThreeColumnPanel, User} from "@intermesh/groupoffice-core";
 import {DomainTable} from "./DomainTable.js";
 import {DomainDialog} from "./DomainDialog.js";
 import {DomainDetail} from "./DomainDetail.js";
@@ -31,6 +31,14 @@ export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 	    this.tbl = new DomainTable();
 			this.tbl.stateId = "maildomains-table";
 			this.tbl!.store.setFilter("active", {active: true});
+			this.tbl.emptyState = emptystate({
+				store: this.tbl.store,
+				icon: "domain",
+				heading: t("No mail domains yet"),
+				description: t("Host e-mail for your own domains on this mail server. Add a domain, then create its mailboxes and aliases and check its DNS records for MX, SPF, DKIM and DMARC."),
+				addText: t("Add mail domain"),
+				onAdd: () => this.addDomain()
+			});
 
 			this.tbl.rowSelection!.on("rowselect", ({target}) => {
 				if(target.getSelected().length) {
@@ -72,11 +80,7 @@ export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 				    icon: "add",
 				    text: t("Add"),
 				    cls: "filled primary",
-				    handler: async () => {
-					    const dlg = new DomainDialog();
-					    dlg.show();
-					    dlg.form.value = {userId: this.user!.id, active: 1};
-				    }
+				    handler: () => this.addDomain()
 			    }),
 
 
@@ -137,6 +141,12 @@ export class MainPanel extends MainThreeColumnPanel<Component, DomainDetail> {
 
 
 
+	}
+
+	private addDomain() {
+		const dlg = new DomainDialog();
+		dlg.show();
+		dlg.form.value = {userId: this.user!.id, active: 1};
 	}
 
 	setDomainId(domainId:EntityID) {

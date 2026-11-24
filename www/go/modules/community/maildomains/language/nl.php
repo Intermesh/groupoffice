@@ -81,4 +81,7 @@ return array (
   'Automatically delete mail from the Trash and Spam folder after a period of time.' => 'Verwijder automatisch e-mail uit de map Prullenbak en Spam na een periode.',
   'Expunge after days' => 'Ontruimen na dagen',
   'Mailbox defaults' => 'Standaardwaarden mailboxen',
+  'No mail domains yet' => 'Nog geen e-maildomeinen',
+  'Host e-mail for your own domains on this mail server. Add a domain, then create its mailboxes and aliases and check its DNS records for MX, SPF, DKIM and DMARC.' => 'Host e-mail voor uw eigen domeinen op deze mailserver. Voeg een domein toe, maak daarna de mailboxen en aliassen aan en controleer de DNS-records voor MX, SPF, DKIM en DMARC.',
+  'Add mail domain' => 'E-maildomein toevoegen',
 );
