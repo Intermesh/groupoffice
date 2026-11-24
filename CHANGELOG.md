@@ -1,3 +1,10 @@
+- Core: After an upgrade, administrators see what's new: the changelog of the versions since the one they saw last, once on any device.
+- Core: "Documentation" in the account menu opens the documentation of the module you are in.
+- Core: New users get a short guided tour of the screen at their first login: the module tabs, the launcher, search, notifications and their account, and what links and sharing are. "Take the tour" in the account menu starts it again.
+- Core: The Swedish translation of "Next" was empty.
+- Core: An empty list explains what its items are for and has a button to add the first one, in notes, tasks, bookmarks, mail domains, absence, activities, catalog, forms, projects, reports and support requests. History and approval explain what they show. While searching or filtering, the list says that nothing was found. The empty state stays in view when a wide table scrolls sideways.
+- Tasks: The search text stays applied when another task list or filter is chosen.
+- Core: After the installation, the administrator gets a welcome window with the system settings to go through (General, Notifications, Appearance, Modules, Groups and Users). From there they can also generate demo data and open the getting started guide.
 - Core: Security: HTML custom fields could store a script that ran in the browser of everyone who opened the item, for example an administrator who opened a contact in a shared address book. A ">" in a quoted attribute value hid the script from the check. Scripts are now removed when an HTML custom field is saved, instead of refusing values that look like a script, and the detail view removes them from values that were stored before. The same check also protects notes and comments.
 - Core: Security: lists that show an HTML custom field as a column could run a script stored in that field, also from values stored before this update.
 
@@ -651,7 +658,6 @@
 - Projects3: Webdav support for projects3
 
 06-03-2026: 26.0.12
->>>>>>> f1810d362 (Ticket 38262: API keys: mask access token in the history log)
 - LDAP: Fixed LDAP authentication not work #1444
 - Core: Fixed encoding issue after moving grid columns
 
