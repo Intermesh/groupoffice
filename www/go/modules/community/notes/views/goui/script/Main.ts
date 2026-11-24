@@ -21,6 +21,7 @@ import {
 import {
 	AclLevel,
 	client,
+	emptystate,
 	entities,
 	Export,
 	filterpanel, Import,
@@ -51,6 +52,20 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 		this.on("render", async () => {
 			void this.noteBookGrid.store.load();
 		});
+	}
+
+	private addNote() {
+		const dlg = new NoteDialog();
+		const noteBookId = this.noteBookGrid.rowSelection!.getSelected()[0].record.id;
+		dlg.form.value = {
+			noteBookId: noteBookId
+		};
+		dlg.show();
+		dlg.form.on("save", ({data, isNew}) => {
+			if (isNew) {
+				entities.get("Note")!.goto(data.id);
+			}
+		})
 	}
 
 	protected createWest() {
@@ -200,19 +215,17 @@ export class Main extends MainThreeColumnPanel<Component, Component, NoteDetail>
 			title: t("Add"),
 			icon: "add",
 			disabled: true,
-			handler: () => {
-				const dlg = new NoteDialog();
-				const noteBookId = this.noteBookGrid.rowSelection!.getSelected()[0].record.id;
-				dlg.form.value = {
-					noteBookId: noteBookId
-				};
-				dlg.show();
-				dlg.form.on("save", ({data, isNew}) => {
-					if (isNew) {
-						entities.get("Note")!.goto(data.id);
-					}
-				})
-			}
+			handler: () => this.addNote()
+		});
+
+		this.noteGrid.emptyState = emptystate({
+			store: this.noteGrid.store,
+			icon: "sticky_note_2",
+			heading: t("No notes yet"),
+			description: t("Keep information you want to find again, like meeting minutes, instructions or ideas. Share notebooks with your colleagues and link notes to contacts and projects."),
+			addText: t("Add note"),
+			mayAdd: () => !this.addButton.disabled,
+			onAdd: () => this.addNote()
 		});
 
 		return comp({

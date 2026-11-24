@@ -27,4 +27,7 @@ return array (
   'Switch between HTML and Markdown editor' => 'Wisselen tussen HTML- en Markdown-editor',
   'Switching the editor will clear the content. Are you sure?' => 'Bij het wisselen van editor wordt de inhoud gewist. Weet u het zeker?',
   'Default editor for new notes' => 'Standaardeditor voor nieuwe notities',
+  'No notes yet' => 'Nog geen notities',
+  'Keep information you want to find again, like meeting minutes, instructions or ideas. Share notebooks with your colleagues and link notes to contacts and projects.' => 'Bewaar informatie die u terug wilt vinden, zoals notulen, instructies of ideeën. Deel notitieblokken met uw collega\'s en koppel notities aan contacten en projecten.',
+  'Add note' => 'Notitie toevoegen',
 );
