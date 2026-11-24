@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="336" height="336" viewBox="0 0 336 336" xmlns="http://www.w3.org/2000/svg">
+	<title>CardDAV server</title>
+	<!-- Contact card -->
+	<rect x="14" y="64" width="280" height="200" rx="28" fill="#000000" opacity="0.14"/>
+	<rect x="14" y="56" width="280" height="200" rx="28" fill="#FF7043"/>
+	<circle cx="90" cy="128" r="30" fill="#FFFFFF"/>
+	<path d="M46 214 a44 44 0 0 1 88 0 z" fill="#FFFFFF"/>
+	<rect x="160" y="104" width="104" height="18" rx="9" fill="#FFFFFF"/>
+	<rect x="160" y="138" width="76" height="14" rx="7" fill="#FFFFFF" opacity="0.7"/>
+	<rect x="160" y="166" width="56" height="14" rx="7" fill="#FFFFFF" opacity="0.7"/>
+	<!-- Sync badge -->
+	<circle cx="254" cy="254" r="78" fill="#FFFFFF"/>
+	<circle cx="254" cy="254" r="72" fill="#1E88E5"/>
+	<g fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M218 254 A36 36 0 0 1 285 236"/>
+		<path d="M290 254 A36 36 0 0 1 223 272"/>
+	</g>
+	<g fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round">
+		<polygon points="294,252 272,244 298,226"/>
+		<polygon points="214,256 236,264 210,282"/>
+	</g>
+</svg>
