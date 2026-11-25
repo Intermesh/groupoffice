@@ -279,11 +279,13 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					'<tpl if="!GO.util.empty(locked_user_name)">'+
 						'<tr>'+
             '<td>'+t("Locked by", "files")+':</td>'+
-            '<td><div class="go-grid-icon btn-lock">{locked_user_name}'+
+            // '<td><div class="go-grid-icon btn-lock">{locked_user_name}'+
+            '<td>{locked_user_name}'+
 						'<tpl if="unlock_allowed">'+
 							' <span class="fs-unlock" style="cursor:pointer;text-decoration:underline;">['+t("Unlock", "files")+']</span>'+
 						'</tpl>'+
-						'</div></td>'+
+						// '</div></td>'+
+						'</td>'+
 						'</tr>'+
           '</tpl>'+
 
