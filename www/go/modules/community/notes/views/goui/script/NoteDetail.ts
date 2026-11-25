@@ -32,7 +32,9 @@ export class NoteDetail extends DetailPanel<Note> {
 			})
 		);
 
-		this.scroller.items.add(this.form = datasourceform({dataSource: noteDS}, ...customFields.getFieldSets("Note").map(fs => new CustomFieldDetailFieldset(fs))))
+		this.scroller.items.add(
+			//todo hide when empty
+			this.form = datasourceform({dataSource: noteDS}, ...customFields.getFieldSets("Note").map(fs => new CustomFieldDetailFieldset(fs))))
 		// Enlarge images when clicked in window
 		Image.enableZoom(this.content.el);
 
