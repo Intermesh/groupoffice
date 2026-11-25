@@ -1,4 +1,4 @@
-import {br, btn, Button, comp, Component, datasourceform, DataSourceForm, h3, hr, menu, t} from "@intermesh/goui";
+import {br, btn, Button, comp, Component, datasourceform, DataSourceForm, h3, hr, menu, t, tbar} from "@intermesh/goui";
 import {
 	AclLevel,
 	addbutton,
@@ -28,7 +28,7 @@ export class NoteDetail extends DetailPanel<Note> {
 
 		this.scroller.items.add(
 			this.content = comp({
-				cls: "normalize code-blocks card pad"
+				cls: "normalize code-blocks card"
 			})
 		);
 
@@ -94,17 +94,17 @@ export class NoteDetail extends DetailPanel<Note> {
 			this.editBtn.disabled = entity.permissionLevel < AclLevel.WRITE;
 
 			this.content.items.clear();
-			this.content.items.add(h3({
+			this.content.items.add(tbar({},h3({
 				text: entity.name
-			}));
-			this.content.items.add(br());
+			})));
+			// this.content.items.add());
 
 			if(Encrypt.isEncrypted(entity.content)) {
 				Encrypt.prompt(entity.content).then(decryptedText => {
-					this.content.items.add(Image.replace(Markdown.contentToHtml(decryptedText, entity.type)));
+					this.content.items.add(comp({cls: "pad"}, Image.replace(Markdown.contentToHtml(decryptedText, entity.type))));
 				})
 			} else{
-				this.content.items.add(Image.replace(Markdown.contentToHtml(entity.content, entity.type)));
+				this.content.items.add(comp({cls: "pad"}, Image.replace(Markdown.contentToHtml(entity.content, entity.type))));
 			}
 
 			void this.form.load(entity.id);
