@@ -128,7 +128,9 @@ class Disk implements CacheInterface {
 	 * @param string $key 
 	 */
 	public function delete(string $key) {
-		$key = File::stripInvalidChars($key, '-');
+		// Same mapping as set() and get(): stripInvalidChars() also replaced '\\' and ':', so a key
+		// holding them (class names, dbColumns_<dsn>_<table>) pointed at a file that was never written.
+		$key = str_replace('/', '-', $key);
 		
 		unset($this->cache[$key]);
 
