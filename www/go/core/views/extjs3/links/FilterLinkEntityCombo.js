@@ -14,3 +14,6 @@ go.links.FilterLinkEntityCombo = Ext.extend(go.form.FormContainer, {
 			return this.items.itemAt(0).getRawValue();
 	}
 });
+
+// "link" is the filter type name used by GOUI filter definitions
+go.filter.types.link = go.filter.variabletypes.link = go.links.FilterLinkEntityCombo;
