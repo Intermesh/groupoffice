@@ -81,7 +81,7 @@ class ResponseTest extends TestCase
 	}
 
 	/**
-	 * Audio and video aren't sandboxed: Safari then requests the media without the session cookie (401)
+	 * Audio and video aren't sandboxed: the media player of the browser doesn't work in a sandbox
 	 */
 	#[DataProvider('mediaTypeProvider')]
 	public function testFileSecurityHeadersMediaNotSandboxed(string $contentType)
