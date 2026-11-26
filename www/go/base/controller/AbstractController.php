@@ -207,7 +207,8 @@ abstract class AbstractController extends Observable {
 			!GO::config()->debug &&
 			!GO::config()->disable_security_token_check &&
 			!empty($_REQUEST['r']) &&
-			(!is_string($requestToken) || !is_string($sessionToken) || !hash_equals($sessionToken, $requestToken))
+			(!is_string($requestToken) || !is_string($sessionToken) || !hash_equals($sessionToken, $requestToken)) &&
+			!($state instanceof State && $state->hasValidCSRFToken())
 		) {
 			throw new SecurityTokenMismatch();
 		} else {
