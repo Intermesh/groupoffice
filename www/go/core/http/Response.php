@@ -161,7 +161,9 @@ class Response extends Singleton{
 	 *
 	 * "X-Content-Type-Options: nosniff" makes the browser use the content type that is sent, instead of guessing a
 	 * more dangerous one from the contents. A file shown inline is also sandboxed so scripts in it can't run. PDF isn't
-	 * sandboxed because the PDF viewer of the browser doesn't work in a sandbox.
+	 * sandboxed because the PDF viewer of the browser doesn't work in a sandbox. Audio and video aren't sandboxed
+	 * because they can't run scripts, and because the sandbox gives the media player page an opaque origin: Safari
+	 * then loads the media with range requests without the SameSite session cookie and gets "401 Unauthorized".
 	 *
 	 * @param string|null $contentType Content type that is sent to the browser
 	 * @param bool $inline True when the file is sent with "Content-Disposition: inline"
@@ -172,7 +174,8 @@ class Response extends Singleton{
 		$headers = ['X-Content-Type-Options' => 'nosniff'];
 
 		$mediaType = strtolower(trim(explode(';', (string) $contentType)[0]));
-		if ($inline && $mediaType !== 'application/pdf') {
+		$isMedia = str_starts_with($mediaType, 'audio/') || str_starts_with($mediaType, 'video/');
+		if ($inline && $mediaType !== 'application/pdf' && !$isMedia) {
 			$headers['Content-Security-Policy'] = 'sandbox';
 		}
 

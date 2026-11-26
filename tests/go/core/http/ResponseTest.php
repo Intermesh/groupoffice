@@ -79,4 +79,47 @@ class ResponseTest extends TestCase
 		// The PDF viewer of the browser doesn't work in a sandbox
 		$this->assertSame(['X-Content-Type-Options' => 'nosniff'], Response::fileSecurityHeaders('application/pdf', true));
 	}
+
+	/**
+	 * Audio and video aren't sandboxed: Safari then requests the media without the session cookie (401)
+	 */
+	#[DataProvider('mediaTypeProvider')]
+	public function testFileSecurityHeadersMediaNotSandboxed(string $contentType)
+	{
+		$this->assertSame(['X-Content-Type-Options' => 'nosniff'], Response::fileSecurityHeaders($contentType, true));
+	}
+
+	public static function mediaTypeProvider(): array
+	{
+		return [
+			['audio/mpeg'],
+			['audio/x-wav'],
+			['Audio/Ogg; codecs=opus'],
+			['video/mp4'],
+		];
+	}
+
+	/**
+	 * Other inline types keep the sandbox, also when they only look like media
+	 */
+	#[DataProvider('sandboxedTypeProvider')]
+	public function testFileSecurityHeadersSandboxed(string $contentType)
+	{
+		$this->assertSame(
+			['X-Content-Type-Options' => 'nosniff', 'Content-Security-Policy' => 'sandbox'],
+			Response::fileSecurityHeaders($contentType, true)
+		);
+	}
+
+	public static function sandboxedTypeProvider(): array
+	{
+		return [
+			['text/plain'],
+			['image/jpeg'],
+			['application/octet-stream'],
+			['application/audio'],
+			['text/video'],
+			[''],
+		];
+	}
 }
