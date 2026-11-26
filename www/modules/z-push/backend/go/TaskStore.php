@@ -308,16 +308,13 @@ class TaskStore extends Store {
 		}
 
 		$tasklist->name = $displayname;
+		if(empty($oldid)) {
+			// A user property, so it's set for the current user only
+			$tasklist->syncToDevice = true;
+		}
 		if(!$tasklist->save()) {
 			ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $displayname could not be created");
 			return false;
-		}
-
-		if(empty($oldid)) {
-			if(!go()->getDbConnection()->insert('sync_tasklist_user', ['userId' => go()->getUserId(), 'tasklistId' => $tasklist->id])->execute()) {
-				ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $displayname could not be added to sync profile");
-				return false;
-			}
 		}
 
 		return $this->StatFolder($tasklist->id);

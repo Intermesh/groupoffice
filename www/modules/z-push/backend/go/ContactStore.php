@@ -203,8 +203,7 @@ class ContactStore extends Store implements ISearchProvider {
 
 		$addressBooks = AddressBook::find()
 			->selectSingleValue('a.id')
-			->join("sync_addressbook_user", "u", "u.addressBookId = a.id")
-			->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
+			->where('syncToDevice', '=', true)
 			->filter([
 				"permissionLevel" => Acl::LEVEL_READ
 			])->all();

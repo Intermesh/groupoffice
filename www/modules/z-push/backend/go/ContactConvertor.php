@@ -452,20 +452,28 @@ class ContactConvertor {
 
 
 	/**
-	 * Get default address book
+	 * Get the address book for new contacts from a device
+	 *
+	 * The default address book of the user, or else the first writable address book that syncs to the device.
 	 *
 	 * @return AddressBook
 	 * @throws Exception
 	 */
 	public function getDefaultAddressBook(): AddressBook
 	{
-
-		$addressbook = AddressBook::find()
-			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
+		$defaultId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
+		$addressbook = isset($defaultId) ? AddressBook::find()
 			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
-			->where('su.userId', '=', go()->getAuthState()->getUserId())
-			->orderBy(['su.isDefault' => 'DESC'])
-			->single();
+			->where('a.id', '=', $defaultId)
+			->single() : null;
+
+		if (!$addressbook) {
+			$addressbook = AddressBook::find()
+				->filter(['permissionLevel' => Acl::LEVEL_WRITE])
+				->where('syncToDevice', '=', true)
+				->orderBy(['a.id' => 'ASC'])
+				->single();
+		}
 
 		if (!$addressbook)
 			throw new Exception("FATAL: No default addressbook configured");
