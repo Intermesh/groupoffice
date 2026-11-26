@@ -12,6 +12,7 @@ use go\core\util\DateTime;
 use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\CalendarEvent as EventModel;
 use go\modules\community\calendar\Module;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -188,9 +189,7 @@ class CalendarEventChangeOrganizerTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider refusedChanges
-	 */
+	#[DataProvider('refusedChanges')]
 	public function testChangeOrganizerWithoutRightIsRefused(string $change): void
 	{
 		$event = $this->createEvent('restricted');

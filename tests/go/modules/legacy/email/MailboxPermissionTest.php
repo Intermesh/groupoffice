@@ -6,6 +6,7 @@ use GO\Email\Controller\AccountController;
 use GO\Email\Controller\FolderController;
 use GO\Email\Controller\MessageController;
 use GO\Email\Model\Account;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/fixtures/SharedAccountTrait.php';
@@ -43,9 +44,7 @@ class MailboxPermissionTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider changingActions
-	 */
+	#[DataProvider('changingActions')]
 	public function testDelegatedUserCannotChangeMail(string $controller, string $action, array $params): void
 	{
 		$this->actAs($this->other->id);
@@ -53,9 +52,7 @@ class MailboxPermissionTest extends TestCase
 		$this->assertDenied(new $controller, $action, $params);
 	}
 
-	/**
-	 * @dataProvider changingActions
-	 */
+	#[DataProvider('changingActions')]
 	public function testOwnerCanChangeMail(string $controller, string $action, array $params): void
 	{
 		$this->actAs($this->owner->id);

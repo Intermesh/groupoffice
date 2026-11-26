@@ -174,9 +174,7 @@ class ICalendarHelperRoundTripTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider participantRoles
-	 */
+	#[DataProvider('participantRoles')]
 	public function testParticipantRoles(string $name, array $expectedRoles): void
 	{
 		$imported = $this->roundTrip($this->eventWithParticipants());

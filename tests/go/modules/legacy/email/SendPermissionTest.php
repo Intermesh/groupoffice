@@ -4,6 +4,7 @@ namespace go\modules\legacy\email;
 
 use GO\Email\Controller\MessageController;
 use GO\Email\Model\Account;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/fixtures/SharedAccountTrait.php';
@@ -48,18 +49,14 @@ class SendPermissionTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider actions
-	 */
+	#[DataProvider('actions')]
 	public function testDelegatedUserCannotSendAsSharedAccount(string $action): void
 	{
 		$this->actAs($this->other->id);
 		$this->assertDenied(new MessageController(), $action, $this->messageParams());
 	}
 
-	/**
-	 * @dataProvider actions
-	 */
+	#[DataProvider('actions')]
 	public function testUserWithUseAccountCanSend(string $action): void
 	{
 		$acl = \go\core\model\Acl::findById($this->account->acl_id);

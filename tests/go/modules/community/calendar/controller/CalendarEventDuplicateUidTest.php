@@ -9,6 +9,7 @@ use go\modules\community\calendar\model\Calendar;
 use go\modules\community\calendar\model\CalendarEvent as EventModel;
 use go\modules\community\calendar\model\ICalendarHelper;
 use go\modules\community\calendar\Module;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -139,9 +140,7 @@ class CalendarEventDuplicateUidTest extends TestCase
 		return ['attendee' => ['attendee'], 'user without access' => ['outsider']];
 	}
 
-	/**
-	 * @dataProvider users
-	 */
+	#[DataProvider('users')]
 	public function testCopyOfScheduledEventIsRefused(string $userKey): void
 	{
 		$response = $this->createAs($userKey, ['uid' => $this->event->uid, 'participants' => $this->participants()]);

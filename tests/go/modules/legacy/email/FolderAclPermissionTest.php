@@ -3,6 +3,7 @@
 namespace go\modules\legacy\email;
 
 use GO\Email\Controller\FolderController;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/fixtures/SharedAccountTrait.php';
@@ -33,9 +34,7 @@ class FolderAclPermissionTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider actions
-	 */
+	#[DataProvider('actions')]
 	public function testUserWithoutManagePermissionCannotShareFolders(string $action, array $params): void
 	{
 		$this->actAs($this->other->id);
@@ -43,9 +42,7 @@ class FolderAclPermissionTest extends TestCase
 		$this->assertDenied(new FolderController(), $action, $params);
 	}
 
-	/**
-	 * @dataProvider actions
-	 */
+	#[DataProvider('actions')]
 	public function testOwnerCanShareFolders(string $action, array $params): void
 	{
 		$this->actAs($this->owner->id);

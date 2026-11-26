@@ -3,6 +3,7 @@
 namespace go\modules\legacy\sieve;
 
 use GO\Sieve\Controller\SieveController;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../email/fixtures/SharedAccountTrait.php';
@@ -40,18 +41,14 @@ class SievePermissionTest extends TestCase
 		return $controllers;
 	}
 
-	/**
-	 * @dataProvider controllers
-	 */
+	#[DataProvider('controllers')]
 	public function testUserWithoutManagePermissionCannotConnect(string $controller): void
 	{
 		$this->actAs($this->other->id);
 		$this->assertDenied(new $controller, '_sieveConnect', $this->account->id);
 	}
 
-	/**
-	 * @dataProvider controllers
-	 */
+	#[DataProvider('controllers')]
 	public function testOwnerCanConnect(string $controller): void
 	{
 		$this->actAs($this->owner->id);
