@@ -137,8 +137,6 @@ try {
 
 		GO::$ignoreAclPermissions = false;
 
-		// fake URL
-		go()->getSettings()->URL = "http://localhost";
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
         echo "Running upgrade: ";
@@ -192,7 +190,11 @@ try {
 	go()->getSettings()->smtpHost = 'mailserver';
 	go()->getSettings()->smtpPort = 25;
 	go()->getSettings()->smtpEncryption = null;
+	// Fake URL. Saved, because the CLI has no request to take the host from and rebuildCache() reloads the settings.
+	go()->getSettings()->URL = "http://localhost/";
 	go()->getSettings()->save();
+	// The request caches the host, which it took from the URL setting before it was set
+	core\http\Request::destroy();
 
 } catch (Exception $e) {
 	echo $e;
