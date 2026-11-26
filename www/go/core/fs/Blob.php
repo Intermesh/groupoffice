@@ -334,31 +334,83 @@ class Blob extends orm\Entity {
 
 	protected function internalSave(): bool
 	{
-		if (!is_dir(dirname($this->path()))) {
-			mkdir(dirname($this->path()), 0775, true);
+		$path = $this->path();
+		if (!is_dir(dirname($path))) {
+			mkdir(dirname($path), 0775, true);
 		}
-		if (!file_exists($this->path())) { 
+		$created = false;
+		$movedFrom = null;
+		if (!file_exists($path)) {
 			if (!empty($this->tmpFile)) {
 
 				$tempFile = new File($this->tmpFile);
 
 				if($this->removeFile) {
-					$tempFile->move(new File($this->path()));
+					$tempFile->move(new File($path));
+					$movedFrom = $this->tmpFile;
 				} else if($this->hardLink) {
 					try {
-						$tempFile->link(new File($this->path()));
+						$tempFile->link(new File($path));
 					} catch(Exception $e) {
 						//ignore
-						$tempFile->copy(new File($this->path()));
+						$tempFile->copy(new File($path));
 					}
 				} else {
-					$tempFile->copy(new File($this->path()));					
+					$tempFile->copy(new File($path));
 				}
 			} else if (!empty($this->strContent)) {
-				file_put_contents($this->path(), $this->strContent);
+				file_put_contents($path, $this->strContent);
 			}
+			$created = is_file($path);
 		}
 
+		if (!$created) {
+			return $this->saveRecord();
+		}
+
+		// The row may still be rolled back, by this save or by an outer transaction. Once the outermost
+		// transaction has ended, remove the file again if no row was committed for it.
+		$discard = self::discardCreatedFile($this->id, $path, $movedFrom);
+		$conn = go()->getDbConnection();
+		if ($conn->inTransaction()) {
+			$conn->afterTransaction($discard);
+			return $this->saveRecord();
+		}
+
+		try {
+			return $this->saveRecord();
+		} finally {
+			$discard();
+		}
+	}
+
+	/**
+	 * Removes a file that a save created, unless a blob row references it. A file that was moved from a temporary file
+	 * is moved back, so the caller can retry. Runs after the transaction has ended, so it sees every committed row.
+	 *
+	 * Static, so that a queued callback does not keep the blob and its content in memory.
+	 */
+	private static function discardCreatedFile(string $id, string $path, ?string $movedFrom): \Closure
+	{
+		return static function() use ($id, $path, $movedFrom) {
+			if (!is_file($path)) {
+				return;
+			}
+			// Another request may have saved the same content (same sha1) and committed meanwhile.
+			$hasRow = go()->getDbConnection()->selectSingleValue('id')->from('core_blob')->where('id', '=', $id)->single();
+			if ($hasRow) {
+				return;
+			}
+			if (isset($movedFrom) && !file_exists($movedFrom)) {
+				rename($path, $movedFrom);
+			} else {
+				unlink($path);
+			}
+		};
+	}
+
+	private function saveRecord(): bool
+	{
 		if (!$this->keepStoredMetaData || $this->isNew()) {
 			return parent::internalSave();
 		}
@@ -618,8 +670,9 @@ class Blob extends orm\Entity {
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function removeMissingFromFilesystem(bool $delete = false) {
+	public static function removeMissingFromFilesystem(bool $delete = false, int $minAgeHours = 24) {
 		$folder = go()->getDataFolder()->getFolder("data");
+		$cutoff = time() - $minAgeHours * 3600;
 
 		foreach($folder->getFolders() as $level1) {
 			foreach($level1->getFolders() as $level2) {
@@ -632,7 +685,11 @@ class Blob extends orm\Entity {
 
 					echo $blob ? "found" : "NOT FOUND";
 
-					if(!$blob && $delete) {
+					// Skip young files: a request may be between writing the file and committing the row.
+					// ctime, not mtime: a moved or hard-linked file keeps the mtime of its source.
+					// The file may be gone by now: a transaction that just ended can remove its own file.
+					$ctime = @filectime($file->getPath());
+					if(!$blob && $delete && $ctime !== false && $ctime < $cutoff) {
 						$file->delete();
 					}
 
