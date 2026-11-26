@@ -165,7 +165,7 @@ i.icon.em-low_priority {
 	text-overflow: initial;
 	white-space: normal;
 	i {
-		font-size: utils.dp(16);
+		font-size: utils.dp(16) !important;
 		float: right;
 		width: utils.dp(16);
 		height: utils.dp(16);
