@@ -396,22 +396,7 @@ go.util =  (function () {
 			this.uploadDialog.click();
 		},
 
-		/**
-		 * Open a file in the browser
-		 *
-		 * Audio and video play in a window of the page (MediaWindow of groupoffice-core), other files open in a new
-		 * tab. Safari doesn't send the login cookie when it plays a media file in a tab of its own.
-		 *
-		 * @param {string} url Download URL, sent inline
-		 * @param {string} [name] File name, to detect audio and video
-		 * @param {string} [type] Content type like "audio/mpeg"
-		 */
-		viewFile : function(url, name, type) {
-
-			// set by MediaWindow.ts when a GOUI module is loaded
-			if((name || type) && go.util.viewMedia && go.util.viewMedia(url, name, type)) {
-				return;
-			}
+		viewFile : function(url) {
 
 			const win  = window.open(url);
 			if(!win || win.closed || typeof win.closed=='undefined') {

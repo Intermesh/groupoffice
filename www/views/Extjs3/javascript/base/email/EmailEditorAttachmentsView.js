@@ -119,12 +119,12 @@ Ext.extend(GO.base.email.EmailEditorAttachmentsView, Ext.DataView, {
 
 		var record = this.store.getAt(index);
 		if(record.data.blobId) {
-			go.util.viewFile(go.Jmap.downloadUrl(record.data.blobId), record.data.name, record.data.type);
+			go.util.viewFile(go.Jmap.downloadUrl(record.data.blobId));
 		} else 	if(record.data.from_file_storage){
-			go.util.viewFile(GO.url("files/file/download",{path:record.data.tmp_file}), record.data.name, record.data.type);
+			go.util.viewFile(GO.url("files/file/download",{path:record.data.tmp_file}));
 		}else
 		{
-			go.util.viewFile(GO.url("core/downloadTempFile",{path:record.data.tmp_file}), record.data.name, record.data.type);
+			go.util.viewFile(GO.url("core/downloadTempFile",{path:record.data.tmp_file}));
 		}		
 	},
 	

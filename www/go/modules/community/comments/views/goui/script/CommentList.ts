@@ -15,7 +15,7 @@ import {
 	t, tbar,
 	Window
 } from "@intermesh/goui";
-import {AclLevel, client, entities, Image, img, principalDS, viewFile} from "@intermesh/groupoffice-core";
+import {AclLevel, client, entities, Image, img, principalDS} from "@intermesh/groupoffice-core";
 import {CommentDialog} from "./CommentDialog.js";
 import {commentDS, commentLabelDS} from "./Index.js";
 
@@ -327,7 +327,7 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 							icon: "description",
 							text: a.name,
 							handler: () => {
-								viewFile(client.downloadUrl(a.blobId) + "&inline=1", a.name);
+								window.open("api/download.php?blob=" + a.blobId + "&inline=1", "_blank");
 							}
 						}),
 						btn({
