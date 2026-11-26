@@ -142,11 +142,11 @@ try {
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
         echo "Running upgrade: ";
-		$importCmd = 'mysql --skip-ssl -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' ' . escapeshellarg($dbName) . ' < ' . __DIR__ . '/upgradetest/go250.sql';
+		$importCmd = 'mysql --skip-ssl -h ' .  escapeshellarg($config['db_host']) . ' -u '.escapeshellarg($config['db_user']) . ' -p'.escapeshellarg($config['db_pass']).' ' . escapeshellarg($dbName) . ' < ' . __DIR__ . '/upgradetest/go260.sql';
         echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
-	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/250data/* ' . $dataFolder->getPath();
+	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/260data/* ' . $dataFolder->getPath();
 	  echo "Running: " . $copyCmd . "\n";
 	  system($copyCmd);
 
