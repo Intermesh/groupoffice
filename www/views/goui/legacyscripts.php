@@ -27,16 +27,17 @@ function readScriptsTxt(string $path, string $prefix) {
 $rootFolder = go()->getEnvironment()->getInstallFolder();
 
 
-$scripts = [
+// Settings of the current user. Kept out of the minified file, which all users with the same modules share.
+$userScript =
 	'Ext.namespace("GO");' .
 	'GO.settings = ' . json_encode(\go\core\webclient\Extjs3::get()->clientSettings()) . ';' .
 	'GO.language = "' . go()->getLanguage()->getIsoCode() . '";' .
 	'GO.calltoTemplate = "' . GO::config()->callto_template . '";' .
 	'GO.calltoOpenWindow = ' . (GO::config()->callto_open_window ? "true" : "false") . ';' .
 	'window.name="' . GO::getId() . '";' .
-	"GO.version='".go()->getVersion()."';"
-];
+	"GO.version='".go()->getVersion()."';";
 
+$scripts = [];
 $scripts[] = new File(go()->getEnvironment()->getInstallFolder() . '/views/Extjs3/javascript/namespaces.js');
 //for t() function to auto detect module package and name
 $scripts[] = "go.module='core';go.package='core';";
@@ -96,24 +97,49 @@ header('Cache-Control: private, max-age=' . (86400 * 30));
 header_remove('Pragma');
 header_remove('Expires');
 
-foreach($scripts as $script) {
-	if ($script instanceof File) {
-		echo "// " . $script->getRelativePath(go()->getEnvironment()->getInstallFolder()) . "\n";
+if(go()->getDebugger()->enabled) {
+	// Unminified with the path of every file, so errors point to the right file and line
+	echo "// inline\n\n" . $userScript . "\n\n";
+
+	foreach ($scripts as $script) {
+		if ($script instanceof File) {
+			echo "// " . $script->getRelativePath(go()->getEnvironment()->getInstallFolder()) . "\n";
+		}
 	}
+
+	echo "\n\n// ----------------- //\n\n";
+
+	foreach ($scripts as $script) {
+		if ($script instanceof File) {
+			echo "\n\n// " . $script->getRelativePath(go()->getEnvironment()->getInstallFolder()) . "\n\n";
+
+			echo $script->getContents();
+		} else {
+			echo "\n\n // inline\n\n";
+
+			echo $script;
+		}
+	}
+	exit();
 }
 
-echo "\n\n// ----------------- //\n\n";
+// The scripts depend on the modules the user can use. Users with the same modules share one minified file. A cache
+// rebuild, like after an upgrade or module installation, deletes the folder.
+$key = md5(implode("\n", array_map(fn($script) => $script instanceof File ? $script->getPath() : $script, $scripts)));
+$cacheFile = go()->getDataFolder()->getFolder('cache/clientscripts')->create()->getFile('legacy-' . $key . '.js');
 
-foreach($scripts as $script) {
-	if($script instanceof File) {
-		echo "\n\n// ".$script->getRelativePath(go()->getEnvironment()->getInstallFolder())."\n\n";
-
-		echo $script->getContents();
-	} else {
-		echo "\n\n // inline\n\n";
-
-		echo $script;
+if (!$cacheFile->exists()) {
+	$minify = new \MatthiasMullie\Minify\JS();
+	foreach ($scripts as $script) {
+		// A file may end without ";", so it could be joined with the next script
+		$minify->add($script instanceof File ? $script->getContents() . "\n;" : $script);
 	}
+
+	// Write to a temporary file first, so another request never reads a half written file
+	$tmpFile = $cacheFile->getPath() . '.' . uniqid() . '.tmp';
+	file_put_contents($tmpFile, $minify->minify());
+	rename($tmpFile, $cacheFile->getPath());
 }
 
-
+echo $userScript . "\n";
+readfile($cacheFile->getPath());
