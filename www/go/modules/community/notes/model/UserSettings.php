@@ -119,8 +119,11 @@ class UserSettings extends Property {
 	public function setSyncNoteBookIds(array $noteBookIds) {
 
 		$notebooks = NoteBook::findFor($this->userId)
-			->where('syncToDevice', '=', true)
-			->andWhere('nb.id', 'NOT IN', $noteBookIds);
+			->where('syncToDevice', '=', true);
+
+		if(!empty($noteBookIds)) {
+			$notebooks->andWhere('nb.id', 'NOT IN', $noteBookIds);
+		}
 
 		foreach($notebooks as $notebook) {
 			$notebook->syncToDevice = false;
@@ -129,18 +132,20 @@ class UserSettings extends Property {
 			}
 		}
 
-		$notebooks = NoteBook::findFor($this->userId)
-			->where(
-				(new Criteria())
-					->where('syncToDevice', '=', false)
-					->orWhere('syncToDevice', '=', null)
-			)
-			->andWhere('nb.id', 'IN', $noteBookIds);
+		if(!empty($noteBookIds)) {
+			$notebooks = NoteBook::findFor($this->userId)
+				->where(
+					(new Criteria())
+						->where('syncToDevice', '=', false)
+						->orWhere('syncToDevice', '=', null)
+				)
+				->andWhere('nb.id', 'IN', $noteBookIds);
 
-		foreach($notebooks as $notebook) {
-			$notebook->syncToDevice = true;
-			if(!$notebook->save()) {
-				throw new SaveException($notebook);
+			foreach ($notebooks as $notebook) {
+				$notebook->syncToDevice = true;
+				if (!$notebook->save()) {
+					throw new SaveException($notebook);
+				}
 			}
 		}
 

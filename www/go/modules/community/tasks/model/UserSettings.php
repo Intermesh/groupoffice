@@ -133,20 +133,18 @@ class UserSettings extends Property {
 			$tasklist->save();
 		}
 
-		$tasklists = TaskList::findFor($this->userId)
-			->where(
-				(new Criteria())
-					->where('syncToDevice', '=', false)
-					->orWhere('syncToDevice', '=', null)
-			);
-
 		if(!empty($tasklistIds)) {
-			$tasklists->andWhere('tasklist.id', '!=', $tasklistIds);
-		}
+			$tasklists = TaskList::findFor($this->userId)
+				->where(
+					(new Criteria())
+						->where('syncToDevice', '=', false)
+						->orWhere('syncToDevice', '=', null)
+				)->andWhere('tasklist.id', '=', $tasklistIds);
 
-		foreach($tasklists as $tasklist) {
-			$tasklist->syncToDevice = true;
-			$tasklist->save();
+			foreach ($tasklists as $tasklist) {
+				$tasklist->syncToDevice = true;
+				$tasklist->save();
+			}
 		}
 
 	}
@@ -165,23 +163,20 @@ class UserSettings extends Property {
 			->where('isSubscribed', '=', true)
 			->andWhere('tasklist.id', '!=', $tasklistIds);
 
-
-
 		foreach($tasklists as $tasklist) {
 			$tasklist->isSubscribed = false;
 			$tasklist->save();
 		}
 
-		$tasklists = TaskList::findFor($this->userId)
-			->where('isSubscribed', '=', false);
-
 		if(!empty($tasklistIds)) {
-			$tasklists->andWhere('tasklist.id', '!=', $tasklistIds);
-		}
+			$tasklists = TaskList::findFor($this->userId)
+				->where('isSubscribed', '=', false)
+				->andWhere('tasklist.id', '!=', $tasklistIds);
 
-		foreach($tasklists as $tasklist) {
-			$tasklist->isSubscribed = true;
-			$tasklist->save();
+			foreach ($tasklists as $tasklist) {
+				$tasklist->isSubscribed = true;
+				$tasklist->save();
+			}
 		}
 
 	}

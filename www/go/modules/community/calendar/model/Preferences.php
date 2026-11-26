@@ -119,20 +119,19 @@ class Preferences extends Property
 			$calendar->save();
 		}
 
-		$calendars = Calendar::findFor($this->userId)
-			->where(
-				(new Criteria())
-					->where('syncToDevice', '=', false)
-					->orWhere('syncToDevice', '=', null)
-			);
-
 		if(!empty($calendarIds)) {
-			$calendars->andWhere('calendar_calendar.id', '!=', $calendarIds);
-		}
+			$calendars = Calendar::findFor($this->userId)
+				->where(
+					(new Criteria())
+						->where('syncToDevice', '=', false)
+						->orWhere('syncToDevice', '=', null)
+				)->andWhere('calendar_calendar.id', '=', $calendarIds);
 
-		foreach($calendars as $calendar) {
-			$calendar->syncToDevice = true;
-			$calendar->save();
+
+			foreach ($calendars as $calendar) {
+				$calendar->syncToDevice = true;
+				$calendar->save();
+			}
 		}
 
 	}
@@ -154,23 +153,26 @@ class Preferences extends Property
 			$calendars->andWhere('calendar_calendar.id', '!=', $calendarIds);
 		}
 
+		$test = (string) $calendars;
+
+
 		foreach($calendars as $calendar) {
 			$calendar->isSubscribed = false;
 			$calendar->save();
 		}
 
-		$calendars = Calendar::findFor($this->userId)
-			->where(
-				(new Criteria())
-					->where('isSubscribed', '=', false)
-					->orWhere('isSubscribed', '=', null)
-			);
 		if(!empty($calendarIds)) {
-			$calendars->andWhere('calendar_calendar.id', '!=', $calendarIds);
-		}
-		foreach($calendars as $calendar) {
-			$calendar->isSubscribed = true;
-			$calendar->save();
+			$calendars = Calendar::findFor($this->userId)
+				->where(
+					(new Criteria())
+						->where('isSubscribed', '=', false)
+						->orWhere('isSubscribed', '=', null)
+				)->andWhere('calendar_calendar.id', '=', $calendarIds);
+
+			foreach ($calendars as $calendar) {
+				$calendar->isSubscribed = true;
+				$calendar->save();
+			}
 		}
 
 	}

@@ -113,25 +113,30 @@ class UserSettings extends Property {
 	public function setSyncAddressBookIds(array $addressBookIds) {
 
 		$addressbooks = AddressBook::findFor($this->userId)
-			->where('syncToDevice', '=', true)
-			->andWhere('a.id', '!=', $addressBookIds);
+			->where('syncToDevice', '=', true);
+
+		if(!empty($addressBookIds)) {
+			$addressbooks->andWhere('a.id', '!=', $addressBookIds);
+		}
 
 		foreach($addressbooks as $addressbook) {
 			$addressbook->syncToDevice = false;
 			$addressbook->save();
 		}
 
-		$addressbooks = AddressBook::findFor($this->userId)
-			->where(
-				(new Criteria())
-				->where('syncToDevice', '=', false)
-				->orWhere('syncToDevice', '=', null)
-			)
-			->andWhere('a.id', '=', $addressBookIds);
+		if(!empty($addressBookIds)) {
+			$addressbooks = AddressBook::findFor($this->userId)
+				->where(
+					(new Criteria())
+						->where('syncToDevice', '=', false)
+						->orWhere('syncToDevice', '=', null)
+				)
+				->andWhere('a.id', '=', $addressBookIds);
 
-		foreach($addressbooks as $addressbook) {
-			$addressbook->syncToDevice = true;
-			$addressbook->save();
+			foreach ($addressbooks as $addressbook) {
+				$addressbook->syncToDevice = true;
+				$addressbook->save();
+			}
 		}
 
 	}
