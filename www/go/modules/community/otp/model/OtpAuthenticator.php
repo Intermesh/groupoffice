@@ -61,12 +61,6 @@ class OtpAuthenticator extends Property
 
 	protected function internalValidate()
 	{
-		// Temporary secrets need not be validated against currently verified password
-		if (!empty($this->expiresAt)) {
-			parent::internalValidate();
-			return;
-		}
-
 		// When saving the new secret, the code needs to be verified first
 		if (!empty($this->verify)) {
 
