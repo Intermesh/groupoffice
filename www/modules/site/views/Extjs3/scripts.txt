@@ -5,10 +5,6 @@ modules/site/views/Extjs3/treenodes/MenuNode.js
 modules/site/views/Extjs3/treenodes/SiteNode.js
 
 modules/site/views/Extjs3/Stores.js
-modules/site/views/Extjs3/MultifileView.js
-modules/site/views/Extjs3/MultifileDialog.js
-modules/site/views/Extjs3/SelectMultiFile.js
-modules/site/views/Extjs3/SelectFile.js
 modules/site/views/Extjs3/Customfield.js
 
 modules/site/views/Extjs3/MenuDialog.js
@@ -25,9 +21,7 @@ modules/site/views/Extjs3/HtmlEditorLinkDialog.js
 modules/site/views/Extjs3/HtmlEditorLinkInsert.js
 
 modules/site/views/Extjs3/ContentPanel.js
-modules/site/views/Extjs3/ContextMenu.js
 modules/site/views/Extjs3/SiteTreePanel.js
 
-modules/site/views/Extjs3/ModuleSettingsDialog.js
 
 modules/site/views/Extjs3/MainPanel.js

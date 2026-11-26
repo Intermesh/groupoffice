@@ -9,4 +9,3 @@ modules/summary/rssFeedPortlet.js
 modules/summary/Portlets.js
 modules/summary/WebFeedsGrid.js
 modules/summary/CalendarPortlet.js
-modules/summary/CalendarPortletSettings.js

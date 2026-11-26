@@ -17,9 +17,7 @@ customfield/MultiContact.js
 customfield/MultiContactDialog.js
 Utils.js
 SelectDialogPanel.js
-SettingsPanel.js
 NameField.js
-SettingsProfilePanel.js
 EmailAddressesField.js
 AddressesField.js
 PhoneNumbersField.js

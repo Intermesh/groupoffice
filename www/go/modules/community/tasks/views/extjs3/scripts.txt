@@ -10,7 +10,6 @@ TaskDialog.js
 AlertFields.js
 ChooseTasklistDialog.js
 ChooseTasklistGrid.js
-TasklistGroupDialog.js
 TaskLinkDetail.js
 TasklistCombo.js
 TaskCombo.js

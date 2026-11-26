@@ -17,13 +17,11 @@ views/Extjs3/javascript/windows/PasswordDialog.js
 views/Extjs3/javascript/DialogListeners.js
 views/Extjs3/javascript/JsonMenu.js
 views/Extjs3/javascript/SmallPagingToolbar.js
-views/Extjs3/javascript/BlindPagingToolbar.js
 
 views/Extjs3/javascript/Cutstring.js
 
 views/Extjs3/javascript/buttons/AddButton.js
 views/Extjs3/javascript/buttons/DeleteButton.js
-views/Extjs3/javascript/buttons/QuickEditButton.js
 
 go/core/views/extjs3/TimeZones.js
 views/Extjs3/javascript/data/PrefetchProxy.js
@@ -45,7 +43,6 @@ views/Extjs3/javascript/grids/CheckColumn.js
 views/Extjs3/javascript/grids/IconColumn.js
 views/Extjs3/javascript/grids/RowAction.js
 views/Extjs3/javascript/grids/RadioColumn.js
-views/Extjs3/javascript/grids/ModulePermissionsGrid.js
 
 views/Extjs3/javascript/blinkTitle.js
 views/Extjs3/javascript/state/HttpProvider.js
@@ -60,14 +57,11 @@ views/Extjs3/javascript/plugins/HtmlEditorSpellCheck.js
 views/Extjs3/javascript/plugins/Ext.ux.HtmlEditor.Plugins-0.2-all.js
 views/Extjs3/javascript/panels/DisplayPanel.js
 views/Extjs3/javascript/panels/DetailView.js
-views/Extjs3/javascript/panels/IframeComponent.js
 views/Extjs3/javascript/windows/SelectGroups.js
 views/Extjs3/javascript/windows/SelectUsers.js
-views/Extjs3/javascript/windows/SelectEmail.js
 views/Extjs3/javascript/windows/ErrorDialog.js
 
 views/Extjs3/javascript/form/FieldHelp.js
-views/Extjs3/javascript/form/TreeSelect.js
 views/Extjs3/javascript/form/SearchField.js
 views/Extjs3/javascript/form/Combo.js
 views/Extjs3/javascript/form/ColorField.js
@@ -84,17 +78,14 @@ views/Extjs3/javascript/form/SuperBoxSelect.js
 views/Extjs3/javascript/form/SelectPriority.js
 views/Extjs3/javascript/form/XCheckbox.js
 views/Extjs3/javascript/form/HtmlEditor.js
-views/Extjs3/javascript/form/ListField.js
 views/Extjs3/javascript/form/DateTime.js
 views/Extjs3/javascript/form/DateTimeField.js
 views/Extjs3/javascript/form/TimeField.js
-views/Extjs3/javascript/form/SelectGroup.js
 
 views/Extjs3/javascript/form/HtmlComponent.js
 views/Extjs3/javascript/form/NumberField.js
 views/Extjs3/javascript/panels/PermissionsPanel.js
 
-views/Extjs3/javascript/NewMenuButton.js
 
 
 
@@ -108,12 +99,9 @@ views/Extjs3/javascript/panels/Portal.js
 views/Extjs3/javascript/panels/PortalColumn.js
 views/Extjs3/javascript/panels/Portlet.js
 
-views/Extjs3/javascript/form/UploadPCForm.js
 views/Extjs3/javascript/Export.js
 
-views/Extjs3/javascript/query/QueryPanel.js
 
-views/Extjs3/javascript/query/CriteriaFormPanel.js
 
 
 views/Extjs3/javascript/windows/SummaryDialog.js
@@ -121,8 +109,6 @@ views/Extjs3/javascript/windows/TabbedFormDialog.js
 
 views/Extjs3/javascript/windows/ExportGridDialog.js
 views/Extjs3/javascript/windows/ExportDialog.js
-views/Extjs3/javascript/windows/PersonalSettingsDialog.js
-views/Extjs3/javascript/windows/MergeDialog.js
 
 views/Extjs3/javascript/windows/DateDialog.js
 
@@ -134,7 +120,6 @@ views/Extjs3/javascript/base/email/EmailEditorAttachmentsView.js
 views/Extjs3/javascript/base/model/BatchEditModelDialog.js
 views/Extjs3/javascript/base/Form.js
 
-views/Extjs3/javascript/base/model/ImportPanel.js
 
 views/Extjs3/javascript/base/upload/Paster.js
 
@@ -145,26 +130,17 @@ views/Extjs3/javascript/base/ContextMenu.js
 views/Extjs3/javascript/base/tree/TreeLoader.js
 
 views/Extjs3/javascript/windows/ResetPasswordDialog.js
-views/Extjs3/javascript/windows/RequirePasswordResetDialog.js
-views/Extjs3/javascript/query/SavedQueryGrid.js
-views/Extjs3/javascript/query/SavedQueryDialog.js
-views/Extjs3/javascript/query/QueryContextMenu.js
 
 
-views/Extjs3/javascript/base/util/MD5.js
 views/Extjs3/javascript/base/util/Format.js
-views/Extjs3/javascript/grids/RowEditor.js
-views/Extjs3/javascript/base/QuickEditDialog.js
 views/Extjs3/javascript/base/model/ImportDialog.js
 
 views/Extjs3/javascript/Base64.js
 
 views/Extjs3/javascript/CreateModifyTemplate.js
 
-views/Extjs3/javascript/grids/GORowEditor.js
 views/Extjs3/javascript/SortableDataView.js
 
-views/Extjs3/javascript/panels/AccordeonPanel.js
 
 views/Extjs3/javascript/base/ColumnSelectPanel.js
 views/Extjs3/javascript/base/CurrentGridExportDialog.js
