@@ -98,7 +98,6 @@ views/Extjs3/javascript/NewMenuButton.js
 
 
 
-views/Extjs3/javascript/panels/SearchPanel.js
 views/Extjs3/javascript/checker.js
 
 views/Extjs3/javascript/grids/RowExpander.js
