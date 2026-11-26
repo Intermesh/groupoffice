@@ -130,6 +130,10 @@ $hue: (
 	margin: utils.dp(16);
 }
 
+.c-secondary-text {
+	color: var(--fg-secondary-text);
+}
+
 strong { font-weight: typography.$font-weight-m; }
 small {
 	font-weight: typography.$font-weight-r;

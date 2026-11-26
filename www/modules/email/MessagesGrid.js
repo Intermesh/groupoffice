@@ -572,7 +572,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
                     title = ` title = "${numFinishedTasks} / ${numTasks} ${t("Completed tasks", "tasks")}"`;
                     break;
                 default:
-                    secondaryCls = 'c-primary';
+                    secondaryCls = 'c-secondary-text';
             }
 			return `<i class="icon ${secondaryCls}"${title}>${i}</i>`;
 		}).join("");
