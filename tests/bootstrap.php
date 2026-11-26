@@ -148,6 +148,11 @@ try {
 	  echo "Running: " . $copyCmd . "\n";
 	  system($copyCmd);
 
+	  // The empty folders of the database dump, which git can't store
+	  foreach (['trash', 'log', 'tmp'] as $folder) {
+		  $dataFolder->getFolder($folder)->create();
+	  }
+
 	  system('chown -R www-data:www-data ' . $dataFolder->getPath());
 
 		// for moving wopi module
