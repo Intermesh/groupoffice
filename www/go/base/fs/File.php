@@ -282,17 +282,10 @@ class File extends Base{
 		if($this->extension()!='')
 		{			
 
-			$pos = stripos($types, ' '.$this->extension());
-
-			if($pos)
+			// "type ext1 ext2" per line. Skip comment lines and match whole extensions only.
+			if(preg_match('/^([^#\s]\S*)[ \t](?:[^\n]*[ \t])?' . preg_quote($this->extension(), '/') . '(?=[ \t]|$)/mi', $types, $matches))
 			{
-				$pos++;
-
-				$start_of_line = \GO\Base\Util\StringHelper::rstrpos($types, "\n", $pos);
-				$end_of_mime = strpos($types, ' ', $start_of_line);
-				$mime = substr($types, $start_of_line+1, $end_of_mime-$start_of_line-1);
-
-				return $mime;
+				return $matches[1];
 			}
 		}
 

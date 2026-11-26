@@ -28,4 +28,26 @@ class FileTest extends TestCase
 		$file = new File('/tmp/file.pdf');
 		$this->assertTrue(Response::isSafeInlineContentType($file->mimeType()));
 	}
+
+	public static function mimeTypeProvider(): array
+	{
+		return [
+			// commented lines in mime.types are skipped
+			['wav', 'audio/wav'],
+			// extension in the middle of a line
+			['mp3', 'audio/mpeg'],
+			['MP3', 'audio/mpeg'],
+			// whole extensions only: "mp" must not match "mpeg" of audio/mpeg
+			['mpg', 'video/mpeg'],
+			['c', 'text/x-csrc'],
+			['d', 'text/x-dsrc'],
+		];
+	}
+
+	#[DataProvider('mimeTypeProvider')]
+	public function testMimeType(string $extension, string $mimeType)
+	{
+		$file = new File('/nonexistent/file.' . $extension);
+		$this->assertSame($mimeType, $file->mimeType());
+	}
 }
