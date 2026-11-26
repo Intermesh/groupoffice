@@ -89,9 +89,9 @@ foreach ($load_modules as $module) {
 
 
 header("Content-Type: text/javascript");
-header("Expires: " . date("D, j M Y G:i:s ", time() + 86400 * 30) . 'GMT'); //expires in 1 day
-header('Cache-Control: cache');
-header('Pragma: cache');
+// The client requests this with a cache key (version, cache rebuild time and user), so it can be cached for 30 days.
+// It contains the settings of the user, so proxies may not cache it.
+header('Cache-Control: private, max-age=' . (86400 * 30));
 
 foreach($scripts as $script) {
 	if ($script instanceof File) {
