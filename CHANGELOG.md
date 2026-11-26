@@ -1,3 +1,5 @@
+- Files: show visual hint in file browser and thumbnails grid when a file is locked
+- Assistant: saving a file with the GroupOffice Assistant locked it again for 30 minutes, also after the Assistant had unlocked it. Saving now only renews a lock that you already hold, and a lock that you set yourself with "Lock" in the menu keeps no expiry time.
 - Core: Security: HTML custom fields could store a script that ran in the browser of everyone who opened the item, for example an administrator who opened a contact in a shared address book. A ">" in a quoted attribute value hid the script from the check. Scripts are now removed when an HTML custom field is saved, instead of refusing values that look like a script, and the detail view removes them from values that were stored before. The same check also protects notes and comments.
 - Core: Security: lists that show an HTML custom field as a column could run a script stored in that field, also from values stored before this update.
 

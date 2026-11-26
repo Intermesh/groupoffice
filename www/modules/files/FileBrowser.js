@@ -173,7 +173,7 @@ GO.files.FileBrowser = function(config){
 			renderer: function (v, meta, r) {
 				var cls = r.get('acl_id') > 0 && r.get('readonly') == 0 ? 'filetype filetype-folder-shared' : 'filetype filetype-' + r.get('extension');
 				if (r.get('locked_user_id') > 0)
-					v = '<div class="fs-grid-locked">' + v + '</div>';
+					v = '<div class="fs-grid-locked"><i class="icon ic-lock"></i> ' + v + '</div>';
 
 				return '<div class="go-grid-icon ' + cls + '" style="float:left;">' + v + '</div>';
 			}
