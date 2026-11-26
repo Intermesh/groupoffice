@@ -67,13 +67,18 @@ class LanguageScanner
 	{
 		$root = Environment::get()->getInstallPath();
 
-		// GOUI and its Group-Office components fall back to the core translations
+		// GOUI and its GroupOffice components fall back to the core translations. They are npm packages, which may be
+		// links to their git clones.
 		$modules = [
 			['core', 'core', $root . '/go/core'],
 			['core', 'core', $root . '/views/Extjs3'],
-			['core', 'core', $root . '/views/goui/groupoffice-core/script'],
-			['core', 'core', $root . '/views/goui/goui/script'],
 		];
+		foreach (['groupoffice-core', 'goui'] as $npmPackage) {
+			$dir = $root . '/node_modules/@intermesh/' . $npmPackage . '/script';
+			if (is_dir($dir)) {
+				$modules[] = ['core', 'core', $dir];
+			}
+		}
 
 		foreach (glob($root . '/go/modules/*', GLOB_ONLYDIR) as $pkgDir) {
 			$pkg = basename($pkgDir);
