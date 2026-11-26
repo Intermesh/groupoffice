@@ -52,17 +52,17 @@ class BackendTest extends TestCase
 		$this->addressBook->setAcl([$this->group->id => Acl::LEVEL_READ]);
 		$this->assertTrue($this->addressBook->save(), $this->addressBook->getValidationErrorsAsString());
 
-		go()->getDbConnection()->insertIgnore('sync_addressbook_user', [
+		// The user property of the address book that makes CardDAV serve it
+		go()->getDbConnection()->insertIgnore('addressbook_addressbook_user', [
 			'addressBookId' => $this->addressBook->id,
 			'userId' => $this->user->id,
-			'isDefault' => 0
+			'syncToDevice' => 1
 		])->execute();
 	}
 
 	protected function tearDown(): void
 	{
 		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
-		go()->getDbConnection()->delete('sync_addressbook_user', ['userId' => $this->user->id])->execute();
 		AddressBook::delete(['id' => $this->addressBook->id]);
 		foreach ([['legacy', 'dav'], ['community', 'addressbook'], ['community', 'carddav']] as [$package, $name]) {
 			$module = ModuleModel::findByName($package, $name);
