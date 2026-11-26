@@ -235,6 +235,15 @@ class MessageController extends \GO\Base\Controller\AbstractController
 			throw new NotFound();
 		}
 
+		//passed when only messages with this label should be shown. Only labels of the account are accepted so the
+		//client can't put anything else in the IMAP search.
+		if(!empty($params['label'])) {
+			$labels = Label::model()->getAccountLabels($account->id);
+			if(isset($labels[$params['label']])) {
+				$query = trim($query . ' KEYWORD ' . $labels[$params['label']]->flag);
+			}
+		}
+
 		// Filters move mail and expunge removes deleted mail, so they need "Use account". Users who may only read the
 		// account just see the mailbox as it is.
 		$mayChangeMail = $account->checkPermissionLevel(Acl::CREATE_PERMISSION);

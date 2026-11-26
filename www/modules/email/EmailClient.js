@@ -695,6 +695,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	setAccount : function(account_id,mailbox, usage)
 	{
 		const reload = account_id==this.account_id && this.mailbox==mailbox;
+		if(account_id != this.account_id) {
+			this.messagesGrid.resetLabelFilter();
+		}
 		if(!reload)
 		{
 			this.messagePanel.reset();
