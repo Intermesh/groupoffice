@@ -30,13 +30,16 @@ do
   fi
 done
 
+# pull the git clones of the GOUI npm packages, which www/node_modules/@intermesh may link to
+for line in $DIR/links/*/;
+do
+  if [ -d "$line/.git" ]; then
+    echo "Pulling $line"
+    git -C "$line" pull
+  fi
+done
+
 # pull main github repo
-cd ../../
-#git reset --hard
-cd views/goui/goui
-#git reset --hard
-cd ../groupoffice-core
-#git reset --hard
 cd $DIR/www;
 
 echo "Pulling main repository"

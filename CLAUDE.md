@@ -28,7 +28,7 @@ Run phpunit as `www-data`, never as root. Use `tools/phpunit <path>` from the do
 
 #### Typescript (GOUI)
 
-Run mocha on the host from `www/views/goui/goui` with `npm test`, or `../../../node_modules/.bin/mocha` (mocha, tsx, chai and jsdom are installed in `www/node_modules`). `.mocharc.json` there sets up jsdom and always loads every file in `tests/`, so a path argument doesn't limit the run. Pick tests with `--grep <describe or it text>`. Running one file first fails with `Collection is not a constructor` because of the import order, also for existing tests.
+Run mocha on the host from the git clone of GOUI (`links/goui`, see "GOUI packages") with `npm test` (mocha, tsx, chai and jsdom are installed in its own `node_modules`). `.mocharc.json` there sets up jsdom and always loads every file in `tests/`, so a path argument doesn't limit the run. Pick tests with `--grep <describe or it text>`. Running one file first fails with `Collection is not a constructor` because of the import order, also for existing tests.
 
 ## Environment
 
@@ -94,16 +94,16 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 - Run a single test: `tools/phpunit <path>` (see "Running tests").
 
 ### Typescript (GOUI)
-- Tests are mocha with chai's `expect`, in `www/views/goui/goui/tests/lib/`, mirroring `script/`: `script/util/Format.ts` is tested in `tests/lib/util/Format.ts`. Group tests with `describe()` per class and method and write `it()` texts as behaviour ("Decodes entities").
+- Tests are mocha with chai's `expect`, in `tests/lib/` of the GOUI clone, mirroring `script/`: `script/util/Format.ts` is tested in `tests/lib/util/Format.ts`. Group tests with `describe()` per class and method and write `it()` texts as behaviour ("Decodes entities").
 - Import the source with a `.js` extension (`../../../script/util/Format.js`), like the existing tests.
 - Tests run in jsdom, not a browser. jsdom-global doesn't expose every browser global (`DOMParser` is missing), and jsdom doesn't load images or run `onerror`, so a test can't prove that an XSS payload doesn't run. Check that in a real browser, e.g. headless Chrome with `--dump-dom`, and test the output (text, elements, attributes) in mocha.
-- Run `npx tsc --noEmit` in the `goui` folder as well; mocha (through tsx) doesn't check types.
-- `goui` and `groupoffice-core` are git submodules: commit the change and its test in the submodule, then the submodule pointer in this repository.
+- Run `npx tsc --noEmit` in the GOUI clone as well; mocha (through tsx) doesn't check types.
+- `goui` and `groupoffice-core` are separate repositories (see "GOUI packages"): commit the change and its test in their clone, not in this repository.
 
 ## Converting ExtJS 3.4 to GOUI
 
 - The legacy UI is ExtJS 3.4 (API docs: https://docs.sencha.com/extjs/3.4.0/). Use them to understand what an old component does, then rebuild it with GOUI components instead of porting it line by line.
-- GOUI docs: https://goui.io (source of the docs site: https://github.com/Intermesh/goui-docs). Source and issues: https://github.com/Intermesh/goui. A local copy with type definitions is in `www/node_modules/@intermesh/goui`. The Group-Office wrappers are in `www/views/goui/groupoffice-core`. Read these for the available components before inventing your own.
+- GOUI docs: https://goui.io (source of the docs site: https://github.com/Intermesh/goui-docs). Source and issues: https://github.com/Intermesh/goui. A local copy with type definitions is in `www/node_modules/@intermesh/goui`. The GroupOffice wrappers are in `www/node_modules/@intermesh/groupoffice-core`. Read these for the available components before inventing your own.
 - The notes module (`www/go/modules/community/notes`) is the reference module: implement other modules the way it does. For example, its `views/goui/script/Main.ts` extends `MainThreeColumnPanel` and uses the base class buttons (`showWestButton`, `openWestButton`, `hideWestButton`, `closeWestButton`, `hideEastButton`, `closeEastButton`) to open and close the west and east panels, and `menucolumn` for row menus.
 - Modules already converted are the best examples: `www/go/modules/community/calendar/views/goui`, `comments`, `apikeys` and `oidc`. Copy their structure (`package.json`, build setup) for a new module UI.
 - Legacy ExtJS code lives in `views/extjs3` folders. The backend behind it should move to JMAP at the same time.
@@ -112,11 +112,15 @@ Never hardcode UI text. Use `go()->t("Text")` in PHP. Strings live in the module
 
 Every module with a GOUI UI has its own `package.json` in its `views/goui` folder (e.g. `www/go/modules/community/calendar/views/goui`), and so does core (`www/views/goui`). Build from that folder with `npm run build`, or `npm run watch` while developing.
 
+### GOUI packages
+
+GOUI and the GroupOffice GOUI components are npm packages, `@intermesh/goui` and `@intermesh/groupoffice-core`, installed in `www/node_modules/@intermesh/`. They're no longer in `www/views/goui/goui` and `www/views/goui/groupoffice-core`. To work on them, clone their repositories into `links/` of this checkout (ignored by git) and link `www/node_modules/@intermesh/goui` and `groupoffice-core` to `links/goui` and `links/groupoffice-core`.
+
 ### Styling
 
 - Don't use inline styles (`el.style.…`, `style: {…}` in a component config). Use GOUI's classes where they fit (`pad`, `flow`, `fit`, …), otherwise a class in the module stylesheet.
 - The module stylesheet is `views/goui/style/style.scss`. `npm run build` compiles it to `dist/style.css`, which the web client loads for every module. The `build:sass` and `start:sass` scripts in `package.json` do this (see the apikeys or approval module).
-- Use GOUI's sass helpers for sizes, like `util.dp()`, instead of pixels: `@use '../../../../../../../views/goui/goui/style/util';` and then `padding: util.dp(12) util.dp(16);`.
+- Use GOUI's sass helpers for sizes, like `util.dp()`, instead of pixels: `@use '@intermesh/goui/style/util';` (the build scripts pass `--load-path=$(npm root)` to sass) and then `padding: util.dp(12) util.dp(16);`.
 - GOUI's utility classes like `pad` are styled as `.goui.pad`, so they only work on GOUI components, not on an element made with `E()`. Give such an element its own class in the module stylesheet.
 
 ## Encoded business modules
