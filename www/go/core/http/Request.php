@@ -172,10 +172,12 @@ class Request extends Singleton{
 	/**
 	 * Get request header value
 	 *
+	 * Headers sent more than once arrive combined in one string, separated by ", ".
+	 *
 	 * @param string $name
-	 * @return mixed|string|null
+	 * @return string|null
 	 */
-	public function getHeader(string $name) {
+	public function getHeader(string $name): ?string {
 		$name = strtolower($name);
 		$headers = $this->getHeaders();
 		return $headers[$name] ?? null;

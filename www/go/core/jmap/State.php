@@ -121,9 +121,17 @@ class State extends AbstractState {
 		return true;
 	}
 
+	/**
+	 * Get the CSRF token from the 'X-CSRF-Token' header or the 'CSRFToken' request parameter
+	 *
+	 * The parameter can be an array ("CSRFToken[]=x"), which is never a valid token.
+	 *
+	 * @return string|null
+	 */
 	private static function getRequestCSRFToken(): ?string
 	{
-		return Request::get()->getHeader('X-CSRF-Token') ?: $_REQUEST['CSRFToken'] ?? null;
+		$token = Request::get()->getHeader('X-CSRF-Token') ?: ($_REQUEST['CSRFToken'] ?? null);
+		return is_string($token) && $token !== '' ? $token : null;
 	}
 
 	/**
