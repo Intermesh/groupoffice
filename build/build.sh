@@ -333,15 +333,46 @@ build_package() {
 	(cd "$PACKAGE_DIR" && npm prune --omit=dev --ignore-scripts --audit=false --fund=false)
 }
 
+# Removes files the web server would otherwise serve without login but GroupOffice doesn't need: tests,
+# examples and docs of libraries, version control data and backup files (OWASP WSTG-CONF-04 and
+# WSTG-INFO-05). Runs after the unit tests, as those use the dev packages.
+remove_unsafe_files() {
+	log "Removing tests, examples and other unneeded files"
+
+	# Composer files reveal the exact library versions
+	find "$PACKAGE_DIR" -type f \( -name composer.json -o -name composer.lock \) \
+		-not -path '*/vendor/*' -not -path '*/node_modules/*' -print -delete
+	find "$PACKAGE_DIR" -type f -path '*/vendor/composer/installed.json' -print -delete
+
+	# Only the top level directories of a package (vendor/<vendor>/<package>/tests). Deeper directories
+	# can be namespaces with runtime code, like symfony's "Test" folders.
+	local vendor_dir
+	while IFS= read -r -d '' vendor_dir; do
+		find "$vendor_dir" -mindepth 3 -maxdepth 3 -type d \( \
+			-name tests -o -name Tests -o -name test -o -name testing \
+			-o -name examples -o -name example -o -name demo -o -name demos -o -name samples \
+			-o -name docs -o -name doc -o -name benchmarks -o -name .github -o -name .gitlab \
+			\) -print -exec rm -rf {} +
+
+		find "$vendor_dir" -mindepth 3 -maxdepth 3 -type f \( \
+			-name 'phpunit.xml*' -o -name 'phpcs.xml*' -o -name 'phpstan.neon*' -o -name 'psalm.xml*' \
+			-o -name '.travis.yml' -o -name '.gitlab-ci.yml' -o -name '.php-cs-fixer*' -o -name '.php_cs*' \
+			-o -name 'Makefile' -o -name '*.sh' -o -name '*.sql' \
+			\) -print -delete
+	done < <(find "$PACKAGE_DIR" -type d -name vendor -not -path '*/vendor/*/*' -not -path '*/node_modules/*' -print0)
+
+	# Version control data and backup files anywhere in the package
+	find "$PACKAGE_DIR" \( -name .git -o -name .svn -o -name .hg \) -prune -print -exec rm -rf {} +
+	find "$PACKAGE_DIR" -type f \( -name '*.bak' -o -name '*.orig' -o -name '*.old' -o -name '*.swp' \
+		-o -name '*~' -o -name '.DS_Store' \) -print -delete
+}
+
 build_tar() {
 	log "Creating $PACKAGE_NAME.tar.gz"
 
 	"$REPO_DIR/scripts/install-composer.sh" --no-dev "$PACKAGE_DIR"
 
-	cd "$PACKAGE_DIR"
-
-	# remove sensitive files OWASP WSTG - WSTG-INFO-05
-	rm composer.json composer.lock vendor/composer/installed.json
+	remove_unsafe_files
 
 	cd "$BUILD_DIR"
 	tar czf "$PACKAGE_NAME.tar.gz" "$PACKAGE_NAME"
