@@ -26,4 +26,10 @@ $updates['202601211115'][] = function() {
 // The time slice of the last code used to log in. Older codes are refused, so a code can't be used twice.
 $updates['202611111200'][] = "ALTER TABLE `otp_secret` ADD `lastTimeSlice` INT NULL DEFAULT NULL;";
 
-$updates['202611111200'][] = "alter table otp_secret drop column verified";
+// Development versions dropped the verified column, which is still used. Authenticators saved without it were active.
+$updates['202611261200'][] = function() {
+	if (!\go\core\db\Table::getInstance('otp_secret')->hasColumn('verified')) {
+		go()->getDbConnection()->exec("ALTER TABLE `otp_secret` ADD `verified` BOOL DEFAULT FALSE NOT NULL");
+		go()->getDbConnection()->exec("UPDATE `otp_secret` SET `verified` = TRUE");
+	}
+};
