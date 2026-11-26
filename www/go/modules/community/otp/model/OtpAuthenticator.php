@@ -49,6 +49,10 @@ class OtpAuthenticator extends Property
 		return null;
 	}
 
+	public function setVerify($code)
+	{
+		$this->verify = $code;
+	}
 
 	public function setSecret(string $secret): void
 	{
