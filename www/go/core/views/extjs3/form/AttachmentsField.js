@@ -99,7 +99,7 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 					scope: this,
 					handler: function () {
 						const records = this.dataView.getSelectedRecords();
-						window.open(go.Jmap.downloadUrl(records[0].data.blobId, true));
+						go.util.viewFile(go.Jmap.downloadUrl(records[0].data.blobId, true), records[0].data.name);
 					}
 				},{
 					hidden: !this.hasDescription,
