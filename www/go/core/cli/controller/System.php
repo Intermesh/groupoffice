@@ -424,11 +424,27 @@ JSON;
 	/**
 	 * docker compose exec --user www-data groupoffice ./www/cli.php  core/System/checkBlobs --delete
 	 *
+	 * Lists blob files without a core_blob row. With --delete it removes those older than --minAgeHours (default 24),
+	 * so that a file whose row is still being written is left alone.
+	 *
+	 * @param array $params
+	 * @throws \InvalidArgumentException
+	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkBlobs() {
-		Blob::removeMissingFromFilesystem(!empty($params['delete']));
+	public function checkBlobs($params = []) {
+		$delete = filter_var($params['delete'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+		if ($delete === null) {
+			throw new \InvalidArgumentException("--delete must be true or false");
+		}
+		$minAgeHours = $params['minAgeHours'] ?? 24;
+		// A bare --minAgeHours arrives as true, which FILTER_VALIDATE_INT would accept as 1.
+		$minAgeHours = is_bool($minAgeHours) ? false : filter_var($minAgeHours, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+		if ($minAgeHours === false) {
+			throw new \InvalidArgumentException("--minAgeHours must be a whole number of hours, 0 or more");
+		}
+		Blob::removeMissingFromFilesystem($delete, $minAgeHours);
 	}
 
 

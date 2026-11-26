@@ -4,6 +4,7 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
+use go\core\ErrorHandler;
 use go\core\orm\EntityType;
 use go\core\orm\Property;
 use LogicException;
@@ -264,6 +265,36 @@ class Connection {
 	private $transactionSavePointLevel = 0;
 
 	/**
+	 * @var callable[] Run once the outermost transaction has ended
+	 */
+	private $afterTransactionCallbacks = [];
+
+	/**
+	 * Register a callback that runs once the outermost transaction has ended, by commit or by rollback,
+	 * also when PDO throws. A callback that throws is logged and does not stop the others.
+	 *
+	 * @param callable $fn
+	 * @return void
+	 */
+	public function afterTransaction(callable $fn): void
+	{
+		$this->afterTransactionCallbacks[] = $fn;
+	}
+
+	private function runAfterTransactionCallbacks(): void
+	{
+		$callbacks = $this->afterTransactionCallbacks;
+		$this->afterTransactionCallbacks = [];
+		foreach($callbacks as $fn) {
+			try {
+				$fn();
+			} catch(Throwable $e) {
+				ErrorHandler::logException($e);
+			}
+		}
+	}
+
+	/**
 	 * Start a database transation
 	 * 
 	 * @return boolean
@@ -341,7 +372,11 @@ class Connection {
 
 		if($this->transactionSavePointLevel == 0) {
 			EntityType::rollbackChanges();
-			return $this->getPdo()->rollBack();
+			try {
+				return $this->getPdo()->rollBack();
+			} finally {
+				$this->runAfterTransactionCallbacks();
+			}
 		}else
 		{
 			return true;
@@ -369,7 +404,11 @@ class Connection {
 
 		if($this->transactionSavePointLevel == 0) {
 			EntityType::discardChangesSnapshot();
-			return $this->getPdo()->commit();
+			try {
+				return $this->getPdo()->commit();
+			} finally {
+				$this->runAfterTransactionCallbacks();
+			}
 		}else
 		{
 			return true;
