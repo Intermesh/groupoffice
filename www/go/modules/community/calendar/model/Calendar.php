@@ -73,7 +73,7 @@ class Calendar extends AclOwnerEntity {
 	public ?string $timeZone = null;
 
 	/** Whether the calendar is synchronized to the user's devices, like phones with CalDAV or ActiveSync */
-	public ?bool $syncToDevice = null;
+	public ?bool $syncToDevice = false;
 
 	/**
 	 * Per user, null when the user didn't choose. {@see getUseCreatorAlerts()}

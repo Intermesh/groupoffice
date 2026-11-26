@@ -16,7 +16,7 @@ class NoteBook extends AclOwnerEntity
 	public string $name;
 	public ?string $filesFolderId;
 
-	public ?bool $syncToDevice;
+	public ?bool $syncToDevice = true;
 
 	protected static function defineMapping(): Mapping
 	{

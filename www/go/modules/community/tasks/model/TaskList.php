@@ -59,7 +59,7 @@ class TaskList extends AclOwnerEntity
 	public ?int $sortOrder = null;
 	public ?bool $isVisible= null;
 	public ?bool $isSubscribed= null;
-	public ?bool $syncToDevice = null;
+	public ?bool $syncToDevice = true;
 	public ?bool $showInCalendar = null;
 
 	protected $highestItemModSeq;

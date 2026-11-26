@@ -28,7 +28,7 @@ class AddressBook extends AclOwnerEntity
 	public ?string $filesFolderId;
 	public ?string $salutationTemplate;
 
-	public ?bool $syncToDevice;
+	public ?bool $syncToDevice = true;
 
 	/**
 	 *
