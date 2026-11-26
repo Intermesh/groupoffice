@@ -829,6 +829,7 @@ class Installer {
 								$e->getPrevious()->getCode() == '23000' ||
 								$e->getPrevious()->getCode() == '42S21' || //duplicate col
 								$e->getPrevious()->getCode() == '42S01' || //table exists
+								$e->getPrevious()->getCode() == '42S02' || //table doesn't exist
 								$e->getPrevious()->getCode() == '42S22' || //col not found
 								strstr($e->getPrevious()->getMessage(), 'errno: 121 ') || // (errno: 121 "Duplicate key on write or update")
 								strstr($e->getPrevious()->getMessage(), ' 1826 ') || //HY000: SQLSTATE[HY000]: General error: 1826 Duplicate foreign key constraint
