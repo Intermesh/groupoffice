@@ -29,7 +29,7 @@ GO.files.ThumbsPanel = Ext.extend(Ext.Panel, {
 
 
 			'<div class="fs-thumb" style="background-image:url({thumb_url});">',
-			'<tpl if="locked_user_id&gt;0"><div class="fs-thumb-locked"></tpl>',
+			'<tpl if="locked_user_id&gt;0"><div class="fs-thumb-locked"><i class="icon ic-lock"></i></tpl>',
 			'&nbsp;',
 			'<tpl if="locked_user_id&gt;0"></div></tpl>',
 			'</div>',
