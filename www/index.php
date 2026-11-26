@@ -38,7 +38,7 @@ $textDirection = go()->getLanguage()->getTextDirection();
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($isoCode) ?>" dir="<?= htmlspecialchars($textDirection) ?>" style="height:100%">
 <head>
-    <title>Group-Office</title>
+    <title>GroupOffice</title>
     <script>
 			var BaseHref = "<?= $baseUrl ?>";
     </script>
@@ -92,7 +92,7 @@ $textDirection = go()->getLanguage()->getTextDirection();
     <script src="views/Extjs3/lang.php?lang=<?= urlencode($isoCode) ?>&amp;v=<?= \go\core\webclient\Extjs3::get()->getLanguageJS()->getModifiedAt()->format("U") ?>"></script>
 <!--    <script src="views/goui/legacyscripts.php"></script>-->
 
-    <script type="module" src="views/goui/dist/Index.js"></script>
+    <script type="module" src="views/goui/dist/Index.js?v=<?= filemtime(__DIR__ . '/views/goui/dist/Index.js'); ?>"></script>
 
 <?php
     $title = htmlspecialchars(go()->getSettings()->title);
