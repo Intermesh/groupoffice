@@ -30,20 +30,26 @@ abstract class Store extends \BackendDiff {
 		}
 			
 		if(!self::$_account){
-			$settings  = GoSyncUtils::getUserSettings();
-			if(!empty($settings->account_id)) {
+
+			$user = go()->getAuthState()->getUser(['syncSettings']);
+
+			$accountId = $user && $user->syncSettings ? $user->syncSettings->account_id : null;
+
+			if(!empty($accountId)) {
 				try{
-					self::$_account = \GO\Email\Model\Account::model()->findByPk($settings->account_id);
+					self::$_account = \GO\Email\Model\Account::model()->findByPk($accountId);
 					if(!self::$_account){
 						ZLog::Write(LOGLEVEL_INFO, 'E-mail account not found!');
+						self::$_account = null;
+						return null;
 					}
 				}catch(\GO\Base\Exception\AccessDenied $e){
 					ZLog::Write(LOGLEVEL_WARN, 'GoBaseBackendDiff->getImapAccount() ~~ ACCESS DENIED to e-mail account configured in sync settings('.(string)$e->getMessage().')');
 				}
 			}else
 			{
-				ZLog::Write(LOGLEVEL_INFO, 'No e-mail account. Settings: '.var_export($settings->getAttributes(), true));
-				return false;
+				ZLog::Write(LOGLEVEL_INFO, 'No e-mail account.');
+				return null;
 			}
 		}
 		return self::$_account;

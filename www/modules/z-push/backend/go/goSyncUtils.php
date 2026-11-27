@@ -1,67 +1,13 @@
 <?php /** @noinspection PhpDeprecationInspection */
 
 use GO\Base\Db\ActiveRecord;
-use GO\Base\Model\User;
-use GO\Base\Util\Date;
 use GO\Base\Util\Icalendar\Rrule;
-use GO\Base\Util\Rtf as RtfAlias;
 use GO\Base\Util\StringHelper;
-use GO\Calendar\Model\Event;
 use go\core\orm\Entity;
 use go\core\util\StringUtil;
-use GO\Sync\Model\Settings as SyncSettings;
 
 class GoSyncUtils {
 
-
-	/**
-	 * Get the Group-Office Sync settings for the given user
-	 * If no user is given then it will take the settings for the current user
-	 *
-	 * @param ?User $user
-	 * @return SyncSettings
-	 */
-	public static function getUserSettings(?User $user = null): SyncSettings
-	{
-
-		if (empty($user))
-			$user = GO::user();
-
-		/** @noinspection PhpUndefinedMethodInspection */
-		return SyncSettings::model()->findForUser($user);
-	}
-	
-//	public static function getEntityModSeq($entity) {
-//		$entityModSeq = go()->getDbConnection()
-//						->selectSingleValue("MAX(modSeq)")
-//						->from("core_change")
-//						->where([
-//								"entityTypeId" => $entity->getType()->getId(), 
-//								"entityId" => $entity->id
-//										])
-//						->single();
-//		
-//		if(empty($entityModSeq)) {
-//			return false;
-//		}
-//		
-//		$userModSeq = go()->getDbConnection()
-//						->selectSingleValue("MAX(modSeq)")
-//						->from("core_change_user")
-//						->where([
-//								"entityTypeId" => $entity->getType()->getId(), 
-//								"entityId" => $entity->id,  
-//								"userId" => go()->getUserId()
-//										])
-//						->single();
-//		
-//		if(empty($entityModSeq)) {
-//			return false;
-//		}
-//		
-//		return $entityModSeq.':'.$userModSeq;	
-//		
-//	}
 
 	/**
 	 * Returns the best match of preferred body preference types.

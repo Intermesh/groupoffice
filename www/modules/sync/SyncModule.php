@@ -2,19 +2,11 @@
 
 namespace GO\Sync;
 
-use GO\Base\Model\User as GOUser;
 use GO\Base\Module;
-use go\core\model\Acl;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\model\User;
-use go\modules\community\addressbook\model\AddressBook;
-use go\modules\community\notes\model\NoteBook;
-use GO\Sync\Model\Settings;
-use GO\Sync\Model\UserAddressBook;
-use GO\Sync\Model\UserNoteBook;
 use GO\Sync\Model\UserSettings;
-use go\core\model;
 
 class SyncModule extends Module{
 
