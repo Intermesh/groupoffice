@@ -918,9 +918,9 @@ class GO{
 		}
 
 		if(empty($path)){
-			$amp = 'index.php?';
+			$amp = 'legacy.php?';
 		}else {
-			$url .= 'index.php?r='.$path;
+			$url .= 'legacy.php?r='.$path;
 
 			$amp = $htmlspecialchars ? '&amp;' : '&';
 		}
