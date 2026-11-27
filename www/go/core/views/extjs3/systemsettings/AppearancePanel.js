@@ -7,7 +7,7 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 			this.logoField.setValue(null);
 		}}),
 			resetLogoButtonD = new Ext.Button({iconCls: 'ic-delete', disabled: true, tooltip: t("Reset"), handler: () => {
-			this.logoField.setValue(null);
+			this.logoDarkField.setValue(null);
 		}});
 
 		Ext.apply(this, {
@@ -61,7 +61,7 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 					{
 						xtype: 'compositefield',
 						items: [
-							this.logoField = new go.form.FileField({
+							this.logoDarkField = new go.form.FileField({
 								hideLabel: true,
 								buttonOnly: true,
 								name: 'logoIdDark',
