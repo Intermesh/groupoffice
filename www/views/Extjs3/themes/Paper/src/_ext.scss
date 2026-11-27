@@ -10,7 +10,7 @@
 	display: inline-block;
 	font-size: utils.sp(13);
 	font-weight: 600;
-	color: rgba(white, 0.87);
+	color: rgba(white, 0.8);
 	//margin-top: dp(1.5);
 	min-width:utils.dp(21);
 	//width: content-box;
@@ -21,6 +21,10 @@
 	text-align:center;
 	border-radius: utils.dp(10.5); // only round with 1 char
 	background-color: #727272; //var(--fg-secondary-text);
+
+	.dark & {
+		background-color: rgba(0,0,0, .4)
+	}
 
 	.x-tree-node & {
 		//position: absolute;
