@@ -564,32 +564,50 @@ END;
   /**
    * Convert plain text to HTML
    *
+   * All text is escaped. URLs and e-mail addresses become links when $convertLinks is true.
+   *
    * @param string $text Plain text string
    * @param bool $convertLinks Whether to convert URLs to links
+   * @param string|null $linkClass CSS class for the links
    * @return string
    */
-	public static function textToHtml(string $text, $convertLinks = true): string
+	public static function textToHtml(string $text, $convertLinks = true, ?string $linkClass = null): string
 	{
+		// Links are matched in the raw text, because escaping first breaks addresses like <mschering@intermesh.nl>.
+		// The text around them and the links themselves are escaped separately, so no part of the text can become markup.
+		$html = '';
+		$pos = 0;
 
-		if ($convertLinks) {
-			$text = preg_replace("/\b(https?:\/\/[\pL0-9.&\-\/@#;`~=%?:_+,)(]+)\b/ui", '{lt}a href={quot}$1{quot} target={quot}_blank{quot}{gt}$1{lt}/a{gt}', $text . "\n");
-			$text = preg_replace("/\b([\pL0-9._\-]+@[\pL0-9.\-_]+\.[a-z]{2,4})(\s)/ui", "{lt}a href={quot}mailto:$1{quot}{gt}$1{lt}/a{gt}$2", $text);
+		if ($convertLinks && preg_match_all(
+				"/\b(https?:\/\/[\pL0-9.&\-\/@#;`~=%?:_+,)(]+)\b|\b([\pL0-9._\-]+@[\pL0-9.\-_]+\.[a-z]{2,4})(?=\s|$)/ui",
+				$text,
+				$matches,
+				PREG_SET_ORDER | PREG_OFFSET_CAPTURE
+			)) {
+			$classAttr = isset($linkClass) ? ' class="' . self::escapeHtml($linkClass) . '"' : '';
+			foreach ($matches as $match) {
+				[$link, $offset] = $match[0];
+				$html .= self::escapeHtml(substr($text, $pos, $offset - $pos));
+				$escapedLink = self::escapeHtml($link);
+				if (isset($match[2]) && $match[2][1] > -1) {
+					$html .= '<a href="mailto:' . $escapedLink . '"' . $classAttr . '>' . $escapedLink . '</a>';
+				} else {
+					$html .= '<a href="' . $escapedLink . '" target="_blank"' . $classAttr . '>' . $escapedLink . '</a>';
+				}
+				$pos = $offset + strlen($link);
+			}
 		}
+		$html .= self::escapeHtml(substr($text, $pos));
 
-		//replace repeating spaces with &nbsp;		
-		$text = htmlspecialchars($text);
-		$text = str_replace('  ', '&nbsp;&nbsp;', $text);
+		//replace repeating spaces with &nbsp;. Links don't contain spaces.
+		$html = str_replace('  ', '&nbsp;&nbsp;', $html);
 
+		return nl2br(trim($html));
+	}
 
-		$text = nl2br(trim($text));
-		//$text = str_replace("\r", "", $text);
-		//$text = str_replace("\n", "", $text);
-		//we dont use < and > directly with the preg functions because htmlspecialchars will screw it up. We don't want to use
-		//htmlspecialchars before the pcre functions because email address like <mschering@intermesh.nl> will fail.
-
-		$text = str_replace("{quot}", '"', $text);
-		$text = str_replace("{lt}", "<", $text);
-		return str_replace("{gt}", ">", $text);
+	private static function escapeHtml(string $text): string
+	{
+		return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
 	}
 	
 	/**
