@@ -978,7 +978,7 @@ return array (
   'Default permissions' => 'Numatytos teisės',
   'Select an entity to manage the default permissions when new items are created.' => 'Pasirinkite objektą, kad galėtumėte valdyti numatytąsias teises, kai kuriami nauji elementai.',
   'Appearance' => 'Išvaizda',
-  'Light' => 'Lengvas',
+  'Light' => 'Šviesus',
   'Dark' => 'Tamsus',
   'Some fields on this page can\'t be edited because they have been locked in the server configuration file.' => 'Kai kurių šio puslapio laukų negalima redaguoti, nes jie buvo užrakinti serverio konfigūracijos faile.',
   'IP pattern' => 'IP šablonas',

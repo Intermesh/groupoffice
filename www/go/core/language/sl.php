@@ -923,7 +923,7 @@ return array (
   'Theme' => 'Tema',
   'Paper' => 'Papir',
   'Compact' => 'Kompaktno',
-  'Light' => 'Svetloba',
+  'Light' => 'Svetlo',
   'Dark' => 'Temno',
   'System default' => 'Sistem privzeto',
   'System' => 'Sistem',
