@@ -298,6 +298,50 @@ class ModuleTest extends TestCase
 		$this->assertEquals([], $this->recipients($this->comment((string) self::$customer->id, Comment::SECTION_DRAFT), self::$agent->id));
 	}
 
+	private function progress(): string
+	{
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		return SupportTicket::findById(self::$ticket->id)->getProgress();
+	}
+
+	/**
+	 * A ticket is only set to "in-progress" when the agent sends a reply to the customer, not when they write a draft or
+	 * a private note
+	 */
+	public function testOnlySentReplySetsTicketInProgress(): void
+	{
+		$alerts = \go\core\model\Alert::$enabled;
+		$sendMail = Module::$sendMailOnComment;
+		\go\core\model\Alert::$enabled = true;
+		Module::$sendMailOnComment = false;
+		try {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			$ticket = SupportTicket::findById(self::$ticket->id);
+			$ticket->responsibleUserId = self::$agent->id;
+			$ticket->setProgress('needs-action');
+			$this->assertTrue($ticket->save(), $ticket->getValidationErrorsAsString());
+			$this->addQuestion();
+			$this->assertEquals('needs-action', $this->progress());
+
+			$result = $this->createAsAgent(['draft' => ['section' => Comment::SECTION_DRAFT]]);
+			$this->assertArrayHasKey('draft', $result['created'], json_encode($result));
+			$draftId = $result['created']['draft']['id'];
+			$this->assertEquals('needs-action', $this->progress(), 'A draft must not change the ticket');
+
+			$result = $this->createAsAgent(['private' => ['section' => 'private']]);
+			$this->assertArrayHasKey('private', $result['created'], json_encode($result));
+			$this->assertEquals('needs-action', $this->progress(), 'A private note must not change the ticket');
+
+			go()->setAuthState(new TemporaryState(self::$agent->id));
+			$result = (new CommentController())->set(['update' => [$draftId => ['section' => null]]]);
+			$this->assertArrayHasKey($draftId, $result['updated'], json_encode($result));
+			$this->assertEquals('in-progress', $this->progress(), 'Sending the reply sets the ticket in progress');
+		} finally {
+			\go\core\model\Alert::$enabled = $alerts;
+			Module::$sendMailOnComment = $sendMail;
+		}
+	}
+
 	public function testDisabledDoesNotNotify(): void
 	{
 		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));

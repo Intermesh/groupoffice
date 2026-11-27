@@ -857,13 +857,17 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		// don't set Ticket to in progress when support agent sent the e-mail
-		$existingComments = Comment::findForEntity($this)->all();
+		// A comment in a section, like a private note of a support ticket, isn't a reply to anyone, so it doesn't change
+		// the progress. Drafts don't get here until they are sent.
+		if(!isset($comment->section)) {
+			// don't set Ticket to in progress when support agent sent the e-mail
+			$existingComments = Comment::findForEntity($this)->all();
 
-		if($comment->createdBy == $this->responsibleUserId && count($existingComments) > 1) {
-			$this->progress = Progress::InProcess;
-		} else {
-			$this->progress = Progress::NeedsAction;
+			if ($comment->createdBy == $this->responsibleUserId && count($existingComments) > 1) {
+				$this->progress = Progress::InProcess;
+			} else {
+				$this->progress = Progress::NeedsAction;
+			}
 		}
 
 		// make sure modified at is updated
