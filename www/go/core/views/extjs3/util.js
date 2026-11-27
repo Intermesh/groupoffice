@@ -408,8 +408,7 @@ go.util =  (function () {
 		 */
 		viewFile : function(url, name, type) {
 
-			// set by MediaWindow.ts when a GOUI module is loaded
-			if((name || type) && go.util.viewMedia && go.util.viewMedia(url, name, type)) {
+			if((name || type) && window.groupofficeCore.viewMedia(url, name, type)) {
 				return;
 			}
 
