@@ -1,4 +1,8 @@
 - Email: the more menu of the message list shows the labels of the account under "Show flagged", so you can quickly show only the messages with a label
+- Core: WAV files and some other file types got a wrong content type, so WAV e-mail attachments didn't play in the browser
+- Core: an SVG logo didn't show in the preview of System settings > Appearance. SVG images are now shown when they are loaded as an image, also elsewhere, while opening an SVG, HTML or XML file still downloads it as text so scripts in it can't run. On a server without HTTPS the preview still doesn't show SVG, because browsers only tell the server how a file is loaded over HTTPS. The logo itself shows on every server.
+- Core: the Reset button of the light logo in System settings > Appearance cleared the dark logo instead
+- Core: audio and video from Files, e-mail attachments, comments and attachment fields play in a window of GroupOffice instead of a new tab. Safari didn't play them in a new tab, because its media player doesn't send the login.
 
 26-11-2026: 26.0.63
 - Files: show visual hint in file browser and thumbnails grid when a file is locked
