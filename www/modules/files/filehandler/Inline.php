@@ -25,7 +25,9 @@ class Inline implements FilehandlerInterface{
 	}
 	
 	public function getHandler(\GO\Files\Model\File $file){
-		return 'go.util.viewFile("'.$file->getDownloadUrl(false, true).'");';
+		// The name is URL encoded because JsonResponse unwraps "startjs:" handlers with stripslashes(), which breaks
+		// JSON escaping. The name lets viewFile() play audio and video in the page.
+		return 'go.util.viewFile("'.$file->getDownloadUrl(false, true).'", decodeURIComponent("' . rawurlencode($file->name) . '"));';
 	}
 }
 
