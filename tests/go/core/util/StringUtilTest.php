@@ -20,6 +20,25 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals(mb_strtolower("гъл") ,$words[1]);
 	}
 
+	/**
+	 * Words joined with an underscore, like in file names, must be found on each part (#38385)
+	 */
+	public function testSplitTextKeywordsOnUnderscore() {
+		$words = StringUtil::splitTextKeywords("CV_Daria_Sikorska_PITERSON sp. z o.o.pdf");
+
+		$this->assertContains("cv_daria_sikorska_piterson", $words);
+		$this->assertContains("daria", $words);
+		$this->assertContains("sikorska", $words);
+		$this->assertContains("piterson", $words);
+
+		$words = StringUtil::splitTextKeywords("Zeta-Jones");
+		$this->assertContains("zeta", $words);
+		$this->assertContains("jones", $words);
+
+		// When searching the query is not split
+		$this->assertSame(["daria_sikorska"], array_values(StringUtil::splitTextKeywords("Daria_Sikorska", false)));
+	}
+
 	public function testXSS() {
 
 		$xss[] = '<script>alert("XSS");</script>';

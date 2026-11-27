@@ -901,9 +901,10 @@ END;
 						$split = mb_split('[_\-\\\\\/.]', $emailPart);
 						$secondPassKeywords = array_merge($secondPassKeywords, $split);
 					}
-				} elseif (strpos($keyword, '-') > 0) {
-					// Split strings with a dash anyway, e.g. as in double surnames
-					$split = mb_split('[\-]', $keyword);
+				} elseif (strpos($keyword, '-') > 0 || strpos($keyword, '_') > 0) {
+					// Split strings with a dash or underscore anyway, e.g. as in double surnames or
+					// file names like CV_John_Smith.pdf
+					$split = mb_split('[\-_]', $keyword);
 					$secondPassKeywords = array_merge($secondPassKeywords, $split);
 				}
 			}
