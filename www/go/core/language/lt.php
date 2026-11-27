@@ -1232,4 +1232,12 @@ return array (
   'Authorized groups' => 'Įgaliotos grupės',
   'Attach files by dropping or pasting them' => 'Pridėkite dokumentus vilkdami arba įklijuodami juos čia.',
   'The minimum length for this field is {min}' => 'Minimalus šio lauko ilgis yra {min}',
+  'Primary color' => 'Pagrindinė spalva',
+  'Secondary color' => 'Antrinė spalva',
+  'Tertiary color' => 'Tretinė spalva',
+  'Accent color' => 'Akcento spalva',
+  'Header bar, Input focus, Active elements, Links' => 'Antraštės juosta, įvesties fokusas, aktyvūs elementai, nuorodos',
+  'Primary actions, Save buttons' => 'Pagrindiniai veiksmai, išsaugojimo mygtukai',
+  'Active tab indication' => 'Aktyvios kortelės žymėjimas',
+  'Badges, warnings' => 'Ženkleliai, įspėjimai',
 );

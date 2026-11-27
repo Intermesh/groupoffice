@@ -2172,4 +2172,7 @@ Cliquez sur le lien ci-dessous (ou collez-le dans un navigateur) pour changer vo
 
 Si vous n\'avez pas demandé de nouveau mot de passe, veuillez supprimer cet e-mail.',
   'description' => 'Contient les fonctions de base nécessaires au bon fonctionnement de {product_name}.',
+  'Secondary color' => 'Couleur secondaire',
+  'Tertiary color' => 'Couleur tertiaire',
+  'Accent color' => 'Couleur d\'accentuation',
 );

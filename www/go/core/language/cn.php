@@ -1043,4 +1043,11 @@ return array (
   'Height' => '高度',
   'Can\'t delete the default item.' => '无法删除默认项',
   'by' => '经过',
+  'Light' => '浅色',
+  'Dark' => '深色',
+  'Tertiary color' => '第三色调',
+  'Header bar, Input focus, Active elements, Links' => '标题栏、输入焦点、活动元素、链接',
+  'Primary actions, Save buttons' => '主要操作、保存按钮',
+  'Active tab indication' => '活动标签指示',
+  'Badges, warnings' => '徽章、警告',
 );

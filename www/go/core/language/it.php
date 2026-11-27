@@ -2191,4 +2191,5 @@ Fai clic sul link qui sotto (o incollalo in un browser) per cambiare la password
 %s
 
 Se non hai richiesto una nuova password, elimina questa e-mail.',
+  'Tertiary color' => 'Colore terziario',
 );

@@ -1317,4 +1317,10 @@ Minden jog fenntartva.<br />
   'Event' => 'Esemény',
   'The item was successfully deleted' => 'Az elemet sikeresen törölték',
   'File' => 'Fájl',
+  'Light' => 'Világos',
+  'Dark' => 'Sötét',
+  'Header bar, Input focus, Active elements, Links' => 'Fejléc, beviteli fókusz, aktív elemek, hivatkozások',
+  'Primary actions, Save buttons' => 'Elsődleges műveletek, mentés gombok',
+  'Active tab indication' => 'Aktív lap jelzése',
+  'Badges, warnings' => 'Jelvények, figyelmeztetések',
 );

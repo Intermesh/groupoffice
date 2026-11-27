@@ -1077,4 +1077,11 @@ return array (
   'Save as' => 'Хадгалах',
   'New email' => 'Шинэ И-мэйл',
   'You have %d unread email(s)' => 'Та% г уншаагүй захиа (ууд) байна',
+  'Light' => 'Цайвар',
+  'Dark' => 'Бараан',
+  'Tertiary color' => 'Гуравдагч өнгө',
+  'Header bar, Input focus, Active elements, Links' => 'Толгойн мөр, оролтын фокус, идэвхтэй элементүүд, холбоосууд',
+  'Primary actions, Save buttons' => 'Үндсэн үйлдлүүд, хадгалах товчнууд',
+  'Active tab indication' => 'Идэвхтэй табын тэмдэглэгээ',
+  'Badges, warnings' => 'Тэмдэг, анхааруулга',
 );

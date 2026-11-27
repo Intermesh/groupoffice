@@ -1294,4 +1294,8 @@ return array (
   'Encrypt content' => '内容を暗号化',
   'Attach files by dropping or pasting them' => 'ファイルをドラッグ＆ドロップまたは貼り付けで添付',
   'The minimum length for this field is {min}' => 'このフィールドの最小文字数は{min}文字です。',
+  'Header bar, Input focus, Active elements, Links' => 'ヘッダーバー、入力フォーカス、アクティブな要素、リンク',
+  'Primary actions, Save buttons' => '主なアクション、保存ボタン',
+  'Active tab indication' => 'アクティブなタブの表示',
+  'Badges, warnings' => 'バッジ、警告',
 );

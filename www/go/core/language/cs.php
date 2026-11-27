@@ -2302,4 +2302,7 @@ Klikněte na níže uvedený odkaz (nebo jej vložte do prohlížeče) a změňt
 %s
 
 Pokud jste o nové heslo nežádali, tento e-mail prosím smažte.',
+  'Secondary color' => 'Sekundární barva',
+  'Tertiary color' => 'Terciární barva',
+  'Accent color' => 'Barva zvýraznění',
 );
