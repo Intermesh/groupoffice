@@ -597,30 +597,8 @@ class StringHelper {
 		if(empty($text)) {
 			return "";
 		}
-	
-		if($convert_links)
-		{
-			$text = preg_replace("/\b(https?:\/\/[\pL0-9\.&\-\/@#;`~=%?:_\+,\)\(]+)\b/ui", '{lt}a href={quot}$1{quot} target={quot}_blank{quot} class={quot}normal-link{quot}{gt}$1{lt}/a{gt}', $text."\n");
-			$text = preg_replace("/\b([\pL0-9\._\-]+@[\pL0-9\.\-_]+\.[a-z]{2,4})(\s)/ui", "{lt}a class={quot}normal-link{quot} href={quot}mailto:$1{quot}{gt}$1{lt}/a{gt}$2", $text);
-		}
 
-		//replace repeating spaces with &nbsp;		
-		$text = htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
-		$text = str_replace('  ', '&nbsp;&nbsp;', $text);
-
-		
-		$text = nl2br(trim($text));
-		//$text = str_replace("\r", "", $text);
-		//$text = str_replace("\n", "", $text);
-
-		//we dont use < and > directly with the preg functions because htmlspecialchars will screw it up. We don't want to use
-		//htmlspecialchars before the pcre functions because email address like <mschering@intermesh.nl> will fail.
-
-		$text = str_replace("{quot}", '"', $text);
-		$text = str_replace("{lt}", "<", $text);
-		$text = str_replace("{gt}", ">", $text);
-
-		return $text;
+		return \go\core\util\StringUtil::textToHtml($text, (bool) $convert_links, 'normal-link');
 	}
 
 	public static function html_to_text($text, $link_list=true){

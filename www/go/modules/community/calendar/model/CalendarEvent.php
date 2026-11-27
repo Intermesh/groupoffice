@@ -470,6 +470,18 @@ class CalendarEvent extends AclItemEntity {
 			->add('calendarid', function(Criteria $criteria, $value) {
 				$criteria->andWhere('cce.calendarId', '=', $value);
 			})
+			->addText('title', function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('eventdata.title', $comparator, $value)
+					->andWhere(self::detailsVisibleCriteria());
+			})
+			->addText('description', function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('eventdata.description', $comparator, $value)
+					->andWhere(self::detailsVisibleCriteria());
+			})
+			->addText('location', function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('eventdata.location', $comparator, $value)
+					->andWhere(self::detailsVisibleCriteria());
+			})
 			->addDate('after', function(Criteria $crit, $comparator, $value) {
 				$crit->where((new Criteria())->where('lastOccurrence', '>', $value)->orWhere('lastOccurrence', 'IS', null));
 			})
@@ -1200,6 +1212,30 @@ class CalendarEvent extends AclItemEntity {
 				->andWhere(self::busyCriteria()));
 		}
 		$query->andWhere($visible);
+	}
+
+	/**
+	 * The events of which the current user may see the details ({@see PrivateDetails}), like the title, description
+	 * and location, the same as {@see showAsPrivate()}: the user owns the calendar, or the event is public and the user
+	 * may read the calendar. Use it in filters on these details, so they can't be used to guess the hidden text.
+	 *
+	 * For a query of {@see find()}.
+	 *
+	 * @return Criteria
+	 * @throws Exception
+	 */
+	private static function detailsVisibleCriteria(): Criteria
+	{
+		$userId = go()->getUserId();
+		$public = (new Criteria())->where('eventdata.privacy', '=', self::Public);
+		if(!User::isAdminById($userId)) {
+			$public->andWhere('cce.calendarId', 'IN', self::calendarIdsWithLevel(Acl::LEVEL_READ));
+		}
+
+		return (new Criteria())
+			->where('cal.ownerId', '=', $userId)
+			->orWhere((new Criteria())->where('cal.ownerId', 'IS', null)->andWhere('eventdata.createdBy', '=', $userId))
+			->orWhere($public);
 	}
 
 	/**

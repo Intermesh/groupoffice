@@ -882,8 +882,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			}
 		}
 
-		if (!isset($folder)) {
-			throw new \Exception('No Folder found with id ' . $params['folder_id']);
+		// findByPk() returns false when the folder doesn't exist
+		if (empty($folder)) {
+			throw new \GO\Base\Exception\NotFound('No Folder found with id ' . (int) $params['folder_id']);
 		}
 
 

@@ -20,6 +20,25 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals(mb_strtolower("гъл") ,$words[1]);
 	}
 
+	/**
+	 * Words joined with an underscore, like in file names, must be found on each part (#38385)
+	 */
+	public function testSplitTextKeywordsOnUnderscore() {
+		$words = StringUtil::splitTextKeywords("CV_Daria_Sikorska_PITERSON sp. z o.o.pdf");
+
+		$this->assertContains("cv_daria_sikorska_piterson", $words);
+		$this->assertContains("daria", $words);
+		$this->assertContains("sikorska", $words);
+		$this->assertContains("piterson", $words);
+
+		$words = StringUtil::splitTextKeywords("Zeta-Jones");
+		$this->assertContains("zeta", $words);
+		$this->assertContains("jones", $words);
+
+		// When searching the query is not split
+		$this->assertSame(["daria_sikorska"], array_values(StringUtil::splitTextKeywords("Daria_Sikorska", false)));
+	}
+
 	public function testXSS() {
 
 		$xss[] = '<script>alert("XSS");</script>';
@@ -293,5 +312,41 @@ class StringUtilTest extends \PHPUnit\Framework\TestCase {
 	{
 		$this->assertSame("'quoted'", StringUtil::unescapeCsvFormula("'quoted'"));
 		$this->assertSame("'-12", StringUtil::unescapeCsvFormula("'-12"));
+	}
+
+	public static function textToHtmlProvider(): array
+	{
+		return [
+			'plain text' => ["Hello world", "Hello world"],
+			'escapes html' => ['<b>bold</b> & "q"', '&lt;b&gt;bold&lt;/b&gt; &amp; &quot;q&quot;'],
+			'url' => ["Visit https://example.com/a?b=1&c=2 now", 'Visit <a href="https://example.com/a?b=1&amp;c=2" target="_blank">https://example.com/a?b=1&amp;c=2</a> now'],
+			'e-mail' => ["Mail info@example.com now", 'Mail <a href="mailto:info@example.com">info@example.com</a> now'],
+			'e-mail in brackets' => ["Mail <info@example.com> now", 'Mail &lt;info@example.com&gt; now'],
+			'e-mail at end' => ["info@example.com", '<a href="mailto:info@example.com">info@example.com</a>'],
+			'e-mail followed by dot is not linked' => ["test@test.nl.", "test@test.nl."],
+			'url with user' => ["http://user@example.com/path", '<a href="http://user@example.com/path" target="_blank">http://user@example.com/path</a>'],
+			'spaces and new lines' => ["two  spaces\nline", "two&nbsp;&nbsp;spaces<br />\nline"],
+			// The function used {lt}, {gt} and {quot} internally and turned them into markup when they were in the text
+			'placeholders stay text' => ['{lt}img src=x onerror={quot}alert(1){quot}{gt}', '{lt}img src=x onerror={quot}alert(1){quot}{gt}'],
+			'placeholders after url stay text' => ['https://example.com/?q={lt}b{gt}', '<a href="https://example.com/?q" target="_blank">https://example.com/?q</a>={lt}b{gt}'],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('textToHtmlProvider')]
+	public function testTextToHtml(string $text, string $expected): void
+	{
+		$this->assertSame($expected, StringUtil::textToHtml($text));
+	}
+
+	public function testTextToHtmlWithoutLinks(): void
+	{
+		$this->assertSame('https://example.com &lt;a@b.nl&gt;', StringUtil::textToHtml('https://example.com <a@b.nl>', false));
+	}
+
+	public function testLegacyTextToHtml(): void
+	{
+		$this->assertSame('', \GO\Base\Util\StringHelper::text_to_html(null));
+		$this->assertSame('<a href="https://example.com" target="_blank" class="normal-link">https://example.com</a> &lt;img src=x&gt;', \GO\Base\Util\StringHelper::text_to_html('https://example.com <img src=x>'));
+		$this->assertSame('{lt}img src=x onerror={quot}alert(1){quot}{gt}', \GO\Base\Util\StringHelper::text_to_html('{lt}img src=x onerror={quot}alert(1){quot}{gt}'));
 	}
 }

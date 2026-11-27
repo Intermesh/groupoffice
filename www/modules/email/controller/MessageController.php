@@ -1642,6 +1642,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$zipFile = $tmpFolder->createChild('winmail.zip');
+		\GO\Base\Fs\Zip::create($zipFile, $tmpFolder, $items);
 		\GO\Base\Util\Http::outputDownloadHeaders($zipFile,false,true);
 		$zipFile->output();
 

@@ -147,6 +147,8 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			);
 
 			let writtenByUser = (client.user.id == comment.creator.id);
+			// The writer and admins, and for a draft everyone who may change the item, may edit, delete and send it
+			const mayChange = comment.permissionLevel >= AclLevel.DELETE;
 
 
 
@@ -204,9 +206,9 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 								btn({
 									icon: "edit",
 									text: t("Edit"),
-									disabled: client.user.isAdmin ? false : !writtenByUser,
+									disabled: !mayChange,
 									handler: () => {
-										if (client.user.isAdmin || writtenByUser) {
+										if (mayChange) {
 											const commentDlg = new CommentDialog();
 											void commentDlg.load(comment.id);
 											commentDlg.show();
@@ -216,9 +218,9 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 								btn({
 									icon: "delete",
 									text: t("Delete"),
-									disabled: client.user.isAdmin ? false : !writtenByUser,
+									disabled: !mayChange,
 									handler: () => {
-										if (client.user.isAdmin || writtenByUser) {
+										if (mayChange) {
 											commentDS.confirmDestroy([comment.id]);
 										}
 									}
@@ -232,7 +234,6 @@ class CommentList extends Component<CommentListEventMap> implements StoreCompone
 			});
 
 			if (comment.section === "draft") {
-				const mayChange = client.user.isAdmin || writtenByUser;
 				commentComp.items.add(
 					tbar({cls: "comment-actions"},
 						// Posting the draft sends it, like a reply to the customer of a support ticket

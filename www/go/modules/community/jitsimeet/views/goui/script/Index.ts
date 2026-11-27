@@ -7,6 +7,13 @@ import {t, translate} from "@intermesh/goui";
 function b64UrlEncode (data:string) {
 	const base64 = btoa(data);
 	return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+/**
+ * Random room name of 16 hexadecimal characters, like the server creates in Settings::createMeetingUri().
+ * Jitsi Meet doesn't accept every character in a room name, such as "-".
+ */
+function randomRoom() {
+	return Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('');
 }
 
 modules.register({
@@ -28,7 +35,7 @@ modules.register({
 
 				const m = modules.get('community', 'jitsimeet')!;
 
-				const room = b64UrlEncode(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(8))));
+				const room = randomRoom();
 
 				let uri;
 				if (!m.settings.videoJwtEnabled) {

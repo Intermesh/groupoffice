@@ -222,6 +222,9 @@ class Comment extends AclItemEntity {
 	 * change the entity. Users who may only read it, like the customer of a ticket, only see the comments without a
 	 * section.
 	 *
+	 * A draft belongs to everyone who may change the entity: they may edit, delete and send it, not only the user who
+	 * wrote it.
+	 *
 	 * @return int
 	 */
 	protected function internalGetPermissionLevel(): int
@@ -242,6 +245,12 @@ class Comment extends AclItemEntity {
 
 		if($this->createdBy == go()->getAuthState()->getUserId()) {
 			return Acl::LEVEL_MANAGE;
+		}
+
+		// The stored section, because sending a draft changes it before the permission is checked
+		$section = array_key_exists('section', $this->getOldValues()) ? $this->getOldValue('section') : ($this->section ?? null);
+		if($section === self::SECTION_DRAFT) {
+			return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_WRITE) ? Acl::LEVEL_DELETE : 0;
 		}
 
 		return $this->findEntity()->hasPermissionLevel($requiredLevel) ? Acl::LEVEL_CREATE : false;
@@ -298,6 +307,12 @@ class Comment extends AclItemEntity {
 		if($this->isPosted()) {
 			// A draft gets the date it was posted, so it's in the right place in the thread
 			$this->date = new DateTime();
+
+			// and is posted on behalf of the user who sends it, who may not be the one who wrote it
+			$userId = go()->getAuthState()?->getUserId();
+			if($userId) {
+				$this->createdBy = $userId;
+			}
 		}
 		$added = $this->isNew() ? $this->section !== self::SECTION_DRAFT : $this->isPosted();
 

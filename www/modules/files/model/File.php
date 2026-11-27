@@ -444,9 +444,17 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\AttachableI
 		$this->cutAttributeLength("extension");
 
 		if($this->fsFile->exists()) {
-			$this->size = $this->fsFile->size();
+			// The file can be removed or become unreadable right after the check, like a temporary file during a file
+			// system sync. Then the size and time are false: keep the old values.
+			$size = $this->fsFile->size();
+			if($size !== false) {
+				$this->size = $size;
+			}
 			//$this->ctime = $this->fsFile->ctime();
-			$this->mtime = $this->fsFile->mtime();
+			$mtime = $this->fsFile->mtime();
+			if($mtime !== false) {
+				$this->mtime = $mtime;
+			}
 		}
 
 		

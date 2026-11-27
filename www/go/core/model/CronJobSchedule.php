@@ -82,10 +82,10 @@ class CronJobSchedule extends Entity
 		}
 		
 		if ($this->isModified('nextRunAt') && isset($this->nextRunAt)) {
-			//round to next minute
-			if (!go()->getDebugger()->enabled) {
-				$seconds = 60 - $this->nextRunAt->format('s');
-				$this->nextRunAt->modify("+$seconds second");
+			//round up to the next minute, a time on the minute stays as it is
+			$seconds = (int) $this->nextRunAt->format('s');
+			if ($seconds > 0 && !go()->getDebugger()->enabled) {
+				$this->nextRunAt->modify("+" . (60 - $seconds) . " second");
 			}
 		} else if (($this->isModified('expression') || (!isset($this->nextRunAt)) && $this->enabled)) {
 			$this->nextRunAt = $this->getNextRunDate();

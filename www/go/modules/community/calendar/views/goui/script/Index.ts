@@ -321,6 +321,21 @@ modules.register(  {
 					multiple: false,
 					title: t("Query")
 				},
+				title: {
+					type: "string",
+					multiple: true,
+					title: t("Title")
+				},
+				description: {
+					type: "string",
+					multiple: true,
+					title: t("Description")
+				},
+				location: {
+					type: "string",
+					multiple: true,
+					title: t("Location")
+				},
 				calendarId: {
 					type: 'go.form.ComboBox',
 					typeConfig: {

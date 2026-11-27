@@ -23,15 +23,12 @@
 namespace GO\Core\Controller;
 
 
-use DateTimeZone;
 use Cron\CronExpression;
 use GO\Base\Util\Date;
 use go\core\model\CronJobSchedule;
 use go\core\util\DateTime;
 
 class CronController extends \GO\Base\Controller\AbstractJsonController{
-
-	private $tz;
 
 	protected function _checkPermission($action)
 	{
@@ -156,9 +153,9 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 				'weekdays' => $expression->getExpression(CronExpression::WEEKDAY),
 				'years' =>  $expression->getExpression(CronExpression::YEAR),
 				'job' => $job->getCronClass(),
-				'nextrun' => $job->nextRunAt ? $this->adjustToUtc($job->nextRunAt) : "-",
-				'lastrun' => $job->runningSince ? $this->adjustToUtc($job->runningSince) : ($job->lastRunAt ? $this->adjustToUtc($job->lastRunAt) : "-"),
-				'completedat' => $job->lastRunAt ? $this->adjustToUtc($job->lastRunAt) : "-",
+				'nextrun' => $job->nextRunAt ? $job->nextRunAt->getTimestamp() : "-",
+				'lastrun' => $job->runningSince ? $job->runningSince->getTimestamp() : ($job->lastRunAt ? $job->lastRunAt->getTimestamp() : "-"),
+				'completedat' => $job->lastRunAt ? $job->lastRunAt->getTimestamp() : "-",
 				'error' => $job->lastError
 
 			];
@@ -298,25 +295,5 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 		);
 	}
 
-	/**
-	 * Hackish function to 'convert' new FW cronjobs to UTC
-	 *
-	 * Timestamps are correctly stored and retrieved, but somewhere along the line, the default  timezone is not being
-	 * taken into account. For old FW cron jobs this is being done correctly. After some time debugging, still not sure
-	 * why old FW timestamps are correctly being displayed.
-	 *
-	 * @param DateTime $dt
-	 * @return int
-	 */
-	private function adjustToUtc(DateTime $dt): int
-	{
-		if(!isset($this->tz)) {
-			$this->tz = new DateTimeZone(go()->getSettings()->defaultTimezone);
-		}
-		$t = $dt->getTimestamp();
-		$t -= intval($dt->setTimeZone($this->tz)->format('Z'));
-		return $t;
-	}
-	
 	
 }
