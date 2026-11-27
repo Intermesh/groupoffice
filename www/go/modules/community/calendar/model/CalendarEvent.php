@@ -471,7 +471,8 @@ class CalendarEvent extends AclItemEntity {
 				$criteria->andWhere('cce.calendarId', '=', $value);
 			})
 			->addText('title', function(Criteria $criteria, $comparator, $value) {
-				$criteria->where('eventdata.title', $comparator, $value);
+				$criteria->where('eventdata.title', $comparator, $value)
+					->andWhere(self::detailsVisibleCriteria());
 			})
 			->addText('description', function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('eventdata.description', $comparator, $value)

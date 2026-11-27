@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The "description" and "location" filters match only that property. Others may not use them on the details of a
+ * The "title", "description" and "location" filters match only that property. Others may not use them on the details of a
  * private event, or of an event in a calendar of which they may only see the free / busy time, because the match
  * would tell them what the hidden text contains.
  */
@@ -56,7 +56,7 @@ class CalendarEventDetailFilterTest extends TestCase
 			foreach ($events as $key => $values) {
 				$event = new CalendarEvent();
 				$event->calendarId = self::$calendars[$values['calendar']]->id;
-				$event->title = 'Meeting detailfiltertest';
+				$event->title = ($key === 'other' ? 'Lunch' : 'Meeting') . ' detailfiltertest';
 				$event->description = $values['description'];
 				$event->location = $values['location'];
 				$event->privacy = $values['privacy'];
@@ -125,6 +125,7 @@ class CalendarEventDetailFilterTest extends TestCase
 	public static function provideFilters(): array
 	{
 		return [
+			'title' => [['title' => '%Meeting%']],
 			'description' => [['description' => '%Agenda%']],
 			'location' => [['location' => '%Room%']],
 		];
