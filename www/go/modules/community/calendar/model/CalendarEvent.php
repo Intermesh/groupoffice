@@ -470,6 +470,9 @@ class CalendarEvent extends AclItemEntity {
 			->add('calendarid', function(Criteria $criteria, $value) {
 				$criteria->andWhere('cce.calendarId', '=', $value);
 			})
+			->addText('title', function(Criteria $criteria, $comparator, $value) {
+				$criteria->where('eventdata.title', $comparator, $value);
+			})
 			->addDate('after', function(Criteria $crit, $comparator, $value) {
 				$crit->where((new Criteria())->where('lastOccurrence', '>', $value)->orWhere('lastOccurrence', 'IS', null));
 			})
