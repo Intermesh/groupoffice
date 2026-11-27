@@ -306,6 +306,7 @@ modules.register(  {
 			name:"CalendarEvent",
 			filters: [
 				{name: 'text', type: "string", multiple: false, title: t("Query")},
+				{name: 'title', type: "string", multiple: true, title: t("Title")},
 				{name: 'calendarId', type: 'go.form.ComboBox', typeConfig: {
 						fieldLabel: t("Calendar"),
 						hiddenName: 'calendarId',
