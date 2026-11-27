@@ -4,6 +4,7 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\db\Table;
+use go\core\http\Request;
 use go\core\http\Response;
 use go\core\orm;
 use go\core\orm\exception\SaveException;
@@ -589,21 +590,47 @@ class Blob extends orm\Entity {
 
 	/**
 	 * Output for download
+	 *
+	 * HTML, SVG and XML are always downloaded and sent as text/plain, unless the browser loads them as an image. See
+	 * {@see Response::downloadContentType()}.
+	 *
+	 * @param bool $inline Show the file inside the browser
+	 * @param string|null $fetchDest Destination the file is loaded for, like "image". Defaults to the
+	 *   "Sec-Fetch-Dest" request header. Pass "image" for a file that is only used as an image, like the logo, so it
+	 *   also shows in browsers that don't send the header.
 	 * @throws Exception
 	 */
-	public function output($inline = false) {
-		// prevent html to render on same domain having access to all global JS stuff
-		if($inline && !Response::isSafeInlineContentType($this->type)) {
-			$inline = false;
-		}
-		$disp = $inline ? 'inline' : 'attachment';
+	public function output(bool $inline = false, ?string $fetchDest = null): void
+	{
+		$this->getFile()->output(true, true, $this->getOutputHeaders($inline, $fetchDest));
+	}
 
-		$this->getFile()->output(true, true, [
+	/**
+	 * HTTP headers that {@see output()} sends
+	 *
+	 * @param bool $inline Show the file inside the browser
+	 * @param string|null $fetchDest Destination the file is loaded for, see {@see output()}
+	 * @return array<string, string> header name => value
+	 */
+	public function getOutputHeaders(bool $inline = false, ?string $fetchDest = null): array
+	{
+		// prevent html to render on same domain having access to all global JS stuff.
+		// Decide this on the real type: the type that is sent can be text/plain, which looks safe.
+		$safe = Response::isSafeInlineContentType($this->type);
+		$disp = $inline && $safe ? 'inline' : 'attachment';
+
+		$headers = [
 			'ETag' => $this->id,
-			'Content-Type' => $this->type, 
+			'Content-Type' => Response::downloadContentType($this->type, $fetchDest ?? Request::get()->getHeader('Sec-Fetch-Dest')),
 			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
 			'Content-Disposition' => Response::contentDisposition($disp, (string) $this->name)
-					]);
+		];
+
+		if(!$safe) {
+			$headers['Vary'] = 'Sec-Fetch-Dest';
+		}
+
+		return $headers;
 	}
 
 	public static function atypicalApiProperties(): array

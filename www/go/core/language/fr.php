@@ -2192,4 +2192,7 @@ Si vous n\'avez pas demandé de nouveau mot de passe, veuillez supprimer cet e-m
   'Read the documentation' => 'Lire la documentation',
   'What\'s new' => 'Nouveautés',
   'Full changelog' => 'Journal des modifications complet',
+  'Secondary color' => 'Couleur secondaire',
+  'Tertiary color' => 'Couleur tertiaire',
+  'Accent color' => 'Couleur d\'accentuation',
 );

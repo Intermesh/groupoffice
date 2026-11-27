@@ -923,7 +923,7 @@ return array (
   'Theme' => 'Tema',
   'Paper' => 'Papir',
   'Compact' => 'Kompaktno',
-  'Light' => 'Svetloba',
+  'Light' => 'Svetlo',
   'Dark' => 'Temno',
   'System default' => 'Sistem privzeto',
   'System' => 'Sistem',
@@ -1235,4 +1235,8 @@ return array (
   'File' => 'Mapa',
   'Drop files here' => 'Spustite datoteke tukaj',
   'Accessed at' => 'Dostop do',
+  'Header bar, Input focus, Active elements, Links' => 'Vrstica glave, fokus vnosa, aktivni elementi, povezave',
+  'Primary actions, Save buttons' => 'Glavna dejanja, gumbi za shranjevanje',
+  'Active tab indication' => 'Oznaka aktivnega zavihka',
+  'Badges, warnings' => 'Značke, opozorila',
 );

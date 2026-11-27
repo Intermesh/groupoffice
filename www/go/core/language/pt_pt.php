@@ -902,4 +902,10 @@ return array (
   'Demo' => 'Demonstração',
   'Do you want to generate some fake demonstration data? This will take about one or two minutes to generate.' => 'Quer gerar dados de demonstração? Esta operação pode demorar alguns minutos.',
   'N/A' => 'Não disponível',
+  'Light' => 'Claro',
+  'Dark' => 'Escuro',
+  'Header bar, Input focus, Active elements, Links' => 'Barra de cabeçalho, foco de entrada, elementos ativos, ligações',
+  'Primary actions, Save buttons' => 'Ações principais, botões de guardar',
+  'Active tab indication' => 'Indicação do separador ativo',
+  'Badges, warnings' => 'Emblemas, avisos',
 );

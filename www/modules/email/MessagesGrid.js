@@ -288,8 +288,13 @@ GO.email.MessagesGrid = function(config){
 				scope: this
 			},
 			this.showFlaggedButton
-		]
+		],
+		listeners: {
+			beforeshow: this.loadLabelFilters,
+			scope: this
+		}
 	});
+	this.labelFilterItems = [];
 
 
 	if(!config.hideSearch) {
@@ -489,6 +494,90 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	{
 		GO.email.messagesGrid.store.baseParams['flagged']=pressed ? 1 : 0;
 		GO.email.messagesGrid.store.load();
+	},
+
+	/**
+	 * Adds the labels of the current account to the more menu, so the user can show only messages with that label.
+	 * Labels belong to an account, so they are loaded again when the account changes.
+	 */
+	loadLabelFilters : function()
+	{
+		const accountId = this.store.baseParams.account_id;
+		if(!accountId || this.labelFiltersAccountId == accountId) {
+			return;
+		}
+		this.labelFiltersAccountId = accountId;
+
+		GO.request({
+			url: "email/label/store",
+			params: {
+				account_id: accountId
+			},
+			success: function(response, options, result) {
+				if(this.labelFiltersAccountId != accountId) {
+					return;
+				}
+
+				this.labelFilterItems.forEach(function(item) {
+					this.settingsMenu.remove(item);
+				}, this);
+				this.labelFilterItems = [];
+
+				if(!result.results.length) {
+					return;
+				}
+
+				this.labelFilterItems.push(this.settingsMenu.add('-'));
+				result.results.forEach(function(label) {
+					this.labelFilterItems.push(this.settingsMenu.add(new Ext.menu.CheckItem({
+						text: Ext.util.Format.htmlEncode(label.name),
+						flag: label.flag,
+						checked: this.store.baseParams.label === label.flag,
+						listeners: {
+							render: function(item) {
+								item.textEl.setStyle('color', '#' + label.color);
+							},
+							checkchange: this.toggleLabel,
+							scope: this
+						}
+					})));
+				}, this);
+				this.settingsMenu.doLayout();
+				if(this.settingsMenu.el) {
+					this.settingsMenu.el.sync();
+				}
+			},
+			scope: this
+		});
+	},
+
+	/**
+	 * Shows only the messages with the checked label. One label can be checked at a time.
+	 */
+	toggleLabel : function(item, checked)
+	{
+		if(checked) {
+			this.labelFilterItems.forEach(function(other) {
+				if(other !== item && other.setChecked) {
+					other.setChecked(false, true);
+				}
+			});
+			this.store.baseParams.label = item.flag;
+		} else if(this.store.baseParams.label === item.flag) {
+			delete this.store.baseParams.label;
+		} else {
+			return;
+		}
+		this.store.load();
+	},
+
+	/**
+	 * Removes the label filter, because labels differ per account.
+	 */
+	resetLabelFilter : function()
+	{
+		delete this.store.baseParams.label;
+		this.labelFiltersAccountId = null;
 	},
 
 	createQtipTemplate: function(record){

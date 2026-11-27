@@ -2280,4 +2280,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Read the documentation' => 'Lees de documentatie',
   'What\'s new' => 'Wat is er nieuw',
   'Full changelog' => 'Volledige wijzigingslog',
+  'Tertiary color' => 'Tertiaire kleur',
 );

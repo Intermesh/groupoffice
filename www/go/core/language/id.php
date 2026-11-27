@@ -843,4 +843,13 @@ return array (
   'Recurrence' => 'Pengulangan',
   'Repeat every' => 'Ulangi setiap',
   'At days' => 'Pada hari',
+  'Light' => 'Terang',
+  'Dark' => 'Gelap',
+  'Secondary color' => 'Warna sekunder',
+  'Tertiary color' => 'Warna tersier',
+  'Accent color' => 'Warna aksen',
+  'Header bar, Input focus, Active elements, Links' => 'Bilah header, fokus input, elemen aktif, tautan',
+  'Primary actions, Save buttons' => 'Tindakan utama, tombol simpan',
+  'Active tab indication' => 'Penanda tab aktif',
+  'Badges, warnings' => 'Lencana, peringatan',
 );

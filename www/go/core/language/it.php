@@ -1094,7 +1094,7 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
   'Login message' => 'Messaggio all\'accesso',
   'This message will show on the login screen' => 'Questo messaggio verrà visualizzato nella schermata di accesso',
   'Appearance' => 'Aspetto',
-  'Primary color' => 'Colore primario:',
+  'Primary color' => 'Colore primario',
   'Secondary color' => 'Colore secondario',
   'Accent color' => 'Colore accento',
   'Notifications' => 'Notifiche',
@@ -1283,7 +1283,7 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
   'Permission denied' => 'Permesso negato',
   'Paper' => 'Carta',
   'Compact' => 'Compatto',
-  'Light' => 'Leggero',
+  'Light' => 'Chiaro',
   'Dark' => 'Scuro',
   'System default' => 'Impostazioni predefinite di sistema',
   'Use shortcut to send forms' => 'Usa scorciatoie per inviare formulari',
@@ -2191,4 +2191,5 @@ Fai clic sul link qui sotto (o incollalo in un browser) per cambiare la password
 %s
 
 Se non hai richiesto una nuova password, elimina questa e-mail.',
+  'Tertiary color' => 'Colore terziario',
 );

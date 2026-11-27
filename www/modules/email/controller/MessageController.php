@@ -235,6 +235,15 @@ class MessageController extends \GO\Base\Controller\AbstractController
 			throw new NotFound();
 		}
 
+		//passed when only messages with this label should be shown. Only labels of the account are accepted so the
+		//client can't put anything else in the IMAP search.
+		if(!empty($params['label'])) {
+			$labels = Label::model()->getAccountLabels($account->id);
+			if(isset($labels[$params['label']])) {
+				$query = trim($query . ' KEYWORD ' . $labels[$params['label']]->flag);
+			}
+		}
+
 		// Filters move mail and expunge removes deleted mail, so they need "Use account". Users who may only read the
 		// account just see the mailbox as it is.
 		$mayChangeMail = $account->checkPermissionLevel(Acl::CREATE_PERMISSION);
@@ -1660,11 +1669,48 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		// HTML, SVG and XML are downloaded even when $inline is true. See Response::isSafeInlineContentType().
 		$imap = $account->openImapConnection($params['mailbox']);
-		
+
+		$mimeType = $file->mimeType();
+		if (str_starts_with($mimeType, 'audio/') || str_starts_with($mimeType, 'video/')) {
+			// Media players request byte ranges and Safari doesn't play media without them. Save the part so
+			// go\core\fs\File::output() can serve the ranges.
+			$this->outputMediaAttachment($imap, $params, $file->name(), $mimeType, $inline);
+			return;
+		}
+
 		\GO\Base\Util\Http::outputDownloadHeaders($file,$inline,true);
 		$fp =fopen("php://output",'w');
 		$imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false, $fp);
 		fclose($fp);
+	}
+
+	/**
+	 * Output an audio or video attachment with support for HTTP range requests.
+	 *
+	 * @param \GO\Base\Mail\Imap $imap Connection with the mailbox of the message selected
+	 * @param array $params Request parameters of actionAttachment()
+	 * @param string $name File name for the Content-Disposition header
+	 * @param string $mimeType Content type of the attachment
+	 * @param bool $inline Show the attachment inside the browser
+	 * @throws \Exception
+	 */
+	private function outputMediaAttachment(\GO\Base\Mail\Imap $imap, array $params, string $name, string $mimeType, bool $inline): void
+	{
+		$tmpFile = go()->getTmpFolder()->getFile(uniqid('attachment_', true));
+		try {
+			if (!$imap->save_to_file($params['uid'], $tmpFile->getPath(), $params['number'], $params['encoding'])) {
+				throw new \Exception("Could not save attachment");
+			}
+
+			$tmpFile->output(true, false, [
+				'Content-Type' => $mimeType,
+				'Content-Disposition' => \go\core\http\Response::contentDisposition($inline ? 'inline' : 'attachment', $name)
+			], $inline);
+		} finally {
+			if ($tmpFile->exists()) {
+				$tmpFile->delete();
+			}
+		}
 	}
 
 	protected function actionTnefAttachmentFromTempFile(array $params)

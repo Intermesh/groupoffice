@@ -2322,4 +2322,7 @@ Pokud jste o nové heslo nežádali, tento e-mail prosím smažte.',
   'Read the documentation' => 'Přečíst dokumentaci',
   'What\'s new' => 'Co je nového',
   'Full changelog' => 'Úplný seznam změn',
+  'Secondary color' => 'Sekundární barva',
+  'Tertiary color' => 'Terciární barva',
+  'Accent color' => 'Barva zvýraznění',
 );
