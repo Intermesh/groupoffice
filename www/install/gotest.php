@@ -502,19 +502,6 @@ function test_system() :array
 	
 	if(class_exists('GO')) {
 		
-		if($sgInstalled) {
-
-			$moduleFolder = Environment::get()->getInstallFolder()->getFolder('go' . DIRECTORY_SEPARATOR . 'modules');
-			$test['name'] = 'Modules directory writable';
-			$test['showSuccessFeedback'] = false;
-			$test['fatal'] = false;
-			$test['pass'] = $moduleFolder->isWritable() || $moduleFolder->getFolder('studio')->isWritable();
-			$test['feedback'] = "Warning: 'modules' subdirectory is not writable. You will not be able to use GroupOffice Studio.";
-
-			$tests[] = $test;
-
-		}
-
 		try {
 			if (GO\Base\Db\Utils::tableExists('core_module')) {
 				$test['name'] = 'Protected files path';
