@@ -47,7 +47,8 @@ try {
 			exit();
 		}
 
-		$blob->output();
+		// the logo is only used as an image
+		$blob->output(false, 'image');
 	}
 
 	$parts = explode("/", $_SERVER['PATH_INFO']);

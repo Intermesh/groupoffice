@@ -50,12 +50,6 @@ try {
 
 		$inline = !empty($_GET['inline']);
 
-		// prevent html to render on same domain having access to all global JS stuff
-		if(!Response::isSafeInlineContentType($blob->type)) {
-			$inline = false;
-			$blob->type = 'text/plain';
-		}
-
 		try {
 			$ua_info = \donatj\UserAgent\parse_user_agent();
 			if ($ua_info['browser'] == 'Safari' && substr(strtolower($blob->name), -5) == '.webm' && !strstr(Request::get()->getUri(), 'webm')) {

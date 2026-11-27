@@ -122,4 +122,34 @@ class ResponseTest extends TestCase
 			[''],
 		];
 	}
+
+	public static function downloadContentTypeProvider(): array
+	{
+		return [
+			'svg as image' => ['image/svg+xml', 'image', 'image/svg+xml'],
+			'svg as image in capitals' => ['image/svg+xml', 'Image', 'image/svg+xml'],
+			'svg opened as page' => ['image/svg+xml', 'document', 'text/plain'],
+			'svg in iframe' => ['image/svg+xml', 'iframe', 'text/plain'],
+			'svg in object' => ['image/svg+xml', 'object', 'text/plain'],
+			'svg in embed' => ['image/svg+xml', 'embed', 'text/plain'],
+			'svg without header' => ['image/svg+xml', null, 'text/plain'],
+			'svg with empty header' => ['image/svg+xml', '', 'text/plain'],
+			'html opened as page' => ['text/html; charset=utf-8', 'document', 'text/plain'],
+			'xml without header' => ['application/xml', null, 'text/plain'],
+			'no type' => [null, 'document', 'text/plain'],
+			'png as image' => ['image/png', 'image', 'image/png'],
+			'png opened as page' => ['image/png', 'document', 'image/png'],
+			'png in object' => ['image/png', 'object', 'image/png'],
+			'pdf without header' => ['application/pdf', null, 'application/pdf'],
+		];
+	}
+
+	/**
+	 * HTML, SVG and XML only keep their type when the browser loads them as an image
+	 */
+	#[DataProvider('downloadContentTypeProvider')]
+	public function testDownloadContentType(?string $contentType, ?string $fetchDest, string $expected)
+	{
+		$this->assertSame($expected, Response::downloadContentType($contentType, $fetchDest));
+	}
 }

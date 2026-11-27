@@ -157,6 +157,30 @@ class Response extends Singleton{
 	}
 
 	/**
+	 * Content type to send for a file download.
+	 *
+	 * HTML, SVG and XML are sent as text/plain, so a browser that opens the URL doesn't run the scripts in them. They
+	 * keep their type when the browser loads them as an image ("Sec-Fetch-Dest: image", from an img element or a CSS
+	 * background), because scripts don't run in an image and an SVG sent as text/plain doesn't show. Web pages can't
+	 * set this header, so a link can't fake it. Browsers only send it to HTTPS and localhost.
+	 *
+	 * The result depends on the header for the types that {@see isSafeInlineContentType()} refuses. Send
+	 * "Vary: Sec-Fetch-Dest" with those, so a browser cache doesn't reuse the response for another destination.
+	 *
+	 * @param string|null $contentType Content type of the file
+	 * @param string|null $fetchDest Value of the "Sec-Fetch-Dest" request header, null when it wasn't sent
+	 * @return string
+	 */
+	public static function downloadContentType(?string $contentType, ?string $fetchDest): string
+	{
+		if (self::isSafeInlineContentType($contentType) || strtolower(trim((string) $fetchDest)) === 'image') {
+			return (string) $contentType;
+		}
+
+		return 'text/plain';
+	}
+
+	/**
 	 * Security headers to send with a file download.
 	 *
 	 * "X-Content-Type-Options: nosniff" makes the browser use the content type that is sent, instead of guessing a

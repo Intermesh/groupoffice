@@ -269,4 +269,52 @@ class BlobTest extends TestCase
 	{
 		return go()->getDbConnection()->selectSingleValue('name')->from('core_blob')->where('id', '=', $id)->single();
 	}
+
+	private function blobOfType(string $type, string $name): Blob
+	{
+		$blob = new Blob();
+		$blob->type = $type;
+		$blob->name = $name;
+		return $blob;
+	}
+
+	/**
+	 * An SVG opened in the browser is downloaded as text/plain, also when it's asked inline. The disposition is
+	 * decided on the real type, because text/plain itself is safe to show inline.
+	 */
+	public function testSvgOpenedAsPageIsDownloadedAsText()
+	{
+		$headers = $this->blobOfType('image/svg+xml', 'logo.svg')->getOutputHeaders(true, 'document');
+
+		$this->assertSame('text/plain', $headers['Content-Type']);
+		$this->assertStringStartsWith('attachment;', $headers['Content-Disposition']);
+		$this->assertSame('Sec-Fetch-Dest', $headers['Vary']);
+	}
+
+	public function testSvgWithoutFetchDestIsDownloadedAsText()
+	{
+		// the CLI request has no Sec-Fetch-Dest header, like a browser that doesn't send it
+		$headers = $this->blobOfType('image/svg+xml', 'logo.svg')->getOutputHeaders(true);
+
+		$this->assertSame('text/plain', $headers['Content-Type']);
+		$this->assertStringStartsWith('attachment;', $headers['Content-Disposition']);
+	}
+
+	public function testSvgLoadedAsImageKeepsType()
+	{
+		$headers = $this->blobOfType('image/svg+xml', 'logo.svg')->getOutputHeaders(true, 'image');
+
+		$this->assertSame('image/svg+xml', $headers['Content-Type']);
+		$this->assertStringStartsWith('attachment;', $headers['Content-Disposition']);
+		$this->assertSame('Sec-Fetch-Dest', $headers['Vary']);
+	}
+
+	public function testSafeTypeIsShownInline()
+	{
+		$headers = $this->blobOfType('image/png', 'photo.png')->getOutputHeaders(true, 'document');
+
+		$this->assertSame('image/png', $headers['Content-Type']);
+		$this->assertStringStartsWith('inline;', $headers['Content-Disposition']);
+		$this->assertArrayNotHasKey('Vary', $headers);
+	}
 }

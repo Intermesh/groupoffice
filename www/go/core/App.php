@@ -1014,7 +1014,8 @@ namespace go\core {
 				exit();
 			}
 
-			$blob->output(true);
+			// the logo is only used as an image
+			$blob->output(true, 'image');
 		}
 
 
