@@ -3,11 +3,6 @@ import {SystemSettings} from "./SystemSettings.js";
 import {onlineMeetingServices} from "@intermesh/community-calendar";
 import {t, translate} from "@intermesh/goui";
 
-
-function b64UrlEncode (data:string) {
-	const base64 = btoa(data);
-	return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
 /**
  * Random room name of 16 hexadecimal characters, like the server creates in Settings::createMeetingUri().
  * Jitsi Meet doesn't accept every character in a room name, such as "-".
