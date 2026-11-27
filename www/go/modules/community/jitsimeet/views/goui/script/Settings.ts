@@ -23,7 +23,11 @@ export class Settings extends Component {
 					checkbox({label: t("Enable JWT authentification"), name: "videoJwtEnabled"}),
 					textfield({type: "password", label: t('App Secret'), name: 'videoJwtSecret'}),
 					textfield({label: t('App ID'), name: 'videoJwtAppId',}),
-
+				h3({html: t('JaaS (8x8)')}),
+				checkbox({label: t('Enable JaaS'), name: 'jaasEnabled'}),
+				textfield({label: t('JaaS App ID'), name: 'jaasAppId'}),
+				textfield({label: t('JaaS Key ID'), name: 'jaasKeyId'}),
+				textfield({label: t('Private key file path'), name: 'jaasPrivateKeyPath'}),
 				)
 			)
 		);

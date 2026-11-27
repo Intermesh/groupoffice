@@ -39,11 +39,13 @@ modules.register({
 				const room = randomRoom();
 
 				let uri;
-				if (!m.settings.videoJwtEnabled) {
+				if (!m.settings.videoJwtEnabled && !m.settings.jaasEnabled) {
 					uri = m.settings.videoUri + room;
 				}else {
 					const response = await client.jmap("community/jitsimeet/Auth/generateJWT", {room}, 'pJwt');
-					uri = m.settings.videoUri + room + '?jwt=' + response.jwt
+					uri = m.settings.jaasEnabled
+						? m.settings.videoUri.replace(/\/$/, '') + '/' + m.settings.jaasAppId + '/' + room + '?jwt=' + response.jwt
+						: m.settings.videoUri + room + '?jwt=' + response.jwt
 				}
 
 				const calendarEvent = calendarEventForm.value;
