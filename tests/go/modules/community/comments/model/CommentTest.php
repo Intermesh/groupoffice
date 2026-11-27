@@ -232,4 +232,94 @@ class CommentTest extends TestCase
 			go()->setAuthState($authState);
 		}
 	}
+
+	private function createDraft(string $text): Comment
+	{
+		$authState = go()->getAuthState();
+		go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+		try {
+			return self::createComment(Comment::SECTION_DRAFT, $text);
+		} finally {
+			go()->setAuthState($authState);
+		}
+	}
+
+	private function set(int $userId, array $params): \ArrayObject
+	{
+		go()->setAuthState(new TemporaryState($userId));
+		return (new CommentController())->set($params);
+	}
+
+	/**
+	 * Everyone with write access to the entity may edit and send a draft of someone else. It's then posted on behalf
+	 * of the user who sends it.
+	 */
+	public function testWriterMayEditAndSendDraftOfOthers(): void
+	{
+		$draft = $this->createDraft('Draft of the admin');
+		try {
+			$result = $this->set(self::$writer->id, ['update' => [$draft->id => ['text' => 'Edited draft']]]);
+			$this->assertArrayHasKey($draft->id, $result['updated'], 'The writer may edit the draft');
+
+			$result = $this->set(self::$writer->id, ['update' => [$draft->id => ['section' => null]]]);
+			$this->assertArrayHasKey($draft->id, $result['updated'], 'The writer may send the draft');
+
+			$posted = Comment::findById($draft->id);
+			$this->assertNull($posted->section);
+			$this->assertEquals('Edited draft', $posted->text);
+			$this->assertEquals(self::$writer->id, $posted->createdBy, 'The draft is sent on behalf of the sender');
+
+			$result = $this->set(self::$writer->id, ['update' => [$draft->id => ['text' => 'Changed after sending']]]);
+			$this->assertArrayHasKey($draft->id, $result['updated'], 'The sender owns the comment now');
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			Comment::delete(['id' => $draft->id]);
+		}
+	}
+
+	public function testWriterMayDeleteDraftOfOthers(): void
+	{
+		$draft = $this->createDraft('Draft to delete');
+		try {
+			$result = $this->set(self::$writer->id, ['destroy' => [$draft->id]]);
+			$this->assertEquals([$draft->id], $result['destroyed']);
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			Comment::delete(['id' => $draft->id]);
+		}
+	}
+
+	/**
+	 * The guard: a user who may only read the entity can't change, send or delete a draft, and a writer still can't
+	 * change other comments of others
+	 */
+	public function testReaderMayNotChangeDraftAndWriterNotOtherComments(): void
+	{
+		$draft = $this->createDraft('Draft the reader may not send');
+		try {
+			$result = $this->set(self::$reader->id, [
+				'update' => [$draft->id => ['section' => null]],
+				'destroy' => [$draft->id]
+			]);
+			$this->assertArrayHasKey($draft->id, $result['notUpdated']);
+			$this->assertArrayHasKey($draft->id, $result['notDestroyed']);
+
+			$result = $this->set(self::$writer->id, [
+				'update' => [
+					self::$public->id => ['text' => 'Changed by the writer'],
+					self::$private->id => ['section' => Comment::SECTION_DRAFT]
+				],
+				'destroy' => [self::$public->id]
+			]);
+			$this->assertArrayHasKey(self::$public->id, $result['notUpdated']);
+			$this->assertArrayHasKey(self::$private->id, $result['notUpdated'], 'Making a comment a draft gives no access');
+			$this->assertArrayHasKey(self::$public->id, $result['notDestroyed']);
+
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			$this->assertEquals(Comment::SECTION_DRAFT, Comment::findById($draft->id)->section);
+		} finally {
+			go()->setAuthState(new TemporaryState(User::ID_SUPER_ADMIN));
+			Comment::delete(['id' => $draft->id]);
+		}
+	}
 }
